@@ -360,179 +360,69 @@ body {
   </div>
 </div>
 
-<!-- ===== SCREEN EDU: ANIMATED EDUCATIONAL INTRO ===== -->
-<div data-id="36" id="screen-edu" class="screen">
-  <div data-id="37" style="max-width:520px;width:100%;padding:2rem 1.5rem;margin:0 auto;display:flex;flex-direction:column;align-items:center;min-height:100vh;justify-content:center;">
+<!-- ===== SCREEN REVEAL: PERSONALIZED NARRATED REVEAL ===== -->
+<div id="screen-reveal" class="screen">
+  <div style="max-width:520px;width:100%;padding:2rem 1.5rem;margin:0 auto;display:flex;flex-direction:column;align-items:center;min-height:100vh;justify-content:center;">
 
-    <!-- Progress dots -->
-    <div data-id="38" id="edu-dots" style="display:flex;gap:8px;margin-bottom:2rem;">
-      <div data-id="39" class="edu-dot active" data-idx="0"></div>
-      <div data-id="40" class="edu-dot" data-idx="1"></div>
-      <div data-id="41" class="edu-dot" data-idx="2"></div>
+    <p class="label-mono mb-3" style="color:var(--accent-gold);font-size:0.6rem;letter-spacing:0.4em;">✦ YOUR BLUEPRINT ✦</p>
+    <h2 id="reveal-name" class="gradient-title font-serif text-3xl font-bold mb-4" style="line-height:1.1;text-align:center;"></h2>
+
+    <!-- Orb with Life Path number -->
+    <div class="reading-orb" id="reveal-orb" style="margin:0.8rem 0;">
+      <span class="lp-number" id="reveal-lp-number"></span>
     </div>
 
-    <!-- Panel container -->
-    <div data-id="42" id="edu-panels" style="width:100%;position:relative;min-height:480px;">
-
-      <!-- PANEL 0: NUMEROLOGY -->
-      <div data-id="43" class="edu-panel active" id="edu-panel-0">
-        <div data-id="44" style="text-align:center;margin-bottom:1.2rem;">
-          <div data-id="45" style="font-family:'Courier New',monospace;font-size:0.55rem;letter-spacing:0.5em;color:#c9a84c;margin-bottom:0.4rem;">✦ THE FIRST SYSTEM ✦</div>
-          <h2 data-id="46" style="font:700 1.6rem Georgia,serif;background:linear-gradient(135deg,#c9a84c,#f0d070);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:0 0 0.5rem;">Numerology</h2>
-          <p data-id="47" style="color:#9b8ec4;font-size:0.88rem;line-height:1.6;margin:0;">Every name and birth date vibrates at a unique frequency. Numerology decodes these vibrations into a Life Path number — a blueprint revealing your soul's purpose, natural strengths, and life lessons.</p>
-        </div>
-
-        <!-- Animated number grid -->
-        <div data-id="48" id="num-anim" style="display:flex;justify-content:center;flex-wrap:wrap;gap:12px;margin:1.2rem 0;"></div>
-
-        <!-- Life path example -->
-        <div data-id="49" id="num-calc-demo" style="text-align:center;margin-top:1rem;padding:1rem;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);border-radius:12px;">
-          <div data-id="50" style="font-size:0.72rem;letter-spacing:0.2em;color:#c9a84c;margin-bottom:0.5rem;">LIFE PATH CALCULATION</div>
-          <div data-id="51" id="num-demo-text" style="font-family:'Courier New',monospace;color:#e8e0ff;font-size:0.9rem;min-height:2rem;"></div>
-          <div data-id="52" id="num-demo-result" style="font-size:2.2rem;font-weight:700;color:#f0d070;margin-top:0.5rem;opacity:0;transition:opacity 0.8s;"></div>
-        </div>
+    <!-- 3-card row: LP · Sign · Sephirah -->
+    <div style="display:flex;gap:0.7rem;flex-wrap:wrap;justify-content:center;margin:0.8rem 0;">
+      <div style="text-align:center;padding:0.5rem 0.9rem;background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.22);border-radius:10px;">
+        <div style="font-size:0.52rem;letter-spacing:0.2em;color:#c9a84c;margin-bottom:0.2rem;">LIFE PATH</div>
+        <div id="reveal-lp-label" style="font:700 0.95rem Georgia,serif;color:#f0d070;"></div>
       </div>
-
-      <!-- PANEL 1: TREE OF LIFE -->
-      <div data-id="53" class="edu-panel" id="edu-panel-1">
-        <div data-id="54" style="text-align:center;margin-bottom:1rem;">
-          <div data-id="55" style="font-family:'Courier New',monospace;font-size:0.55rem;letter-spacing:0.5em;color:#b08aff;margin-bottom:0.4rem;">✦ THE SECOND SYSTEM ✦</div>
-          <h2 data-id="56" style="font:700 1.6rem Georgia,serif;background:linear-gradient(135deg,#e8e0ff,#b08aff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:0 0 0.5rem;">The Tree of Life</h2>
-          <p data-id="57" style="color:#9b8ec4;font-size:0.88rem;line-height:1.6;margin:0;">The Kabbalistic Tree of Life maps the ten divine attributes — called Sephiroth — through which the infinite expresses itself. Your numerology places you at a specific point on this cosmic map.</p>
-        </div>
-
-        <!-- Animated SVG Tree of Life -->
-        <div data-id="58" style="display:flex;justify-content:center;">
-          <svg data-id="59" id="edu-tree-svg" viewBox="0 0 220 320" width="220" height="320" style="overflow:visible;">
-            <g data-id="60" id="edu-tree-paths" opacity="0.3">
-              <line data-id="61" x1="60" y1="80" x2="60" y2="160" stroke="#b08aff" stroke-width="1.2"/>
-              <line data-id="62" x1="60" y1="160" x2="60" y2="240" stroke="#b08aff" stroke-width="1.2"/>
-              <line data-id="63" x1="160" y1="80" x2="160" y2="160" stroke="#b08aff" stroke-width="1.2"/>
-              <line data-id="64" x1="160" y1="160" x2="160" y2="240" stroke="#b08aff" stroke-width="1.2"/>
-              <line data-id="65" x1="110" y1="20" x2="110" y2="80" stroke="#c9a84c" stroke-width="1.5"/>
-              <line data-id="66" x1="110" y1="80" x2="110" y2="160" stroke="#c9a84c" stroke-width="1.5"/>
-              <line data-id="67" x1="110" y1="160" x2="110" y2="240" stroke="#c9a84c" stroke-width="1.5"/>
-              <line data-id="68" x1="110" y1="240" x2="110" y2="300" stroke="#c9a84c" stroke-width="1.5"/>
-              <line data-id="69" x1="60" y1="80" x2="160" y2="80" stroke="#b08aff" stroke-width="1"/>
-              <line data-id="70" x1="60" y1="160" x2="160" y2="160" stroke="#b08aff" stroke-width="1"/>
-              <line data-id="71" x1="60" y1="240" x2="160" y2="240" stroke="#b08aff" stroke-width="1"/>
-              <line data-id="72" x1="110" y1="20" x2="60" y2="80" stroke="#b08aff" stroke-width="1"/>
-              <line data-id="73" x1="110" y1="20" x2="160" y2="80" stroke="#b08aff" stroke-width="1"/>
-              <line data-id="74" x1="60" y1="80" x2="110" y2="160" stroke="#b08aff" stroke-width="1"/>
-              <line data-id="75" x1="160" y1="80" x2="110" y2="160" stroke="#b08aff" stroke-width="1"/>
-              <line data-id="76" x1="60" y1="160" x2="110" y2="240" stroke="#b08aff" stroke-width="1"/>
-              <line data-id="77" x1="160" y1="160" x2="110" y2="240" stroke="#b08aff" stroke-width="1"/>
-              <line data-id="78" x1="60" y1="80" x2="160" y2="160" stroke="#b08aff" stroke-width="0.7" stroke-dasharray="3,3"/>
-              <line data-id="79" x1="160" y1="80" x2="60" y2="160" stroke="#b08aff" stroke-width="0.7" stroke-dasharray="3,3"/>
-              <line data-id="80" x1="60" y1="160" x2="160" y2="240" stroke="#b08aff" stroke-width="0.7" stroke-dasharray="3,3"/>
-              <line data-id="81" x1="160" y1="160" x2="60" y2="240" stroke="#b08aff" stroke-width="0.7" stroke-dasharray="3,3"/>
-              <line data-id="82" x1="110" y1="160" x2="60" y2="240" stroke="#b08aff" stroke-width="0.7"/>
-              <line data-id="83" x1="110" y1="160" x2="160" y2="240" stroke="#b08aff" stroke-width="0.7"/>
-              <line data-id="84" x1="60" y1="240" x2="110" y2="300" stroke="#b08aff" stroke-width="1"/>
-              <line data-id="85" x1="160" y1="240" x2="110" y2="300" stroke="#b08aff" stroke-width="1"/>
-            </g>
-            <g data-id="86" id="edu-tree-nodes">
-              <g data-id="87" class="edu-seph" data-name="Kether" data-desc="The Crown — Pure divine consciousness" style="opacity:0">
-                <circle data-id="88" cx="110" cy="20" r="16" fill="rgba(255,255,255,0.12)" stroke="#ffffff" stroke-width="1.5"/>
-                <text data-id="89" x="110" y="16" text-anchor="middle" fill="#ffffff" font-size="7" font-family="Georgia">Kether</text>
-                <text data-id="90" x="110" y="25" text-anchor="middle" fill="#ffffff" font-size="6" font-family="Georgia">1</text>
-              </g>
-              <g data-id="91" class="edu-seph" data-name="Chokmah" data-desc="Wisdom — Divine masculine spark" style="opacity:0">
-                <circle data-id="92" cx="160" cy="80" r="16" fill="rgba(176,138,255,0.15)" stroke="#b08aff" stroke-width="1.5"/>
-                <text data-id="93" x="160" y="76" text-anchor="middle" fill="#e8e0ff" font-size="6" font-family="Georgia">Chokmah</text>
-                <text data-id="94" x="160" y="85" text-anchor="middle" fill="#e8e0ff" font-size="6" font-family="Georgia">2</text>
-              </g>
-              <g data-id="95" class="edu-seph" data-name="Binah" data-desc="Understanding — The Great Mother, form" style="opacity:0">
-                <circle data-id="96" cx="60" cy="80" r="16" fill="rgba(176,138,255,0.15)" stroke="#b08aff" stroke-width="1.5"/>
-                <text data-id="97" x="60" y="76" text-anchor="middle" fill="#e8e0ff" font-size="7" font-family="Georgia">Binah</text>
-                <text data-id="98" x="60" y="85" text-anchor="middle" fill="#e8e0ff" font-size="6" font-family="Georgia">3</text>
-              </g>
-              <g data-id="99" class="edu-seph" data-name="Chesed" data-desc="Mercy — Love, grace, abundance" style="opacity:0">
-                <circle data-id="100" cx="160" cy="160" r="16" fill="rgba(201,168,76,0.15)" stroke="#c9a84c" stroke-width="1.5"/>
-                <text data-id="101" x="160" y="156" text-anchor="middle" fill="#f0d070" font-size="7" font-family="Georgia">Chesed</text>
-                <text data-id="102" x="160" y="165" text-anchor="middle" fill="#f0d070" font-size="6" font-family="Georgia">4</text>
-              </g>
-              <g data-id="103" class="edu-seph" data-name="Geburah" data-desc="Severity — Strength, discipline, judgment" style="opacity:0">
-                <circle data-id="104" cx="60" cy="160" r="16" fill="rgba(255,80,80,0.15)" stroke="#ff8080" stroke-width="1.5"/>
-                <text data-id="105" x="60" y="156" text-anchor="middle" fill="#ff9ed2" font-size="6" font-family="Georgia">Geburah</text>
-                <text data-id="106" x="60" y="165" text-anchor="middle" fill="#ff9ed2" font-size="6" font-family="Georgia">5</text>
-              </g>
-              <g data-id="107" class="edu-seph" data-name="Tiphareth" data-desc="Beauty — Harmony, the heart centre" style="opacity:0">
-                <circle data-id="108" cx="110" cy="160" r="18" fill="rgba(255,215,0,0.18)" stroke="#ffd700" stroke-width="2"/>
-                <text data-id="109" x="110" y="156" text-anchor="middle" fill="#ffd700" font-size="6" font-family="Georgia">Tiphareth</text>
-                <text data-id="110" x="110" y="165" text-anchor="middle" fill="#ffd700" font-size="6" font-family="Georgia">6</text>
-              </g>
-              <g data-id="111" class="edu-seph" data-name="Netzach" data-desc="Victory — Desire, emotion, creativity" style="opacity:0">
-                <circle data-id="112" cx="160" cy="240" r="16" fill="rgba(100,220,120,0.15)" stroke="#88dd99" stroke-width="1.5"/>
-                <text data-id="113" x="160" y="236" text-anchor="middle" fill="#88dd99" font-size="7" font-family="Georgia">Netzach</text>
-                <text data-id="114" x="160" y="245" text-anchor="middle" fill="#88dd99" font-size="6" font-family="Georgia">7</text>
-              </g>
-              <g data-id="115" class="edu-seph" data-name="Hod" data-desc="Splendour — Intellect, communication" style="opacity:0">
-                <circle data-id="116" cx="60" cy="240" r="16" fill="rgba(100,180,255,0.15)" stroke="#88bbff" stroke-width="1.5"/>
-                <text data-id="117" x="60" y="236" text-anchor="middle" fill="#88bbff" font-size="7" font-family="Georgia">Hod</text>
-                <text data-id="118" x="60" y="245" text-anchor="middle" fill="#88bbff" font-size="6" font-family="Georgia">8</text>
-              </g>
-              <g data-id="119" class="edu-seph" data-name="Yesod" data-desc="Foundation — Dreams, the subconscious" style="opacity:0">
-                <circle data-id="120" cx="110" cy="240" r="16" fill="rgba(180,130,255,0.18)" stroke="#c0a0ff" stroke-width="1.5"/>
-                <text data-id="121" x="110" y="236" text-anchor="middle" fill="#c0a0ff" font-size="7" font-family="Georgia">Yesod</text>
-                <text data-id="122" x="110" y="245" text-anchor="middle" fill="#c0a0ff" font-size="6" font-family="Georgia">9</text>
-              </g>
-              <g data-id="123" class="edu-seph" data-name="Malkuth" data-desc="Kingdom — The physical world, manifestation" style="opacity:0">
-                <circle data-id="124" cx="110" cy="300" r="16" fill="rgba(139,90,43,0.2)" stroke="#b8860b" stroke-width="1.5"/>
-                <text data-id="125" x="110" y="296" text-anchor="middle" fill="#d4a050" font-size="6" font-family="Georgia">Malkuth</text>
-                <text data-id="126" x="110" y="305" text-anchor="middle" fill="#d4a050" font-size="6" font-family="Georgia">10</text>
-              </g>
-            </g>
-          </svg>
-        </div>
-
-        <!-- Seph tooltip -->
-        <div data-id="127" id="edu-seph-tip" style="text-align:center;min-height:2.2rem;margin-top:0.5rem;color:#c9a84c;font-size:0.8rem;font-style:italic;transition:opacity 0.4s;"></div>
+      <div style="text-align:center;padding:0.5rem 0.9rem;background:rgba(176,138,255,0.07);border:1px solid rgba(176,138,255,0.22);border-radius:10px;">
+        <div style="font-size:0.52rem;letter-spacing:0.2em;color:#b08aff;margin-bottom:0.2rem;">SUN SIGN</div>
+        <div id="reveal-sign-label" style="font:700 0.95rem Georgia,serif;color:#e8e0ff;"></div>
       </div>
-
-      <!-- PANEL 2: ASTROLOGY -->
-      <div data-id="128" class="edu-panel" id="edu-panel-2">
-        <div data-id="129" style="text-align:center;margin-bottom:1rem;">
-          <div data-id="130" style="font-family:'Courier New',monospace;font-size:0.55rem;letter-spacing:0.5em;color:#ff9ed2;margin-bottom:0.4rem;">✦ THE THIRD SYSTEM ✦</div>
-          <h2 data-id="131" style="font:700 1.6rem Georgia,serif;background:linear-gradient(135deg,#ff9ed2,#b08aff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:0 0 0.5rem;">Astrology</h2>
-          <p data-id="132" style="color:#9b8ec4;font-size:0.88rem;line-height:1.6;margin:0;">At the moment you were born, the planets held specific positions in the sky. These cosmic alignments — your natal chart — shape your personality, emotional patterns, and destiny across this lifetime.</p>
-        </div>
-
-        <!-- Animated zodiac wheel -->
-        <div data-id="133" style="display:flex;justify-content:center;margin:0.8rem 0;">
-          <svg data-id="134" id="edu-zodiac-svg" viewBox="-120 -120 240 240" width="240" height="240" style="overflow:visible;">
-            <circle data-id="135" cx="0" cy="0" r="110" fill="none" stroke="rgba(176,138,255,0.2)" stroke-width="1"/>
-            <circle data-id="136" cx="0" cy="0" r="90" fill="none" stroke="rgba(176,138,255,0.15)" stroke-width="1"/>
-            <circle data-id="137" cx="0" cy="0" r="22" fill="rgba(255,215,0,0.15)" stroke="#ffd700" stroke-width="1.5"/>
-            <text data-id="138" x="0" y="6" text-anchor="middle" fill="#ffd700" font-size="18">☀</text>
-            <g data-id="139" id="edu-zodiac-signs"></g>
-            <circle data-id="140" cx="0" cy="0" r="60" fill="none" stroke="rgba(201,168,76,0.12)" stroke-width="1" stroke-dasharray="4,4"/>
-            <circle data-id="141" cx="0" cy="0" r="78" fill="none" stroke="rgba(176,138,255,0.12)" stroke-width="1" stroke-dasharray="4,4"/>
-            <g data-id="142" id="edu-planet-mercury"><circle data-id="143" cx="60" cy="0" r="5" fill="#b8b8b8"/><text data-id="144" x="60" y="4" text-anchor="middle" fill="#fff" font-size="8">☿</text></g>
-            <g data-id="145" id="edu-planet-venus"><circle data-id="146" cx="-78" cy="0" r="6" fill="#ffccaa"/><text data-id="147" x="-78" y="4" text-anchor="middle" fill="#fff" font-size="9">♀</text></g>
-          </svg>
-        </div>
-
-        <!-- Element display -->
-        <div data-id="148" id="edu-element-display" style="display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;margin-top:0.8rem;"></div>
-      </div>
-
-    </div><!-- /edu-panels -->
-
-    <!-- Nav area -->
-    <div data-id="149" style="display:flex;flex-direction:column;align-items:center;gap:1rem;margin-top:1.5rem;width:100%;">
-      <div data-id="150" style="display:flex;gap:1rem;">
-        <button data-id="151" id="edu-prev-btn" style="padding:0.5rem 1.2rem;border:1px solid rgba(176,138,255,0.4);background:transparent;color:#b08aff;border-radius:8px;cursor:pointer;font-size:0.9rem;display:none;">← Back</button>
-        <button data-id="152" id="edu-next-btn" style="padding:0.5rem 1.4rem;border:none;background:linear-gradient(135deg,#b08aff,#c9a84c);color:#0a0015;border-radius:8px;cursor:pointer;font-weight:700;font-size:0.95rem;">Next →</button>
-      </div>
-      <button data-id="153" id="edu-begin-btn" style="display:none;width:100%;max-width:300px;padding:0.9rem 2rem;border:none;background:linear-gradient(135deg,#c9a84c,#b08aff);color:#0a0015;border-radius:12px;cursor:pointer;font-weight:700;font-size:1rem;letter-spacing:0.04em;">✦ Reveal My Blueprint ✦</button>
-      <div data-id="154" id="edu-auto-bar-wrap" style="width:100%;max-width:320px;height:3px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden;">
-        <div data-id="155" id="edu-auto-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#c9a84c,#b08aff);transition:width 0.1s linear;"></div>
+      <div style="text-align:center;padding:0.5rem 0.9rem;background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.18);border-radius:10px;">
+        <div style="font-size:0.52rem;letter-spacing:0.2em;color:#ffd700;margin-bottom:0.2rem;">SEPHIRAH</div>
+        <div id="reveal-seph-label" style="font:700 0.95rem Georgia,serif;color:#f0d070;"></div>
       </div>
     </div>
+
+    <!-- Waveform -->
+    <div class="waveform mt-4" id="reveal-waveform">
+      <div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div>
+      <div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div>
+      <div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div>
+      <div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div>
+    </div>
+    <p id="reveal-status" class="mt-3" style="color:var(--text-muted);font-size:0.78rem;letter-spacing:0.15em;text-align:center;">Preparing your reading...</p>
+
+    <!-- Skip button (appears after 20 seconds) -->
+    <button id="reveal-skip-btn" class="skip-btn" style="display:none;margin-top:1.8rem;">Continue →</button>
 
   </div>
 </div>
+
+<!-- ===== SCREEN EMAIL: EMAIL GATE ===== -->
+<div id="screen-email" class="screen">
+  <div style="max-width:460px;width:100%;padding:2rem 1.5rem;margin:0 auto;display:flex;flex-direction:column;align-items:center;min-height:100vh;justify-content:center;">
+
+    <p class="label-mono mb-2" style="color:var(--accent-gold);font-size:0.6rem;letter-spacing:0.4em;">✦ YOUR READING IS READY ✦</p>
+    <h2 id="email-gate-name" class="gradient-title font-serif text-2xl font-bold mb-3" style="text-align:center;"></h2>
+    <p style="color:#9b8ec4;font-size:0.9rem;line-height:1.65;text-align:center;margin:0 0 1.8rem;">Enter your name and email to receive your complete numerological blueprint — and to hear the full story written in the stars at the moment of your birth.</p>
+
+    <div style="width:100%;display:flex;flex-direction:column;gap:0.85rem;">
+      <input id="gate-fullname" type="text" placeholder="Your full name" style="width:100%;padding:0.85rem 1rem;background:rgba(255,255,255,0.05);border:1px solid rgba(176,138,255,0.3);border-radius:10px;color:#e8e0ff;font-size:1rem;outline:none;box-sizing:border-box;" />
+      <input id="gate-email" type="email" placeholder="Your email address" style="width:100%;padding:0.85rem 1rem;background:rgba(255,255,255,0.05);border:1px solid rgba(176,138,255,0.3);border-radius:10px;color:#e8e0ff;font-size:1rem;outline:none;box-sizing:border-box;" />
+      <div id="val-gate" style="color:#ff9ed2;font-size:0.8rem;min-height:1.2rem;text-align:center;"></div>
+      <button id="gate-submit-btn" style="width:100%;padding:1rem;border:none;background:linear-gradient(135deg,#c9a84c,#b08aff);color:#0a0015;border-radius:12px;cursor:pointer;font-weight:700;font-size:1rem;letter-spacing:0.04em;">✦ Reveal My Full Blueprint ✦</button>
+    </div>
+
+    <p style="color:#5a4a7a;font-size:0.7rem;margin-top:1.2rem;text-align:center;">Your information is private and will never be shared.</p>
+  </div>
+</div>
+
+<!-- (old edu screen removed — replaced by screen-reveal and screen-email above) -->
 
 <!-- ===== SCREEN 2: GENERATING ===== -->
 <div data-id="156" id="screen-generating" class="screen">
@@ -1574,7 +1464,7 @@ function showScreen(name){
   window.scrollTo({top:0,behavior:'smooth'});
   // Show mute toggle only on teaser screen
   var muteBtn = document.getElementById('mute-btn');
-  if (name === 'teaser' || name === 'edu') { muteBtn.style.display = 'flex'; }
+  if (name === 'teaser' || name === 'reveal' || name === 'email') { muteBtn.style.display = 'flex'; }
   else { muteBtn.style.display = 'none'; }
 }
 
@@ -1730,17 +1620,19 @@ document.getElementById('hook-btn').addEventListener('click', function(){
     personalYear2026: personalYear2026
   };
 
-  // CHANGE 1: Show edu screen first instead of generating
-  showScreen('edu');
-  initEduScreen();
+  // Start AI reading in background while reveal narration plays
+  _readingReady = false;
+  _readingPromise = doReading()
+    .then(function() { _readingReady = true; })
+    .catch(function() { _readingReady = true; });
+  showScreen('reveal');
+  initRevealScreen();
 });
 
 // ===========================
 // GENERATING SCREEN (CHANGE 1 — refactored)
 // ===========================
 function startGenerating() {
-  stopEduAutoAdvance();
-  if (_zodiacRaf) cancelAnimationFrame(_zodiacRaf);
   showScreen('generating');
   document.getElementById('gen-name-line').textContent = (window._readingProfile.firstName || '') + ', your chart is taking shape...';
   beginReadingGeneration();
@@ -1756,15 +1648,18 @@ function beginReadingGeneration() {
     setTimeout(function(){ msgEl.textContent = messages[mi]; msgEl.style.opacity = '1'; }, 300);
   }, 2000);
 
-  doReading().then(function(){
+  var finish = function() {
     clearInterval(msgInterval);
     showScreen('teaser');
     startOracleReading();
-  }).catch(function(e){
-    clearInterval(msgInterval);
-    showScreen('teaser');
-    startOracleReading();
-  });
+  };
+
+  if (_readingReady) {
+    setTimeout(finish, 800);
+  } else {
+    (_readingPromise || doReading().then(function(){ _readingReady = true; }))
+      .then(finish, finish);
+  }
 }
 
 // ===========================
@@ -2319,6 +2214,9 @@ document.getElementById('reset-btn').addEventListener('click', function() {
   window._allPages = [];
   selectedTier = null;
   isMuted = false;
+  _readingReady = false;
+  _readingPromise = null;
+  if (_revealSkipTimer) { clearTimeout(_revealSkipTimer); _revealSkipTimer = null; }
 
   document.getElementById('hook-firstname').value = '';
   document.getElementById('hook-month').value = '';
@@ -2364,293 +2262,192 @@ document.getElementById('reset-btn').addEventListener('click', function() {
   var tierCardsDiv = document.getElementById('tierCards');
   if (tierCardsDiv) tierCardsDiv.style.display = '';
 
-  // Stop edu animations
-  stopEduAutoAdvance();
-  if (_zodiacRaf) cancelAnimationFrame(_zodiacRaf);
-  _eduTransitioned = false;
-
   showScreen('hook');
 });
 
 // ===========================
-// EDU SCREEN (CHANGE 1)
+// SUPABASE + SHEETS LEAD SAVE
 // ===========================
-var EDU_NARRATION = [
-  "Before we begin your personal reading, let me show you the three ancient systems that form your blueprint. The first is Numerology. Every name and birth date carries a unique vibrational frequency. By reducing your numbers to a single digit, we uncover your Life Path — the master thread of your soul's entire journey. This is the most important number in your chart.",
-  "The second system is the Kabbalistic Tree of Life. This ancient mystical map shows ten divine spheres, called Sephiroth, through which consciousness descends from the infinite into physical form. Your numerology places you at one of these spheres — a specific point on the cosmic map that reveals the quality of consciousness your soul chose to embody in this lifetime.",
-  "The third system is Astrology. At the exact moment you were born, the planets held specific positions in the sky. These cosmic alignments shaped your personality, your emotional patterns, and your deepest purpose. Together — your numbers, your Tree position, and your stars — they form one complete portrait of your soul. And yours is now ready."
-];
-var _eduTransitioned = false;
-var _eduIdx = 0;
-var _eduTotal = 3;
-var _eduAutoTimer = null;
-var _eduAutoMs = 14000;
-var _eduBarRaf = null;
+var SUPABASE_URL = 'https://domsyutwvcukvbamujzv.supabase.co';
+var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRvbXN5dXR3dmN1a3ZiYW11anp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0MDk0MjgsImV4cCI6MjA5Njk4NTQyOH0.nVdwlxspPIeC-3JxxNvsvEMsT4Ez8uf5DaI_7vti1ts';
+var SHEETS_WEBHOOK = '';
 
-function initEduScreen() {
-  _eduTransitioned = false;
-  _eduIdx = 0;
-  initNumerologyAnim();
-  initTreeAnim();
-  initZodiacAnim();
-  initElementDisplay();
-  showEduPanel(0);
+async function saveLeadToSupabase(fullname, email, profile) {
+  try {
+    await fetch(SUPABASE_URL + '/rest/v1/leads', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({
+        full_name: fullname,
+        email: email,
+        life_path: profile ? profile.lifePath : null,
+        sun_sign: profile ? profile.sunSign.sign : null,
+        sephirah: profile ? profile.tree.name : null,
+        dob: profile ? profile.dob : null,
+        created_at: new Date().toISOString()
+      })
+    });
+  } catch(e) { console.warn('Supabase save failed:', e); }
 }
 
-function showEduPanel(idx) {
-  stopSpeech();
-  stopEduAutoAdvance();
-  _eduIdx = idx;
-  document.querySelectorAll('.edu-panel').forEach(function(p,i){
-    p.classList.toggle('active', i === idx);
-  });
-  document.querySelectorAll('.edu-dot').forEach(function(d,i){
-    d.classList.toggle('active', i === idx);
-  });
-  document.getElementById('edu-prev-btn').style.display = idx > 0 ? 'inline-block' : 'none';
-  var isLast = idx === _eduTotal - 1;
-  document.getElementById('edu-next-btn').style.display = isLast ? 'none' : 'inline-block';
-  document.getElementById('edu-begin-btn').style.display = isLast ? 'block' : 'none';
-  if (idx === 1) animateTreeIn();
-  if (idx === 2) animateZodiac();
-  startEduNarration(idx);
+async function saveLeadToSheets(fullname, email, profile) {
+  if (!SHEETS_WEBHOOK) return;
+  try {
+    await fetch(SHEETS_WEBHOOK, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        full_name: fullname, email: email,
+        life_path: profile ? profile.lifePath : null,
+        sun_sign: profile ? profile.sunSign.sign : null,
+        sephirah: profile ? profile.tree.name : null,
+        dob: profile ? profile.dob : null,
+        timestamp: new Date().toISOString()
+      })
+    });
+  } catch(e) { console.warn('Sheets save failed:', e); }
 }
 
-function eduNav(dir) {
-  var next = _eduIdx + dir;
-  if (next < 0 || next >= _eduTotal) return;
-  _eduTransitioned = false;
-  showEduPanel(next);
+function saveLead(fullname, email) {
+  var profile = window._readingProfile || null;
+  saveLeadToSupabase(fullname, email, profile);
+  saveLeadToSheets(fullname, email, profile);
 }
 
-// Wire edu nav buttons with addEventListener
-document.getElementById('edu-prev-btn').addEventListener('click', function() { eduNav(-1); });
-document.getElementById('edu-next-btn').addEventListener('click', function() { eduNav(1); });
-document.getElementById('edu-begin-btn').addEventListener('click', function() { _eduTransitioned = true; startGenerating(); });
+// ===========================
+// REVEAL SCREEN
+// ===========================
+var _readingReady = false;
+var _readingPromise = null;
+var _revealSkipTimer = null;
 
-function startEduAutoAdvance() {
-  stopEduAutoAdvance();
-  var startTime = performance.now();
-  var bar = document.getElementById('edu-auto-bar');
-  if (bar) bar.style.width = '0%';
+function initRevealScreen() {
+  var p = window._readingProfile;
+  var lpData = LP_DATA[p.lifePath] || LP_DATA[reduceNum(p.lifePath,false)] || LP_DATA[6];
 
-  function tick(now) {
-    var elapsed = now - startTime;
-    var pct = Math.min(100, (elapsed / _eduAutoMs) * 100);
-    if (bar) bar.style.width = pct + '%';
-    if (elapsed >= _eduAutoMs) {
-      var next = _eduIdx + 1;
-      if (next < _eduTotal) {
-        showEduPanel(next);
-        if (next < _eduTotal - 1) {
-          startTime = performance.now();
-          if (bar) bar.style.width = '0%';
-          _eduBarRaf = requestAnimationFrame(tick);
-        } else {
-          if (bar) bar.style.width = '100%';
-        }
-      }
-      return;
-    }
-    _eduBarRaf = requestAnimationFrame(tick);
-  }
-  _eduBarRaf = requestAnimationFrame(tick);
-}
+  document.getElementById('reveal-name').textContent = p.firstName.toUpperCase();
+  document.getElementById('reveal-lp-number').textContent = p.lifePath;
+  document.getElementById('reveal-lp-label').textContent = p.lifePath + ' — ' + lpData.title;
+  document.getElementById('reveal-sign-label').textContent = p.sunSign.symbol + ' ' + p.sunSign.sign;
+  document.getElementById('reveal-seph-label').textContent = p.tree.name;
+  document.getElementById('reveal-status').textContent = 'Channeling your blueprint...';
+  document.getElementById('reveal-skip-btn').style.display = 'none';
 
-function stopEduAutoAdvance() {
-  if (_eduBarRaf) cancelAnimationFrame(_eduBarRaf);
-  _eduBarRaf = null;
-  if (_eduAutoTimer) { clearTimeout(_eduAutoTimer); _eduAutoTimer = null; }
-  var bar = document.getElementById('edu-auto-bar');
-  if (bar) bar.style.width = '0%';
-}
+  _revealSkipTimer = setTimeout(function() {
+    var btn = document.getElementById('reveal-skip-btn');
+    if (btn) btn.style.display = 'inline-block';
+  }, 20000);
 
-function startEduNarration(idx) {
-  var narration = EDU_NARRATION[idx];
-  if (!narration) return;
-  var isLast = idx === _eduTotal - 1;
-
-  function onNarrationEnd() {
-    if (_eduIdx !== idx || _eduTransitioned) return;
-    setTimeout(function() {
-      if (_eduIdx !== idx || _eduTransitioned) return;
-      if (!isLast) {
-        showEduPanel(idx + 1);
-      } else {
-        _eduTransitioned = true;
-        startGenerating();
-      }
-    }, 1500);
-  }
-
+  var script = buildRevealScript();
   if (isMuted) {
-    _eduAutoTimer = setTimeout(function() {
-      if (_eduIdx !== idx || _eduTransitioned) return;
-      if (!isLast) { showEduPanel(idx + 1); }
-      else { _eduTransitioned = true; startGenerating(); }
-    }, isLast ? 14000 : 12000);
-    return;
+    setTimeout(onRevealComplete, 65000);
+  } else {
+    speakLongText(script, onRevealComplete);
   }
-
-  speakLongText(narration, onNarrationEnd);
 }
 
-// --- Panel 0: Numerology animation ---
-function initNumerologyAnim() {
-  var grid = document.getElementById('num-anim');
-  if (!grid) return;
-  grid.innerHTML = '';
-  var nums = [
-    {n:1, label:'Leader'}, {n:2, label:'Healer'}, {n:3, label:'Creator'},
-    {n:4, label:'Builder'}, {n:5, label:'Freedom'}, {n:6, label:'Nurturer'},
-    {n:7, label:'Mystic'}, {n:8, label:'Power'}, {n:9, label:'Visionary'},
-    {n:11, label:'Illuminator'}, {n:22, label:'Master Builder'}
-  ];
-  nums.forEach(function(item, i) {
-    var el = document.createElement('div');
-    el.style.cssText = 'width:62px;height:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid rgba(201,168,76,0.25);border-radius:10px;background:rgba(201,168,76,0.06);cursor:default;opacity:0;transform:scale(0.7);transition:opacity 0.5s,transform 0.5s,border-color 0.3s,background 0.3s;';
-    el.innerHTML = '<div style="font-size:1.3rem;font-weight:700;color:#f0d070;font-family:Georgia,serif;">' + item.n + '</div><div style="font-size:0.6rem;color:#9b8ec4;letter-spacing:0.05em;">' + item.label + '</div>';
-    el.addEventListener('mouseenter', function(){ this.style.borderColor='rgba(201,168,76,0.7)'; this.style.background='rgba(201,168,76,0.15)'; });
-    el.addEventListener('mouseleave', function(){ this.style.borderColor='rgba(201,168,76,0.25)'; this.style.background='rgba(201,168,76,0.06)'; });
-    grid.appendChild(el);
-    setTimeout(function(){ el.style.opacity='1'; el.style.transform='scale(1)'; }, 120 + i * 90);
-  });
-
-  var demo = document.getElementById('num-demo-text');
-  var res = document.getElementById('num-demo-result');
-  if (!demo || !res) return;
-  res.style.opacity = '0';
-  var steps = ['6 + 1 + 1 + 1 + 9 + 8 + 4', '= 30', '3 + 0'];
-  var si = 0;
-  demo.textContent = steps[0];
-  var demoInterval = setInterval(function(){
-    si++;
-    if (si >= steps.length) {
-      clearInterval(demoInterval);
-      demo.textContent = '3 + 0 = 3';
-      res.style.opacity = '1';
-      res.textContent = 'Life Path 3 \u2726';
-      return;
-    }
-    demo.textContent = steps[si];
-  }, 1400);
-}
-
-// --- Panel 1: Tree of Life animation ---
-function initTreeAnim() {}
-function animateTreeIn() {
-  var nodes = document.querySelectorAll('.edu-seph');
-  nodes.forEach(function(n, i) {
-    n.style.opacity = '0';
-    n.style.transform = 'scale(0.5)';
-    n.style.transition = 'opacity 0.5s, transform 0.5s';
-    setTimeout(function(){ n.style.opacity = '1'; n.style.transform = 'scale(1)'; }, 200 + i * 180);
-  });
-
-  document.querySelectorAll('.edu-seph').forEach(function(n){
-    n.style.cursor = 'pointer';
-    n.addEventListener('mouseenter', function(){
-      var tip = document.getElementById('edu-seph-tip');
-      if (tip) tip.textContent = this.getAttribute('data-name') + ' \u2014 ' + this.getAttribute('data-desc');
-    });
-    n.addEventListener('mouseleave', function(){
-      var tip = document.getElementById('edu-seph-tip');
-      if (tip) tip.textContent = '';
-    });
-  });
-
-  var sephy = document.querySelectorAll('.edu-seph circle');
-  var pi = 0;
-  var pulseInterval = setInterval(function(){
-    sephy.forEach(function(c){ c.style.filter = ''; });
-    if (sephy[pi]) sephy[pi].style.filter = 'drop-shadow(0 0 8px #c9a84c)';
-    pi = (pi + 1) % sephy.length;
-  }, 600);
-  setTimeout(function(){ clearInterval(pulseInterval); sephy.forEach(function(c){ c.style.filter = ''; }); }, _eduAutoMs + 1000);
-}
-
-// --- Panel 2: Astrology zodiac animation ---
-var _zodiacRaf = null;
-var _zodiacAngle = 0;
-var _mercuryAngle = 0;
-var _venusAngle = 180;
-
-function initZodiacAnim() {
-  var signs = ['\u2648','\u2649','\u264A','\u264B','\u264C','\u264D','\u264E','\u264F','\u2650','\u2651','\u2652','\u2653'];
-  var labels = ['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'];
-  var g = document.getElementById('edu-zodiac-signs');
-  if (!g) return;
-  g.innerHTML = '';
-  signs.forEach(function(sign, i){
-    var angle = (i / 12) * Math.PI * 2 - Math.PI / 2;
-    var x = Math.cos(angle) * 98;
-    var y = Math.sin(angle) * 98;
-    var el = document.createElementNS('http://www.w3.org/2000/svg','text');
-    el.setAttribute('x', x);
-    el.setAttribute('y', y + 4);
-    el.setAttribute('text-anchor','middle');
-    el.setAttribute('fill','rgba(176,138,255,0.7)');
-    el.setAttribute('font-size','14');
-    el.setAttribute('class','edu-zodiac-sign');
-    el.setAttribute('data-label', labels[i]);
-    el.textContent = sign;
-    g.appendChild(el);
-  });
-}
-
-function animateZodiac() {
-  if (_zodiacRaf) cancelAnimationFrame(_zodiacRaf);
-  var g = document.getElementById('edu-zodiac-signs');
-  var mercury = document.getElementById('edu-planet-mercury');
-  var venus = document.getElementById('edu-planet-venus');
-  var signs = document.querySelectorAll('.edu-zodiac-sign');
-  var highlighted = Math.floor(Math.random() * 12);
-
-  function frame() {
-    _zodiacAngle += 0.003;
-    _mercuryAngle += 0.012;
-    _venusAngle -= 0.007;
-
-    if (g) g.setAttribute('transform', 'rotate(' + (_zodiacAngle * 180 / Math.PI) + ')');
-
-    if (mercury) {
-      var mx = Math.cos(_mercuryAngle) * 60;
-      var my = Math.sin(_mercuryAngle) * 60;
-      mercury.setAttribute('transform', 'translate(' + mx + ',' + my + ')');
-    }
-    if (venus) {
-      var vx = Math.cos(_venusAngle) * 78;
-      var vy = Math.sin(_venusAngle) * 78;
-      venus.setAttribute('transform', 'translate(' + vx + ',' + vy + ')');
-    }
-
-    signs.forEach(function(s, i){
-      s.setAttribute('fill', i === highlighted ? '#ffd700' : 'rgba(176,138,255,0.7)');
-    });
-
-    _zodiacRaf = requestAnimationFrame(frame);
+function buildRevealScript() {
+  var p = window._readingProfile;
+  var lpData = LP_DATA[p.lifePath] || LP_DATA[reduceNum(p.lifePath,false)] || LP_DATA[6];
+  var lpMeaning = LP_MEANINGS[p.lifePath] || LP_MEANINGS[reduceNum(p.lifePath,false)] || LP_MEANINGS[6];
+  var seph = p.tree;
+  var sign = p.sunSign;
+  var lpKey = p.lifePath;
+  if (!ELEMENT_LP_INTERACTION[sign.element] || !ELEMENT_LP_INTERACTION[sign.element][lpKey]) {
+    lpKey = reduceNum(p.lifePath, false);
   }
-  _zodiacRaf = requestAnimationFrame(frame);
+  var elementLine = (ELEMENT_LP_INTERACTION[sign.element] && ELEMENT_LP_INTERACTION[sign.element][lpKey]) || '';
+
+  return p.firstName + '.\n\n'
+    + 'I need you to hear something before we begin. The three ancient systems I am about to reveal '
+    + 'were not built for everyone. They were built for this — for the exact moment your name and your birth date '
+    + 'are placed side by side and read together.\n\n'
+    + 'The first system is Numerology. '
+    + 'Your birth date — ' + p.dob + ' — carries a hidden frequency. '
+    + 'When we add and reduce those digits, step by step, they converge on a single sacred number: the number ' + p.lifePath + '. '
+    + 'In numerology, this is called your Life Path. It is the master thread woven through your entire existence. '
+    + 'Life Path ' + p.lifePath + ' is known as ' + lpData.title + '. '
+    + lpMeaning + '\n\n'
+    + 'Now here is where it becomes extraordinary.\n\n'
+    + 'The second system is the Kabbalistic Tree of Life — an ancient mystical map of ten divine spheres '
+    + 'through which all consciousness flows into form. '
+    + 'Because your Life Path number is ' + p.lifePath + ', the Tree places you at ' + seph.name + ': '
+    + seph.meaning + '. '
+    + 'This is not symbolic. It is the precise energetic frequency your soul carries into this lifetime.\n\n'
+    + 'The third system is Astrology. '
+    + 'At the exact moment you were born, the Sun stood in ' + sign.sign + ' — '
+    + 'a ' + sign.element + ' sign, ruled by ' + sign.planet + '. '
+    + (elementLine ? elementLine + '\n\n' : '\n\n')
+    + 'Three systems. Three ancient traditions. One person. You.\n\n'
+    + p.firstName + ', when these three converge on a single birth — the way they have converged on yours — '
+    + 'they do not just describe who you are. They reveal who you were always meant to become.\n\n'
+    + 'Your complete reading is ready. I just need your name and email to open it for you.';
 }
 
-function initElementDisplay() {
-  var wrap = document.getElementById('edu-element-display');
-  if (!wrap) return;
-  var elements = [
-    {name:'Fire', signs:'Aries \u00b7 Leo \u00b7 Sagittarius', color:'#ff7755', icon:'\ud83d\udd25'},
-    {name:'Earth', signs:'Taurus \u00b7 Virgo \u00b7 Capricorn', color:'#88bb66', icon:'\ud83c\udf3f'},
-    {name:'Air', signs:'Gemini \u00b7 Libra \u00b7 Aquarius', color:'#88ccff', icon:'\ud83d\udca8'},
-    {name:'Water', signs:'Cancer \u00b7 Scorpio \u00b7 Pisces', color:'#8899ff', icon:'\ud83c\udf0a'},
-  ];
-  wrap.innerHTML = elements.map(function(e){
-    return '<div style="text-align:center;padding:0.5rem 0.8rem;border:1px solid ' + e.color + '44;border-radius:10px;background:' + e.color + '11;min-width:100px;">' +
-      '<div style="font-size:1.3rem;">' + e.icon + '</div>' +
-      '<div style="font-weight:700;color:' + e.color + ';font-size:0.8rem;">' + e.name + '</div>' +
-      '<div style="color:#9b8ec4;font-size:0.62rem;margin-top:2px;">' + e.signs + '</div>' +
-      '</div>';
-  }).join('');
+function onRevealComplete() {
+  if (_revealSkipTimer) { clearTimeout(_revealSkipTimer); _revealSkipTimer = null; }
+  stopSpeech();
+  var p = window._readingProfile;
+  var nameEl = document.getElementById('email-gate-name');
+  if (nameEl) nameEl.textContent = p.firstName + ', your blueprint awaits.';
+  var fnEl = document.getElementById('gate-fullname');
+  if (fnEl) fnEl.value = p.firstName || '';
+  var valEl = document.getElementById('val-gate');
+  if (valEl) valEl.textContent = '';
+  showScreen('email');
 }
-// ── END EDU SCREEN ────────────────────────────────────────────
+
+document.getElementById('reveal-skip-btn').addEventListener('click', onRevealComplete);
+
+// ===========================
+// EMAIL GATE
+// ===========================
+document.getElementById('gate-submit-btn').addEventListener('click', function() {
+  var fullname = document.getElementById('gate-fullname').value.trim();
+  var email = document.getElementById('gate-email').value.trim();
+  var valDiv = document.getElementById('val-gate');
+
+  if (!fullname) { valDiv.textContent = 'Please enter your full name.'; return; }
+  if (!email || !email.includes('@') || !email.includes('.')) { valDiv.textContent = 'Please enter a valid email address.'; return; }
+  valDiv.textContent = '';
+
+  saveLead(fullname, email);
+
+  var btn = this;
+  btn.textContent = '✦ Opening your reading...';
+  btn.disabled = true;
+
+  var finish = function() {
+    btn.textContent = '✦ Reveal My Full Blueprint ✦';
+    btn.disabled = false;
+    showScreen('teaser');
+    startOracleReading();
+  };
+
+  if (_readingReady) {
+    finish();
+  } else {
+    showScreen('generating');
+    document.getElementById('gen-name-line').textContent = (window._readingProfile.firstName || '') + ', your chart is taking shape...';
+    var messages = ['Reading your Life Path...','Consulting your Sun Sign...','Locating you on the Tree of Life...','Weaving your celestial story...','Aligning the sacred numbers...'];
+    var mi = 0;
+    var msgEl = document.getElementById('gen-msg');
+    var msgInterval = setInterval(function(){
+      mi = (mi + 1) % messages.length;
+      msgEl.style.opacity = '0';
+      setTimeout(function(){ msgEl.textContent = messages[mi]; msgEl.style.opacity = '1'; }, 300);
+    }, 2000);
+    var done = function() { clearInterval(msgInterval); finish(); };
+    (_readingPromise || Promise.resolve()).then(done, done);
+  }
+});
+// ── END REVEAL / EMAIL SCREEN ────────────────────────────────────────
 
 // ===========================
 // INIT
