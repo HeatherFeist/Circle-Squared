@@ -730,6 +730,24 @@ body {
       <div data-id="283" id="el-status" style="font-size:0.75rem;color:#5a4a7a;min-height:1.2em;margin-top:0.3rem;"></div>
     </div>
 
+    <!-- ===== OWNER PDF DOWNLOAD ===== -->
+    <div style="margin-top:2rem;border-top:1px solid rgba(176,138,255,0.15);padding-top:1.5rem;">
+      <div style="font-family:'Courier New',monospace;font-size:0.62rem;letter-spacing:0.4em;color:#c9a84c;margin-bottom:0.3rem;">📄 OWNER PDF DOWNLOAD</div>
+      <div style="font:700 1.1rem Georgia,serif;color:#e8e0ff;margin-bottom:0.5rem;">Download Any Tier PDF</div>
+      <p style="font-size:0.8rem;color:#8a7aaa;line-height:1.6;margin-bottom:1rem;">Complete a reading first (enter a name &amp; birth date on the main screen), then come back here to download any tier without going through checkout.</p>
+      <div style="margin-bottom:0.8rem;">
+        <label style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#c9a84c;display:block;margin-bottom:0.4rem;">SELECT TIER</label>
+        <select id="admin-pdf-tier" class="cosmic-select" style="width:100%;">
+          <option value="initiation">The Initiation — 3 pages ($33)</option>
+          <option value="unveiling">The Unveiling — 6 pages ($66)</option>
+          <option value="blueprint">The Complete Blueprint — 9 pages ($99)</option>
+          <option value="partnership">Partnership Blueprint — 6 pages ($66)</option>
+        </select>
+      </div>
+      <button id="admin-pdf-btn" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.6rem 1.4rem;background:linear-gradient(135deg,#c9a84c,#f0d070);color:#0a0015;font-weight:700;font-size:0.85rem;border:none;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;">📄 Download PDF</button>
+      <div id="admin-pdf-status" style="font-size:0.75rem;color:#5a4a7a;min-height:1.2em;margin-top:0.5rem;"></div>
+    </div>
+
   </div>
 </div>
 
@@ -1239,6 +1257,27 @@ document.getElementById('admin-export-btn').addEventListener('click', exportPurc
 document.getElementById('admin-clear-btn').addEventListener('click', function() {
   if (!confirm('Clear all purchase records? This cannot be undone.')) return;
   localStorage.removeItem('cs_purchases'); showAdminPanel();
+});
+
+document.getElementById('admin-pdf-btn').addEventListener('click', function() {
+  var status = document.getElementById('admin-pdf-status');
+  if (!window._allPages || !window._allPages.filter(function(p){return p;}).length) {
+    status.textContent = '⚠️ No reading loaded yet — complete a reading on the main screen first.';
+    status.style.color = '#ff9ed2';
+    return;
+  }
+  var slug = document.getElementById('admin-pdf-tier').value;
+  selectedTier = TIERS.find(function(t){ return t.slug === slug; });
+  status.textContent = '⏳ Generating PDF...';
+  status.style.color = '#c9a84c';
+  try {
+    generateAndDownloadPDF();
+    status.textContent = '✅ PDF downloaded!';
+    status.style.color = '#88dd99';
+  } catch(e) {
+    status.textContent = '❌ Error: ' + (e.message || 'Try again.');
+    status.style.color = '#ff9ed2';
+  }
 });
 
 // ===========================
