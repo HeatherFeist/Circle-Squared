@@ -655,21 +655,29 @@ body {
       <div data-id="283" id="el-status" style="font-size:0.75rem;color:#5a4a7a;min-height:1.2em;margin-top:0.3rem;"></div>
     </div>
 
-    <!-- ===== OWNER PDF DOWNLOAD ===== -->
+    <!-- ===== CUSTOMER PDF GENERATOR ===== -->
     <div style="margin-top:2rem;border-top:1px solid rgba(176,138,255,0.15);padding-top:1.5rem;">
-      <div style="font-family:'Courier New',monospace;font-size:0.62rem;letter-spacing:0.4em;color:#c9a84c;margin-bottom:0.3rem;">📄 OWNER PDF DOWNLOAD</div>
-      <div style="font:700 1.1rem Georgia,serif;color:#e8e0ff;margin-bottom:0.5rem;">Download Any Tier PDF</div>
-      <p style="font-size:0.8rem;color:#8a7aaa;line-height:1.6;margin-bottom:1rem;">Complete a reading first (enter a name &amp; birth date on the main screen), then come back here to download any tier without going through checkout.</p>
+      <div style="font-family:'Courier New',monospace;font-size:0.62rem;letter-spacing:0.4em;color:#c9a84c;margin-bottom:0.3rem;">📄 CUSTOMER PDF GENERATOR</div>
+      <div style="font:700 1.1rem Georgia,serif;color:#e8e0ff;margin-bottom:0.4rem;">Generate Any Reading PDF</div>
+      <p style="font-size:0.8rem;color:#8a7aaa;line-height:1.6;margin-bottom:1rem;">Enter the customer's info directly here — no need to run a reading on the main screen first.</p>
+      <div style="margin-bottom:0.6rem;">
+        <label style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#c9a84c;display:block;margin-bottom:0.4rem;">CUSTOMER FIRST NAME</label>
+        <input id="admin-pdf-name" type="text" class="cosmic-input" placeholder="First name" style="padding:0.6rem 0.9rem;" />
+      </div>
+      <div style="display:flex;gap:0.5rem;margin-bottom:0.8rem;">
+        <div style="flex:1;"><label style="font-family:'Courier New',monospace;font-size:0.5rem;letter-spacing:0.15em;color:#c9a84c;display:block;margin-bottom:0.3rem;">MONTH</label><input id="admin-pdf-month" type="number" min="1" max="12" class="cosmic-input" placeholder="M" style="padding:0.6rem 0.5rem;text-align:center;" /></div>
+        <div style="flex:1;"><label style="font-family:'Courier New',monospace;font-size:0.5rem;letter-spacing:0.15em;color:#c9a84c;display:block;margin-bottom:0.3rem;">DAY</label><input id="admin-pdf-day" type="number" min="1" max="31" class="cosmic-input" placeholder="D" style="padding:0.6rem 0.5rem;text-align:center;" /></div>
+        <div style="flex:1.5;"><label style="font-family:'Courier New',monospace;font-size:0.5rem;letter-spacing:0.15em;color:#c9a84c;display:block;margin-bottom:0.3rem;">YEAR</label><input id="admin-pdf-year" type="number" min="1900" max="2015" class="cosmic-input" placeholder="YYYY" style="padding:0.6rem 0.5rem;text-align:center;" /></div>
+      </div>
       <div style="margin-bottom:0.8rem;">
         <label style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#c9a84c;display:block;margin-bottom:0.4rem;">SELECT TIER</label>
         <select id="admin-pdf-tier" class="cosmic-select" style="width:100%;">
           <option value="initiation">The Initiation — 3 pages ($33)</option>
           <option value="unveiling">The Unveiling — 6 pages ($66)</option>
           <option value="blueprint">The Complete Blueprint — 9 pages ($99)</option>
-          <option value="partnership">Partnership Blueprint — 6 pages ($77)</option>
         </select>
       </div>
-      <button id="admin-pdf-btn" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.6rem 1.4rem;background:linear-gradient(135deg,#c9a84c,#f0d070);color:#0a0015;font-weight:700;font-size:0.85rem;border:none;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;">📄 Download PDF</button>
+      <button id="admin-pdf-btn" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.6rem 1.4rem;background:linear-gradient(135deg,#c9a84c,#f0d070);color:#0a0015;font-weight:700;font-size:0.85rem;border:none;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;">✦ Generate &amp; Download PDF</button>
       <div id="admin-pdf-status" style="font-size:0.75rem;color:#5a4a7a;min-height:1.2em;margin-top:0.5rem;"></div>
     </div>
 
@@ -1537,25 +1545,63 @@ document.getElementById('admin-clear-btn').addEventListener('click', function() 
   localStorage.removeItem('cs_purchases'); showAdminPanel();
 });
 
-document.getElementById('admin-pdf-btn').addEventListener('click', function() {
+document.getElementById('admin-pdf-btn').addEventListener('click', async function() {
   var status = document.getElementById('admin-pdf-status');
-  if (!window._allPages || !window._allPages.filter(function(p){return p;}).length) {
-    status.textContent = '⚠️ No reading loaded yet — complete a reading on the main screen first.';
+  var btn = document.getElementById('admin-pdf-btn');
+  var firstName = (document.getElementById('admin-pdf-name').value || '').trim();
+  var month = parseInt(document.getElementById('admin-pdf-month').value);
+  var day = parseInt(document.getElementById('admin-pdf-day').value);
+  var year = parseInt(document.getElementById('admin-pdf-year').value);
+  var slug = document.getElementById('admin-pdf-tier').value;
+  if (!firstName || !month || !day || !year) {
+    status.textContent = '⚠️ Please fill in customer name and full date of birth.';
     status.style.color = '#ff9ed2';
     return;
   }
-  var slug = document.getElementById('admin-pdf-tier').value;
-  selectedTier = TIERS.find(function(t){ return t.slug === slug; });
-  status.textContent = '⏳ Generating PDF...';
+  btn.disabled = true;
   status.style.color = '#c9a84c';
   try {
+    status.textContent = '⏳ Computing celestial profile...';
+    var lp = calcLifePath(month, day, year);
+    var sunSign = getSunSign(month, day);
+    var sephInfo = getSephirahForLP(lp);
+    var hiddenMaster = calcHiddenMaster(month, day, year);
+    var expression = calcExpression(firstName);
+    var soulUrge = calcSoulUrge(firstName);
+    var personality = calcPersonality(firstName);
+    var gematria = calcGematria(firstName);
+    var personalYear2026 = calcPersonalYear(month, day, 2026);
+    var lpData = LP_DATA[lp] || LP_DATA[reduceNum(lp,false)] || LP_DATA[6];
+    var tarotCard = getTarotCard(gematria.total, lp);
+    var codexArchetype = getCodexArchetype(lp, sunSign.element);
+    var dob = year + '-' + String(month).padStart(2,'0') + '-' + String(day).padStart(2,'0');
+    window._readingProfile = {
+      firstName: firstName, fullName: firstName, dob: dob,
+      month: month, day: day, year: year,
+      lifePath: lp, lpTitle: lpData.title, lpTeaser: lpData.teaser, lpGift: lpData.gift,
+      sunSign: sunSign, tree: sephInfo,
+      treePosition: { sephId: sephInfo.sephId },
+      hiddenMaster: hiddenMaster,
+      expression: expression, soulUrge: soulUrge,
+      personality: personality, gematria: gematria,
+      personalYear2026: personalYear2026,
+      tarotCard: tarotCard, codexArchetype: codexArchetype
+    };
+    selectedTier = TIERS.find(function(t){ return t.slug === slug; });
+    status.textContent = '⏳ Channeling the oracle...';
+    await doReading();
+    if (!window._allPages || !window._allPages.filter(function(pg){return pg;}).length) {
+      window._allPages = parseReadingPages(getFallbackReading());
+    }
+    status.textContent = '⏳ Weaving the PDF...';
     generateAndDownloadPDF();
-    status.textContent = '✅ PDF downloaded!';
+    status.textContent = '✅ PDF downloaded for ' + firstName + '!';
     status.style.color = '#88dd99';
   } catch(e) {
-    status.textContent = '❌ Error: ' + (e.message || 'Try again.');
+    status.textContent = '❌ Error: ' + (e.message || 'Please try again.');
     status.style.color = '#ff9ed2';
   }
+  btn.disabled = false;
 });
 
 // Partnership generate + download handlers
@@ -2627,63 +2673,181 @@ function generateAndDownloadPDF() {
     {sys:'AIN SOPH AUR',layer:'SYNTHESIS · BLESSING',title:'The Limitless Light',color:ROSE}
   ];
 
-  function pdfBg(){doc.setFillColor(BG[0],BG[1],BG[2]);doc.rect(0,0,W,H,'F');doc.setFillColor(BG2[0],BG2[1],BG2[2]);doc.rect(0,0,W,55,'F');}
-  function pdfStars(seed,n){var x=seed;for(var i=0;i<n;i++){x=(x*1664525+1013904223)%4294967296;var sx=(x%1000)/1000*W;x=(x*1664525+1013904223)%4294967296;var sy=(x%1000)/1000*H;doc.setFillColor(200,190,240);doc.circle(sx,sy,0.4,'F');}}
-  function pdfFooter(pn,tot,color){doc.setDrawColor(DIM[0],DIM[1],DIM[2]);doc.setLineWidth(0.25);doc.line(20,H-14,W-20,H-14);doc.setFont('helvetica','normal');doc.setFontSize(6.5);doc.setTextColor(DIM[0],DIM[1],DIM[2]);doc.text('CIRCLES SQUARED \u2022 CELESTIAL BLUEPRINT',20,H-9);doc.text('PAGE '+pn+' OF '+tot,W-20,H-9,{align:'right'});}
+  var GHOST=[18,8,52];
 
-  // COVER PAGE
-  pdfBg(); pdfStars(42,110);
-  doc.setFillColor(GOLD[0],GOLD[1],GOLD[2]); doc.rect(0,0,W,2.5,'F'); doc.rect(0,H-2.5,W,2.5,'F');
-  doc.setDrawColor(PURPLE[0],PURPLE[1],PURPLE[2]); doc.setLineWidth(0.3); doc.circle(W/2,H/2-15,62,'S');
-  doc.setDrawColor(GOLD[0],GOLD[1],GOLD[2]); doc.setLineWidth(0.2); doc.circle(W/2,H/2-15,51,'S');
+  function pdfBg() {
+    doc.setFillColor(BG[0],BG[1],BG[2]); doc.rect(0,0,W,H,'F');
+    doc.setFillColor(BG2[0],BG2[1],BG2[2]); doc.rect(0,0,W,58,'F');
+  }
+
+  function pdfStars(seed,n) {
+    var x=seed;
+    for(var i=0;i<n;i++){
+      x=(x*1664525+1013904223)%4294967296; var sx=(x%1000)/1000*W;
+      x=(x*1664525+1013904223)%4294967296; var sy=(x%1000)/1000*H;
+      var r=(i%7===0)?0.65:(i%3===0)?0.45:0.28;
+      var bright=(i%5===0)?[230,220,255]:(i%3===0)?[200,188,240]:[160,148,210];
+      doc.setFillColor(bright[0],bright[1],bright[2]); doc.circle(sx,sy,r,'F');
+    }
+  }
+
+  function eggOfLife(cx,cy,r,color,lw) {
+    doc.setDrawColor(color[0],color[1],color[2]); doc.setLineWidth(lw);
+    doc.circle(cx,cy,r,'S');
+    for(var i=0;i<6;i++){var a=i*Math.PI/3; doc.circle(cx+r*Math.cos(a),cy+r*Math.sin(a),r,'S');}
+    doc.circle(cx,cy,r*2,'S');
+  }
+
+  function pdfDivider(x1,x2,y,col) {
+    doc.setDrawColor(col[0],col[1],col[2]); doc.setLineWidth(0.3);
+    doc.line(x1,y,W/2-5,y); doc.line(W/2+5,y,x2,y);
+    doc.setFillColor(col[0],col[1],col[2]);
+    doc.circle(W/2,y,2,'F'); doc.circle(W/2-7,y,0.7,'F'); doc.circle(W/2+7,y,0.7,'F');
+  }
+
+  function pdfFooter(pn,tot) {
+    doc.setDrawColor(DIM[0],DIM[1],DIM[2]); doc.setLineWidth(0.2);
+    doc.line(14,H-13,W-14,H-13);
+    doc.setFillColor(DIM[0],DIM[1],DIM[2]);
+    doc.circle(13,H-13,0.9,'F'); doc.circle(W-13,H-13,0.9,'F');
+    doc.setFont('helvetica','normal'); doc.setFontSize(6); doc.setTextColor(DIM[0],DIM[1],DIM[2]);
+    doc.text('CIRCLES SQUARED  \u00b7  CELESTIAL BLUEPRINT', 16, H-8);
+    doc.text('PAGE '+pn+' OF '+tot, W-16, H-8, {align:'right'});
+  }
+
+  // ===== COVER PAGE =====
+  pdfBg(); pdfStars(42,140);
+
+  // Corner bracket accents
+  doc.setDrawColor(DIM[0],DIM[1],DIM[2]); doc.setLineWidth(0.2);
+  doc.line(8,8,22,8); doc.line(8,8,8,22);
+  doc.line(W-8,8,W-22,8); doc.line(W-8,8,W-8,22);
+  doc.line(8,H-8,22,H-8); doc.line(8,H-8,8,H-22);
+  doc.line(W-8,H-8,W-22,H-8); doc.line(W-8,H-8,W-8,H-22);
+
+  // Gold border bars
+  doc.setFillColor(GOLD[0],GOLD[1],GOLD[2]);
+  doc.rect(0,0,W,2.5,'F'); doc.rect(0,H-2.5,W,2.5,'F');
+
+  // Outer rings (purple + gold + inner ring)
+  var cx=W/2, cy=H/2-12;
+  doc.setDrawColor(PURPLE[0],PURPLE[1],PURPLE[2]); doc.setLineWidth(0.4); doc.circle(cx,cy,65,'S');
+  doc.setDrawColor(GOLD[0],GOLD[1],GOLD[2]); doc.setLineWidth(0.2); doc.circle(cx,cy,54,'S');
+  doc.setDrawColor(PURPLE[0],PURPLE[1],PURPLE[2]); doc.setLineWidth(0.15); doc.circle(cx,cy,44,'S');
+
+  // Egg of Life watermark inside rings
+  eggOfLife(cx,cy,22,GHOST,0.15);
+
+  // Title
   doc.setFont('helvetica','bold'); doc.setFontSize(8.5); doc.setTextColor(GOLD[0],GOLD[1],GOLD[2]);
   doc.text('C I R C L E S   S Q U A R E D', W/2, 22, {align:'center'});
-  doc.setFont('helvetica','bold'); doc.setFontSize(20); doc.setTextColor(WHITE[0],WHITE[1],WHITE[2]);
-  doc.text('CELESTIAL BLUEPRINT', W/2, 45, {align:'center'});
-  doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor(PURPLE[0],PURPLE[1],PURPLE[2]);
-  doc.text((tier?tier.name:'The Initiation').toUpperCase(), W/2, 54, {align:'center'});
-  doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(MUTED[0],MUTED[1],MUTED[2]);
+  doc.setFont('helvetica','bold'); doc.setFontSize(22); doc.setTextColor(WHITE[0],WHITE[1],WHITE[2]);
+  doc.text('CELESTIAL BLUEPRINT', W/2, 46, {align:'center'});
+  doc.setFont('helvetica','normal'); doc.setFontSize(9.5); doc.setTextColor(PURPLE[0],PURPLE[1],PURPLE[2]);
+  doc.text((tier?tier.name:'The Initiation').toUpperCase(), W/2, 56, {align:'center'});
+
+  // Ornate rule + "prepared for"
+  doc.setDrawColor(DIM[0],DIM[1],DIM[2]); doc.setLineWidth(0.15);
+  doc.line(W/2-32,H/2-43,W/2-5,H/2-43); doc.line(W/2+5,H/2-43,W/2+32,H/2-43);
+  doc.setFillColor(DIM[0],DIM[1],DIM[2]); doc.circle(W/2,H/2-43,1.3,'F');
+  doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(MUTED[0],MUTED[1],MUTED[2]);
   doc.text('P R E P A R E D   F O R', W/2, H/2-36, {align:'center'});
+
+  // Client name
   var displayName = (p.fullName||p.firstName||'Seeker').toUpperCase();
-  doc.setFont('helvetica','bold'); doc.setFontSize(displayName.length>18?18:24); doc.setTextColor(WHITE[0],WHITE[1],WHITE[2]);
+  doc.setFont('helvetica','bold'); doc.setFontSize(displayName.length>18?17:24); doc.setTextColor(WHITE[0],WHITE[1],WHITE[2]);
   doc.text(displayName, W/2, H/2-22, {align:'center'});
+
+  // Key identifiers
   var pdfTc = p.tarotCard || TAROT_PATHS[1];
   var pdfCa = p.codexArchetype || 'The Integrator';
   var keyNums = [];
-  if(p.lifePath)keyNums.push('Life Path '+p.lifePath);
-  if(p.sunSign)keyNums.push(p.sunSign.sign);
-  if(p.tree)keyNums.push(p.tree.name);
+  if(p.lifePath) keyNums.push('Life Path '+p.lifePath);
+  if(p.sunSign) keyNums.push(p.sunSign.sign);
+  if(p.tree) keyNums.push(p.tree.name);
   doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(GOLD[0],GOLD[1],GOLD[2]);
   doc.text(keyNums.join('  \u00b7  '), W/2, H/2-10, {align:'center'});
   doc.setFontSize(8); doc.setTextColor(PURPLE[0],PURPLE[1],PURPLE[2]);
-  doc.text(pdfCa.toUpperCase() + '  \u00b7  ' + pdfTc.card.toUpperCase(), W/2, H/2-3, {align:'center'});
+  doc.text(pdfCa.toUpperCase()+'  \u00b7  '+pdfTc.card.toUpperCase(), W/2, H/2-3, {align:'center'});
   doc.setFontSize(7); doc.setTextColor(DIM[0],DIM[1],DIM[2]);
-  doc.text('ASTROLOGY  \u00b7  NUMEROLOGY  \u00b7  KABBALAH  \u00b7  TAROT  \u00b7  SACRED GEOMETRY', W/2, H/2+2, {align:'center'});
+  doc.text('ASTROLOGY  \u00b7  NUMEROLOGY  \u00b7  KABBALAH  \u00b7  TAROT  \u00b7  SACRED GEOMETRY', W/2, H/2+3, {align:'center'});
 
-  // CONTENT PAGES
+  // Lower Egg of Life decoration
+  eggOfLife(W/2,H/2+68,17,GHOST,0.12);
+
+  // Generated date
+  var now = new Date();
+  doc.setFont('helvetica','normal'); doc.setFontSize(6); doc.setTextColor(DIM[0],DIM[1],DIM[2]);
+  doc.text(now.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}).toUpperCase(), W/2, H-7, {align:'center'});
+
+  // ===== CONTENT PAGES =====
+  var PAGE_ROMS = ['I','II','III','IV','V','VI','VII','VIII','IX'];
   var totalPdf = 1 + pagesToDeliver.length;
+
   pagesToDeliver.forEach(function(pageContent, idx) {
     doc.addPage();
     var meta = PAGE_META[idx]||{sys:'READING',layer:'SECTION '+(idx+1),title:'Your Reading',color:PURPLE};
     var col = meta.color;
-    pdfBg(); pdfStars((idx+1)*777, 55);
-    doc.setFillColor(col[0],col[1],col[2]); doc.rect(0,0,W,2.5,'F');
-    doc.setFont('helvetica','bold'); doc.setFontSize(6.5); doc.setTextColor(col[0],col[1],col[2]);
-    doc.text(meta.sys+'  \u00b7  '+meta.layer, 20, 18);
-    doc.setFont('helvetica','bold'); doc.setFontSize(17); doc.setTextColor(WHITE[0],WHITE[1],WHITE[2]);
-    doc.text(meta.title, 20, 30);
-    doc.setDrawColor(col[0],col[1],col[2]); doc.setLineWidth(0.35); doc.line(20,43,W-20,43);
+
+    pdfBg(); pdfStars((idx+1)*1013, 75);
+
+    // Left accent stripe
+    var colDark = [Math.max(Math.floor(col[0]*0.2),8), Math.max(Math.floor(col[1]*0.2),4), Math.max(Math.floor(col[2]*0.2),30)];
+    doc.setFillColor(colDark[0],colDark[1],colDark[2]); doc.rect(0,0,5,H,'F');
+    doc.setFillColor(col[0],col[1],col[2]); doc.rect(0,0,5,2.5,'F');
+    doc.setDrawColor(col[0],col[1],col[2]); doc.setLineWidth(0.12); doc.line(5,2.5,5,H-12);
+
+    // Top bar (full width)
+    doc.setFillColor(col[0],col[1],col[2]); doc.rect(5,0,W-5,2.5,'F');
+
+    // Faint concentric arc watermark clipping off right edge
+    doc.setDrawColor(GHOST[0],GHOST[1],GHOST[2]); doc.setLineWidth(0.15);
+    doc.circle(W,32,28,'S'); doc.circle(W,32,19,'S'); doc.circle(W,32,10,'S');
+
+    // Section label + roman numeral
+    doc.setFont('helvetica','bold'); doc.setFontSize(6); doc.setTextColor(col[0],col[1],col[2]);
+    doc.text(meta.sys+'  \u00b7  '+meta.layer, 12, 17);
+    doc.setFont('helvetica','bold'); doc.setFontSize(7.5);
+    doc.text(PAGE_ROMS[idx]||String(idx+1), W-12, 17, {align:'right'});
+
+    // Page title
+    doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor(WHITE[0],WHITE[1],WHITE[2]);
+    doc.text(meta.title, 12, 30);
+
+    // Ornate divider
+    pdfDivider(12, W-12, 39, col);
+
+    // Body text
     var body = (pageContent||'Your reading is being prepared.').trim();
-    doc.setFont('helvetica','normal'); doc.setFontSize(9.5); doc.setTextColor(WHITE[0],WHITE[1],WHITE[2]);
-    var maxW=W-40, curY=51, lh=5.8, maxY=H-20;
+    doc.setTextColor(WHITE[0],WHITE[1],WHITE[2]);
+    var maxW=W-26, curY=48, lh=5.9, maxY=H-18;
     var paras = body.split(/\n\n+/).filter(function(s){return s.trim().length>10;});
-    paras.forEach(function(para, pi){
+
+    paras.forEach(function(para,pi){
       if(curY>maxY) return;
-      if(pi>0) curY+=2.5;
+      if(pi>0) curY+=3.5;
+      if(pi===0){
+        doc.setFontSize(10); doc.setFont('helvetica','bold');
+        doc.setTextColor(WHITE[0]+12,WHITE[1]+12,WHITE[2]+12);
+      } else {
+        doc.setFontSize(9.5); doc.setFont('helvetica','normal');
+        doc.setTextColor(WHITE[0],WHITE[1],WHITE[2]);
+      }
       var lines = doc.splitTextToSize(para.trim().replace(/\n/g,' '), maxW);
-      lines.forEach(function(line){ if(curY>maxY) return; doc.text(line, 20, curY); curY+=lh; });
+      lines.forEach(function(line){
+        if(curY>maxY) return;
+        doc.text(line, 12, curY); curY+=lh;
+      });
     });
-    pdfFooter(idx+2, totalPdf, col);
+
+    // Bottom ornament (if whitespace remains)
+    if(curY < maxY-6) {
+      doc.setDrawColor(DIM[0],DIM[1],DIM[2]); doc.setLineWidth(0.15);
+      doc.line(12,maxY,W/2-4,maxY); doc.line(W/2+4,maxY,W-12,maxY);
+      doc.setFillColor(DIM[0],DIM[1],DIM[2]); doc.circle(W/2,maxY,1.2,'F');
+    }
+
+    pdfFooter(idx+2, totalPdf);
   });
 
   var fname = (p.firstName||'reading').toLowerCase().replace(/[^a-z]/g,'');
