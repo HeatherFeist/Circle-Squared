@@ -1192,7 +1192,7 @@ var _adminTaps = 0, _adminTapTimer = null;
 function handleAdminTap() {
   _adminTaps++;
   clearTimeout(_adminTapTimer);
-  _adminTapTimer = setTimeout(function() { _adminTaps = 0; }, 2000);
+  _adminTapTimer = setTimeout(function() { _adminTaps = 0; }, 3000);
   if (_adminTaps >= 5) { _adminTaps = 0; showAdminPanel(); }
 }
 function showAdminPanel() {
@@ -1253,6 +1253,7 @@ function exportPurchaseCSV() {
 
 document.getElementById('admin-tap-target').addEventListener('click', handleAdminTap);
 document.getElementById('reading-label').addEventListener('click', handleAdminTap);
+document.getElementById('reading-name').addEventListener('click', handleAdminTap);
 document.getElementById('admin-close-btn').addEventListener('click', function() { document.getElementById('adminPanel').style.display = 'none'; });
 document.getElementById('admin-export-btn').addEventListener('click', exportPurchaseCSV);
 document.getElementById('admin-clear-btn').addEventListener('click', function() {
