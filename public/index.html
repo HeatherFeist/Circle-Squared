@@ -1,0 +1,2620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Circles Squared — Unified Metaphysical Reading</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest" defer></script>
+<script src="https://www.paypal.com/sdk/js?client-id=ASrj3y9nxc2VwvvvZ7KZRbhCxYYjdtjY8H71RH-lpCNTNZhNhiKBga0l-_ukYo_9myQntZLneCjNAdY6&currency=USD&components=buttons&intent=capture"></script>
+<script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<meta name="color-scheme" content="dark" />
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: {
+        sans: ['Inter', 'sans-serif'],
+        serif: ['Georgia', 'serif'],
+        mono: ['Courier New', 'monospace'],
+      },
+    },
+  },
+};
+</script>
+<style>
+:root {
+  --bg-deep: #000010;
+  --bg-mid: #050215;
+  --text-primary: #e8e0ff;
+  --text-muted: #9b8ec4;
+  --accent-purple: #b08aff;
+  --accent-gold: #c9a84c;
+  --accent-rose: #ff9ed2;
+  --card-bg: rgba(20,10,40,0.85);
+  --card-border: rgba(176,138,255,0.25);
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0; padding: 0;
+  background: linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-mid) 100%);
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+#starfield {
+  position: fixed; top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  z-index: 0; pointer-events: none;
+}
+.cosmic-symbols {
+  position: fixed; top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  z-index: 1; pointer-events: none; overflow: hidden;
+}
+.cosmic-symbol {
+  position: absolute;
+  color: rgba(176,138,255,0.12);
+  font-size: 1.2rem;
+  animation: floatUp linear infinite;
+}
+@keyframes floatUp {
+  0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+}
+.screen {
+  position: relative; z-index: 10;
+  display: none; min-height: 100vh;
+  opacity: 0; transition: opacity 0.6s ease;
+}
+.screen.active {
+  display: flex; flex-direction: column;
+  align-items: center; opacity: 1;
+}
+.gradient-title {
+  background: linear-gradient(135deg, #c9a84c, #f0d070, #b08aff);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.cosmic-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px; padding: 1.5rem;
+}
+.cta-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 0.5rem; padding: 0.875rem 2.25rem;
+  background: linear-gradient(135deg, #c9a84c, #b08aff);
+  color: #0a0015; font-weight: 700; font-size: 1rem;
+  border: none; border-radius: 9999px; cursor: pointer;
+  transition: all 0.3s ease; letter-spacing: 0.02em;
+  min-height: 48px; text-decoration: none;
+}
+.cta-btn:hover {
+  box-shadow: 0 0 28px rgba(176,138,255,0.45), 0 0 12px rgba(201,168,76,0.35);
+  transform: translateY(-2px);
+}
+.cta-btn:active { transform: translateY(0); }
+.cosmic-input {
+  width: 100%; padding: 0.8rem 1.1rem;
+  background: rgba(15,5,35,0.8);
+  border: 1px solid var(--card-border);
+  border-radius: 12px; color: var(--text-primary);
+  font-family: 'Inter', sans-serif; font-size: 1rem;
+  outline: none; transition: border-color 0.3s, box-shadow 0.3s;
+}
+.cosmic-input:focus {
+  border-color: var(--accent-purple);
+  box-shadow: 0 0 12px rgba(176,138,255,0.2);
+}
+.cosmic-input::placeholder { color: var(--text-muted); opacity: 0.6; }
+.cosmic-select {
+  padding: 0.8rem 0.6rem;
+  background: rgba(15,5,35,0.8);
+  border: 1px solid var(--card-border);
+  border-radius: 12px; color: var(--text-primary);
+  font-family: 'Inter', sans-serif; font-size: 0.9rem;
+  outline: none; transition: border-color 0.3s, box-shadow 0.3s;
+  appearance: none; cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239b8ec4' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.7rem center;
+  padding-right: 2rem;
+}
+.cosmic-select:focus {
+  border-color: var(--accent-purple);
+  box-shadow: 0 0 12px rgba(176,138,255,0.2);
+}
+.cosmic-select option { background: #0a0020; color: #e8e0ff; }
+.validation-msg {
+  color: var(--accent-rose); font-size: 0.8rem;
+  margin-top: 0.25rem; min-height: 1.2em;
+}
+.label-mono {
+  font-family: 'Courier New', monospace;
+  font-size: 0.65rem; letter-spacing: 0.3em;
+  text-transform: uppercase; color: var(--accent-gold);
+}
+.orb {
+  width: 120px; height: 120px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #f0d070, #c9a84c 40%, #b08aff 70%, #7c5cbf);
+  animation: orbPulse 3s ease-in-out infinite;
+  margin: 0 auto 1.5rem;
+}
+@keyframes orbPulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 30px rgba(201,168,76,0.3), 0 0 60px rgba(176,138,255,0.15); }
+  50% { transform: scale(1.08); box-shadow: 0 0 50px rgba(201,168,76,0.5), 0 0 90px rgba(176,138,255,0.25); }
+}
+@keyframes orbSpin {
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.06); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+.orb-loading { animation: orbSpin 4s linear infinite, orbPulse 3s ease-in-out infinite; }
+.skip-btn {
+  color: var(--text-muted); background: none; border: none;
+  cursor: pointer; font-size: 0.875rem;
+  text-decoration: underline; text-underline-offset: 3px;
+  transition: color 0.2s; font-family: 'Inter', sans-serif; padding: 0.5rem;
+}
+.skip-btn:hover { color: var(--text-primary); }
+.divider {
+  text-align: center; color: var(--text-muted);
+  font-size: 0.8rem; letter-spacing: 0.3em;
+  padding: 1.5rem 0; opacity: 0.6;
+}
+.pill-badge {
+  display: inline-block; padding: 0.3rem 0.85rem;
+  border-radius: 9999px; font-size: 0.8rem;
+  font-weight: 600; margin: 0.2rem;
+}
+.tier-card-el {
+  background: rgba(15,8,35,0.85);
+  border: 1px solid rgba(176,138,255,0.2);
+  border-radius: 14px; padding: 1.2rem 1.4rem;
+  cursor: pointer; text-align: left;
+  transition: all 0.25s; position: relative;
+}
+.tier-card-el:hover {
+  border-color: rgba(176,138,255,0.5);
+  background: rgba(20,10,45,0.9);
+}
+.tier-card-el.selected {
+  border-color: rgba(201,168,76,0.7);
+  background: rgba(30,15,55,0.95);
+  box-shadow: 0 0 20px rgba(201,168,76,0.15);
+}
+.typewriter-cursor {
+  display: inline-block; width: 2px; height: 1.1em;
+  background: var(--accent-gold); margin-left: 2px;
+  animation: cursorBlink 0.8s step-end infinite;
+  vertical-align: text-bottom;
+}
+@keyframes cursorBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-in-up { animation: fadeInUp 0.6s ease forwards; }
+.payment-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,16,0.92); backdrop-filter: blur(8px);
+  z-index: 1000; display: none;
+  align-items: center; justify-content: center; padding: 1rem;
+}
+.payment-overlay.show { display: flex; }
+/* Tree of Life */
+.tol-sephirah { cursor: pointer; transition: all 0.3s ease; }
+.tol-sephirah:hover .tol-circle { filter: brightness(1.4); }
+.tol-sephirah.user-node .tol-circle { animation: sephGlow 2s ease-in-out infinite; }
+@keyframes sephGlow {
+  0%,100% { filter: drop-shadow(0 0 8px rgba(201,168,76,0.9)) brightness(1.3); }
+  50% { filter: drop-shadow(0 0 20px rgba(201,168,76,1)) brightness(1.6); }
+}
+.tol-panel {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: rgba(8,4,30,0.97);
+  border-top: 1px solid rgba(176,138,255,0.25);
+  padding: 1.1rem 1.2rem 1rem;
+  transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.4s;
+  transform: translateY(100%); opacity: 0;
+  z-index: 20; border-radius: 0 0 16px 16px;
+}
+.tol-panel.open { transform: translateY(0); opacity: 1; }
+.tol-wrapper { position: relative; overflow: hidden; border-radius: 16px; }
+
+/* ===== READING ORB BREATHE ===== */
+@keyframes orbBreathe {
+  0%, 100% { transform: scale(1.0); box-shadow: 0 0 40px rgba(201,168,76,0.4), 0 0 80px rgba(176,138,255,0.2); }
+  50% { transform: scale(1.12); box-shadow: 0 0 70px rgba(201,168,76,0.6), 0 0 130px rgba(176,138,255,0.35); }
+}
+.reading-orb {
+  width: 220px; height: 220px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #f0d070, #c9a84c 40%, #b08aff 70%, #7c5cbf);
+  animation: orbBreathe 3s ease-in-out infinite;
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column; position: relative;
+}
+.reading-orb .lp-number {
+  font-family: Georgia, serif; font-size: 4rem; font-weight: 700;
+  color: #0a0015; line-height: 1; text-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+/* ===== WAVEFORM ===== */
+.waveform {
+  display: flex; align-items: center; justify-content: center;
+  gap: 4px; height: 40px;
+}
+.waveform-bar {
+  width: 4px; border-radius: 2px;
+  background: linear-gradient(180deg, #c9a84c, #b08aff);
+  animation: wave 1.2s ease-in-out infinite alternate;
+  transform-origin: bottom;
+}
+.waveform-bar:nth-child(1)  { animation-delay: 0s;    height: 60%; }
+.waveform-bar:nth-child(2)  { animation-delay: 0.1s;  height: 80%; }
+.waveform-bar:nth-child(3)  { animation-delay: 0.2s;  height: 40%; }
+.waveform-bar:nth-child(4)  { animation-delay: 0.05s; height: 90%; }
+.waveform-bar:nth-child(5)  { animation-delay: 0.3s;  height: 60%; }
+.waveform-bar:nth-child(6)  { animation-delay: 0.15s; height: 100%; }
+.waveform-bar:nth-child(7)  { animation-delay: 0.25s; height: 70%; }
+.waveform-bar:nth-child(8)  { animation-delay: 0.35s; height: 50%; }
+.waveform-bar:nth-child(9)  { animation-delay: 0.1s;  height: 85%; }
+.waveform-bar:nth-child(10) { animation-delay: 0.2s;  height: 45%; }
+.waveform-bar:nth-child(11) { animation-delay: 0.3s;  height: 75%; }
+.waveform-bar:nth-child(12) { animation-delay: 0.0s;  height: 55%; }
+@keyframes wave {
+  from { transform: scaleY(0.3); }
+  to   { transform: scaleY(1.0); }
+}
+.waveform.paused .waveform-bar,
+.waveform-stopped .waveform-bar {
+  animation-play-state: paused;
+  opacity: 0.3;
+}
+
+/* ===== MUTE BUTTON ===== */
+.mute-toggle {
+  position: fixed; bottom: 1.2rem; right: 1.2rem;
+  z-index: 100; width: 44px; height: 44px;
+  border-radius: 50%; border: 1px solid rgba(176,138,255,0.3);
+  background: rgba(10,5,30,0.9); color: var(--accent-purple);
+  font-size: 1.2rem; cursor: pointer;
+  display: none; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.mute-toggle:hover { background: rgba(20,10,50,0.95); border-color: rgba(176,138,255,0.5); }
+
+/* ===== EDU SCREEN ===== */
+.edu-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: rgba(176,138,255,0.3); transition: background 0.4s;
+}
+.edu-dot.active { background: #c9a84c; }
+.edu-panel {
+  display: none; width: 100%;
+  animation: eduFadeIn 0.6s ease;
+}
+.edu-panel.active { display: block; }
+@keyframes eduFadeIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 640px) {
+  .cosmic-card { padding: 1rem; }
+  .cta-btn { padding: 0.75rem 1.5rem; font-size: 0.9rem; }
+  .reading-orb { width: 180px; height: 180px; }
+  .reading-orb .lp-number { font-size: 3rem; }
+}
+</style>
+</head>
+<body data-id="0">
+<app-icon data-id="1" hidden data-icon="sun" data-palette="Dark"></app-icon>
+<canvas data-id="2" id="starfield"></canvas>
+<div data-id="3" class="cosmic-symbols" id="cosmicSymbols"></div>
+
+<!-- Mute/Unmute toggle -->
+<button data-id="4" id="mute-btn" class="mute-toggle" title="Toggle voice">🔊</button>
+
+<!-- ===== SCREEN 1: THE HOOK ===== -->
+<div data-id="5" id="screen-hook" class="screen active">
+  <div data-id="6" class="flex flex-col items-center justify-center min-h-screen px-5 py-12 text-center w-full" style="max-width:700px; margin:0 auto;">
+    <p data-id="7" id="admin-tap-target" class="label-mono mb-4" style="color:var(--accent-gold); cursor:pointer; user-select:none;">✦ CIRCLES SQUARED — THE UNIFIED METAPHYSICAL READING ✦</p>
+
+    <h1 data-id="8" class="gradient-title font-serif text-3xl md:text-5xl font-bold leading-tight mb-5" style="line-height:1.2;">What Your Name and Birthday Have Already Been Trying to Tell You</h1>
+
+    <p data-id="9" class="mb-10" style="color:var(--text-muted); max-width:520px; font-size:0.95rem; line-height:1.7;">Your numbers hold a pattern. Your stars confirm it. The Tree of Life names it. Enter your details and discover what it all means.</p>
+
+    <div data-id="10" class="cosmic-card w-full" style="max-width:420px;">
+      <label data-id="11" class="label-mono block mb-2">FIRST NAME</label>
+      <input data-id="12" id="hook-firstname" type="text" class="cosmic-input mb-4" placeholder="Your first name" autocomplete="given-name" />
+
+      <label data-id="13" class="label-mono block mb-2">DATE OF BIRTH</label>
+      <div data-id="14" class="flex gap-2 mb-1">
+        <select data-id="15" id="hook-month" class="cosmic-select flex-1">
+          <option data-id="16" value="" disabled selected>Month</option>
+          <option data-id="17" value="1">January</option><option data-id="18" value="2">February</option><option data-id="19" value="3">March</option>
+          <option data-id="20" value="4">April</option><option data-id="21" value="5">May</option><option data-id="22" value="6">June</option>
+          <option data-id="23" value="7">July</option><option data-id="24" value="8">August</option><option data-id="25" value="9">September</option>
+          <option data-id="26" value="10">October</option><option data-id="27" value="11">November</option><option data-id="28" value="12">December</option>
+        </select>
+        <select data-id="29" id="hook-day" class="cosmic-select" style="width:80px;">
+          <option data-id="30" value="" disabled selected>Day</option>
+        </select>
+        <select data-id="31" id="hook-year" class="cosmic-select" style="width:100px;">
+          <option data-id="32" value="" disabled selected>Year</option>
+        </select>
+      </div>
+      <div data-id="33" class="validation-msg" id="val-hook"></div>
+
+      <button data-id="34" id="hook-btn" class="cta-btn w-full mt-5" style="font-size:1.05rem;">✦ Reveal My Blueprint</button>
+      <p data-id="35" class="text-center mt-3" style="color:var(--text-muted); font-size:0.72rem; opacity:0.7;">🔒 Your information is never stored or shared.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SCREEN EDU: ANIMATED EDUCATIONAL INTRO ===== -->
+<div data-id="36" id="screen-edu" class="screen">
+  <div data-id="37" style="max-width:520px;width:100%;padding:2rem 1.5rem;margin:0 auto;display:flex;flex-direction:column;align-items:center;min-height:100vh;justify-content:center;">
+
+    <!-- Progress dots -->
+    <div data-id="38" id="edu-dots" style="display:flex;gap:8px;margin-bottom:2rem;">
+      <div data-id="39" class="edu-dot active" data-idx="0"></div>
+      <div data-id="40" class="edu-dot" data-idx="1"></div>
+      <div data-id="41" class="edu-dot" data-idx="2"></div>
+    </div>
+
+    <!-- Panel container -->
+    <div data-id="42" id="edu-panels" style="width:100%;position:relative;min-height:480px;">
+
+      <!-- PANEL 0: NUMEROLOGY -->
+      <div data-id="43" class="edu-panel active" id="edu-panel-0">
+        <div data-id="44" style="text-align:center;margin-bottom:1.2rem;">
+          <div data-id="45" style="font-family:'Courier New',monospace;font-size:0.55rem;letter-spacing:0.5em;color:#c9a84c;margin-bottom:0.4rem;">✦ THE FIRST SYSTEM ✦</div>
+          <h2 data-id="46" style="font:700 1.6rem Georgia,serif;background:linear-gradient(135deg,#c9a84c,#f0d070);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:0 0 0.5rem;">Numerology</h2>
+          <p data-id="47" style="color:#9b8ec4;font-size:0.88rem;line-height:1.6;margin:0;">Every name and birth date vibrates at a unique frequency. Numerology decodes these vibrations into a Life Path number — a blueprint revealing your soul's purpose, natural strengths, and life lessons.</p>
+        </div>
+
+        <!-- Animated number grid -->
+        <div data-id="48" id="num-anim" style="display:flex;justify-content:center;flex-wrap:wrap;gap:12px;margin:1.2rem 0;"></div>
+
+        <!-- Life path example -->
+        <div data-id="49" id="num-calc-demo" style="text-align:center;margin-top:1rem;padding:1rem;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);border-radius:12px;">
+          <div data-id="50" style="font-size:0.72rem;letter-spacing:0.2em;color:#c9a84c;margin-bottom:0.5rem;">LIFE PATH CALCULATION</div>
+          <div data-id="51" id="num-demo-text" style="font-family:'Courier New',monospace;color:#e8e0ff;font-size:0.9rem;min-height:2rem;"></div>
+          <div data-id="52" id="num-demo-result" style="font-size:2.2rem;font-weight:700;color:#f0d070;margin-top:0.5rem;opacity:0;transition:opacity 0.8s;"></div>
+        </div>
+      </div>
+
+      <!-- PANEL 1: TREE OF LIFE -->
+      <div data-id="53" class="edu-panel" id="edu-panel-1">
+        <div data-id="54" style="text-align:center;margin-bottom:1rem;">
+          <div data-id="55" style="font-family:'Courier New',monospace;font-size:0.55rem;letter-spacing:0.5em;color:#b08aff;margin-bottom:0.4rem;">✦ THE SECOND SYSTEM ✦</div>
+          <h2 data-id="56" style="font:700 1.6rem Georgia,serif;background:linear-gradient(135deg,#e8e0ff,#b08aff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:0 0 0.5rem;">The Tree of Life</h2>
+          <p data-id="57" style="color:#9b8ec4;font-size:0.88rem;line-height:1.6;margin:0;">The Kabbalistic Tree of Life maps the ten divine attributes — called Sephiroth — through which the infinite expresses itself. Your numerology places you at a specific point on this cosmic map.</p>
+        </div>
+
+        <!-- Animated SVG Tree of Life -->
+        <div data-id="58" style="display:flex;justify-content:center;">
+          <svg data-id="59" id="edu-tree-svg" viewBox="0 0 220 320" width="220" height="320" style="overflow:visible;">
+            <g data-id="60" id="edu-tree-paths" opacity="0.3">
+              <line data-id="61" x1="60" y1="80" x2="60" y2="160" stroke="#b08aff" stroke-width="1.2"/>
+              <line data-id="62" x1="60" y1="160" x2="60" y2="240" stroke="#b08aff" stroke-width="1.2"/>
+              <line data-id="63" x1="160" y1="80" x2="160" y2="160" stroke="#b08aff" stroke-width="1.2"/>
+              <line data-id="64" x1="160" y1="160" x2="160" y2="240" stroke="#b08aff" stroke-width="1.2"/>
+              <line data-id="65" x1="110" y1="20" x2="110" y2="80" stroke="#c9a84c" stroke-width="1.5"/>
+              <line data-id="66" x1="110" y1="80" x2="110" y2="160" stroke="#c9a84c" stroke-width="1.5"/>
+              <line data-id="67" x1="110" y1="160" x2="110" y2="240" stroke="#c9a84c" stroke-width="1.5"/>
+              <line data-id="68" x1="110" y1="240" x2="110" y2="300" stroke="#c9a84c" stroke-width="1.5"/>
+              <line data-id="69" x1="60" y1="80" x2="160" y2="80" stroke="#b08aff" stroke-width="1"/>
+              <line data-id="70" x1="60" y1="160" x2="160" y2="160" stroke="#b08aff" stroke-width="1"/>
+              <line data-id="71" x1="60" y1="240" x2="160" y2="240" stroke="#b08aff" stroke-width="1"/>
+              <line data-id="72" x1="110" y1="20" x2="60" y2="80" stroke="#b08aff" stroke-width="1"/>
+              <line data-id="73" x1="110" y1="20" x2="160" y2="80" stroke="#b08aff" stroke-width="1"/>
+              <line data-id="74" x1="60" y1="80" x2="110" y2="160" stroke="#b08aff" stroke-width="1"/>
+              <line data-id="75" x1="160" y1="80" x2="110" y2="160" stroke="#b08aff" stroke-width="1"/>
+              <line data-id="76" x1="60" y1="160" x2="110" y2="240" stroke="#b08aff" stroke-width="1"/>
+              <line data-id="77" x1="160" y1="160" x2="110" y2="240" stroke="#b08aff" stroke-width="1"/>
+              <line data-id="78" x1="60" y1="80" x2="160" y2="160" stroke="#b08aff" stroke-width="0.7" stroke-dasharray="3,3"/>
+              <line data-id="79" x1="160" y1="80" x2="60" y2="160" stroke="#b08aff" stroke-width="0.7" stroke-dasharray="3,3"/>
+              <line data-id="80" x1="60" y1="160" x2="160" y2="240" stroke="#b08aff" stroke-width="0.7" stroke-dasharray="3,3"/>
+              <line data-id="81" x1="160" y1="160" x2="60" y2="240" stroke="#b08aff" stroke-width="0.7" stroke-dasharray="3,3"/>
+              <line data-id="82" x1="110" y1="160" x2="60" y2="240" stroke="#b08aff" stroke-width="0.7"/>
+              <line data-id="83" x1="110" y1="160" x2="160" y2="240" stroke="#b08aff" stroke-width="0.7"/>
+              <line data-id="84" x1="60" y1="240" x2="110" y2="300" stroke="#b08aff" stroke-width="1"/>
+              <line data-id="85" x1="160" y1="240" x2="110" y2="300" stroke="#b08aff" stroke-width="1"/>
+            </g>
+            <g data-id="86" id="edu-tree-nodes">
+              <g data-id="87" class="edu-seph" data-name="Kether" data-desc="The Crown — Pure divine consciousness" style="opacity:0">
+                <circle data-id="88" cx="110" cy="20" r="16" fill="rgba(255,255,255,0.12)" stroke="#ffffff" stroke-width="1.5"/>
+                <text data-id="89" x="110" y="16" text-anchor="middle" fill="#ffffff" font-size="7" font-family="Georgia">Kether</text>
+                <text data-id="90" x="110" y="25" text-anchor="middle" fill="#ffffff" font-size="6" font-family="Georgia">1</text>
+              </g>
+              <g data-id="91" class="edu-seph" data-name="Chokmah" data-desc="Wisdom — Divine masculine spark" style="opacity:0">
+                <circle data-id="92" cx="160" cy="80" r="16" fill="rgba(176,138,255,0.15)" stroke="#b08aff" stroke-width="1.5"/>
+                <text data-id="93" x="160" y="76" text-anchor="middle" fill="#e8e0ff" font-size="6" font-family="Georgia">Chokmah</text>
+                <text data-id="94" x="160" y="85" text-anchor="middle" fill="#e8e0ff" font-size="6" font-family="Georgia">2</text>
+              </g>
+              <g data-id="95" class="edu-seph" data-name="Binah" data-desc="Understanding — The Great Mother, form" style="opacity:0">
+                <circle data-id="96" cx="60" cy="80" r="16" fill="rgba(176,138,255,0.15)" stroke="#b08aff" stroke-width="1.5"/>
+                <text data-id="97" x="60" y="76" text-anchor="middle" fill="#e8e0ff" font-size="7" font-family="Georgia">Binah</text>
+                <text data-id="98" x="60" y="85" text-anchor="middle" fill="#e8e0ff" font-size="6" font-family="Georgia">3</text>
+              </g>
+              <g data-id="99" class="edu-seph" data-name="Chesed" data-desc="Mercy — Love, grace, abundance" style="opacity:0">
+                <circle data-id="100" cx="160" cy="160" r="16" fill="rgba(201,168,76,0.15)" stroke="#c9a84c" stroke-width="1.5"/>
+                <text data-id="101" x="160" y="156" text-anchor="middle" fill="#f0d070" font-size="7" font-family="Georgia">Chesed</text>
+                <text data-id="102" x="160" y="165" text-anchor="middle" fill="#f0d070" font-size="6" font-family="Georgia">4</text>
+              </g>
+              <g data-id="103" class="edu-seph" data-name="Geburah" data-desc="Severity — Strength, discipline, judgment" style="opacity:0">
+                <circle data-id="104" cx="60" cy="160" r="16" fill="rgba(255,80,80,0.15)" stroke="#ff8080" stroke-width="1.5"/>
+                <text data-id="105" x="60" y="156" text-anchor="middle" fill="#ff9ed2" font-size="6" font-family="Georgia">Geburah</text>
+                <text data-id="106" x="60" y="165" text-anchor="middle" fill="#ff9ed2" font-size="6" font-family="Georgia">5</text>
+              </g>
+              <g data-id="107" class="edu-seph" data-name="Tiphareth" data-desc="Beauty — Harmony, the heart centre" style="opacity:0">
+                <circle data-id="108" cx="110" cy="160" r="18" fill="rgba(255,215,0,0.18)" stroke="#ffd700" stroke-width="2"/>
+                <text data-id="109" x="110" y="156" text-anchor="middle" fill="#ffd700" font-size="6" font-family="Georgia">Tiphareth</text>
+                <text data-id="110" x="110" y="165" text-anchor="middle" fill="#ffd700" font-size="6" font-family="Georgia">6</text>
+              </g>
+              <g data-id="111" class="edu-seph" data-name="Netzach" data-desc="Victory — Desire, emotion, creativity" style="opacity:0">
+                <circle data-id="112" cx="160" cy="240" r="16" fill="rgba(100,220,120,0.15)" stroke="#88dd99" stroke-width="1.5"/>
+                <text data-id="113" x="160" y="236" text-anchor="middle" fill="#88dd99" font-size="7" font-family="Georgia">Netzach</text>
+                <text data-id="114" x="160" y="245" text-anchor="middle" fill="#88dd99" font-size="6" font-family="Georgia">7</text>
+              </g>
+              <g data-id="115" class="edu-seph" data-name="Hod" data-desc="Splendour — Intellect, communication" style="opacity:0">
+                <circle data-id="116" cx="60" cy="240" r="16" fill="rgba(100,180,255,0.15)" stroke="#88bbff" stroke-width="1.5"/>
+                <text data-id="117" x="60" y="236" text-anchor="middle" fill="#88bbff" font-size="7" font-family="Georgia">Hod</text>
+                <text data-id="118" x="60" y="245" text-anchor="middle" fill="#88bbff" font-size="6" font-family="Georgia">8</text>
+              </g>
+              <g data-id="119" class="edu-seph" data-name="Yesod" data-desc="Foundation — Dreams, the subconscious" style="opacity:0">
+                <circle data-id="120" cx="110" cy="240" r="16" fill="rgba(180,130,255,0.18)" stroke="#c0a0ff" stroke-width="1.5"/>
+                <text data-id="121" x="110" y="236" text-anchor="middle" fill="#c0a0ff" font-size="7" font-family="Georgia">Yesod</text>
+                <text data-id="122" x="110" y="245" text-anchor="middle" fill="#c0a0ff" font-size="6" font-family="Georgia">9</text>
+              </g>
+              <g data-id="123" class="edu-seph" data-name="Malkuth" data-desc="Kingdom — The physical world, manifestation" style="opacity:0">
+                <circle data-id="124" cx="110" cy="300" r="16" fill="rgba(139,90,43,0.2)" stroke="#b8860b" stroke-width="1.5"/>
+                <text data-id="125" x="110" y="296" text-anchor="middle" fill="#d4a050" font-size="6" font-family="Georgia">Malkuth</text>
+                <text data-id="126" x="110" y="305" text-anchor="middle" fill="#d4a050" font-size="6" font-family="Georgia">10</text>
+              </g>
+            </g>
+          </svg>
+        </div>
+
+        <!-- Seph tooltip -->
+        <div data-id="127" id="edu-seph-tip" style="text-align:center;min-height:2.2rem;margin-top:0.5rem;color:#c9a84c;font-size:0.8rem;font-style:italic;transition:opacity 0.4s;"></div>
+      </div>
+
+      <!-- PANEL 2: ASTROLOGY -->
+      <div data-id="128" class="edu-panel" id="edu-panel-2">
+        <div data-id="129" style="text-align:center;margin-bottom:1rem;">
+          <div data-id="130" style="font-family:'Courier New',monospace;font-size:0.55rem;letter-spacing:0.5em;color:#ff9ed2;margin-bottom:0.4rem;">✦ THE THIRD SYSTEM ✦</div>
+          <h2 data-id="131" style="font:700 1.6rem Georgia,serif;background:linear-gradient(135deg,#ff9ed2,#b08aff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:0 0 0.5rem;">Astrology</h2>
+          <p data-id="132" style="color:#9b8ec4;font-size:0.88rem;line-height:1.6;margin:0;">At the moment you were born, the planets held specific positions in the sky. These cosmic alignments — your natal chart — shape your personality, emotional patterns, and destiny across this lifetime.</p>
+        </div>
+
+        <!-- Animated zodiac wheel -->
+        <div data-id="133" style="display:flex;justify-content:center;margin:0.8rem 0;">
+          <svg data-id="134" id="edu-zodiac-svg" viewBox="-120 -120 240 240" width="240" height="240" style="overflow:visible;">
+            <circle data-id="135" cx="0" cy="0" r="110" fill="none" stroke="rgba(176,138,255,0.2)" stroke-width="1"/>
+            <circle data-id="136" cx="0" cy="0" r="90" fill="none" stroke="rgba(176,138,255,0.15)" stroke-width="1"/>
+            <circle data-id="137" cx="0" cy="0" r="22" fill="rgba(255,215,0,0.15)" stroke="#ffd700" stroke-width="1.5"/>
+            <text data-id="138" x="0" y="6" text-anchor="middle" fill="#ffd700" font-size="18">☀</text>
+            <g data-id="139" id="edu-zodiac-signs"></g>
+            <circle data-id="140" cx="0" cy="0" r="60" fill="none" stroke="rgba(201,168,76,0.12)" stroke-width="1" stroke-dasharray="4,4"/>
+            <circle data-id="141" cx="0" cy="0" r="78" fill="none" stroke="rgba(176,138,255,0.12)" stroke-width="1" stroke-dasharray="4,4"/>
+            <g data-id="142" id="edu-planet-mercury"><circle data-id="143" cx="60" cy="0" r="5" fill="#b8b8b8"/><text data-id="144" x="60" y="4" text-anchor="middle" fill="#fff" font-size="8">☿</text></g>
+            <g data-id="145" id="edu-planet-venus"><circle data-id="146" cx="-78" cy="0" r="6" fill="#ffccaa"/><text data-id="147" x="-78" y="4" text-anchor="middle" fill="#fff" font-size="9">♀</text></g>
+          </svg>
+        </div>
+
+        <!-- Element display -->
+        <div data-id="148" id="edu-element-display" style="display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;margin-top:0.8rem;"></div>
+      </div>
+
+    </div><!-- /edu-panels -->
+
+    <!-- Nav area -->
+    <div data-id="149" style="display:flex;flex-direction:column;align-items:center;gap:1rem;margin-top:1.5rem;width:100%;">
+      <div data-id="150" style="display:flex;gap:1rem;">
+        <button data-id="151" id="edu-prev-btn" style="padding:0.5rem 1.2rem;border:1px solid rgba(176,138,255,0.4);background:transparent;color:#b08aff;border-radius:8px;cursor:pointer;font-size:0.9rem;display:none;">← Back</button>
+        <button data-id="152" id="edu-next-btn" style="padding:0.5rem 1.4rem;border:none;background:linear-gradient(135deg,#b08aff,#c9a84c);color:#0a0015;border-radius:8px;cursor:pointer;font-weight:700;font-size:0.95rem;">Next →</button>
+      </div>
+      <button data-id="153" id="edu-begin-btn" style="display:none;width:100%;max-width:300px;padding:0.9rem 2rem;border:none;background:linear-gradient(135deg,#c9a84c,#b08aff);color:#0a0015;border-radius:12px;cursor:pointer;font-weight:700;font-size:1rem;letter-spacing:0.04em;">✦ Reveal My Blueprint ✦</button>
+      <div data-id="154" id="edu-auto-bar-wrap" style="width:100%;max-width:320px;height:3px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden;">
+        <div data-id="155" id="edu-auto-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#c9a84c,#b08aff);transition:width 0.1s linear;"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== SCREEN 2: GENERATING ===== -->
+<div data-id="156" id="screen-generating" class="screen">
+  <div data-id="157" class="flex flex-col items-center justify-center min-h-screen px-5 text-center w-full" style="max-width:500px; margin:0 auto;">
+    <p data-id="158" id="gen-name-line" class="font-serif text-lg mb-6" style="color:var(--accent-gold);"></p>
+    <div data-id="159" class="orb orb-loading"></div>
+    <p data-id="160" id="gen-msg" style="color:var(--text-muted); font-size:0.95rem; min-height:1.5em; transition: opacity 0.4s;">Reading your Life Path...</p>
+  </div>
+</div>
+
+<!-- ===== SCREEN 3: TEASER READING — PURE VISUAL ORACLE ===== -->
+<div data-id="161" id="screen-teaser" class="screen">
+  <div data-id="162" class="flex flex-col items-center justify-start min-h-screen px-5 py-10 w-full" style="max-width:700px; margin:0 auto;">
+
+    <!-- TOP: Name & label -->
+    <div data-id="163" class="text-center mb-2 mt-4">
+      <p data-id="164" id="reading-label" class="label-mono mb-3" style="color:var(--accent-gold);">✦ YOUR SAMPLE READING ✦</p>
+      <h2 data-id="165" id="reading-name" class="gradient-title font-serif text-3xl md:text-5xl font-bold mb-3" style="line-height:1.1;"></h2>
+      <div data-id="166" style="width:60px;height:2px;background:linear-gradient(90deg,transparent,#c9a84c,transparent);margin:0 auto;"></div>
+    </div>
+
+    <!-- CENTER: Orb visual -->
+    <div data-id="167" class="flex flex-col items-center justify-center" style="flex:1;min-height:320px;padding:2rem 0;">
+      <div data-id="168" class="reading-orb" id="reading-orb">
+        <span data-id="169" class="lp-number" id="reading-lp-number"></span>
+      </div>
+      <p data-id="170" id="reading-sign-label" class="mt-5 font-serif" style="color:var(--accent-gold);font-size:1.1rem;"></p>
+      <p data-id="171" id="reading-seph-label" class="mt-1" style="color:var(--text-muted);font-size:0.85rem;font-style:italic;"></p>
+
+      <!-- Waveform visualizer -->
+      <div data-id="172" class="waveform mt-8" id="waveform">
+        <div data-id="173" class="waveform-bar"></div>
+        <div data-id="174" class="waveform-bar"></div>
+        <div data-id="175" class="waveform-bar"></div>
+        <div data-id="176" class="waveform-bar"></div>
+        <div data-id="177" class="waveform-bar"></div>
+        <div data-id="178" class="waveform-bar"></div>
+        <div data-id="179" class="waveform-bar"></div>
+        <div data-id="180" class="waveform-bar"></div>
+        <div data-id="181" class="waveform-bar"></div>
+        <div data-id="182" class="waveform-bar"></div>
+        <div data-id="183" class="waveform-bar"></div>
+        <div data-id="184" class="waveform-bar"></div>
+      </div>
+      <p data-id="185" id="oracle-status" class="mt-3" style="color:var(--text-muted);font-size:0.78rem;letter-spacing:0.15em;transition:opacity 0.6s;">Oracle Speaking...</p>
+    </div>
+
+    <!-- BOTTOM: Pricing (hidden initially, revealed after voice ends) -->
+    <div data-id="186" id="reading-pricing" class="w-full" style="display:none;opacity:0;transform:translateY(20px);pointer-events:none;">
+
+      <div data-id="187" class="divider w-full">✦ ✦ ✦</div>
+
+      <h2 data-id="188" id="offer-heading" class="font-serif text-2xl md:text-3xl mb-2 text-center gradient-title mt-4"></h2>
+      <p data-id="189" id="offer-subtext" class="text-center mb-8" style="color:var(--text-muted); font-size:0.9rem; font-style:italic;">Your sample reading has revealed the foundation. Your complete Blueprint goes deeper — choose the level that calls to you.</p>
+
+      <div data-id="190" id="tierCards" class="flex flex-col gap-4 w-full mb-8"></div>
+
+      <!-- Tree of Life Interactive Section -->
+      <div data-id="191" id="tol-section" style="display:none;width:100%;max-width:520px;margin:0 auto 2rem;padding:0 1rem;">
+        <div data-id="192" style="text-align:center;margin-bottom:1rem;">
+          <div data-id="193" style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.4em;color:#c9a84c;margin-bottom:0.3rem;">✦ KABBALISTIC TREE OF LIFE ✦</div>
+          <h3 data-id="194" style="font:700 1.2rem Georgia,serif;background:linear-gradient(135deg,#e8e0ff,#b08aff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:0 0 0.3rem;">Your Position on the Tree</h3>
+          <p data-id="195" style="color:#8a7aaa;font-size:0.8rem;font-style:italic;margin:0;">Tap any sphere to explore. Your position glows gold.</p>
+        </div>
+        <div data-id="196" id="main-tree-svg-wrapper" class="tol-wrapper cosmic-card" style="padding:1.2rem 0.5rem 0.5rem;">
+          <div data-id="197" id="main-tree-svg"></div>
+          <div data-id="198" class="tol-panel"></div>
+        </div>
+        <div data-id="199" id="main-tree-user-label" style="text-align:center;margin-top:0.8rem;"></div>
+      </div>
+
+      <div data-id="200" class="divider w-full mt-4">✦ ─────── ✦</div>
+      <div data-id="201" class="text-center">
+        <button data-id="202" id="reset-btn" class="skip-btn mt-4">↩ Begin a New Reading</button>
+      </div>
+      <footer data-id="203" class="mt-8 text-center w-full">
+        <p data-id="204" style="color:var(--text-muted); font-size:0.65rem; opacity:0.5;">✦ Circles Squared · Where the circle of your name meets the circle of your stars ✦</p>
+        <p data-id="205" style="color:var(--text-muted); font-size:0.65rem; opacity:0.4; margin-top:0.25rem;">Made by Copilot</p>
+      </footer>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== PAYMENT MODAL ===== -->
+<div data-id="206" id="payment-modal" class="payment-overlay">
+  <div data-id="207" class="cosmic-card text-center" style="max-width:480px; width:100%; border-color:rgba(201,168,76,0.4); max-height:90vh; overflow-y:auto; position:relative;">
+    <button data-id="208" id="close-payment-modal" style="position:absolute;top:0.8rem;right:1rem;background:none;border:none;color:#6a5a9a;font-size:1.3rem;cursor:pointer;">&times;</button>
+    <p data-id="209" class="label-mono mb-2" style="color:var(--accent-gold);">✦ COMPLETE YOUR ORDER ✦</p>
+    <h3 data-id="210" id="modal-tier-name" class="font-serif text-xl mb-2 gradient-title"></h3>
+    <p data-id="211" id="modal-tier-price" class="font-serif text-2xl font-bold mb-3" style="color:var(--accent-gold);"></p>
+    <div data-id="212" id="modal-tier-includes" class="text-left mb-4" style="font-size:0.82rem; color:var(--text-muted); line-height:1.9;"></div>
+    <div data-id="213" class="mb-4">
+      <label data-id="214" class="label-mono block mb-2" style="text-align:left;">EMAIL FOR PDF DELIVERY</label>
+      <input data-id="215" type="email" id="modal-email" placeholder="your@email.com" class="cosmic-input" autocomplete="email" />
+      <div data-id="216" class="validation-msg" id="val-modal-email"></div>
+    </div>
+    <div data-id="217" id="paypal-button-container" style="border-radius:12px;overflow:hidden;min-height:50px;"></div>
+    <div data-id="218" style="font-size:0.68rem;color:#3a2a5a;margin-top:0.5rem;">🔒 Secure PayPal checkout · All major cards accepted</div>
+  </div>
+</div>
+
+<!-- ===== PAYMENT SUCCESS OVERLAY ===== -->
+<div data-id="219" id="payment-success" class="payment-overlay">
+  <div data-id="220" class="cosmic-card text-center" style="max-width:480px; width:100%; border-color:rgba(201,168,76,0.4); max-height:90vh; overflow-y:auto;">
+    <div data-id="221" class="orb" style="width:80px; height:80px; margin-bottom:1rem;"></div>
+    <p data-id="222" class="label-mono mb-2" style="color:var(--accent-gold);">✦ PAYMENT RECEIVED ✦</p>
+    <h3 data-id="223" class="font-serif text-xl mb-3 gradient-title">Your Blueprint is Being Prepared</h3>
+    <p data-id="224" id="success-buyer-name" style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1rem;"></p>
+    <div data-id="225" class="cosmic-card mb-4" style="background:rgba(10,5,25,0.5); text-align:left;">
+      <p data-id="226" class="label-mono mb-2">ORDER DETAILS</p>
+      <p data-id="227" id="success-tier-name" style="font-size:0.85rem; color:var(--text-primary);"></p>
+      <p data-id="228" id="success-tier-price" style="font-size:0.85rem; color:var(--accent-gold); font-weight:700;"></p>
+      <p data-id="229" id="success-email-display" style="font-size:0.8rem; color:var(--text-muted); margin-top:0.25rem;"></p>
+      <p data-id="230" id="success-order-id" style="font-size:0.75rem; color:var(--text-muted);"></p>
+    </div>
+    <div data-id="231" style="text-align:left; margin-bottom:1rem;">
+      <p data-id="232" class="label-mono mb-2">WHAT HAPPENS NEXT</p>
+      <ol data-id="233" style="color:var(--text-muted); font-size:0.82rem; line-height:2; padding-left:1.2rem;">
+        <li data-id="234">Your full Blueprint PDF is being generated now</li>
+        <li data-id="235">Celestia will deliver it to your email within 24 hours</li>
+        <li data-id="236">Your full reading will unlock below immediately</li>
+      </ol>
+    </div>
+    <div data-id="237" style="margin-top:0.8rem;text-align:center;">
+      <a data-id="238" id="notifyOwnerBtn" href="#" style="display:inline-block;padding:0.7rem 1.4rem;background:linear-gradient(135deg,rgba(201,168,76,0.15),rgba(176,138,255,0.15));border:1px solid rgba(201,168,76,0.4);border-radius:50px;color:#c9a84c;font-size:0.82rem;font-family:'Courier New',monospace;letter-spacing:0.1em;text-decoration:none;cursor:pointer;">✦ Open Email Notification Draft</a>
+      <div data-id="239" style="font-size:0.68rem;color:#3a2a5a;margin-top:0.4rem;">Opens a pre-filled email to heatherf@constructivedesignsinc.org</div>
+    </div>
+    <div data-id="240" style="margin-top:1rem;text-align:center;">
+      <button data-id="241" id="download-pdf-btn" style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.85rem 2rem;background:linear-gradient(135deg,#c9a84c,#f0d070);color:#0a0015;font-weight:700;font-size:0.92rem;border:none;border-radius:50px;cursor:pointer;box-shadow:0 0 30px rgba(201,168,76,0.4);width:100%;max-width:340px;justify-content:center;">
+        📄 Download Your PDF Blueprint
+      </button>
+      <div data-id="242" style="font-size:0.68rem;color:#3a2a5a;margin-top:0.35rem;">Downloads instantly to your device</div>
+    </div>
+    <button data-id="243" id="close-success-overlay" class="cta-btn" style="margin-top:1.2rem;">✦ View My Full Reading</button>
+  </div>
+</div>
+
+<!-- Hidden Admin Panel -->
+<div data-id="244" id="adminPanel" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(2,0,15,0.97);overflow-y:auto;padding:2rem 1rem;">
+  <div data-id="245" style="max-width:640px;margin:0 auto;">
+    <div data-id="246" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+      <div data-id="247">
+        <div data-id="248" style="font-family:'Courier New',monospace;font-size:0.62rem;letter-spacing:0.4em;color:#c9a84c;">✦ CIRCLES SQUARED ADMIN ✦</div>
+        <div data-id="249" style="font:700 1.3rem Georgia,serif;color:#e8e0ff;margin-top:0.2rem;">Purchase Log</div>
+      </div>
+      <button data-id="250" id="admin-close-btn" style="background:none;border:1px solid rgba(176,138,255,0.3);border-radius:50px;color:#9b8ec4;padding:0.4rem 0.9rem;cursor:pointer;font-size:0.82rem;">✕ Close</button>
+    </div>
+    <div data-id="251" style="display:flex;gap:0.6rem;margin-bottom:1.2rem;">
+      <div data-id="252" style="flex:1;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);border-radius:10px;padding:0.8rem;text-align:center;">
+        <div data-id="253" style="font-size:1.3rem;font-weight:700;color:#c9a84c;" id="adminRevTotal">$0</div>
+        <div data-id="254" style="font-size:0.7rem;color:#5a4a7a;font-family:'Courier New',monospace;letter-spacing:0.15em;">TOTAL REVENUE</div>
+      </div>
+      <div data-id="255" style="flex:1;background:rgba(176,138,255,0.08);border:1px solid rgba(176,138,255,0.2);border-radius:10px;padding:0.8rem;text-align:center;">
+        <div data-id="256" style="font-size:1.3rem;font-weight:700;color:#b08aff;" id="adminOrderCount">0</div>
+        <div data-id="257" style="font-size:0.7rem;color:#5a4a7a;font-family:'Courier New',monospace;letter-spacing:0.15em;">TOTAL ORDERS</div>
+      </div>
+      <div data-id="258" style="flex:1;background:rgba(255,158,210,0.08);border:1px solid rgba(255,158,210,0.2);border-radius:10px;padding:0.8rem;text-align:center;">
+        <div data-id="259" style="font-size:1.3rem;font-weight:700;color:#ff9ed2;" id="adminAvgOrder">$0</div>
+        <div data-id="260" style="font-size:0.7rem;color:#5a4a7a;font-family:'Courier New',monospace;letter-spacing:0.15em;">AVG ORDER</div>
+      </div>
+    </div>
+    <div data-id="261" style="display:flex;gap:0.6rem;margin-bottom:1.2rem;flex-wrap:wrap;">
+      <button data-id="262" id="admin-export-btn" style="background:none;border:1px solid rgba(176,138,255,0.3);border-radius:50px;color:#b08aff;padding:0.45rem 1rem;cursor:pointer;font-size:0.78rem;">↓ Export CSV</button>
+      <button data-id="263" id="admin-clear-btn" style="background:none;border:1px solid rgba(255,100,100,0.2);border-radius:50px;color:#ff6b6b;padding:0.45rem 1rem;cursor:pointer;font-size:0.78rem;">🗑 Clear Log</button>
+    </div>
+    <div data-id="264" id="adminPurchaseList" style="display:flex;flex-direction:column;gap:0.7rem;"></div>
+    <div data-id="265" id="adminEmptyState" style="text-align:center;padding:3rem;color:#3a2a5a;font-style:italic;display:none;">No purchases recorded yet.</div>
+
+    <!-- ===== ELEVENLABS VOICE SETTINGS ===== -->
+    <div data-id="266" style="margin-top:2rem;border-top:1px solid rgba(176,138,255,0.15);padding-top:1.5rem;">
+      <div data-id="267" style="font-family:'Courier New',monospace;font-size:0.62rem;letter-spacing:0.4em;color:#c9a84c;margin-bottom:0.3rem;">🎙️ VOICE SETTINGS (ELEVENLABS)</div>
+      <div data-id="268" style="font:700 1.1rem Georgia,serif;color:#e8e0ff;margin-bottom:0.6rem;">Voice Settings (ElevenLabs)</div>
+      <p data-id="269" style="font-size:0.8rem;color:#8a7aaa;line-height:1.6;margin-bottom:1rem;">Enter your ElevenLabs API key below. It is stored only in your browser's local storage — never in any file or server.</p>
+
+      <div data-id="270" style="margin-bottom:0.8rem;">
+        <label data-id="271" style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#c9a84c;display:block;margin-bottom:0.4rem;">API KEY</label>
+        <input data-id="272" type="password" id="el-api-key-input" class="cosmic-input" placeholder="sk_..." style="font-family:'Courier New',monospace;font-size:0.88rem;" />
+      </div>
+
+      <div data-id="273" style="margin-bottom:1rem;">
+        <label data-id="274" style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#c9a84c;display:block;margin-bottom:0.4rem;">VOICE</label>
+        <select data-id="275" id="el-voice-select" class="cosmic-select" style="width:100%;">
+          <option data-id="276" value="21m00Tcm4TlvDq8ikWAM">Rachel — Warm &amp; Ethereal (Recommended)</option>
+          <option data-id="277" value="EXAVITQu4vr4xnSDxMaL">Bella — Soulful &amp; Intimate</option>
+          <option data-id="278" value="ThT5KcBeYPX3keUQqHPh">Dorothy — Clear &amp; Mystical</option>
+          <option data-id="279" value="piTKgcLEGmPE4e6mEKli">Nicole — Soft &amp; Whispery</option>
+        </select>
+      </div>
+
+      <div data-id="280" style="display:flex;gap:0.6rem;margin-bottom:0.6rem;flex-wrap:wrap;">
+        <button data-id="281" id="el-save-btn" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.55rem 1.2rem;background:linear-gradient(135deg,#c9a84c,#f0d070);color:#0a0015;font-weight:700;font-size:0.82rem;border:none;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;">💾 Save Key</button>
+        <button data-id="282" id="el-test-btn" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.55rem 1.2rem;background:none;border:1px solid rgba(176,138,255,0.3);color:#b08aff;font-size:0.82rem;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;">🔊 Test Voice</button>
+      </div>
+      <div data-id="283" id="el-status" style="font-size:0.75rem;color:#5a4a7a;min-height:1.2em;margin-top:0.3rem;"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// === Guard Lucide ===
+if (typeof lucide !== "undefined" && typeof lucide.createIcons === "function") {
+  lucide.createIcons();
+}
+
+// ===========================
+// GLOBAL STATE
+// ===========================
+window._readingProfile = {};
+window._readingText = '';
+window._allPages = [];
+var selectedTier = null;
+
+// ── SPEECH PREPROCESSING (CHANGE 4) ──────────────────────────
+function preprocessForSpeech(text) {
+  var replacements = [
+    [/Kabbalistic/g, 'Kah-bah-LISS-tik'],
+    [/Kabbalah/g, 'Kah-BAH-lah'],
+    [/Sephiroth/g, 'Seh-FEE-roth'],
+    [/Sephirothic/g, 'Seh-FEE-roth-ik'],
+    [/Sephirah/g, 'Seh-FEE-rah'],
+    [/Kether/g, 'KEH-ther'],
+    [/Chokmah/g, 'CHOHK-mah'],
+    [/Binah/g, 'BEE-nah'],
+    [/Chesed/g, 'KHEH-sed'],
+    [/Geburah/g, 'Geh-BOO-rah'],
+    [/Tiphareth/g, 'Tee-FAH-reth'],
+    [/Netzach/g, 'NET-zahk'],
+    [/Yesod/g, 'YEH-sod'],
+    [/Malkuth/g, 'MAL-koot'],
+    [/\bHod\b/g, 'HOHD'],
+    [/AIN SOPH AUR/g, 'Ain Sof Or'],
+    [/AIN SOPH/g, 'Ain Sof'],
+    [/Chiron/g, 'KY-ron'],
+    [/Lilith/g, 'LIL-ith'],
+    [/\b11\b/g, 'eleven'],
+    [/\b22\b/g, 'twenty-two'],
+    [/\b33\b/g, 'thirty-three'],
+  ];
+  replacements.forEach(function(pair){ text = text.replace(pair[0], pair[1]); });
+  return text;
+}
+
+// ── VOICE SYSTEM ──────────────────────────────────────────────
+var isMuted = false;
+var currentAudio = null;
+var _speakCancelled = false;
+
+// Core ElevenLabs TTS function — fetches audio and plays it
+async function elevenLabsSpeak(text, apiKey, voiceId) {
+  var response = await fetch('https://api.elevenlabs.io/v1/text-to-speech/' + voiceId, {
+    method: 'POST',
+    headers: {
+      'Accept': 'audio/mpeg',
+      'Content-Type': 'application/json',
+      'xi-api-key': apiKey
+    },
+    body: JSON.stringify({
+      text: text,
+      model_id: 'eleven_turbo_v2_5',
+      voice_settings: {
+        stability: 0.55,
+        similarity_boost: 0.75,
+        style: 0.35,
+        use_speaker_boost: true
+      }
+    })
+  });
+  if (!response.ok) {
+    var errText = await response.text();
+    throw new Error('ElevenLabs ' + response.status + ': ' + errText);
+  }
+  var blob = await response.blob();
+  var url = URL.createObjectURL(blob);
+  var audio = new Audio(url);
+  currentAudio = audio;
+  await audio.play();
+  return new Promise(function(resolve, reject) {
+    audio.addEventListener('ended', function() { URL.revokeObjectURL(url); resolve(); });
+    audio.addEventListener('error', function(e) { URL.revokeObjectURL(url); reject(e); });
+  });
+}
+
+// AppSDK.ai.speak fallback — uses built-in TTS
+async function appSdkSpeak(text) {
+  if (!window.AppSDK || !window.AppSDK.ai || !window.AppSDK.ai.speak) return false;
+  try {
+    var result = await AppSDK.ai.speak({ text: text, voice: 'onyx', audioFormat: 'mp3' });
+    if (_speakCancelled) return true;
+    var audio = new Audio('data:audio/' + result.format + ';base64,' + result.audio);
+    currentAudio = audio;
+    await audio.play();
+    await new Promise(function(resolve) {
+      audio.addEventListener('ended', resolve);
+      audio.addEventListener('error', resolve);
+    });
+    currentAudio = null;
+    return true;
+  } catch(e) {
+    console.warn('AppSDK speak error:', e);
+    currentAudio = null;
+    return false;
+  }
+}
+
+// Browser TTS fallback (Microsoft Edge neural voices)
+function browserSpeak(text, onEnd) {
+  if (!window.speechSynthesis) { if (onEnd) onEnd(); return; }
+  window.speechSynthesis.cancel();
+  var utter = new SpeechSynthesisUtterance(text);
+  utter.rate = 0.95;
+  utter.pitch = 0.75;
+  utter.volume = 1.0;
+
+  function pickVoice() {
+    var voices = window.speechSynthesis.getVoices();
+    var prefs = [
+      'Microsoft Aria Online (Natural)',
+      'Microsoft Jenny Online (Natural)',
+      'Microsoft Michelle Online (Natural)',
+      'Microsoft Zira Online (Natural)',
+      'Microsoft Susan Online (Natural)',
+      'Google UK English Female',
+      'Samantha', 'Victoria', 'Karen'
+    ];
+    for (var i = 0; i < prefs.length; i++) {
+      var v = voices.find(function(vo) { return vo.name.indexOf(prefs[i]) !== -1; });
+      if (v) return v;
+    }
+    return voices.find(function(vo) { return vo.lang && vo.lang.startsWith('en'); }) || null;
+  }
+
+  function go() {
+    var v = pickVoice();
+    if (v) utter.voice = v;
+    window.speechSynthesis.speak(utter);
+  }
+
+  utter.onend = function() { if (onEnd) onEnd(); };
+  utter.onerror = function() { if (onEnd) onEnd(); };
+
+  var voices = window.speechSynthesis.getVoices();
+  if (voices.length) { go(); }
+  else { window.speechSynthesis.onvoiceschanged = go; }
+}
+
+// Main speak function — uses ElevenLabs if key is saved, else AppSDK, else browser fallback
+async function speakLongText(fullText, onFinish) {
+  fullText = preprocessForSpeech(fullText);
+  if (isMuted) { if (onFinish) onFinish(); return; }
+  stopSpeech();
+  _speakCancelled = false;
+
+  var apiKey = localStorage.getItem('el_api_key');
+  var voiceId = localStorage.getItem('el_voice_id') || '21m00Tcm4TlvDq8ikWAM';
+
+  if (apiKey) {
+    // ElevenLabs path — chunk into pieces under 2400 chars
+    var sentences = fullText.match(/[^.!?]+[.!?]+/g) || [fullText];
+    var chunks = [];
+    var current = '';
+    for (var i = 0; i < sentences.length; i++) {
+      if ((current + sentences[i]).length > 2400 && current.length > 0) {
+        chunks.push(current.trim());
+        current = sentences[i];
+      } else {
+        current += sentences[i];
+      }
+    }
+    if (current.trim()) chunks.push(current.trim());
+
+    var elSuccess = true;
+    for (var j = 0; j < chunks.length; j++) {
+      if (_speakCancelled || isMuted) break;
+      try {
+        await elevenLabsSpeak(chunks[j], apiKey, voiceId);
+      } catch(e) {
+        console.warn('ElevenLabs chunk error:', e);
+        elSuccess = false;
+        break;
+      }
+    }
+    currentAudio = null;
+    if (!_speakCancelled && elSuccess && onFinish) onFinish();
+    else if (!_speakCancelled && !elSuccess) {
+      // ElevenLabs failed — fall through to AppSDK / browser
+      await _fallbackSpeakLong(fullText, onFinish);
+    }
+  } else {
+    // No ElevenLabs key — try AppSDK, then browser
+    await _fallbackSpeakLong(fullText, onFinish);
+  }
+}
+
+// Fallback chain: AppSDK.ai.speak → Browser TTS
+async function _fallbackSpeakLong(fullText, onFinish) {
+  if (_speakCancelled || isMuted) { if (onFinish) onFinish(); return; }
+
+  // Try AppSDK.ai.speak with chunking
+  if (window.AppSDK && window.AppSDK.ai && window.AppSDK.ai.speak) {
+    var sentences = fullText.match(/[^.!?]+[.!?]+/g) || [fullText];
+    var chunks = [];
+    var current = '';
+    for (var i = 0; i < sentences.length; i++) {
+      if ((current + sentences[i]).length > 3800 && current.length > 0) {
+        chunks.push(current.trim());
+        current = sentences[i];
+      } else {
+        current += sentences[i];
+      }
+    }
+    if (current.trim()) chunks.push(current.trim());
+
+    var sdkWorked = true;
+    for (var j = 0; j < chunks.length; j++) {
+      if (_speakCancelled || isMuted) break;
+      var ok = await appSdkSpeak(chunks[j]);
+      if (!ok) { sdkWorked = false; break; }
+    }
+    currentAudio = null;
+    if (!_speakCancelled && sdkWorked) { if (onFinish) onFinish(); return; }
+    if (!_speakCancelled && !sdkWorked) {
+      // SDK failed — fall to browser
+      browserSpeak(fullText, onFinish);
+      return;
+    }
+    if (onFinish) onFinish();
+  } else {
+    // No SDK — browser fallback
+    browserSpeak(fullText, onFinish);
+  }
+}
+
+// Short single-phrase speak (for non-reading UI like sephirah descriptions)
+async function speakText(text) {
+  text = preprocessForSpeech(text);
+  if (isMuted) return;
+  stopSpeech();
+  _speakCancelled = false;
+
+  var apiKey = localStorage.getItem('el_api_key');
+  var voiceId = localStorage.getItem('el_voice_id') || '21m00Tcm4TlvDq8ikWAM';
+
+  if (apiKey) {
+    try {
+      await elevenLabsSpeak(text, apiKey, voiceId);
+      return;
+    } catch(e) {
+      console.warn('ElevenLabs short speak error:', e);
+    }
+  }
+
+  // Fallback: AppSDK
+  if (window.AppSDK && window.AppSDK.ai && window.AppSDK.ai.speak) {
+    var ok = await appSdkSpeak(text);
+    if (ok) return;
+  }
+
+  // Final fallback: browser
+  browserSpeak(text, null);
+}
+
+function stopSpeech() {
+  _speakCancelled = true;
+  if (currentAudio) {
+    try { currentAudio.pause(); currentAudio.currentTime = 0; } catch(e) {}
+    currentAudio = null;
+  }
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
+}
+
+function toggleMute() {
+  isMuted = !isMuted;
+  var btn = document.getElementById('mute-btn');
+  if (isMuted) {
+    stopSpeech();
+    if (btn) btn.textContent = '🔇';
+    btn.title = 'Unmute voice';
+  } else {
+    if (btn) btn.textContent = '🔊';
+    btn.title = 'Mute voice';
+  }
+}
+// ── END VOICE SYSTEM ──────────────────────────────────────────
+
+// Called when the reading voice finishes — reveals pricing
+function onReadingEnd() {
+  // Stop waveform animation
+  var waveform = document.getElementById('waveform');
+  if (waveform) waveform.classList.add('paused');
+
+  // Update oracle status with smooth transition
+  var oracleStatus = document.getElementById('oracle-status');
+  if (oracleStatus) {
+    oracleStatus.style.transition = 'opacity 0.6s';
+    oracleStatus.style.opacity = '0';
+    setTimeout(function() {
+      oracleStatus.textContent = '\u2726 Your reading is complete \u2726';
+      oracleStatus.style.color = '#c9a84c';
+      oracleStatus.style.letterSpacing = '0.2em';
+      oracleStatus.style.opacity = '1';
+    }, 600);
+  }
+
+  // Reveal pricing section with smooth transition
+  var pricingEl = document.getElementById('reading-pricing');
+  if (pricingEl) {
+    pricingEl.style.display = 'block';
+    void pricingEl.offsetWidth;
+    setTimeout(function() {
+      pricingEl.style.transition = 'opacity 1.2s ease, transform 1.2s ease';
+      pricingEl.style.opacity = '1';
+      pricingEl.style.transform = 'translateY(0)';
+      pricingEl.style.pointerEvents = 'auto';
+    }, 50);
+  }
+
+  // Scroll down to pricing
+  setTimeout(function() {
+    if (pricingEl) pricingEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 1400);
+}
+
+// ===========================
+// SEPHIROTH DATA & PATHS
+// ===========================
+var SEPHIROTH = [
+  { id:1, name:'Kether', hebrew:'\u05DB\u05B6\u05BC\u05EA\u05B6\u05E8', meaning:'Crown', x:200, y:45, color:'#ffffff', glow:'#e8e0ff', number:1, planet:'Primum Mobile', description:'The Crown \u2014 pure consciousness before form. The first emanation, the point of unity before division.', affirmation:'I AM the undivided light before all beginning.' },
+  { id:2, name:'Chokmah', hebrew:'\u05D7\u05C7\u05DB\u05B0\u05DE\u05B8\u05D4', meaning:'Wisdom', x:320, y:110, color:'#b8d4ff', glow:'#7ab0ff', number:2, planet:'Zodiac / Uranus', description:'Wisdom \u2014 the first flash of divine intelligence. The Father principle, pure yang energy.', affirmation:'I carry the seed of all wisdom within my being.' },
+  { id:3, name:'Binah', hebrew:'\u05D1\u05B4\u05BC\u05D9\u05E0\u05B8\u05D4', meaning:'Understanding', x:80, y:110, color:'#2a1a5a', glow:'#b08aff', number:3, planet:'Saturn', description:'Understanding \u2014 the Great Mother, the womb of form. She is time, structure, and the sacred container.', affirmation:'I understand the deep patterns beneath all things.' },
+  { id:4, name:'Chesed', hebrew:'\u05D7\u05B6\u05E1\u05B6\u05D3', meaning:'Mercy', x:320, y:200, color:'#1a3a8a', glow:'#4488ff', number:4, planet:'Jupiter', description:'Mercy \u2014 boundless loving-kindness and expansive grace. The builder, the lawgiver.', affirmation:'I give and receive love without condition or limit.' },
+  { id:5, name:'Geburah', hebrew:'\u05D2\u05B0\u05BC\u05D1\u05D5\u05BC\u05E8\u05B8\u05D4', meaning:'Strength', x:80, y:200, color:'#8a1a1a', glow:'#ff4444', number:5, planet:'Mars', description:'Strength and Severity \u2014 the divine warrior, the force that burns away what no longer serves.', affirmation:'I have the courage to cut away what diminishes my truth.' },
+  { id:6, name:'Tiphareth', hebrew:'\u05EA\u05B4\u05BC\u05E4\u05B0\u05D0\u05B6\u05E8\u05B6\u05EA', meaning:'Beauty', x:200, y:210, color:'#c9a84c', glow:'#f0d070', number:6, planet:'Sun', description:'Beauty \u2014 the heart of the Tree, the point of perfect balance. The solar king.', affirmation:'I am the beautiful center where all forces find their balance.' },
+  { id:7, name:'Netzach', hebrew:'\u05E0\u05B6\u05BC\u05E6\u05B7\u05D7', meaning:'Victory', x:320, y:290, color:'#1a6a2a', glow:'#44cc66', number:7, planet:'Venus', description:'Victory \u2014 the sphere of emotion, desire, art, and the natural world. The realm of the Muse.', affirmation:'I honor the full truth of my desires and feelings.' },
+  { id:8, name:'Hod', hebrew:'\u05D4\u05D5\u05B9\u05D3', meaning:'Splendour', x:80, y:290, color:'#8a5a1a', glow:'#ffaa44', number:8, planet:'Mercury', description:'Splendour \u2014 the sphere of intellect, language, and magic. The realm of form and symbol.', affirmation:'I communicate my truth with precision and power.' },
+  { id:9, name:'Yesod', hebrew:'\u05D9\u05B0\u05E1\u05D5\u05B9\u05D3', meaning:'Foundation', x:200, y:355, color:'#4a3a8a', glow:'#9966cc', number:9, planet:'Moon', description:'Foundation \u2014 the astral realm, the treasure house of images, the subconscious mind.', affirmation:'My foundations are deep, my inner world is rich and clear.' },
+  { id:10, name:'Malkuth', hebrew:'\u05DE\u05B7\u05DC\u05B0\u05DB\u05D5\u05BC\u05EA', meaning:'Kingdom', x:200, y:430, color:'#3a2a1a', glow:'#c4a882', number:10, planet:'Earth', description:'The Kingdom \u2014 the physical world, where spirit becomes flesh and all emanations crystallize.', affirmation:'I am fully present in my body and the world I inhabit.' }
+];
+
+var PATHS_22 = [
+  [1,2],[1,3],[2,3],[2,6],[3,6],[4,5],[4,6],[4,7],[5,6],[5,8],
+  [6,7],[6,8],[6,9],[7,8],[7,9],[7,10],[8,9],[8,10],[9,10],[1,6],[3,5],[2,4]
+];
+
+// ===========================
+// POPULATE DROPDOWNS
+// ===========================
+(function(){
+  var daySelect = document.getElementById('hook-day');
+  for (var d = 1; d <= 31; d++) {
+    var opt = document.createElement('option');
+    opt.value = d; opt.textContent = d;
+    daySelect.appendChild(opt);
+  }
+  var yearSelect = document.getElementById('hook-year');
+  for (var y = 2010; y >= 1940; y--) {
+    var opt2 = document.createElement('option');
+    opt2.value = y; opt2.textContent = y;
+    yearSelect.appendChild(opt2);
+  }
+})();
+
+// ===========================
+// OWNER EMAIL & PURCHASE LOGGING
+// ===========================
+var OWNER_EMAIL = 'heatherf@constructivedesignsinc.org';
+
+function logPurchase(buyerName, buyerEmail, orderId, tier) {
+  try {
+    var purchases = JSON.parse(localStorage.getItem('cs_purchases') || '[]');
+    purchases.unshift({
+      id: orderId, date: new Date().toISOString(),
+      buyer: buyerName || 'Anonymous', email: buyerEmail || 'not provided',
+      tier: tier ? tier.name : 'Unknown', pages: tier ? tier.pages : '?',
+      price: tier ? '$' + tier.price : 'unknown',
+      profile: window._readingProfile ? {
+        name: window._readingProfile.firstName, dob: window._readingProfile.dob,
+        sunSign: window._readingProfile.sunSign ? window._readingProfile.sunSign.sign : '',
+        lifePath: window._readingProfile.lifePath
+      } : {}
+    });
+    localStorage.setItem('cs_purchases', JSON.stringify(purchases));
+  } catch(e) { console.warn('Purchase log failed:', e); }
+}
+
+// ===========================
+// ELEVENLABS ADMIN SETTINGS
+// ===========================
+function loadElevenLabsSettings() {
+  var savedKey = localStorage.getItem('el_api_key');
+  var savedVoice = localStorage.getItem('el_voice_id') || '21m00Tcm4TlvDq8ikWAM';
+  var keyInput = document.getElementById('el-api-key-input');
+  var voiceSelect = document.getElementById('el-voice-select');
+  if (keyInput && savedKey) keyInput.value = savedKey;
+  if (voiceSelect) voiceSelect.value = savedVoice;
+}
+
+document.getElementById('el-save-btn').addEventListener('click', function() {
+  var key = document.getElementById('el-api-key-input').value.trim();
+  var voice = document.getElementById('el-voice-select').value;
+  var status = document.getElementById('el-status');
+  if (!key) {
+    status.textContent = '⚠️ Please enter your API key.';
+    status.style.color = '#ff9ed2';
+    return;
+  }
+  localStorage.setItem('el_api_key', key);
+  localStorage.setItem('el_voice_id', voice);
+  status.textContent = '✅ Key saved successfully! Voice will use ElevenLabs on next reading.';
+  status.style.color = '#c9a84c';
+});
+
+document.getElementById('el-test-btn').addEventListener('click', async function() {
+  var status = document.getElementById('el-status');
+  var key = localStorage.getItem('el_api_key');
+  var voice = localStorage.getItem('el_voice_id') || '21m00Tcm4TlvDq8ikWAM';
+  if (!key) {
+    status.textContent = '⚠️ Save your API key first.';
+    status.style.color = '#ff9ed2';
+    return;
+  }
+  status.textContent = '🎙️ Testing voice...';
+  status.style.color = '#b08aff';
+  try {
+    await elevenLabsSpeak('The oracle is ready. Your blueprint awaits.', key, voice);
+    status.textContent = '✅ Voice test successful!';
+    status.style.color = '#c9a84c';
+  } catch(e) {
+    status.textContent = '❌ Error: ' + (e.message || 'Check your API key and try again.');
+    status.style.color = '#ff9ed2';
+  }
+});
+
+// ===========================
+// ADMIN PANEL
+// ===========================
+var _adminTaps = 0, _adminTapTimer = null;
+function handleAdminTap() {
+  _adminTaps++;
+  clearTimeout(_adminTapTimer);
+  _adminTapTimer = setTimeout(function() { _adminTaps = 0; }, 2000);
+  if (_adminTaps >= 5) { _adminTaps = 0; showAdminPanel(); }
+}
+function showAdminPanel() {
+  var panel = document.getElementById('adminPanel'); if (!panel) return;
+  var purchases = [];
+  try { purchases = JSON.parse(localStorage.getItem('cs_purchases') || '[]'); } catch(e){}
+  var total = 0;
+  purchases.forEach(function(p) { var val = parseFloat((p.price || '$0').replace('$','')); if (!isNaN(val)) total += val; });
+  var avg = purchases.length > 0 ? (total / purchases.length) : 0;
+  var revEl = document.getElementById('adminRevTotal');
+  var cntEl = document.getElementById('adminOrderCount');
+  var avgEl = document.getElementById('adminAvgOrder');
+  if (revEl) revEl.textContent = '$' + total.toFixed(2);
+  if (cntEl) cntEl.textContent = purchases.length;
+  if (avgEl) avgEl.textContent = '$' + avg.toFixed(2);
+  var listEl = document.getElementById('adminPurchaseList');
+  var emptyEl = document.getElementById('adminEmptyState');
+  if (!purchases.length) { if (listEl) listEl.innerHTML = ''; if (emptyEl) emptyEl.style.display = 'block'; }
+  else {
+    if (emptyEl) emptyEl.style.display = 'none';
+    if (listEl) {
+      listEl.innerHTML = purchases.map(function(p) {
+        var d = new Date(p.date);
+        var dateStr = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+        return '<div style="background:rgba(15,8,35,0.8);border:1px solid rgba(176,138,255,0.15);border-radius:12px;padding:1rem 1.2rem;">'
+          + '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.5rem;">'
+          + '<div><div style="font:600 0.92rem Georgia,serif;color:#e8e0ff;">' + (p.buyer||'Anonymous') + '</div>'
+          + '<div style="font-size:0.75rem;color:#6a5a9a;margin-top:2px;">' + (p.email||'\u2014') + '</div></div>'
+          + '<div style="text-align:right;"><div style="font:700 1rem Georgia,serif;color:#c9a84c;">' + p.price + '</div>'
+          + '<div style="font-size:0.68rem;color:#4a3a6a;">' + dateStr + '</div></div></div>'
+          + '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;">'
+          + '<span style="font-size:0.72rem;background:rgba(176,138,255,0.1);border:1px solid rgba(176,138,255,0.2);border-radius:20px;padding:2px 8px;color:#9b8ec4;">' + (p.tier||'\u2014') + '</span>'
+          + '<span style="font-size:0.72rem;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);border-radius:20px;padding:2px 8px;color:#c9a84c;">' + (p.pages||'?') + ' pages</span>'
+          + (p.profile && p.profile.name ? '<span style="font-size:0.72rem;background:rgba(255,158,210,0.08);border:1px solid rgba(255,158,210,0.15);border-radius:20px;padding:2px 8px;color:#ff9ed2;">LP' + (p.profile.lifePath||'') + ' \u00b7 ' + (p.profile.sunSign||'') + '</span>' : '')
+          + '</div>'
+          + '<div style="margin-top:0.5rem;font-size:0.68rem;color:#3a2a5a;font-family:Courier New,monospace;">Order: ' + (p.id||'N/A') + '</div></div>';
+      }).join('');
+    }
+  }
+  // Load ElevenLabs settings when admin panel opens
+  loadElevenLabsSettings();
+  panel.style.display = 'block';
+}
+function exportPurchaseCSV() {
+  var purchases = [];
+  try { purchases = JSON.parse(localStorage.getItem('cs_purchases') || '[]'); } catch(e){}
+  if (!purchases.length) return;
+  var rows = ['Date,Buyer Name,Email,Tier,Pages,Price,Life Path,Sun Sign,Order ID'];
+  purchases.forEach(function(p) {
+    rows.push([new Date(p.date).toLocaleString(),p.buyer||'',p.email||'',p.tier||'',p.pages||'',p.price||'',p.profile?(p.profile.lifePath||''):'',p.profile?(p.profile.sunSign||''):'',p.id||''].map(function(v){ return '"'+String(v).replace(/"/g,'""')+'"'; }).join(','));
+  });
+  var blob = new Blob([rows.join('\n')], {type:'text/csv'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a'); a.href = url;
+  a.download = 'circles-squared-purchases-' + new Date().toISOString().slice(0,10) + '.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+document.getElementById('admin-tap-target').addEventListener('click', handleAdminTap);
+document.getElementById('admin-close-btn').addEventListener('click', function() { document.getElementById('adminPanel').style.display = 'none'; });
+document.getElementById('admin-export-btn').addEventListener('click', exportPurchaseCSV);
+document.getElementById('admin-clear-btn').addEventListener('click', function() {
+  if (!confirm('Clear all purchase records? This cannot be undone.')) return;
+  localStorage.removeItem('cs_purchases'); showAdminPanel();
+});
+
+// ===========================
+// TIER SYSTEM (CHANGE 3 — Partnership tier added)
+// ===========================
+var TIERS = [
+  {
+    slug:'initiation', name:'The Initiation', price:'33.00', pages:3, badge:null,
+    tagline:'All three systems. The essential portrait.',
+    includes: [
+      '\u2726 Life Path \u2014 your core soul identity',
+      '\u2609 Sun Sign \u2014 your celestial portrait',
+      '\ud83c\udf33 Tree of Life \u2014 your Sephirah position',
+      '3-page personalized PDF delivered to your email'
+    ]
+  },
+  {
+    slug:'unveiling', name:'The Unveiling', price:'66.00', pages:6, badge:'Most Popular',
+    tagline:'Deeper into every system. The hidden layers revealed.',
+    includes: [
+      'Everything in The Initiation (pages 1\u20133)',
+      '\u2726 Expression + Soul Urge \u2014 your name\'s hidden gifts',
+      '\u2609 Shadow & Gift Duality \u2014 your full elemental spectrum',
+      '\ud83c\udf33 The 22 Paths + your Hidden Master Number',
+      '6-page personalized PDF delivered to your email'
+    ]
+  },
+  {
+    slug:'blueprint', name:'The Complete Blueprint', price:'99.00', pages:9, badge:'Best Value',
+    tagline:'Every number. Every star. Every path on the Tree.',
+    includes: [
+      'Everything in The Unveiling (pages 1\u20136)',
+      '\u2726 Karmic Debt + Personal Year 2026 Forecast',
+      '\u2609 Romantic Compatibility + Cosmic Timing',
+      '\ud83c\udf33 AIN SOPH AUR + Full Chart + Celestia\'s Closing Blessing',
+      '9-page personalized PDF delivered to your email'
+    ]
+  },
+  {
+    slug:'partnership', name:'Partnership Blueprint', price:'66.00', pages:6, badge:'\ud83d\udc9e Most Requested',
+    color:'#ff9ed2',
+    tagline:'Two Souls, One Map',
+    includes: [
+      '\u2726 Full reading for both individuals',
+      '\u2726 Composite Life Path compatibility',
+      '\u2726 Sephirothic overlap analysis',
+      '\u2726 Synastry chart highlights',
+      '\u2726 Relationship strengths & growth edges',
+      '\u2726 Detailed PDF delivered by email'
+    ]
+  }
+];
+
+// ===========================
+// STARFIELD
+// ===========================
+(function(){
+  var canvas = document.getElementById('starfield');
+  var ctx = canvas.getContext('2d');
+  var stars = [];
+  function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+  for (var i = 0; i < 220; i++) {
+    stars.push({ x:Math.random()*canvas.width, y:Math.random()*canvas.height, r:Math.random()*1.5+0.3, alpha:Math.random(), da:(Math.random()-0.5)*0.015, dx:(Math.random()-0.5)*0.12, dy:(Math.random()-0.5)*0.08 });
+  }
+  function draw() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    for (var i=0;i<stars.length;i++) {
+      var s=stars[i]; s.alpha+=s.da;
+      if(s.alpha<=0.1||s.alpha>=1)s.da*=-1;
+      s.x+=s.dx; s.y+=s.dy;
+      if(s.x<0)s.x=canvas.width; if(s.x>canvas.width)s.x=0;
+      if(s.y<0)s.y=canvas.height; if(s.y>canvas.height)s.y=0;
+      ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fillStyle='rgba(232,224,255,'+Math.max(0,Math.min(1,s.alpha))+')'; ctx.fill();
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// Floating symbols
+(function(){
+  var container=document.getElementById('cosmicSymbols');
+  var symbols=['\u2726','\u2B21','\u25C8','\u2727','\u22B9','\u27E1'];
+  function spawn(){
+    var el=document.createElement('div'); el.className='cosmic-symbol';
+    el.textContent=symbols[Math.floor(Math.random()*symbols.length)];
+    el.style.left=(Math.random()*100)+'%';
+    el.style.animationDuration=(18+Math.random()*25)+'s';
+    el.style.animationDelay=(Math.random()*5)+'s';
+    el.style.fontSize=(0.8+Math.random()*0.8)+'rem';
+    container.appendChild(el);
+    setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);},45000);
+  }
+  for(var i=0;i<8;i++)setTimeout(spawn,i*2000);
+  setInterval(spawn,4500);
+})();
+
+// ===========================
+// NUMEROLOGY CALCULATIONS
+// ===========================
+function reduceNum(n,keepMaster){
+  if(keepMaster&&(n===11||n===22||n===33))return n;
+  if(n<10)return n;
+  var s=0;String(n).split('').forEach(function(d){s+=parseInt(d);});
+  return reduceNum(s,keepMaster);
+}
+function calcLifePath(month,day,year){
+  var digits = (String(month)+String(day)+String(year)).split('').map(Number);
+  var sum = digits.reduce(function(a,b){return a+b;},0);
+  return reduceNum(sum,true);
+}
+function calcHiddenMaster(month,day,year){
+  var yearDigits=String(year).split('').map(Number).reduce(function(a,b){return a+b;},0);
+  var yearReduced=reduceNum(yearDigits,false);
+  var total=month+day+yearReduced;
+  if(total===11||total===22||total===33)return total; return null;
+}
+function calcPersonalYear(month,day,year){
+  var sum=month+day+String(year).split('').reduce(function(a,b){return a+parseInt(b);},0);
+  while(sum>9&&sum!==11&&sum!==22&&sum!==33){sum=String(sum).split('').reduce(function(a,b){return a+parseInt(b);},0);}
+  return sum;
+}
+var PYTH={A:1,B:2,C:3,D:4,E:5,F:6,G:7,H:8,I:9,J:1,K:2,L:3,M:4,N:5,O:6,P:7,Q:8,R:9,S:1,T:2,U:3,V:4,W:5,X:6,Y:7,Z:8};
+var VOWELS_MAP={A:1,E:1,I:1,O:1,U:1};
+function nameVal(name,onlyV,onlyC){var sum=0;name.toUpperCase().split('').forEach(function(c){var v=PYTH[c];if(!v)return;if(onlyV&&!VOWELS_MAP[c])return;if(onlyC&&VOWELS_MAP[c])return;sum+=v;});return sum;}
+function calcExpression(fn){return reduceNum(nameVal(fn,false,false),true);}
+function calcSoulUrge(fn){return reduceNum(nameVal(fn,true,false),true);}
+function calcPersonality(fn){return reduceNum(nameVal(fn,false,true),true);}
+function calcGematria(word){var sum=0;word.toUpperCase().split('').forEach(function(c){var v=c.charCodeAt(0)-64;if(v>=1&&v<=26)sum+=v;});return{total:sum,reduced:reduceNum(sum,true)};}
+
+function getSunSign(month,day){
+  var signs=[
+    {sign:'Capricorn',symbol:'\u2651',element:'Earth',modality:'Cardinal',planet:'Saturn',start:[12,22]},
+    {sign:'Aquarius',symbol:'\u2652',element:'Air',modality:'Fixed',planet:'Uranus',start:[1,20]},
+    {sign:'Pisces',symbol:'\u2653',element:'Water',modality:'Mutable',planet:'Neptune',start:[2,19]},
+    {sign:'Aries',symbol:'\u2648',element:'Fire',modality:'Cardinal',planet:'Mars',start:[3,21]},
+    {sign:'Taurus',symbol:'\u2649',element:'Earth',modality:'Fixed',planet:'Venus',start:[4,20]},
+    {sign:'Gemini',symbol:'\u264A',element:'Air',modality:'Mutable',planet:'Mercury',start:[5,21]},
+    {sign:'Cancer',symbol:'\u264B',element:'Water',modality:'Cardinal',planet:'Moon',start:[6,21]},
+    {sign:'Leo',symbol:'\u264C',element:'Fire',modality:'Fixed',planet:'Sun',start:[7,23]},
+    {sign:'Virgo',symbol:'\u264D',element:'Earth',modality:'Mutable',planet:'Mercury',start:[8,23]},
+    {sign:'Libra',symbol:'\u264E',element:'Air',modality:'Cardinal',planet:'Venus',start:[9,23]},
+    {sign:'Scorpio',symbol:'\u264F',element:'Water',modality:'Fixed',planet:'Pluto',start:[10,23]},
+    {sign:'Sagittarius',symbol:'\u2650',element:'Fire',modality:'Mutable',planet:'Jupiter',start:[11,22]},
+    {sign:'Capricorn',symbol:'\u2651',element:'Earth',modality:'Cardinal',planet:'Saturn',start:[12,22]}
+  ];
+  for(var i=signs.length-1;i>=0;i--){if(month>signs[i].start[0]||(month===signs[i].start[0]&&day>=signs[i].start[1]))return signs[i];}
+  return signs[0];
+}
+
+// ===========================
+// LIFE PATH MEANINGS
+// ===========================
+var LP_MEANINGS = {
+  1: "You are here to lead. Not because power was handed to you, but because the universe wired you to forge a path where none existed. Your greatest challenge is learning that independence and isolation are not the same thing.",
+  2: "You are here to bridge worlds. Your sensitivity is not a weakness \u2014 it is your most sophisticated tool. You feel what others cannot name, and that gift, when trusted, becomes your greatest power.",
+  3: "You are here to illuminate. Your words, your presence, your creativity \u2014 these are not hobbies. They are your assignment. The world becomes more alive when you choose to speak.",
+  4: "You are here to build. Not just structures, but foundations \u2014 the kind that outlast you. Your discipline is rare. Your patience is rarer. What you construct will stand long after you are gone.",
+  5: "You are here to move. Through ideas, through experience, through every door that curiosity opens. Your freedom is not a flaw to be corrected \u2014 it is the very vehicle of your purpose.",
+  6: "You are here to love, and to teach others what love actually looks like in practice. Responsibility found you early because the universe knew you could carry it. Your home, in every sense, is sacred ground.",
+  7: "You are here to know. The deeper questions \u2014 the ones most people deflect \u2014 those are yours to sit with and answer. Your inner world is vast. Your wisdom, earned through solitude, is meant to be shared.",
+  8: "You are here to master the material world in service of something larger. Power, abundance, authority \u2014 these are your tools, not your identity. Your greatest work is learning the difference.",
+  9: "You are here to complete. To gather wisdom from every experience, distill it into something universal, and offer it back to the world without attachment. You are the oldest soul in the room. Act accordingly.",
+  11: "You carry the rare frequency of spiritual illumination. You see and feel more than most \u2014 and that is not a burden, it is your assignment. You are here to illuminate the path for others.",
+  22: "You carry the extraordinary ability to turn visionary dreams into physical reality on a scale that serves humanity. You are the architect of the impossible, the master builder.",
+  33: "The rarest of all master frequencies. Unconditional love is not your aspiration \u2014 it is your soul's native language and the vibration that heals everything it touches."
+};
+
+// ===========================
+// SEPHIRAH ASSIGNMENTS
+// ===========================
+function getSephirahForLP(lp) {
+  var map = {
+    1: { name:'Kether', meaning:'the undivided source, the first light', sephId:1 },
+    2: { name:'Chokmah', meaning:'the original impulse, the father principle', sephId:2 },
+    3: { name:'Binah', meaning:'the great mother, the womb of form', sephId:3 },
+    4: { name:'Chesed', meaning:'divine grace, abundance, expansion', sephId:4 },
+    5: { name:'Geburah', meaning:'sacred discipline, the power of discernment', sephId:5 },
+    6: { name:'Tiphareth', meaning:'the heart of the Tree, the solar center, the self', sephId:6 },
+    7: { name:'Netzach', meaning:'desire, nature, the instinctual soul', sephId:7 },
+    8: { name:'Hod', meaning:'intellect, communication, the crafted mind', sephId:8 },
+    9: { name:'Yesod', meaning:'the dream, the unconscious, the reflective self', sephId:9 },
+    11: { name:"Da'ath", meaning:'the hidden sephirah, the abyss between worlds', sephId:6 },
+    22: { name:'Malkuth', meaning:'the manifest world, the body of God', sephId:10 },
+    33: { name:'AIN SOPH AUR', meaning:'the limitless light above the Tree', sephId:1 }
+  };
+  return map[lp] || map[reduceNum(lp,false)] || map[6];
+}
+
+var ELEMENT_LP_INTERACTION = {
+  Fire: {
+    1: "That Fire energy fuels your independence with relentless passion \u2014 you do not simply lead, you ignite.",
+    2: "Fire beneath a peacemaker creates a fierce protector \u2014 your diplomacy burns with conviction.",
+    3: "Fire and creativity are ancient partners. Your self-expression does not whisper \u2014 it blazes.",
+    4: "Fire tempered by discipline becomes a forge. You build with intensity others cannot sustain.",
+    5: "Fire and freedom together are unstoppable. You move through life like a flame through a forest.",
+    6: "Fire in a nurturer creates a love so fierce it transforms everything it touches.",
+    7: "Fire and contemplation together create the mystic \u2014 you seek truth with burning urgency.",
+    8: "Fire fuels your drive for mastery. Your authority is not cold \u2014 it radiates.",
+    9: "Fire at the end of the cycle creates a purifier. Your compassion burns clean.",
+    11: "Fire amplifies your illumination. You are a beacon that cannot be ignored.",
+    22: "Fire and master building together create unstoppable momentum.",
+    33: "Fire and unconditional love create a force of pure spiritual transformation."
+  },
+  Water: {
+    1: "Water beneath leadership creates intuitive command \u2014 you lead by feeling the current.",
+    2: "Water is your native element. Your sensitivity runs as deep as the ocean itself.",
+    3: "Water and creativity produce art that moves the soul to tears and back to joy.",
+    4: "Water and structure together create the dam \u2014 you hold vast emotional power in perfect form.",
+    5: "Water and freedom together make you fluid, adaptive, impossible to contain.",
+    6: "Water and nurturing are inseparable. Your love flows like a river \u2014 constant and life-giving.",
+    7: "Water and the seeker are natural allies. You dive deeper than anyone dares.",
+    8: "Water beneath power creates emotional intelligence that most leaders never achieve.",
+    9: "Water at the completion carries the memory of every soul it has touched.",
+    11: "Water amplifies your psychic gifts. You feel the future before it arrives.",
+    22: "Water and the master builder create someone who shapes reality through pure feeling.",
+    33: "Water and unconditional love together are the ocean of compassion itself."
+  },
+  Air: {
+    1: "Air fuels your leadership with vision \u2014 you see paths that others cannot conceive.",
+    2: "Air and sensitivity together create a mind that reads the room before a word is spoken.",
+    3: "Air and creativity produce ideas that spread like wildfire through every conversation.",
+    4: "Air and structure together create the architect of systems \u2014 elegant, precise, enduring.",
+    5: "Air and freedom are the winds of change itself. You think at the speed of possibility.",
+    6: "Air in a nurturer creates wisdom \u2014 you teach through clarity, not control.",
+    7: "Air and the seeker create the philosopher \u2014 your mind reaches for truths beyond the visible.",
+    8: "Air beneath mastery creates strategic brilliance. You see the whole board at once.",
+    9: "Air at the completion creates a teacher whose ideas outlive every generation.",
+    11: "Air and illumination together create a visionary whose insights change paradigms.",
+    22: "Air and the master builder create someone who manifests through pure thought.",
+    33: "Air and unconditional love create a communicator of divine truth."
+  },
+  Earth: {
+    1: "Earth grounds your leadership in reality \u2014 you build empires that last.",
+    2: "Earth and sensitivity create a grounded intuition that others trust instinctively.",
+    3: "Earth and creativity produce tangible beauty \u2014 your art has weight and permanence.",
+    4: "Earth is your native ground. You and this element together are the foundation of worlds.",
+    5: "Earth and freedom create a paradox \u2014 you crave stability and adventure in equal measure.",
+    6: "Earth and nurturing create sacred ground. Your home is a temple, and everyone feels it.",
+    7: "Earth and the seeker create practical wisdom \u2014 your knowledge always has a use.",
+    8: "Earth is the domain of abundance. You understand material reality at a cellular level.",
+    9: "Earth at the completion creates a legacy \u2014 something you leave behind in the soil itself.",
+    11: "Earth grounds your illumination, making your spiritual gifts practical and real.",
+    22: "Earth and master building together are the ultimate combination for manifesting vision.",
+    33: "Earth and unconditional love create a healer whose presence alone is medicine."
+  }
+};
+
+// ===========================
+// FULL LP_DATA for PDF generation
+// ===========================
+var LP_DATA = {
+  1:{title:'The Pioneer',teaser:LP_MEANINGS[1],gift:'Visionary leadership'},
+  2:{title:'The Peacemaker',teaser:LP_MEANINGS[2],gift:'Intuitive diplomacy'},
+  3:{title:'The Creative',teaser:LP_MEANINGS[3],gift:'Joyful self-expression'},
+  4:{title:'The Builder',teaser:LP_MEANINGS[4],gift:'Sacred structure & stability'},
+  5:{title:'The Adventurer',teaser:LP_MEANINGS[5],gift:'Transformative freedom'},
+  6:{title:'The Nurturer',teaser:LP_MEANINGS[6],gift:'Creating harmony and beauty'},
+  7:{title:'The Seeker',teaser:LP_MEANINGS[7],gift:'Mystical wisdom & analysis'},
+  8:{title:'The Powerhouse',teaser:LP_MEANINGS[8],gift:'Manifesting abundance'},
+  9:{title:'The Humanitarian',teaser:LP_MEANINGS[9],gift:'Universal compassion'},
+  11:{title:'The Illuminator \u2726',teaser:LP_MEANINGS[11],gift:'Spiritual illumination'},
+  22:{title:'The Master Builder \u2726',teaser:LP_MEANINGS[22],gift:'Manifesting the impossible'},
+  33:{title:'The Master Teacher \u2726',teaser:LP_MEANINGS[33],gift:'Unconditional love actualized'}
+};
+
+var SIGN_TEASERS={
+  Aries:"Born under the fire of the first sign \u2014 you arrived as the spark that ignites every new beginning.",
+  Taurus:"Rooted in the richest earth of spring \u2014 you carry the patient power of nature herself.",
+  Gemini:"Born under the sign of the celestial twins \u2014 your mind dances between worlds.",
+  Cancer:"Born under the Moon's tender gaze \u2014 you carry the ocean's memory in your heart.",
+  Leo:"Born when the Sun reaches its full glory \u2014 you arrived as living sunlight.",
+  Virgo:"Born under the harvest constellation \u2014 your soul carries the sacred gift of discernment.",
+  Libra:"Born under the autumn equinox \u2014 the one moment each year when light and dark stand in perfect balance.",
+  Scorpio:"You carry the power of complete transformation \u2014 you know how to die to what no longer serves and rise.",
+  Sagittarius:"Born under the Archer's star \u2014 your soul carries an arrow aimed at truth itself.",
+  Capricorn:"Born when the Sun touches its lowest point and begins to climb \u2014 you carry the ancient wisdom of mastery.",
+  Aquarius:"Born under the Water Bearer's star \u2014 you carry the frequency of the future itself.",
+  Pisces:"Born where the zodiac wheel dissolves back into the cosmic ocean \u2014 you carry the dreams of every sign before you."
+};
+
+// ===========================
+// SCREEN MANAGEMENT
+// ===========================
+function showScreen(name){
+  stopSpeech(); // Always stop speech when switching screens
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');s.style.display='none';});
+  var target=document.getElementById('screen-'+name);
+  if(target){target.style.display='flex';void target.offsetWidth;target.classList.add('active');}
+  window.scrollTo({top:0,behavior:'smooth'});
+  // Show mute toggle only on teaser screen
+  var muteBtn = document.getElementById('mute-btn');
+  if (name === 'teaser' || name === 'edu') { muteBtn.style.display = 'flex'; }
+  else { muteBtn.style.display = 'none'; }
+}
+
+// ===========================
+// TREE OF LIFE SVG BUILDER
+// ===========================
+function buildInteractiveTree(userSephId, containerId) {
+  var container = document.getElementById(containerId); if (!container) return;
+  var svgW = 400, svgH = 490;
+  var svgEl = document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svgEl.setAttribute('viewBox','0 0 '+svgW+' '+svgH);
+  svgEl.setAttribute('width','100%');
+  svgEl.setAttribute('style','max-width:400px;display:block;margin:0 auto;');
+
+  PATHS_22.forEach(function(path) {
+    var a = SEPHIROTH.find(function(s){return s.id===path[0];});
+    var b = SEPHIROTH.find(function(s){return s.id===path[1];});
+    if (!a||!b) return;
+    var isUserPath = (path[0]===userSephId||path[1]===userSephId);
+    var line = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',a.x); line.setAttribute('y1',a.y);
+    line.setAttribute('x2',b.x); line.setAttribute('y2',b.y);
+    line.setAttribute('stroke', isUserPath ? 'rgba(201,168,76,0.55)' : 'rgba(176,138,255,0.2)');
+    line.setAttribute('stroke-width', isUserPath ? '1.8' : '1');
+    if (isUserPath) {
+      var anim = document.createElementNS('http://www.w3.org/2000/svg','animate');
+      anim.setAttribute('attributeName','stroke-opacity');
+      anim.setAttribute('values','0.5;1;0.5');
+      anim.setAttribute('dur','3s');
+      anim.setAttribute('repeatCount','indefinite');
+      line.appendChild(anim);
+    }
+    svgEl.appendChild(line);
+  });
+
+  SEPHIROTH.forEach(function(seph) {
+    var isUser = (seph.id === userSephId);
+    var g = document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.setAttribute('class','tol-sephirah'+(isUser?' user-node':''));
+    g.style.cursor = 'pointer';
+    if (isUser) {
+      var glowCirc = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      glowCirc.setAttribute('cx',seph.x); glowCirc.setAttribute('cy',seph.y); glowCirc.setAttribute('r','22');
+      glowCirc.setAttribute('fill','none'); glowCirc.setAttribute('stroke',seph.glow);
+      glowCirc.setAttribute('stroke-width','1.5'); glowCirc.setAttribute('opacity','0.6');
+      var animR = document.createElementNS('http://www.w3.org/2000/svg','animate');
+      animR.setAttribute('attributeName','r'); animR.setAttribute('values','20;26;20'); animR.setAttribute('dur','2s'); animR.setAttribute('repeatCount','indefinite');
+      glowCirc.appendChild(animR);
+      g.appendChild(glowCirc);
+    }
+    var circ = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    circ.setAttribute('cx',seph.x); circ.setAttribute('cy',seph.y);
+    circ.setAttribute('r', isUser ? '18' : '14');
+    circ.setAttribute('fill', isUser ? seph.glow : seph.color);
+    circ.setAttribute('stroke', isUser ? seph.glow : (seph.glow+'55'));
+    circ.setAttribute('stroke-width', isUser ? '2' : '1');
+    circ.setAttribute('class','tol-circle');
+    if (!isUser) circ.setAttribute('fill-opacity','0.35');
+    g.appendChild(circ);
+    var numTxt = document.createElementNS('http://www.w3.org/2000/svg','text');
+    numTxt.setAttribute('x',seph.x); numTxt.setAttribute('y',seph.y+1);
+    numTxt.setAttribute('text-anchor','middle'); numTxt.setAttribute('dominant-baseline','middle');
+    numTxt.setAttribute('font-size', isUser ? '9' : '8');
+    numTxt.setAttribute('font-family','Courier New,monospace'); numTxt.setAttribute('font-weight','bold');
+    numTxt.setAttribute('fill', isUser ? '#0a0015' : '#e8e0ff');
+    numTxt.setAttribute('pointer-events','none');
+    numTxt.textContent = seph.number;
+    g.appendChild(numTxt);
+    var labelY = seph.y + (isUser ? 26 : 22);
+    var labelTxt = document.createElementNS('http://www.w3.org/2000/svg','text');
+    labelTxt.setAttribute('x',seph.x); labelTxt.setAttribute('y',labelY);
+    labelTxt.setAttribute('text-anchor','middle'); labelTxt.setAttribute('font-size','7');
+    labelTxt.setAttribute('font-family','Courier New,monospace');
+    labelTxt.setAttribute('fill', isUser ? seph.glow : 'rgba(200,185,240,0.65)');
+    labelTxt.setAttribute('pointer-events','none');
+    labelTxt.textContent = seph.name.toUpperCase();
+    g.appendChild(labelTxt);
+
+    (function(sephRef, cId) {
+      g.addEventListener('click', function() { showSephPanel(cId, sephRef, userSephId); });
+    })(seph, containerId);
+
+    svgEl.appendChild(g);
+  });
+  container.innerHTML = '';
+  container.appendChild(svgEl);
+}
+
+function showSephPanel(containerId, seph, userSephId) {
+  var wrapper = document.getElementById(containerId+'-wrapper');
+  if (!wrapper) return;
+  var panel = wrapper.querySelector('.tol-panel');
+  if (!panel) return;
+  var isUser = (seph.id === userSephId);
+  panel.innerHTML =
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.6rem;">'
+    + '<div>'
+    + '<div style="font-family:Courier New,monospace;font-size:0.55rem;letter-spacing:0.3em;color:'+(isUser?'#c9a84c':'#9b8ec4')+';">'+(isUser?'\u2726 YOUR POSITION \u00b7 ':'')+'SEPHIRAH '+seph.number+'</div>'
+    + '<div style="font:700 1.05rem Georgia,serif;color:'+(isUser?'#f0d070':'#e8e0ff')+';">'+seph.name+' \u2014 '+seph.meaning+'</div>'
+    + '<div style="font-size:0.72rem;color:#5a4a7a;font-family:Courier New,monospace;margin-top:2px;">'+seph.planet+' &nbsp;\u00b7&nbsp; '+seph.hebrew+'</div>'
+    + '</div>'
+    + '<button id="close-seph-'+containerId+'" style="background:none;border:none;color:#4a3a6a;font-size:1.1rem;cursor:pointer;padding:0 0.3rem;line-height:1;flex-shrink:0;">&times;</button>'
+    + '</div>'
+    + '<p style="font-size:0.8rem;line-height:1.7;color:rgba(232,224,255,0.82);margin:0 0 0.65rem;">'+seph.description+'</p>'
+    + (isUser ? '<p style="font-size:0.75rem;font-style:italic;color:#c9a84c;border-left:2px solid rgba(201,168,76,0.4);padding-left:0.7rem;margin:0;">&ldquo;'+seph.affirmation+'&rdquo;</p>' : '')
+    + '<button id="hear-seph-'+containerId+'" style="margin-top:0.7rem;background:none;border:1px solid rgba(176,138,255,0.25);border-radius:50px;color:#9b8ec4;font-size:0.72rem;padding:0.35rem 0.85rem;cursor:pointer;">\ud83d\udd2e Hear Celestia</button>';
+  panel.classList.add('open');
+  document.getElementById('close-seph-'+containerId).addEventListener('click', function() {
+    panel.classList.remove('open');
+  });
+  document.getElementById('hear-seph-'+containerId).addEventListener('click', function() {
+    speakText(seph.name + '. ' + seph.description);
+  });
+}
+
+// ===========================
+// HOOK SCREEN HANDLER (CHANGE 1 — now goes to edu screen)
+// ===========================
+document.getElementById('hook-btn').addEventListener('click', function(){
+  var firstName = document.getElementById('hook-firstname').value.trim();
+  var month = document.getElementById('hook-month').value;
+  var day = document.getElementById('hook-day').value;
+  var year = document.getElementById('hook-year').value;
+  var valEl = document.getElementById('val-hook');
+  valEl.textContent = '';
+
+  if (!firstName) { valEl.textContent = 'Please enter your first name.'; return; }
+  if (!month || !day || !year) { valEl.textContent = 'Please select your full date of birth.'; return; }
+
+  month = parseInt(month); day = parseInt(day); year = parseInt(year);
+  var dob = year + '-' + String(month).padStart(2,'0') + '-' + String(day).padStart(2,'0');
+
+  var lp = calcLifePath(month, day, year);
+  var sunSign = getSunSign(month, day);
+  var sephInfo = getSephirahForLP(lp);
+  var hiddenMaster = calcHiddenMaster(month, day, year);
+  var expression = calcExpression(firstName);
+  var soulUrge = calcSoulUrge(firstName);
+  var personality = calcPersonality(firstName);
+  var gematria = calcGematria(firstName);
+  var personalYear2026 = calcPersonalYear(month, day, 2026);
+  var lpData = LP_DATA[lp] || LP_DATA[reduceNum(lp,false)] || LP_DATA[6];
+
+  window._readingProfile = {
+    firstName: firstName, fullName: firstName, dob: dob,
+    month: month, day: day, year: year,
+    lifePath: lp, lpTitle: lpData.title, lpTeaser: lpData.teaser, lpGift: lpData.gift,
+    sunSign: sunSign, tree: sephInfo,
+    treePosition: { sephId: sephInfo.sephId },
+    hiddenMaster: hiddenMaster,
+    expression: expression, soulUrge: soulUrge,
+    personality: personality, gematria: gematria,
+    personalYear2026: personalYear2026
+  };
+
+  // CHANGE 1: Show edu screen first instead of generating
+  showScreen('edu');
+  initEduScreen();
+});
+
+// ===========================
+// GENERATING SCREEN (CHANGE 1 — refactored)
+// ===========================
+function startGenerating() {
+  stopEduAutoAdvance();
+  if (_zodiacRaf) cancelAnimationFrame(_zodiacRaf);
+  showScreen('generating');
+  document.getElementById('gen-name-line').textContent = (window._readingProfile.firstName || '') + ', your chart is taking shape...';
+  beginReadingGeneration();
+}
+
+function beginReadingGeneration() {
+  var messages = ['Reading your Life Path...','Consulting your Sun Sign...','Locating you on the Tree of Life...','Weaving your celestial story...','Aligning the sacred numbers...'];
+  var mi = 0;
+  var msgEl = document.getElementById('gen-msg');
+  var msgInterval = setInterval(function(){
+    mi = (mi + 1) % messages.length;
+    msgEl.style.opacity = '0';
+    setTimeout(function(){ msgEl.textContent = messages[mi]; msgEl.style.opacity = '1'; }, 300);
+  }, 2000);
+
+  doReading().then(function(){
+    clearInterval(msgInterval);
+    showScreen('teaser');
+    startOracleReading();
+  }).catch(function(e){
+    clearInterval(msgInterval);
+    showScreen('teaser');
+    startOracleReading();
+  });
+}
+
+// ===========================
+// AI READING GENERATION — 9 PAGE SECTIONS
+// ===========================
+async function generateReading(prompt){
+  try{
+    if(window.AppSDK&&window.AppSDK.ai&&window.AppSDK.ai.chat){
+      var result=await AppSDK.ai.chat({
+        messages:[
+          {role:'system',content:'You are Celestia, a warm, poetic, deeply insightful metaphysical oracle for Circles Squared. Write rich, intimate, second-person readings. Follow the exact page delimiter structure requested. Each page section should contain 3-5 substantial paragraphs. Never use generic affirmations. Always be specific to the exact numbers provided. Always use the exact delimiters ===PAGE_N_START=== and ===PAGE_N_END=== on their own lines.'},
+          {role:'user',content:prompt}
+        ]
+      });
+      return result.content||'';
+    }
+    return getFallbackReading();
+  }catch(e){return getFallbackReading();}
+}
+
+function getFallbackReading(){
+  var p=window._readingProfile;
+  var lpData=LP_DATA[p.lifePath]||LP_DATA[reduceNum(p.lifePath,false)]||LP_DATA[6];
+  var expData=LP_DATA[p.expression]||LP_DATA[reduceNum(p.expression||0,false)]||LP_DATA[6];
+  var py=p.personalYear2026||calcPersonalYear(p.month,p.day,2026);
+  var fb = '';
+  fb += '===PAGE_1_START===\n';
+  fb += p.firstName+', your Life Path '+p.lifePath+' as '+lpData.title+' reveals a soul of remarkable depth and purpose. '+lpData.teaser+'\n\nYour gift is '+lpData.gift+'. This is not something you learned \u2014 it is something you arrived with. The universe does not assign these numbers randomly. They are chosen by the soul before incarnation.\n\nThe challenge of your path is not a punishment \u2014 it is the resistance that builds the muscle of your gift.\n';
+  fb += '===PAGE_1_END===\n\n';
+  fb += '===PAGE_2_START===\n';
+  fb += 'As a '+p.sunSign.sign+' '+p.sunSign.symbol+', governed by '+p.sunSign.planet+', you move through the world with the elemental force of '+p.sunSign.element+'. '+(SIGN_TEASERS[p.sunSign.sign]||'')+'\n\nYour '+p.sunSign.element+' nature gives you a specific way of processing reality. The modality of your sign \u2014 '+p.sunSign.modality+' \u2014 reveals how you initiate change in the world.\n';
+  fb += '===PAGE_2_END===\n\n';
+  fb += '===PAGE_3_START===\n';
+  fb += 'On the Kabbalistic Tree of Life, your Life Path of '+p.lifePath+' resonates at the sphere of '+p.tree.name+' \u2014 '+p.tree.meaning+'.\n\nThis is not merely a symbolic placement. Each Sephirah represents a specific quality of divine consciousness \u2014 and your soul chose to incarnate through this particular lens.\n';
+  fb += '===PAGE_3_END===\n\n';
+  fb += '===PAGE_4_START===\n';
+  fb += 'Your Expression Number is '+(p.expression||'unknown')+' \u2014 '+expData.title+'. While your Life Path reveals the road you walk, your Expression Number reveals the gifts you were given to walk it with.\n\nYour Soul Urge of '+(p.soulUrge||'unknown')+' reveals what your heart secretly longs for. The tension between your Expression and your Soul Urge is the engine of your spiritual evolution.\n';
+  fb += '===PAGE_4_END===\n\n';
+  fb += '===PAGE_5_START===\n';
+  fb += 'The shadow side of your '+p.sunSign.sign+' nature holds teachings just as valuable as the light. Every gift carries a corresponding challenge.\n\nYour highest expression as a '+p.sunSign.sign+' is the capacity to transcend your shadow. Recognizing this pattern is the first step toward mastering it.\n';
+  fb += '===PAGE_5_END===\n\n';
+  fb += '===PAGE_6_START===\n';
+  fb += 'The twenty-two paths on the Tree of Life connect the ten Sephiroth. The paths leading to '+p.tree.name+' are specifically significant for your soul\'s journey.\n\n';
+  if(p.hiddenMaster){fb += 'Your Hidden Master Number is '+p.hiddenMaster+'. This number does not appear on the surface \u2014 it emerges only through the Sacred Addition Method.\n\n';}
+  fb += 'The Hebrew letters associated with these paths each carry their own vibrational teaching.\n';
+  fb += '===PAGE_6_END===\n\n';
+  fb += '===PAGE_7_START===\n';
+  fb += 'Your Personality Number is '+(p.personality||'unknown')+' \u2014 the impression you make before you speak a single word.\n\nYour Personal Year in 2026 is '+py+'. This means you are entering a cycle that specifically favors '+(py<=3?'new beginnings and creative expression':py<=6?'building and deepening relationships':'completion and preparing for a major new chapter')+'.\n';
+  fb += '===PAGE_7_END===\n\n';
+  fb += '===PAGE_8_START===\n';
+  fb += 'In matters of love and partnership, your Life Path '+p.lifePath+' is most naturally aligned with Life Paths '+(p.lifePath<=3?'3, 5, and 7':p.lifePath<=6?'2, 4, and 8':'1, 6, and 9')+'.\n\nYour '+p.sunSign.sign+' nature adds another layer to your romantic blueprint. The cosmic timing of your current chapter favors deep, transformative connections.\n';
+  fb += '===PAGE_8_END===\n\n';
+  fb += '===PAGE_9_START===\n';
+  fb += 'Above the Tree of Life itself radiate the Three Veils: AIN, AIN SOPH, and AIN SOPH AUR. These are the infinite potential from which all creation springs.\n\nYour complete chart \u2014 Life Path '+p.lifePath+', Expression '+(p.expression||'unknown')+', '+p.sunSign.sign+' Sun, and '+p.tree.name+' on the Tree \u2014 all point toward the same essential truth: you are a soul of extraordinary purpose.\n\n'+p.firstName+', I am Celestia, and it has been my honor to read your chart. Go now with the knowledge that you are not random \u2014 you are sacred mathematics made flesh. Blessings upon every step of your journey.\n';
+  fb += '===PAGE_9_END===';
+  return fb;
+}
+
+function parseReadingPages(fullText) {
+  var pages = [];
+  for (var i = 1; i <= 9; i++) {
+    var startTag = '===PAGE_' + i + '_START===';
+    var endTag = '===PAGE_' + i + '_END===';
+    var startIdx = fullText.indexOf(startTag);
+    var endIdx = fullText.indexOf(endTag);
+    if (startIdx !== -1 && endIdx !== -1) {
+      var content = fullText.slice(startIdx + startTag.length, endIdx).trim();
+      pages.push(content);
+    } else {
+      pages.push('');
+    }
+  }
+  var nonEmpty = pages.filter(function(p) { return p.length > 0; });
+  if (nonEmpty.length === 0) {
+    var chunks = fullText.split(/\n\n+/).filter(function(p) { return p.trim().length > 30; });
+    for (var j = 0; j < 9; j++) { pages[j] = chunks[j] || ''; }
+  }
+  return pages;
+}
+
+async function doReading() {
+  var p = window._readingProfile;
+  var lpTitle = (LP_DATA[p.lifePath]||LP_DATA[reduceNum(p.lifePath,false)]||LP_DATA[6]).title;
+
+  var prompt = 'Generate a complete 9-section metaphysical reading for ' + p.firstName + '. '
+    + 'Date of birth: ' + p.dob + '. Life Path: ' + p.lifePath + ' (' + lpTitle + '). '
+    + 'Expression: ' + (p.expression||'unknown') + '. Soul Urge: ' + (p.soulUrge||'unknown') + '. '
+    + 'Sun Sign: ' + p.sunSign.sign + ' (' + p.sunSign.element + ', ruled by ' + p.sunSign.planet + '). '
+    + 'Tree of Life: ' + p.tree.name + ' \u2014 ' + p.tree.meaning + '. '
+    + (p.hiddenMaster ? 'Hidden Master Number: ' + p.hiddenMaster + '. ' : '')
+    + 'Personal Year 2026: ' + p.personalYear2026 + '. '
+    + '\n\nWrite exactly 9 sections with ===PAGE_N_START=== and ===PAGE_N_END=== delimiters. Each section ~1 page. Rich, personal, poetic, second-person. Be specific to the exact numbers. '
+    + '\nPage 1: Life Path. Page 2: Sun Sign. Page 3: Tree of Life. Page 4: Expression + Soul Urge. Page 5: Shadow & Gift. Page 6: Paths + Hidden Master. Page 7: Personality + Karmic + Personal Year 2026. Page 8: Romantic Compatibility. Page 9: AIN SOPH AUR + Synthesis + Closing Blessing.';
+
+  window._readingText = await generateReading(prompt);
+  window._allPages = parseReadingPages(window._readingText);
+}
+
+// ===========================
+// ORACLE READING — Pure visual + voice experience
+// ===========================
+function startOracleReading() {
+  var p = window._readingProfile;
+  var lp = p.lifePath;
+  var lpMeaning = LP_MEANINGS[lp] || LP_MEANINGS[reduceNum(lp,false)] || LP_MEANINGS[6];
+  var seph = p.tree;
+  var sign = p.sunSign;
+  var element = sign.element;
+  var lpKey = lp;
+  if (!ELEMENT_LP_INTERACTION[element][lpKey]) lpKey = reduceNum(lp,false);
+  var elementInteraction = ELEMENT_LP_INTERACTION[element][lpKey] || '';
+
+  // Set up the visual display
+  document.getElementById('reading-name').textContent = p.firstName.toUpperCase();
+  document.getElementById('reading-lp-number').textContent = lp;
+  document.getElementById('reading-sign-label').textContent = sign.symbol + ' ' + sign.sign;
+  document.getElementById('reading-seph-label').textContent = seph.name + ' \u2014 ' + seph.meaning;
+
+  // Reset waveform
+  var waveform = document.getElementById('waveform');
+  waveform.classList.remove('paused');
+
+  // Reset oracle status
+  var oracleStatus = document.getElementById('oracle-status');
+  oracleStatus.textContent = 'Oracle Speaking...';
+  oracleStatus.style.color = 'var(--text-muted)';
+  oracleStatus.style.letterSpacing = '0.15em';
+  oracleStatus.style.opacity = '1';
+
+  // Reset pricing (fully hidden)
+  var pricingEl = document.getElementById('reading-pricing');
+  pricingEl.style.display = 'none';
+  pricingEl.style.opacity = '0';
+  pricingEl.style.transform = 'translateY(20px)';
+  pricingEl.style.pointerEvents = 'none';
+
+  // Prepare the offer section
+  document.getElementById('offer-heading').textContent = 'There Is More Waiting For You, ' + p.firstName;
+
+  // Build Tree of Life
+  var tolSection = document.getElementById('tol-section');
+  tolSection.style.display = 'block';
+  var userSephId = p.treePosition.sephId;
+  buildInteractiveTree(userSephId, 'main-tree-svg');
+  var labelEl = document.getElementById('main-tree-user-label');
+  if (labelEl) {
+    var sephData = SEPHIROTH.find(function(s){ return s.id === userSephId; });
+    if (sephData) {
+      labelEl.innerHTML = '<div style="display:inline-block;padding:0.5rem 1.2rem;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.25);border-radius:50px;">'
+        + '<span style="font-family:Courier New,monospace;font-size:0.65rem;letter-spacing:0.25em;color:#c9a84c;">YOUR SEPHIRAH: </span>'
+        + '<span style="font:700 0.85rem Georgia,serif;color:#f0d070;">'+sephData.name+'</span>'
+        + '<span style="color:#5a4a7a;font-size:0.75rem;"> \u2014 '+sephData.meaning+'</span></div>';
+    }
+  }
+
+  // Render tier cards
+  renderTierCards();
+
+  // Build the spoken script
+  var script = p.firstName + ".\n\n"
+    + "That name carries more than you know. The letters, the vibration, the exact moment you arrived in this world \u2014 they form a pattern. And that pattern has been trying to speak to you your entire life.\n\n"
+    + "I'm going to tell you what it says.\n\n"
+    + "Your Life Path number is " + lp + ".\n\n"
+    + "Of all the numbers that shape a human life, this is the master thread. The single most important number in your entire chart. It is not a coincidence. It is a directive.\n\n"
+    + lpMeaning + "\n\n"
+    + "Your Sun in " + sign.sign + " confirms this. " + sign.sign + " is a " + element + " sign \u2014 and that " + element + " energy " + elementInteraction + "\n\n"
+    + "And on the Kabbalistic Tree of Life, your numbers place you at " + seph.name + " \u2014 the sphere of " + seph.meaning + ". This is not metaphor. This is the architecture of your soul.\n\n"
+    + p.firstName + ", I have only shown you the door.\n\n"
+    + "What lies behind it \u2014 your Expression Number, your Soul Urge, your Shadow and your Gift, your Karmic Debt, your Personal Year for 2026, your Romantic Compatibility, and a complete closing blessing written only for you \u2014 that is your full Blueprint.\n\n"
+    + "And it's waiting.";
+
+  // Clean text for speech — replace double newlines with pauses
+  var spokenText = script.replace(/\n\n/g, '... ').replace(/\n/g, ' ');
+
+  // Start speaking — callback reveals pricing when done
+  speakLongText(spokenText, function() {
+    onReadingEnd();
+  });
+
+  // If muted, reveal pricing after a short delay since no voice will play
+  if (isMuted) {
+    setTimeout(function() {
+      onReadingEnd();
+    }, 8000);
+  } else {
+    // Safety fallback — if speech somehow never completes (e.g. SDK error)
+    setTimeout(function() {
+      var pEl = document.getElementById('reading-pricing');
+      if (pEl && pEl.style.opacity === '0') {
+        onReadingEnd();
+      }
+    }, 120000); // 2 min max
+  }
+}
+
+// ===========================
+// TIER CARD RENDERING (CHANGE 3 — Partnership support)
+// ===========================
+function renderTierCards() {
+  var container = document.getElementById('tierCards');
+  if (!container) return;
+  container.innerHTML = '';
+
+  TIERS.forEach(function(tier) {
+    var card = document.createElement('div');
+    card.id = 'tier-card-' + tier.slug;
+    card.className = 'tier-card-el';
+
+    // Partnership tier gets rose accent border
+    if (tier.slug === 'partnership') {
+      card.style.borderColor = 'rgba(255,158,210,0.3)';
+    }
+
+    var badgeHtml = '';
+    if (tier.badge) {
+      var bgColor, fgColor, emoji;
+      if (tier.slug === 'partnership') {
+        bgColor = 'linear-gradient(135deg,#ff9ed2,#ff6ab4)';
+        fgColor = '#fff';
+        emoji = '';
+      } else if (tier.badge === 'Most Popular') {
+        bgColor = 'linear-gradient(135deg,#b08aff,#7c3aed)';
+        fgColor = '#fff';
+        emoji = '\u2B50 ';
+      } else {
+        bgColor = 'linear-gradient(135deg,#c9a84c,#f0d070)';
+        fgColor = '#1a1000';
+        emoji = '\ud83d\udd25 ';
+      }
+      badgeHtml = '<span style="position:absolute;top:-1px;right:12px;background:'+bgColor+';color:'+fgColor+';font-size:0.6rem;font-family:Courier New,monospace;letter-spacing:0.15em;padding:3px 10px;border-radius:0 0 8px 8px;">'+emoji+tier.badge.toUpperCase()+'</span>';
+    }
+
+    var ctaLabel;
+    if (tier.slug === 'initiation') ctaLabel = 'Begin with The Initiation \u2192';
+    else if (tier.slug === 'unveiling') ctaLabel = 'Choose The Unveiling \u2192';
+    else if (tier.slug === 'partnership') ctaLabel = '\ud83d\udc9e Get the Partnership Blueprint \u2192';
+    else ctaLabel = 'Get The Complete Blueprint \u2192';
+
+    var priceColor = tier.slug === 'partnership' ? '#ff9ed2' : '#c9a84c';
+    var priceGrad = tier.slug === 'partnership' ? 'linear-gradient(135deg,#ff9ed2,#ff6ab4)' : 'linear-gradient(135deg,#c9a84c,#f0d070)';
+
+    var partnershipNote = '';
+    if (tier.slug === 'partnership') {
+      partnershipNote = '<div style="font-size:0.72rem;color:#ff9ed2;background:rgba(255,158,210,0.08);border:1px solid rgba(255,158,210,0.2);border-radius:8px;padding:0.5rem 0.7rem;margin-top:0.5rem;font-style:italic;">💌 Enter both names and birth dates in the notes field after payment.</div>';
+    }
+
+    var ctaBtnStyle = tier.slug === 'partnership'
+      ? 'font-size:0.9rem;padding:0.7rem 1.5rem;background:linear-gradient(135deg,#ff9ed2,#b08aff);'
+      : 'font-size:0.9rem;padding:0.7rem 1.5rem;';
+
+    card.innerHTML = badgeHtml
+      + '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.5rem;">'
+      + '<div><div style="font:700 1.05rem Georgia,serif;color:#e8e0ff;">' + tier.name + '</div>'
+      + '<div style="font-size:0.78rem;color:#8a7aaa;font-style:italic;margin-top:2px;">' + tier.tagline + '</div></div>'
+      + '<div style="text-align:right;flex-shrink:0;margin-left:1rem;">'
+      + '<div style="font:700 1.4rem Georgia,serif;background:'+priceGrad+';-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">$' + tier.price + '</div>'
+      + (tier.pages ? '<div style="font-size:0.68rem;color:#5a4a7a;">' + tier.pages + ' pages</div>' : '')
+      + '</div></div>'
+      + '<div style="display:flex;flex-direction:column;gap:3px;margin-top:0.4rem;margin-bottom:0.8rem;">'
+      + tier.includes.map(function(inc) { return '<div style="font-size:0.75rem;color:#9b8ec4;">' + inc + '</div>'; }).join('')
+      + '</div>'
+      + partnershipNote
+      + '<button class="tier-cta-btn cta-btn w-full" data-tier="'+tier.slug+'" style="'+ctaBtnStyle+'">' + ctaLabel + '</button>';
+
+    container.appendChild(card);
+  });
+
+  document.querySelectorAll('.tier-cta-btn').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var slug = btn.getAttribute('data-tier');
+      openPaymentModal(slug);
+    });
+  });
+}
+
+// ===========================
+// PAYMENT MODAL
+// ===========================
+function openPaymentModal(slug) {
+  selectedTier = TIERS.find(function(t) { return t.slug === slug; });
+  if (!selectedTier) return;
+
+  document.getElementById('modal-tier-name').textContent = selectedTier.name;
+  document.getElementById('modal-tier-price').textContent = '$' + selectedTier.price;
+  document.getElementById('modal-tier-includes').innerHTML = selectedTier.includes.map(function(inc) {
+    return '<div>' + inc + '</div>';
+  }).join('');
+
+  var p = window._readingProfile;
+  if (p.email) document.getElementById('modal-email').value = p.email;
+
+  document.getElementById('val-modal-email').textContent = '';
+  document.getElementById('payment-modal').classList.add('show');
+
+  renderPayPalButton('paypal-button-container', selectedTier.price, selectedTier.name);
+}
+
+document.getElementById('close-payment-modal').addEventListener('click', function() {
+  document.getElementById('payment-modal').classList.remove('show');
+});
+
+// ===========================
+// PAYPAL (CHANGE 2 — polling retry)
+// ===========================
+function renderPayPalButton(containerId, amount, tierName) {
+  var container = document.getElementById(containerId);
+  if (!container) return;
+  container.innerHTML = '';
+
+  function tryRender(attemptsLeft) {
+    if (typeof paypal === 'undefined' || !paypal.Buttons) {
+      if (attemptsLeft <= 0) {
+        container.innerHTML = '<p style="color:#ff9ed2;text-align:center;font-size:0.85rem;padding:1rem;">PayPal could not load. Please refresh the page and try again.</p>';
+        return;
+      }
+      container.innerHTML = '<p style="color:#9b8ec4;text-align:center;font-size:0.8rem;padding:1rem;">\u23F3 Loading payment...</p>';
+      setTimeout(function(){ tryRender(attemptsLeft - 1); }, 800);
+      return;
+    }
+    container.innerHTML = '';
+    try {
+      paypal.Buttons({
+        style: { layout: 'vertical', color: 'gold', shape: 'pill', label: 'pay', height: 48 },
+        createOrder: function(data, actions) {
+          var email = document.getElementById('modal-email').value.trim();
+          if (!email || !email.includes('@')) {
+            document.getElementById('val-modal-email').textContent = 'Please enter your email for PDF delivery.';
+            document.getElementById('modal-email').focus();
+            return new Promise(function(resolve, reject) { reject(new Error('Email required')); });
+          }
+          document.getElementById('val-modal-email').textContent = '';
+          return actions.order.create({
+            purchase_units: [{
+              amount: { value: String(amount), currency_code: 'USD' },
+              description: 'Circles Squared \u2014 ' + tierName
+            }]
+          });
+        },
+        onApprove: function(data, actions) {
+          return actions.order.capture().then(function(details) {
+            var buyerName = (details.payer && details.payer.name) ? details.payer.name.given_name : window._readingProfile.firstName;
+            var buyerEmail = document.getElementById('modal-email').value.trim();
+            var orderId = details.id || data.orderID || 'CS-' + Date.now();
+            document.getElementById('payment-modal').classList.remove('show');
+            showSuccessScreen(buyerName, buyerEmail, orderId, selectedTier);
+          });
+        },
+        onError: function(err) {
+          console.error('PayPal error:', err);
+          container.innerHTML = '<p style="color:#ff9ed2;text-align:center;font-size:0.85rem;padding:1rem;">Payment error. Please try again or refresh.</p>';
+        },
+        onCancel: function() {
+          container.innerHTML = '';
+          tryRender(0);
+        }
+      }).render('#' + containerId);
+    } catch(e) {
+      console.error('PayPal render error:', e);
+      container.innerHTML = '<p style="color:#ff9ed2;text-align:center;font-size:0.85rem;padding:1rem;">Payment could not render. Please refresh.</p>';
+    }
+  }
+
+  tryRender(8);
+}
+
+function showSuccessScreen(buyerName, buyerEmail, orderId, tier) {
+  logPurchase(buyerName, buyerEmail, orderId, tier);
+
+  document.getElementById('success-buyer-name').textContent = buyerName ? ('Welcome, ' + buyerName + '.') : '';
+  document.getElementById('success-tier-name').textContent = 'Circles Squared \u2014 ' + tier.name + ' (' + tier.pages + '-page PDF)';
+  document.getElementById('success-tier-price').textContent = '$' + tier.price;
+  document.getElementById('success-email-display').textContent = 'Delivery: ' + (buyerEmail || 'Not provided');
+  document.getElementById('success-order-id').textContent = 'Order: ' + orderId;
+
+  var sunSignStr = window._readingProfile.sunSign ? window._readingProfile.sunSign.sign : '';
+  var treeStr = window._readingProfile.tree ? window._readingProfile.tree.name : '';
+  var subject = encodeURIComponent('\ud83c\udf19 New Circles Squared Purchase \u2014 ' + tier.name + ' \u2014 ' + (buyerName || 'New Customer'));
+  var body = encodeURIComponent(
+    'NEW PURCHASE RECEIVED\n\nOrder ID: ' + orderId + '\nDate: ' + new Date().toLocaleString() + '\n\nBUYER\nName: ' + (buyerName||'N/A') + '\nEmail: ' + (buyerEmail||'N/A') + '\n\nPURCHASE\nTier: ' + tier.name + '\nPages: ' + tier.pages + '\nPrice: $' + tier.price + '\n\nPROFILE\nFirst Name: ' + (window._readingProfile.firstName||'') + '\nLife Path: ' + (window._readingProfile.lifePath||'') + '\nSun Sign: ' + sunSignStr + '\nTree: ' + treeStr + '\n\nSend PDF to: ' + (buyerEmail||'ask buyer')
+  );
+  document.getElementById('notifyOwnerBtn').href = 'mailto:' + OWNER_EMAIL + '?subject=' + subject + '&body=' + body;
+
+  document.getElementById('payment-success').classList.add('show');
+
+  setTimeout(function() { generateAndDownloadPDF(); }, 1500);
+}
+
+document.getElementById('close-success-overlay').addEventListener('click', function() {
+  document.getElementById('payment-success').classList.remove('show');
+  unlockFullReading();
+});
+
+document.getElementById('download-pdf-btn').addEventListener('click', function() {
+  generateAndDownloadPDF();
+});
+
+// ===========================
+// UNLOCK FULL READING
+// ===========================
+function unlockFullReading() {
+  var unlockedPages = selectedTier ? window._allPages.slice(0, selectedTier.pages) : window._allPages.slice(0, 3);
+  var PAGE_LABELS = [
+    '\u2726 NUMEROLOGY \u00b7 LAYER 1', '\u2609 ASTROLOGY \u00b7 LAYER 1', '\ud83c\udf33 TREE OF LIFE \u00b7 LAYER 1',
+    '\u2726 NUMEROLOGY \u00b7 LAYER 2', '\u2609 ASTROLOGY \u00b7 LAYER 2', '\ud83c\udf33 TREE OF LIFE \u00b7 LAYER 2',
+    '\u2726 NUMEROLOGY \u00b7 LAYER 3', '\u2609 ASTROLOGY \u00b7 LAYER 3', '\ud83c\udf33 TREE OF LIFE \u00b7 LAYER 3'
+  ];
+
+  var readingContainer = document.createElement('div');
+  readingContainer.id = 'unlocked-reading-container';
+  readingContainer.style.cssText = 'width:100%;margin-bottom:2rem;';
+
+  var pageHtml = '<div style="font-family:Courier New,monospace;font-size:0.62rem;letter-spacing:0.4em;color:#c9a84c;text-align:center;margin-bottom:1.5rem;">\u2726 ' + (selectedTier ? selectedTier.name.toUpperCase() : 'READING') + ' UNLOCKED \u2726</div>';
+
+  unlockedPages.forEach(function(pageContent, idx) {
+    if (!pageContent || pageContent.trim().length === 0) return;
+    pageHtml += '<div style="margin-bottom:2.5rem;padding-bottom:2.5rem;border-bottom:1px solid rgba(176,138,255,0.12);">'
+      + '<div style="font-family:Courier New,monospace;font-size:0.6rem;letter-spacing:0.35em;color:#c9a84c;margin-bottom:1rem;">' + (PAGE_LABELS[idx]||'PAGE '+(idx+1)) + '</div>'
+      + pageContent.split(/\n\n+/).filter(function(pp) { return pp.trim(); }).map(function(para) {
+          return '<p style="margin-bottom:1.3rem;line-height:1.9;font-size:1rem;color:rgba(232,224,255,0.9);">' + para.trim() + '</p>';
+        }).join('')
+      + '</div>';
+  });
+
+  readingContainer.innerHTML = pageHtml;
+
+  var readingOrb = document.getElementById('reading-orb');
+  if (readingOrb && readingOrb.parentElement) readingOrb.parentElement.style.display = 'none';
+
+  var waveform = document.getElementById('waveform');
+  if (waveform) waveform.style.display = 'none';
+  var oracleStatus = document.getElementById('oracle-status');
+  if (oracleStatus) oracleStatus.style.display = 'none';
+
+  var pricingEl = document.getElementById('reading-pricing');
+  if (pricingEl && pricingEl.parentNode) {
+    pricingEl.parentNode.insertBefore(readingContainer, pricingEl);
+  }
+
+  var tierCards = document.getElementById('tierCards');
+  if (tierCards) tierCards.style.display = 'none';
+  var offerHeading = document.getElementById('offer-heading');
+  if (offerHeading) offerHeading.style.display = 'none';
+  var offerSubtext = document.getElementById('offer-subtext');
+  if (offerSubtext) offerSubtext.style.display = 'none';
+
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+// ===========================
+// PDF GENERATOR
+// ===========================
+function generateAndDownloadPDF() {
+  var jsPDFLib = (window.jspdf && window.jspdf.jsPDF) ? window.jspdf.jsPDF : (window.jsPDF || null);
+  if (!jsPDFLib) { alert('PDF generator is still loading \u2014 please wait and try again.'); return; }
+  var p = window._readingProfile || {};
+  var tier = selectedTier;
+  var allPgs = window._allPages || [];
+  var numPgs = tier ? tier.pages : 3;
+  var pagesToDeliver = allPgs.slice(0, numPgs);
+  if (!pagesToDeliver.length) { alert('Your reading content is not ready yet.'); return; }
+
+  var doc = new jsPDFLib({ orientation:'portrait', unit:'mm', format:'a4' });
+  var W=210, H=297;
+  var BG=[2,0,20], BG2=[8,4,35];
+  var GOLD=[201,168,76], PURPLE=[176,138,255], ROSE=[255,158,210];
+  var WHITE=[232,224,255], MUTED=[120,100,170], DIM=[50,35,90];
+
+  var PAGE_META = [
+    {sys:'NUMEROLOGY',layer:'LAYER I',title:'Life Path',color:PURPLE},
+    {sys:'ASTROLOGY',layer:'LAYER I',title:'Sun Sign',color:GOLD},
+    {sys:'TREE OF LIFE',layer:'LAYER I',title:'The Sephirah',color:ROSE},
+    {sys:'NUMEROLOGY',layer:'LAYER II',title:'Expression & Soul Urge',color:PURPLE},
+    {sys:'ASTROLOGY',layer:'LAYER II',title:'Shadow & Gift',color:GOLD},
+    {sys:'TREE OF LIFE',layer:'LAYER II',title:'The Paths & Hidden Master',color:ROSE},
+    {sys:'NUMEROLOGY',layer:'LAYER III',title:'Karmic Synthesis',color:PURPLE},
+    {sys:'ASTROLOGY',layer:'LAYER III',title:'Romantic Compatibility',color:GOLD},
+    {sys:'TREE OF LIFE',layer:'LAYER III',title:'AIN SOPH AUR',color:ROSE}
+  ];
+
+  function pdfBg(){doc.setFillColor(BG[0],BG[1],BG[2]);doc.rect(0,0,W,H,'F');doc.setFillColor(BG2[0],BG2[1],BG2[2]);doc.rect(0,0,W,55,'F');}
+  function pdfStars(seed,n){var x=seed;for(var i=0;i<n;i++){x=(x*1664525+1013904223)%4294967296;var sx=(x%1000)/1000*W;x=(x*1664525+1013904223)%4294967296;var sy=(x%1000)/1000*H;doc.setFillColor(200,190,240);doc.circle(sx,sy,0.4,'F');}}
+  function pdfFooter(pn,tot,color){doc.setDrawColor(DIM[0],DIM[1],DIM[2]);doc.setLineWidth(0.25);doc.line(20,H-14,W-20,H-14);doc.setFont('helvetica','normal');doc.setFontSize(6.5);doc.setTextColor(DIM[0],DIM[1],DIM[2]);doc.text('CIRCLES SQUARED \u2022 CELESTIAL BLUEPRINT',20,H-9);doc.text('PAGE '+pn+' OF '+tot,W-20,H-9,{align:'right'});}
+
+  // COVER PAGE
+  pdfBg(); pdfStars(42,110);
+  doc.setFillColor(GOLD[0],GOLD[1],GOLD[2]); doc.rect(0,0,W,2.5,'F'); doc.rect(0,H-2.5,W,2.5,'F');
+  doc.setDrawColor(PURPLE[0],PURPLE[1],PURPLE[2]); doc.setLineWidth(0.3); doc.circle(W/2,H/2-15,62,'S');
+  doc.setDrawColor(GOLD[0],GOLD[1],GOLD[2]); doc.setLineWidth(0.2); doc.circle(W/2,H/2-15,51,'S');
+  doc.setFont('helvetica','bold'); doc.setFontSize(8.5); doc.setTextColor(GOLD[0],GOLD[1],GOLD[2]);
+  doc.text('C I R C L E S   S Q U A R E D', W/2, 22, {align:'center'});
+  doc.setFont('helvetica','bold'); doc.setFontSize(20); doc.setTextColor(WHITE[0],WHITE[1],WHITE[2]);
+  doc.text('CELESTIAL BLUEPRINT', W/2, 45, {align:'center'});
+  doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor(PURPLE[0],PURPLE[1],PURPLE[2]);
+  doc.text((tier?tier.name:'The Initiation').toUpperCase(), W/2, 54, {align:'center'});
+  doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(MUTED[0],MUTED[1],MUTED[2]);
+  doc.text('P R E P A R E D   F O R', W/2, H/2-36, {align:'center'});
+  var displayName = (p.fullName||p.firstName||'Seeker').toUpperCase();
+  doc.setFont('helvetica','bold'); doc.setFontSize(displayName.length>18?18:24); doc.setTextColor(WHITE[0],WHITE[1],WHITE[2]);
+  doc.text(displayName, W/2, H/2-22, {align:'center'});
+  var keyNums = [];
+  if(p.lifePath)keyNums.push('Life Path '+p.lifePath);
+  if(p.sunSign)keyNums.push(p.sunSign.sign);
+  if(p.tree)keyNums.push(p.tree.name);
+  doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(GOLD[0],GOLD[1],GOLD[2]);
+  doc.text(keyNums.join('  \u00b7  '), W/2, H/2-10, {align:'center'});
+  doc.setFontSize(7); doc.setTextColor(DIM[0],DIM[1],DIM[2]);
+  doc.text('PYTHAGOREAN NUMEROLOGY  \u00b7  WESTERN ASTROLOGY  \u00b7  KABBALISTIC TREE OF LIFE', W/2, H/2+2, {align:'center'});
+
+  // CONTENT PAGES
+  var totalPdf = 1 + pagesToDeliver.length;
+  pagesToDeliver.forEach(function(pageContent, idx) {
+    doc.addPage();
+    var meta = PAGE_META[idx]||{sys:'READING',layer:'SECTION '+(idx+1),title:'Your Reading',color:PURPLE};
+    var col = meta.color;
+    pdfBg(); pdfStars((idx+1)*777, 55);
+    doc.setFillColor(col[0],col[1],col[2]); doc.rect(0,0,W,2.5,'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(6.5); doc.setTextColor(col[0],col[1],col[2]);
+    doc.text(meta.sys+'  \u00b7  '+meta.layer, 20, 18);
+    doc.setFont('helvetica','bold'); doc.setFontSize(17); doc.setTextColor(WHITE[0],WHITE[1],WHITE[2]);
+    doc.text(meta.title, 20, 30);
+    doc.setDrawColor(col[0],col[1],col[2]); doc.setLineWidth(0.35); doc.line(20,43,W-20,43);
+    var body = (pageContent||'Your reading is being prepared.').trim();
+    doc.setFont('helvetica','normal'); doc.setFontSize(9.5); doc.setTextColor(WHITE[0],WHITE[1],WHITE[2]);
+    var maxW=W-40, curY=51, lh=5.8, maxY=H-20;
+    var paras = body.split(/\n\n+/).filter(function(s){return s.trim().length>10;});
+    paras.forEach(function(para, pi){
+      if(curY>maxY) return;
+      if(pi>0) curY+=2.5;
+      var lines = doc.splitTextToSize(para.trim().replace(/\n/g,' '), maxW);
+      lines.forEach(function(line){ if(curY>maxY) return; doc.text(line, 20, curY); curY+=lh; });
+    });
+    pdfFooter(idx+2, totalPdf, col);
+  });
+
+  var fname = (p.firstName||'reading').toLowerCase().replace(/[^a-z]/g,'');
+  doc.save('circles-squared-'+fname+'-'+(tier?tier.slug:'reading')+'.pdf');
+}
+
+// ===========================
+// MUTE TOGGLE
+// ===========================
+document.getElementById('mute-btn').addEventListener('click', toggleMute);
+
+// ===========================
+// RESET
+// ===========================
+document.getElementById('reset-btn').addEventListener('click', function() {
+  stopSpeech();
+  window._readingProfile = {};
+  window._readingText = '';
+  window._allPages = [];
+  selectedTier = null;
+  isMuted = false;
+
+  document.getElementById('hook-firstname').value = '';
+  document.getElementById('hook-month').value = '';
+  document.getElementById('hook-day').value = '';
+  document.getElementById('hook-year').value = '';
+  document.getElementById('val-hook').textContent = '';
+  document.getElementById('modal-email').value = '';
+
+  // Reset reading screen visuals
+  document.getElementById('reading-name').textContent = '';
+  document.getElementById('reading-lp-number').textContent = '';
+  document.getElementById('reading-sign-label').textContent = '';
+  document.getElementById('reading-seph-label').textContent = '';
+
+  // Re-show orb section if hidden by unlockFullReading
+  var readingOrb = document.getElementById('reading-orb');
+  if (readingOrb && readingOrb.parentElement) readingOrb.parentElement.style.display = '';
+  var waveform = document.getElementById('waveform');
+  if (waveform) { waveform.style.display = ''; waveform.classList.remove('paused'); }
+  var oracleStatus = document.getElementById('oracle-status');
+  if (oracleStatus) { oracleStatus.style.display = ''; oracleStatus.textContent = 'Oracle Speaking...'; }
+
+  // Remove unlocked reading container if exists
+  var unlockedContainer = document.getElementById('unlocked-reading-container');
+  if (unlockedContainer && unlockedContainer.parentNode) unlockedContainer.parentNode.removeChild(unlockedContainer);
+
+  // Reset pricing section
+  var pricingEl = document.getElementById('reading-pricing');
+  if (pricingEl) { pricingEl.style.display = 'none'; pricingEl.style.opacity = '0'; pricingEl.style.transform = 'translateY(20px)'; pricingEl.style.pointerEvents = 'none'; }
+
+  document.getElementById('tol-section').style.display = 'none';
+  document.getElementById('main-tree-svg').innerHTML = '';
+  document.getElementById('main-tree-user-label').innerHTML = '';
+  document.getElementById('tierCards').innerHTML = '';
+  document.getElementById('paypal-button-container').innerHTML = '';
+  document.getElementById('mute-btn').textContent = '🔊';
+
+  // Re-show offer elements if hidden by unlockFullReading
+  var offerHeading = document.getElementById('offer-heading');
+  if (offerHeading) offerHeading.style.display = '';
+  var offerSubtext = document.getElementById('offer-subtext');
+  if (offerSubtext) offerSubtext.style.display = '';
+  var tierCardsDiv = document.getElementById('tierCards');
+  if (tierCardsDiv) tierCardsDiv.style.display = '';
+
+  // Stop edu animations
+  stopEduAutoAdvance();
+  if (_zodiacRaf) cancelAnimationFrame(_zodiacRaf);
+  _eduTransitioned = false;
+
+  showScreen('hook');
+});
+
+// ===========================
+// EDU SCREEN (CHANGE 1)
+// ===========================
+var EDU_NARRATION = [
+  "Before we begin your personal reading, let me show you the three ancient systems that form your blueprint. The first is Numerology. Every name and birth date carries a unique vibrational frequency. By reducing your numbers to a single digit, we uncover your Life Path — the master thread of your soul's entire journey. This is the most important number in your chart.",
+  "The second system is the Kabbalistic Tree of Life. This ancient mystical map shows ten divine spheres, called Sephiroth, through which consciousness descends from the infinite into physical form. Your numerology places you at one of these spheres — a specific point on the cosmic map that reveals the quality of consciousness your soul chose to embody in this lifetime.",
+  "The third system is Astrology. At the exact moment you were born, the planets held specific positions in the sky. These cosmic alignments shaped your personality, your emotional patterns, and your deepest purpose. Together — your numbers, your Tree position, and your stars — they form one complete portrait of your soul. And yours is now ready."
+];
+var _eduTransitioned = false;
+var _eduIdx = 0;
+var _eduTotal = 3;
+var _eduAutoTimer = null;
+var _eduAutoMs = 14000;
+var _eduBarRaf = null;
+
+function initEduScreen() {
+  _eduTransitioned = false;
+  _eduIdx = 0;
+  initNumerologyAnim();
+  initTreeAnim();
+  initZodiacAnim();
+  initElementDisplay();
+  showEduPanel(0);
+}
+
+function showEduPanel(idx) {
+  stopSpeech();
+  stopEduAutoAdvance();
+  _eduIdx = idx;
+  document.querySelectorAll('.edu-panel').forEach(function(p,i){
+    p.classList.toggle('active', i === idx);
+  });
+  document.querySelectorAll('.edu-dot').forEach(function(d,i){
+    d.classList.toggle('active', i === idx);
+  });
+  document.getElementById('edu-prev-btn').style.display = idx > 0 ? 'inline-block' : 'none';
+  var isLast = idx === _eduTotal - 1;
+  document.getElementById('edu-next-btn').style.display = isLast ? 'none' : 'inline-block';
+  document.getElementById('edu-begin-btn').style.display = isLast ? 'block' : 'none';
+  if (idx === 1) animateTreeIn();
+  if (idx === 2) animateZodiac();
+  startEduNarration(idx);
+}
+
+function eduNav(dir) {
+  var next = _eduIdx + dir;
+  if (next < 0 || next >= _eduTotal) return;
+  _eduTransitioned = false;
+  showEduPanel(next);
+}
+
+// Wire edu nav buttons with addEventListener
+document.getElementById('edu-prev-btn').addEventListener('click', function() { eduNav(-1); });
+document.getElementById('edu-next-btn').addEventListener('click', function() { eduNav(1); });
+document.getElementById('edu-begin-btn').addEventListener('click', function() { _eduTransitioned = true; startGenerating(); });
+
+function startEduAutoAdvance() {
+  stopEduAutoAdvance();
+  var startTime = performance.now();
+  var bar = document.getElementById('edu-auto-bar');
+  if (bar) bar.style.width = '0%';
+
+  function tick(now) {
+    var elapsed = now - startTime;
+    var pct = Math.min(100, (elapsed / _eduAutoMs) * 100);
+    if (bar) bar.style.width = pct + '%';
+    if (elapsed >= _eduAutoMs) {
+      var next = _eduIdx + 1;
+      if (next < _eduTotal) {
+        showEduPanel(next);
+        if (next < _eduTotal - 1) {
+          startTime = performance.now();
+          if (bar) bar.style.width = '0%';
+          _eduBarRaf = requestAnimationFrame(tick);
+        } else {
+          if (bar) bar.style.width = '100%';
+        }
+      }
+      return;
+    }
+    _eduBarRaf = requestAnimationFrame(tick);
+  }
+  _eduBarRaf = requestAnimationFrame(tick);
+}
+
+function stopEduAutoAdvance() {
+  if (_eduBarRaf) cancelAnimationFrame(_eduBarRaf);
+  _eduBarRaf = null;
+  if (_eduAutoTimer) { clearTimeout(_eduAutoTimer); _eduAutoTimer = null; }
+  var bar = document.getElementById('edu-auto-bar');
+  if (bar) bar.style.width = '0%';
+}
+
+function startEduNarration(idx) {
+  var narration = EDU_NARRATION[idx];
+  if (!narration) return;
+  var isLast = idx === _eduTotal - 1;
+
+  function onNarrationEnd() {
+    if (_eduIdx !== idx || _eduTransitioned) return;
+    setTimeout(function() {
+      if (_eduIdx !== idx || _eduTransitioned) return;
+      if (!isLast) {
+        showEduPanel(idx + 1);
+      } else {
+        _eduTransitioned = true;
+        startGenerating();
+      }
+    }, 1500);
+  }
+
+  if (isMuted) {
+    _eduAutoTimer = setTimeout(function() {
+      if (_eduIdx !== idx || _eduTransitioned) return;
+      if (!isLast) { showEduPanel(idx + 1); }
+      else { _eduTransitioned = true; startGenerating(); }
+    }, isLast ? 14000 : 12000);
+    return;
+  }
+
+  speakLongText(narration, onNarrationEnd);
+}
+
+// --- Panel 0: Numerology animation ---
+function initNumerologyAnim() {
+  var grid = document.getElementById('num-anim');
+  if (!grid) return;
+  grid.innerHTML = '';
+  var nums = [
+    {n:1, label:'Leader'}, {n:2, label:'Healer'}, {n:3, label:'Creator'},
+    {n:4, label:'Builder'}, {n:5, label:'Freedom'}, {n:6, label:'Nurturer'},
+    {n:7, label:'Mystic'}, {n:8, label:'Power'}, {n:9, label:'Visionary'},
+    {n:11, label:'Illuminator'}, {n:22, label:'Master Builder'}
+  ];
+  nums.forEach(function(item, i) {
+    var el = document.createElement('div');
+    el.style.cssText = 'width:62px;height:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid rgba(201,168,76,0.25);border-radius:10px;background:rgba(201,168,76,0.06);cursor:default;opacity:0;transform:scale(0.7);transition:opacity 0.5s,transform 0.5s,border-color 0.3s,background 0.3s;';
+    el.innerHTML = '<div style="font-size:1.3rem;font-weight:700;color:#f0d070;font-family:Georgia,serif;">' + item.n + '</div><div style="font-size:0.6rem;color:#9b8ec4;letter-spacing:0.05em;">' + item.label + '</div>';
+    el.addEventListener('mouseenter', function(){ this.style.borderColor='rgba(201,168,76,0.7)'; this.style.background='rgba(201,168,76,0.15)'; });
+    el.addEventListener('mouseleave', function(){ this.style.borderColor='rgba(201,168,76,0.25)'; this.style.background='rgba(201,168,76,0.06)'; });
+    grid.appendChild(el);
+    setTimeout(function(){ el.style.opacity='1'; el.style.transform='scale(1)'; }, 120 + i * 90);
+  });
+
+  var demo = document.getElementById('num-demo-text');
+  var res = document.getElementById('num-demo-result');
+  if (!demo || !res) return;
+  res.style.opacity = '0';
+  var steps = ['6 + 1 + 1 + 1 + 9 + 8 + 4', '= 30', '3 + 0'];
+  var si = 0;
+  demo.textContent = steps[0];
+  var demoInterval = setInterval(function(){
+    si++;
+    if (si >= steps.length) {
+      clearInterval(demoInterval);
+      demo.textContent = '3 + 0 = 3';
+      res.style.opacity = '1';
+      res.textContent = 'Life Path 3 \u2726';
+      return;
+    }
+    demo.textContent = steps[si];
+  }, 1400);
+}
+
+// --- Panel 1: Tree of Life animation ---
+function initTreeAnim() {}
+function animateTreeIn() {
+  var nodes = document.querySelectorAll('.edu-seph');
+  nodes.forEach(function(n, i) {
+    n.style.opacity = '0';
+    n.style.transform = 'scale(0.5)';
+    n.style.transition = 'opacity 0.5s, transform 0.5s';
+    setTimeout(function(){ n.style.opacity = '1'; n.style.transform = 'scale(1)'; }, 200 + i * 180);
+  });
+
+  document.querySelectorAll('.edu-seph').forEach(function(n){
+    n.style.cursor = 'pointer';
+    n.addEventListener('mouseenter', function(){
+      var tip = document.getElementById('edu-seph-tip');
+      if (tip) tip.textContent = this.getAttribute('data-name') + ' \u2014 ' + this.getAttribute('data-desc');
+    });
+    n.addEventListener('mouseleave', function(){
+      var tip = document.getElementById('edu-seph-tip');
+      if (tip) tip.textContent = '';
+    });
+  });
+
+  var sephy = document.querySelectorAll('.edu-seph circle');
+  var pi = 0;
+  var pulseInterval = setInterval(function(){
+    sephy.forEach(function(c){ c.style.filter = ''; });
+    if (sephy[pi]) sephy[pi].style.filter = 'drop-shadow(0 0 8px #c9a84c)';
+    pi = (pi + 1) % sephy.length;
+  }, 600);
+  setTimeout(function(){ clearInterval(pulseInterval); sephy.forEach(function(c){ c.style.filter = ''; }); }, _eduAutoMs + 1000);
+}
+
+// --- Panel 2: Astrology zodiac animation ---
+var _zodiacRaf = null;
+var _zodiacAngle = 0;
+var _mercuryAngle = 0;
+var _venusAngle = 180;
+
+function initZodiacAnim() {
+  var signs = ['\u2648','\u2649','\u264A','\u264B','\u264C','\u264D','\u264E','\u264F','\u2650','\u2651','\u2652','\u2653'];
+  var labels = ['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'];
+  var g = document.getElementById('edu-zodiac-signs');
+  if (!g) return;
+  g.innerHTML = '';
+  signs.forEach(function(sign, i){
+    var angle = (i / 12) * Math.PI * 2 - Math.PI / 2;
+    var x = Math.cos(angle) * 98;
+    var y = Math.sin(angle) * 98;
+    var el = document.createElementNS('http://www.w3.org/2000/svg','text');
+    el.setAttribute('x', x);
+    el.setAttribute('y', y + 4);
+    el.setAttribute('text-anchor','middle');
+    el.setAttribute('fill','rgba(176,138,255,0.7)');
+    el.setAttribute('font-size','14');
+    el.setAttribute('class','edu-zodiac-sign');
+    el.setAttribute('data-label', labels[i]);
+    el.textContent = sign;
+    g.appendChild(el);
+  });
+}
+
+function animateZodiac() {
+  if (_zodiacRaf) cancelAnimationFrame(_zodiacRaf);
+  var g = document.getElementById('edu-zodiac-signs');
+  var mercury = document.getElementById('edu-planet-mercury');
+  var venus = document.getElementById('edu-planet-venus');
+  var signs = document.querySelectorAll('.edu-zodiac-sign');
+  var highlighted = Math.floor(Math.random() * 12);
+
+  function frame() {
+    _zodiacAngle += 0.003;
+    _mercuryAngle += 0.012;
+    _venusAngle -= 0.007;
+
+    if (g) g.setAttribute('transform', 'rotate(' + (_zodiacAngle * 180 / Math.PI) + ')');
+
+    if (mercury) {
+      var mx = Math.cos(_mercuryAngle) * 60;
+      var my = Math.sin(_mercuryAngle) * 60;
+      mercury.setAttribute('transform', 'translate(' + mx + ',' + my + ')');
+    }
+    if (venus) {
+      var vx = Math.cos(_venusAngle) * 78;
+      var vy = Math.sin(_venusAngle) * 78;
+      venus.setAttribute('transform', 'translate(' + vx + ',' + vy + ')');
+    }
+
+    signs.forEach(function(s, i){
+      s.setAttribute('fill', i === highlighted ? '#ffd700' : 'rgba(176,138,255,0.7)');
+    });
+
+    _zodiacRaf = requestAnimationFrame(frame);
+  }
+  _zodiacRaf = requestAnimationFrame(frame);
+}
+
+function initElementDisplay() {
+  var wrap = document.getElementById('edu-element-display');
+  if (!wrap) return;
+  var elements = [
+    {name:'Fire', signs:'Aries \u00b7 Leo \u00b7 Sagittarius', color:'#ff7755', icon:'\ud83d\udd25'},
+    {name:'Earth', signs:'Taurus \u00b7 Virgo \u00b7 Capricorn', color:'#88bb66', icon:'\ud83c\udf3f'},
+    {name:'Air', signs:'Gemini \u00b7 Libra \u00b7 Aquarius', color:'#88ccff', icon:'\ud83d\udca8'},
+    {name:'Water', signs:'Cancer \u00b7 Scorpio \u00b7 Pisces', color:'#8899ff', icon:'\ud83c\udf0a'},
+  ];
+  wrap.innerHTML = elements.map(function(e){
+    return '<div style="text-align:center;padding:0.5rem 0.8rem;border:1px solid ' + e.color + '44;border-radius:10px;background:' + e.color + '11;min-width:100px;">' +
+      '<div style="font-size:1.3rem;">' + e.icon + '</div>' +
+      '<div style="font-weight:700;color:' + e.color + ';font-size:0.8rem;">' + e.name + '</div>' +
+      '<div style="color:#9b8ec4;font-size:0.62rem;margin-top:2px;">' + e.signs + '</div>' +
+      '</div>';
+  }).join('');
+}
+// ── END EDU SCREEN ────────────────────────────────────────────
+
+// ===========================
+// INIT
+// ===========================
+showScreen('hook');
+</script>
+</body>
+</html>
