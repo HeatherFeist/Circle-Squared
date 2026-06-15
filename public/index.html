@@ -1315,77 +1315,198 @@ function generatePartnershipPDF(p1, p2, pages) {
   if (!jsPDFLib) { alert('PDF generator still loading — please wait.'); return; }
   var doc = new jsPDFLib({ orientation:'portrait', unit:'mm', format:'a4' });
   var W=210, H=297;
-  var BG=[2,0,20], BG2=[8,4,35];
+  var BG=[2,0,20], BG2=[8,4,35], GHOST=[18,8,52];
   var GOLD=[201,168,76], PURPLE=[176,138,255], ROSE=[255,158,210];
-  var WHITE=[232,224,255], MUTED=[120,100,170], DIM=[50,35,90];
+  var TEAL=[80,220,200], WHITE=[232,224,255], MUTED=[120,100,170], DIM=[50,35,90];
 
   var PARTNER_PAGE_META = [
     {sys:p1.firstName.toUpperCase()+'\'S AXIS',       layer:'THE ' + AXIS_ROLES[p1.axisRole].pillar.toUpperCase(), title:'The ' + AXIS_ROLES[p1.axisRole].title,              color:GOLD},
     {sys:p2.firstName.toUpperCase()+'\'S AXIS',       layer:'THE ' + AXIS_ROLES[p2.axisRole].pillar.toUpperCase(), title:'The ' + AXIS_ROLES[p2.axisRole].title,              color:ROSE},
     {sys:'COMBINED ARCHITECTURE',                     layer:AXIS_CONFIGS[getAxisConfig(p1.axisRole,p2.axisRole)].name.toUpperCase(), title:'Two Souls, One Tree',             color:PURPLE},
-    {sys:'TOROIDAL CARNATION FIELD',                  layer:'SACRED GEOMETRY · RELATIONAL TORUS',        title:'The Living Field You Generate',                               color:[80,220,200]},
+    {sys:'TOROIDAL CARNATION FIELD',                  layer:'SACRED GEOMETRY  ·  RELATIONAL TORUS',  title:'The Living Field You Generate',                                   color:TEAL},
     {sys:'SHADOW, GIFT & INTEGRATION',                layer:'INTEGRATION NUMBER ' + reduceNum(p1.gematria.total+p2.gematria.total,false), title:'The Teaching of the Union', color:GOLD},
-    {sys:'AIN SOPH AUR · PARTNERSHIP BLESSING',       layer:'COMPOSITE LIFE PATH ' + reduceNum(p1.lifePath+p2.lifePath,true), title:'The Limitless Light',                   color:ROSE}
+    {sys:'AIN SOPH AUR  ·  PARTNERSHIP BLESSING',     layer:'COMPOSITE LIFE PATH ' + reduceNum(p1.lifePath+p2.lifePath,true), title:'The Limitless Light',                   color:ROSE}
   ];
 
-  function pdfBg(){doc.setFillColor(BG[0],BG[1],BG[2]);doc.rect(0,0,W,H,'F');doc.setFillColor(BG2[0],BG2[1],BG2[2]);doc.rect(0,0,W,55,'F');}
-  function pdfStars(seed,n){var x=seed;for(var i=0;i<n;i++){x=(x*1664525+1013904223)%4294967296;var sx=(x%1000)/1000*W;x=(x*1664525+1013904223)%4294967296;var sy=(x%1000)/1000*H;doc.setFillColor(200,190,240);doc.circle(sx,sy,0.4,'F');}}
-  function pdfFooter(pn,tot,col){doc.setDrawColor(DIM[0],DIM[1],DIM[2]);doc.setLineWidth(0.25);doc.line(20,H-14,W-20,H-14);doc.setFont('helvetica','normal');doc.setFontSize(6.5);doc.setTextColor(DIM[0],DIM[1],DIM[2]);doc.text('CIRCLES SQUARED • PARTNERSHIP BLUEPRINT',20,H-9);doc.text('PAGE '+pn+' OF '+tot,W-20,H-9,{align:'right'});}
+  function pdfBg(){
+    doc.setFillColor(BG[0],BG[1],BG[2]); doc.rect(0,0,W,H,'F');
+  }
+  function pdfStars(seed,n){
+    var x=seed;
+    for(var i=0;i<n;i++){
+      x=(x*1664525+1013904223)%4294967296; var sx=(x%1000)/1000*W;
+      x=(x*1664525+1013904223)%4294967296; var sy=(x%1000)/1000*H;
+      var r=(i%7===0)?0.6:(i%3===0)?0.4:0.25;
+      var bright=(i%5===0)?[230,220,255]:(i%3===0)?[200,188,240]:[155,145,205];
+      doc.setFillColor(bright[0],bright[1],bright[2]); doc.circle(sx,sy,r,'F');
+    }
+  }
+  function eggOfLifeP(cx,cy,r,color,lw){
+    doc.setDrawColor(color[0],color[1],color[2]); doc.setLineWidth(lw);
+    doc.circle(cx,cy,r,'S');
+    for(var i=0;i<6;i++){var a=i*Math.PI/3; doc.circle(cx+r*Math.cos(a),cy+r*Math.sin(a),r,'S');}
+    doc.circle(cx,cy,r*2,'S');
+  }
+  function pdfFooter(pn,tot){
+    doc.setFont('courier','normal'); doc.setFontSize(5.5);
+    doc.setTextColor(Math.round(DIM[0]*1.5),Math.round(DIM[1]*1.5),Math.round(DIM[2]*1.5));
+    doc.text('CIRCLES SQUARED  ·  PARTNERSHIP BLUEPRINT', 14, H-6);
+    doc.text('PAGE '+pn+' OF '+tot, W-14, H-6, {align:'right'});
+  }
 
-  // COVER PAGE
-  pdfBg(); pdfStars(77,110);
-  doc.setFillColor(ROSE[0],ROSE[1],ROSE[2]); doc.rect(0,0,W,2.5,'F'); doc.rect(0,H-2.5,W,2.5,'F');
-  doc.setDrawColor(ROSE[0],ROSE[1],ROSE[2]); doc.setLineWidth(0.3); doc.circle(W/2,H/2-15,62,'S');
-  doc.setDrawColor(GOLD[0],GOLD[1],GOLD[2]); doc.setLineWidth(0.2); doc.circle(W/2,H/2-15,51,'S');
-  doc.setFont('helvetica','bold'); doc.setFontSize(8.5); doc.setTextColor(ROSE[0],ROSE[1],ROSE[2]);
-  doc.text('C I R C L E S   S Q U A R E D', W/2, 22, {align:'center'});
-  doc.setFont('helvetica','bold'); doc.setFontSize(16); doc.setTextColor(WHITE[0],WHITE[1],WHITE[2]);
-  doc.text('PARTNERSHIP BLUEPRINT', W/2, 42, {align:'center'});
-  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(ROSE[0],ROSE[1],ROSE[2]);
-  var axisConfName = AXIS_CONFIGS[getAxisConfig(p1.axisRole,p2.axisRole)].name;
-  doc.text(axisConfName.toUpperCase(), W/2, 52, {align:'center'});
-  doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(MUTED[0],MUTED[1],MUTED[2]);
-  doc.text('P R E P A R E D   F O R', W/2, H/2-38, {align:'center'});
-  var n1 = p1.firstName.toUpperCase(), n2 = p2.firstName.toUpperCase();
-  doc.setFont('helvetica','bold'); doc.setFontSize(22); doc.setTextColor(GOLD[0],GOLD[1],GOLD[2]);
-  doc.text(n1, W/2, H/2-24, {align:'center'});
-  doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor(MUTED[0],MUTED[1],MUTED[2]);
-  doc.text('& ', W/2, H/2-14, {align:'center'});
-  doc.setFont('helvetica','bold'); doc.setFontSize(22); doc.setTextColor(ROSE[0],ROSE[1],ROSE[2]);
+  // ===== COVER PAGE =====
+  pdfBg(); pdfStars(77,165);
+
+  // Rose + gold accent bars
+  doc.setFillColor(ROSE[0],ROSE[1],ROSE[2]); doc.rect(0,0,W,2,'F');
+  doc.setFillColor(Math.round(GOLD[0]*0.55),Math.round(GOLD[1]*0.55),Math.round(GOLD[2]*0.55)); doc.rect(0,2,W,1,'F');
+  doc.setFillColor(ROSE[0],ROSE[1],ROSE[2]); doc.rect(0,H-2,W,2,'F');
+  doc.setFillColor(Math.round(GOLD[0]*0.55),Math.round(GOLD[1]*0.55),Math.round(GOLD[2]*0.55)); doc.rect(0,H-3,W,1,'F');
+
+  // Corner brackets
+  doc.setDrawColor(Math.round(ROSE[0]*0.55),Math.round(ROSE[1]*0.55),Math.round(ROSE[2]*0.55)); doc.setLineWidth(0.3);
+  doc.line(7,7,20,7); doc.line(7,7,7,20);
+  doc.line(W-7,7,W-20,7); doc.line(W-7,7,W-7,20);
+  doc.line(7,H-7,20,H-7); doc.line(7,H-7,7,H-20);
+  doc.line(W-7,H-7,W-20,H-7); doc.line(W-7,H-7,W-7,H-20);
+
+  // Central content card
+  doc.setFillColor(GHOST[0],GHOST[1],GHOST[2]);
+  doc.roundedRect(8,60,W-16,180,4,4,'F');
+  doc.setDrawColor(Math.round(ROSE[0]*0.3),Math.round(ROSE[1]*0.3),Math.round(ROSE[2]*0.3)); doc.setLineWidth(0.28);
+  doc.roundedRect(8,60,W-16,180,4,4,'S');
+  doc.setDrawColor(Math.round(GOLD[0]*0.15),Math.round(GOLD[1]*0.15),Math.round(GOLD[2]*0.15)); doc.setLineWidth(0.12);
+  doc.roundedRect(10,62,W-20,176,3,3,'S');
+
+  // Logo label — Courier
+  doc.setFont('courier','bold'); doc.setFontSize(7.5); doc.setTextColor(ROSE[0],ROSE[1],ROSE[2]);
+  doc.text('C I R C L E S   S Q U A R E D', W/2, 15, {align:'center'});
+  doc.setFont('courier','normal'); doc.setFontSize(5.2); doc.setTextColor(MUTED[0],MUTED[1],MUTED[2]);
+  doc.text('TAURUS CODEX GEOMETRY  ·  PARTNERSHIP BLUEPRINT', W/2, 21, {align:'center'});
+
+  // Decorative rings
+  var cxP=W/2, cyP=H/2-14;
+  doc.setDrawColor(Math.round(ROSE[0]*0.22),Math.round(ROSE[1]*0.22),Math.round(ROSE[2]*0.22)); doc.setLineWidth(0.5); doc.circle(cxP,cyP,68,'S');
+  doc.setDrawColor(Math.round(GOLD[0]*0.25),Math.round(GOLD[1]*0.25),Math.round(GOLD[2]*0.25)); doc.setLineWidth(0.3); doc.circle(cxP,cyP,56,'S');
+  doc.setDrawColor(Math.round(ROSE[0]*0.15),Math.round(ROSE[1]*0.15),Math.round(ROSE[2]*0.15)); doc.setLineWidth(0.2); doc.circle(cxP,cyP,44,'S');
+  doc.setDrawColor(Math.round(GOLD[0]*0.1),Math.round(GOLD[1]*0.1),Math.round(GOLD[2]*0.1)); doc.setLineWidth(0.15); doc.circle(cxP,cyP,33,'S');
+  eggOfLifeP(cxP,cyP,22,[30,12,60],0.14);
+
+  // Title — Times Roman
+  doc.setFont('times','bold'); doc.setFontSize(24); doc.setTextColor(252,250,255);
+  doc.text('PARTNERSHIP BLUEPRINT', W/2, 48, {align:'center'});
+  var axisConfName=AXIS_CONFIGS[getAxisConfig(p1.axisRole,p2.axisRole)].name;
+  doc.setFont('courier','normal'); doc.setFontSize(8); doc.setTextColor(ROSE[0],ROSE[1],ROSE[2]);
+  doc.text(axisConfName.toUpperCase(), W/2, 57, {align:'center'});
+
+  // "Prepared for" — Courier
+  doc.setFont('courier','normal'); doc.setFontSize(5.5); doc.setTextColor(MUTED[0],MUTED[1],MUTED[2]);
+  doc.text('P R E P A R E D   F O R', W/2, H/2-42, {align:'center'});
+  doc.setDrawColor(Math.round(ROSE[0]*0.3),Math.round(ROSE[1]*0.3),Math.round(ROSE[2]*0.3)); doc.setLineWidth(0.15);
+  doc.line(W/2-22,H/2-39,W/2-3,H/2-39); doc.line(W/2+3,H/2-39,W/2+22,H/2-39);
+  doc.setFillColor(Math.round(ROSE[0]*0.5),Math.round(ROSE[1]*0.5),Math.round(ROSE[2]*0.5)); doc.circle(W/2,H/2-39,1,'F');
+
+  // Names — Times
+  var n1=p1.firstName.toUpperCase(), n2=p2.firstName.toUpperCase();
+  doc.setFont('times','bold'); doc.setFontSize(24); doc.setTextColor(GOLD[0],GOLD[1],GOLD[2]);
+  doc.text(n1, W/2, H/2-26, {align:'center'});
+  doc.setFont('times','normal'); doc.setFontSize(11); doc.setTextColor(MUTED[0],MUTED[1],MUTED[2]);
+  doc.text('&', W/2, H/2-15, {align:'center'});
+  doc.setFont('times','bold'); doc.setFontSize(24); doc.setTextColor(ROSE[0],ROSE[1],ROSE[2]);
   doc.text(n2, W/2, H/2-4, {align:'center'});
-  doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(GOLD[0],GOLD[1],GOLD[2]);
-  doc.text(AXIS_CONFIGS[getAxisConfig(p1.axisRole,p2.axisRole)].symbol + '  Composite Life Path ' + reduceNum(p1.lifePath+p2.lifePath,true), W/2, H/2+6, {align:'center'});
-  doc.setFontSize(6.5); doc.setTextColor(DIM[0],DIM[1],DIM[2]);
-  doc.text('TREE OF LIFE ARCHITECTURE  ·  TOROIDAL FIELD GEOMETRY  ·  SACRED GEMATRIA', W/2, H/2+12, {align:'center'});
 
-  var totalPdf = 1 + pages.length;
+  // Key info — Courier
+  doc.setFont('courier','normal'); doc.setFontSize(7); doc.setTextColor(GOLD[0],GOLD[1],GOLD[2]);
+  doc.text(AXIS_CONFIGS[getAxisConfig(p1.axisRole,p2.axisRole)].symbol+'  Composite Life Path '+reduceNum(p1.lifePath+p2.lifePath,true), W/2, H/2+7, {align:'center'});
+  doc.setFontSize(5.2); doc.setTextColor(Math.round(DIM[0]*1.8),Math.round(DIM[1]*1.8),Math.round(DIM[2]*1.8));
+  doc.text('TREE OF LIFE ARCHITECTURE  ·  TOROIDAL FIELD GEOMETRY  ·  SACRED GEMATRIA', W/2, H/2+13, {align:'center'});
+
+  eggOfLifeP(W/2,H/2+66,16,[22,10,52],0.12);
+
+  var nowP=new Date();
+  doc.setFont('courier','normal'); doc.setFontSize(5.5); doc.setTextColor(Math.round(DIM[0]*1.8),Math.round(DIM[1]*1.8),Math.round(DIM[2]*1.8));
+  doc.text(nowP.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}).toUpperCase(), W/2, H-8, {align:'center'});
+
+  // ===== CONTENT PAGES =====
+  var PAGE_ROMS_P=['I','II','III','IV','V','VI'];
+  var totalPdf=1+pages.length;
+
   pages.forEach(function(pageContent, idx) {
     doc.addPage();
-    var meta = PARTNER_PAGE_META[idx] || {sys:'PARTNERSHIP',layer:'SECTION '+(idx+1),title:'Your Reading',color:PURPLE};
-    var col = meta.color;
-    pdfBg(); pdfStars((idx+1)*777, 55);
-    doc.setFillColor(col[0],col[1],col[2]); doc.rect(0,0,W,2.5,'F');
-    doc.setFont('helvetica','bold'); doc.setFontSize(6.5); doc.setTextColor(col[0],col[1],col[2]);
-    doc.text(meta.sys+'  ·  '+meta.layer, 20, 18);
-    doc.setFont('helvetica','bold'); doc.setFontSize(17); doc.setTextColor(WHITE[0],WHITE[1],WHITE[2]);
-    doc.text(meta.title, 20, 30);
-    doc.setDrawColor(col[0],col[1],col[2]); doc.setLineWidth(0.35); doc.line(20,43,W-20,43);
-    var body = (pageContent||'Your reading is being prepared.').trim();
-    doc.setFont('helvetica','normal'); doc.setFontSize(9.5); doc.setTextColor(WHITE[0],WHITE[1],WHITE[2]);
-    var maxW=W-40, curY=51, lh=5.8, maxY=H-20;
-    var paras = body.split(/\n\n+/).filter(function(s){return s.trim().length>10;});
-    paras.forEach(function(para, pi){
+    var meta=PARTNER_PAGE_META[idx]||{sys:'PARTNERSHIP',layer:'SECTION '+(idx+1),title:'Your Reading',color:ROSE};
+    var col=meta.color;
+
+    pdfBg(); pdfStars((idx+1)*777, 80);
+
+    // Atmospheric rings
+    doc.setDrawColor(GHOST[0],GHOST[1],GHOST[2]); doc.setLineWidth(0.18);
+    doc.circle(W+22,38,55,'S'); doc.circle(W+22,38,40,'S');
+
+    // Full-page panel card
+    doc.setFillColor(GHOST[0],GHOST[1],GHOST[2]);
+    doc.roundedRect(6,6,W-12,H-20,3,3,'F');
+    doc.setDrawColor(Math.round(col[0]*0.3),Math.round(col[1]*0.3),Math.round(col[2]*0.3)); doc.setLineWidth(0.28);
+    doc.roundedRect(6,6,W-12,H-20,3,3,'S');
+    // Color accent strip
+    doc.setFillColor(col[0],col[1],col[2]);
+    doc.rect(6,6,W-12,2.2,'F');
+
+    // Category label — COURIER MONOSPACE
+    doc.setFont('courier','bold'); doc.setFontSize(5);
+    doc.setTextColor(col[0],col[1],col[2]);
+    doc.text(meta.sys+'  ·  '+meta.layer, 14, 17);
+    doc.setFont('courier','normal'); doc.setFontSize(7);
+    doc.setTextColor(Math.round(col[0]*0.6),Math.round(col[1]*0.6),Math.round(col[2]*0.6));
+    doc.text(PAGE_ROMS_P[idx]||String(idx+1), W-14, 17, {align:'right'});
+
+    // Page title — TIMES ROMAN
+    doc.setFont('times','bold'); doc.setFontSize(20);
+    doc.setTextColor(252,250,255);
+    doc.text(meta.title, 14, 28);
+
+    // Divider
+    doc.setDrawColor(Math.round(col[0]*0.55),Math.round(col[1]*0.55),Math.round(col[2]*0.55)); doc.setLineWidth(0.22);
+    doc.line(14,33,W-14,33);
+    doc.setFillColor(col[0],col[1],col[2]);
+    doc.circle(W/2,33,1.2,'F'); doc.circle(W/2-9,33,0.5,'F'); doc.circle(W/2+9,33,0.5,'F');
+
+    // Body text — Times Roman
+    var body=(pageContent||'Your reading is being prepared.').trim();
+    var BODYC=[232,224,255];
+    var curY=40,lh=6.3,maxY=H-24;
+    var paras=body.split(/\n\n+/).filter(function(s){return s.trim().length>10;});
+
+    paras.forEach(function(para,pi){
       if(curY>maxY) return;
-      if(pi>0) curY+=2.5;
-      var lines = doc.splitTextToSize(para.trim().replace(/\n/g,' '), maxW);
-      lines.forEach(function(line){ if(curY>maxY) return; doc.text(line, 20, curY); curY+=lh; });
+      if(pi>0) curY+=3.5;
+      if(curY>maxY) return;
+      if(pi===0){
+        doc.setFont('times','bold'); doc.setFontSize(11.5);
+        doc.setTextColor(252,250,255);
+      } else {
+        doc.setFont('times','normal'); doc.setFontSize(10.5);
+        doc.setTextColor(BODYC[0],BODYC[1],BODYC[2]);
+      }
+      var lines=doc.splitTextToSize(para.trim().replace(/\n/g,' '),W-28);
+      lines.forEach(function(line){
+        if(curY>maxY) return;
+        doc.text(line,14,curY); curY+=lh;
+      });
     });
-    pdfFooter(idx+2, totalPdf, col);
+
+    // Bottom ornament
+    if(curY<maxY-4){
+      doc.setDrawColor(Math.round(col[0]*0.28),Math.round(col[1]*0.28),Math.round(col[2]*0.28)); doc.setLineWidth(0.12);
+      doc.line(14,maxY,W/2-5,maxY); doc.line(W/2+5,maxY,W-14,maxY);
+      doc.setFillColor(Math.round(col[0]*0.4),Math.round(col[1]*0.4),Math.round(col[2]*0.4)); doc.circle(W/2,maxY,1,'F');
+    }
+
+    pdfFooter(idx+2, totalPdf);
   });
 
-  var fn1 = p1.firstName.toLowerCase().replace(/[^a-z]/g,'');
-  var fn2 = p2.firstName.toLowerCase().replace(/[^a-z]/g,'');
-  var partnerFilename = 'circles-squared-partnership-'+fn1+'-'+fn2+'.pdf';
+  var fn1=p1.firstName.toLowerCase().replace(/[^a-z]/g,'');
+  var fn2=p2.firstName.toLowerCase().replace(/[^a-z]/g,'');
+  var partnerFilename='circles-squared-partnership-'+fn1+'-'+fn2+'.pdf';
   _openPDF(doc, partnerFilename);
 }
 
