@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -2799,7 +2799,7 @@ function generateAndDownloadPDF() {
     doc.setDrawColor(col[0],col[1],col[2]); doc.setLineWidth(0.55);
     doc.line(cx+(outerR+0.5)*Math.cos(mA),cy+(outerR+0.5)*Math.sin(mA),cx+(outerR+4)*Math.cos(mA),cy+(outerR+4)*Math.sin(mA));
     // Label below wheel
-    doc.setFont('helvetica','bold'); doc.setFontSize(4.8); doc.setTextColor(col[0],col[1],col[2]);
+    doc.setFont('courier','bold'); doc.setFontSize(4.8); doc.setTextColor(col[0],col[1],col[2]);
     doc.text('NATAL SUN PLACEMENT',cx,cy+outerR+9,{align:'center'});
   }
 
@@ -2814,7 +2814,7 @@ function generateAndDownloadPDF() {
     doc.line(x,y+h,x+5,y+h); doc.line(x,y+h,x,y+h-5);
     doc.line(x+w,y+h,x+w-5,y+h); doc.line(x+w,y+h,x+w,y+h-5);
     // Title
-    doc.setFont('helvetica','bold'); doc.setFontSize(5.5); doc.setTextColor(col[0],col[1],col[2]);
+    doc.setFont('courier','bold'); doc.setFontSize(5.5); doc.setTextColor(col[0],col[1],col[2]);
     doc.text('NUMEROLOGY  ·  LIFE PATH',x+w/2,y+6.5,{align:'center'});
     doc.setDrawColor(col[0]*0.35,col[1]*0.35,col[2]*0.35); doc.setLineWidth(0.2); doc.line(x+6,y+9,x+w-6,y+9);
     var cy2=y+14;
@@ -2842,7 +2842,7 @@ function generateAndDownloadPDF() {
     // Life Path box
     doc.setFillColor(BG[0],BG[1],BG[2]); doc.rect(x+5,cy2-3.5,w-10,12,'F');
     doc.setDrawColor(GOLD[0],GOLD[1],GOLD[2]); doc.setLineWidth(0.3); doc.rect(x+5,cy2-3.5,w-10,12,'S');
-    doc.setFont('helvetica','bold'); doc.setFontSize(5); doc.setTextColor(WHITE[0]*0.8,WHITE[1]*0.8,WHITE[2]*0.8);
+    doc.setFont('courier','bold'); doc.setFontSize(5); doc.setTextColor(WHITE[0]*0.8,WHITE[1]*0.8,WHITE[2]*0.8);
     doc.text('LIFE PATH',x+10,cy2+3);
     doc.setFontSize(11); doc.setTextColor(GOLD[0],GOLD[1],GOLD[2]);
     doc.text(String(n)+(n===11||n===22||n===33?' (M)':''),x+w-8,cy2+4,{align:'right'});
@@ -2851,7 +2851,7 @@ function generateAndDownloadPDF() {
     if(pp.hiddenMaster){
       doc.setFillColor(BG[0],BG[1],BG[2]); doc.rect(x+5,cy2-3,w-10,11,'F');
       doc.setDrawColor(col[0],col[1],col[2]); doc.setLineWidth(0.25); doc.rect(x+5,cy2-3,w-10,11,'S');
-      doc.setFont('helvetica','bold'); doc.setFontSize(4.5); doc.setTextColor(col[0],col[1],col[2]);
+      doc.setFont('courier','bold'); doc.setFontSize(4.5); doc.setTextColor(col[0],col[1],col[2]);
       doc.text('HIDDEN MASTER',x+10,cy2+2);
       doc.setFontSize(9); doc.setTextColor(col[0],col[1],col[2]);
       doc.text(String(pp.hiddenMaster)+' **',x+w-8,cy2+2.5,{align:'right'});
@@ -2867,7 +2867,7 @@ function generateAndDownloadPDF() {
       if(pp.gematria) sec.push({l:'GEMATRIA',v:pp.gematria.reduced});
       sec.forEach(function(s){
         if(cy2>y+h-5) return;
-        doc.setFont('helvetica','normal'); doc.setFontSize(4.5); doc.setTextColor(WHITE[0]*0.65,WHITE[1]*0.65,WHITE[2]*0.65);
+        doc.setFont('courier','normal'); doc.setFontSize(4.5); doc.setTextColor(WHITE[0]*0.65,WHITE[1]*0.65,WHITE[2]*0.65);
         doc.text(s.l,x+9,cy2);
         doc.setFont('helvetica','bold'); doc.setFontSize(5.5); doc.setTextColor(GOLD[0],GOLD[1],GOLD[2]);
         doc.text(String(s.v),x+w-8,cy2,{align:'right'});
@@ -2912,7 +2912,7 @@ function generateAndDownloadPDF() {
     var cn=11,ca=(pp.codexArchetype||'Integrator'),caW=ca.split(' ');
     doc.setFillColor(BG[0],BG[1],BG[2]); doc.circle(cx,cy,cn,'F');
     doc.setDrawColor(col[0],col[1],col[2]); doc.setLineWidth(0.55); doc.circle(cx,cy,cn,'S');
-    doc.setFont('helvetica','bold'); doc.setFontSize(3.8); doc.setTextColor(col[0],col[1],col[2]);
+    doc.setFont('courier','bold'); doc.setFontSize(3.8); doc.setTextColor(col[0],col[1],col[2]);
     doc.text('CODEX',cx,cy-4.5,{align:'center'});
     doc.setFontSize(4.8); doc.setTextColor(GOLD[0],GOLD[1],GOLD[2]);
     if(caW.length<=2){
@@ -2923,7 +2923,7 @@ function generateAndDownloadPDF() {
       doc.text(caW.slice(mid2).join(' ').slice(0,11),cx,cy+4.2,{align:'center'});
     }
     // Label below
-    doc.setFont('helvetica','bold'); doc.setFontSize(4.8); doc.setTextColor(col[0],col[1],col[2]);
+    doc.setFont('courier','bold'); doc.setFontSize(4.8); doc.setTextColor(col[0],col[1],col[2]);
     doc.text('EGG OF LIFE  ·  LIVING MANDALA',cx,cy+outerR*2+8,{align:'center'});
   }
 
@@ -2968,181 +2968,202 @@ function generateAndDownloadPDF() {
       doc.text(seph.name,sx,sy+r+3.8,{align:'center'});
     });
     // Title below
-    doc.setFont('helvetica','bold'); doc.setFontSize(5); doc.setTextColor(col[0],col[1],col[2]);
+    doc.setFont('courier','bold'); doc.setFontSize(5); doc.setTextColor(col[0],col[1],col[2]);
     doc.text('TREE OF LIFE',bx+bw/2,by+bh+5,{align:'center'});
   }
 
   function pdfDivider(x1,x2,y,col) {
-    doc.setDrawColor(col[0],col[1],col[2]); doc.setLineWidth(0.3);
-    doc.line(x1,y,W/2-5,y); doc.line(W/2+5,y,x2,y);
+    doc.setDrawColor(Math.round(col[0]*0.55),Math.round(col[1]*0.55),Math.round(col[2]*0.55)); doc.setLineWidth(0.22);
+    doc.line(x1,y,x2,y);
     doc.setFillColor(col[0],col[1],col[2]);
-    doc.circle(W/2,y,2,'F'); doc.circle(W/2-7,y,0.7,'F'); doc.circle(W/2+7,y,0.7,'F');
+    doc.circle((x1+x2)/2,y,1.2,'F');
+    doc.circle((x1+x2)/2-9,y,0.5,'F');
+    doc.circle((x1+x2)/2+9,y,0.5,'F');
   }
 
   function pdfFooter(pn,tot) {
-    doc.setDrawColor(DIM[0],DIM[1],DIM[2]); doc.setLineWidth(0.2);
-    doc.line(14,H-13,W-14,H-13);
-    doc.setFillColor(DIM[0],DIM[1],DIM[2]);
-    doc.circle(13,H-13,0.9,'F'); doc.circle(W-13,H-13,0.9,'F');
-    doc.setFont('helvetica','normal'); doc.setFontSize(6); doc.setTextColor(DIM[0],DIM[1],DIM[2]);
-    doc.text('CIRCLES SQUARED  \u00b7  CELESTIAL BLUEPRINT', 16, H-8);
-    doc.text('PAGE '+pn+' OF '+tot, W-16, H-8, {align:'right'});
+    doc.setFont('courier','normal'); doc.setFontSize(5.5);
+    doc.setTextColor(Math.round(DIM[0]*1.5),Math.round(DIM[1]*1.5),Math.round(DIM[2]*1.5));
+    doc.text('CIRCLES SQUARED  \u00b7  CELESTIAL BLUEPRINT', 14, H-6);
+    doc.text('PAGE '+pn+' OF '+tot, W-14, H-6, {align:'right'});
   }
 
   // ===== COVER PAGE =====
-  pdfBg(); pdfStars(42,140);
+  pdfBg(); pdfStars(42,165);
 
-  // Corner bracket accents
-  doc.setDrawColor(DIM[0],DIM[1],DIM[2]); doc.setLineWidth(0.2);
-  doc.line(8,8,22,8); doc.line(8,8,8,22);
-  doc.line(W-8,8,W-22,8); doc.line(W-8,8,W-8,22);
-  doc.line(8,H-8,22,H-8); doc.line(8,H-8,8,H-22);
-  doc.line(W-8,H-8,W-22,H-8); doc.line(W-8,H-8,W-8,H-22);
+  // Gold + purple accent bars
+  doc.setFillColor(GOLD[0],GOLD[1],GOLD[2]); doc.rect(0,0,W,2,'F');
+  doc.setFillColor(Math.round(PURPLE[0]*0.5),Math.round(PURPLE[1]*0.5),Math.round(PURPLE[2]*0.5)); doc.rect(0,2,W,1,'F');
+  doc.setFillColor(GOLD[0],GOLD[1],GOLD[2]); doc.rect(0,H-2,W,2,'F');
+  doc.setFillColor(Math.round(PURPLE[0]*0.5),Math.round(PURPLE[1]*0.5),Math.round(PURPLE[2]*0.5)); doc.rect(0,H-3,W,1,'F');
 
-  // Gold border bars
-  doc.setFillColor(GOLD[0],GOLD[1],GOLD[2]);
-  doc.rect(0,0,W,2.5,'F'); doc.rect(0,H-2.5,W,2.5,'F');
+  // Corner brackets
+  doc.setDrawColor(Math.round(GOLD[0]*0.5),Math.round(GOLD[1]*0.5),Math.round(GOLD[2]*0.5)); doc.setLineWidth(0.3);
+  doc.line(7,7,20,7); doc.line(7,7,7,20);
+  doc.line(W-7,7,W-20,7); doc.line(W-7,7,W-7,20);
+  doc.line(7,H-7,20,H-7); doc.line(7,H-7,7,H-20);
+  doc.line(W-7,H-7,W-20,H-7); doc.line(W-7,H-7,W-7,H-20);
 
-  // Outer rings (purple + gold + inner ring)
-  var cx=W/2, cy=H/2-12;
-  doc.setDrawColor(PURPLE[0],PURPLE[1],PURPLE[2]); doc.setLineWidth(0.4); doc.circle(cx,cy,65,'S');
-  doc.setDrawColor(GOLD[0],GOLD[1],GOLD[2]); doc.setLineWidth(0.2); doc.circle(cx,cy,54,'S');
-  doc.setDrawColor(PURPLE[0],PURPLE[1],PURPLE[2]); doc.setLineWidth(0.15); doc.circle(cx,cy,44,'S');
+  // Central content card (matches app panel aesthetic)
+  doc.setFillColor(GHOST[0],GHOST[1],GHOST[2]);
+  doc.roundedRect(8,60,W-16,178,4,4,'F');
+  doc.setDrawColor(Math.round(GOLD[0]*0.32),Math.round(GOLD[1]*0.32),Math.round(GOLD[2]*0.32)); doc.setLineWidth(0.28);
+  doc.roundedRect(8,60,W-16,178,4,4,'S');
+  doc.setDrawColor(Math.round(PURPLE[0]*0.18),Math.round(PURPLE[1]*0.18),Math.round(PURPLE[2]*0.18)); doc.setLineWidth(0.12);
+  doc.roundedRect(10,62,W-20,174,3,3,'S');
 
-  // Egg of Life watermark inside rings
-  eggOfLife(cx,cy,22,GHOST,0.15);
+  // Logo label in Courier (app-style monospace)
+  doc.setFont('courier','bold'); doc.setFontSize(7.5); doc.setTextColor(GOLD[0],GOLD[1],GOLD[2]);
+  doc.text('C I R C L E S   S Q U A R E D', W/2, 15, {align:'center'});
+  doc.setFont('courier','normal'); doc.setFontSize(5.2); doc.setTextColor(MUTED[0],MUTED[1],MUTED[2]);
+  doc.text('TAURUS CODEX GEOMETRY  ·  CELESTIAL BLUEPRINT', W/2, 21, {align:'center'});
 
-  // Title
-  doc.setFont('helvetica','bold'); doc.setFontSize(8.5); doc.setTextColor(GOLD[0],GOLD[1],GOLD[2]);
-  doc.text('C I R C L E S   S Q U A R E D', W/2, 22, {align:'center'});
-  doc.setFont('helvetica','bold'); doc.setFontSize(22); doc.setTextColor(WHITE[0],WHITE[1],WHITE[2]);
-  doc.text('CELESTIAL BLUEPRINT', W/2, 46, {align:'center'});
-  doc.setFont('helvetica','normal'); doc.setFontSize(9.5); doc.setTextColor(PURPLE[0],PURPLE[1],PURPLE[2]);
-  doc.text((tier?tier.name:'The Initiation').toUpperCase(), W/2, 56, {align:'center'});
+  // Decorative concentric rings
+  var cx=W/2, cy=H/2-14;
+  doc.setDrawColor(Math.round(PURPLE[0]*0.22),Math.round(PURPLE[1]*0.22),Math.round(PURPLE[2]*0.22)); doc.setLineWidth(0.5); doc.circle(cx,cy,68,'S');
+  doc.setDrawColor(Math.round(GOLD[0]*0.28),Math.round(GOLD[1]*0.28),Math.round(GOLD[2]*0.28)); doc.setLineWidth(0.3); doc.circle(cx,cy,56,'S');
+  doc.setDrawColor(Math.round(PURPLE[0]*0.18),Math.round(PURPLE[1]*0.18),Math.round(PURPLE[2]*0.18)); doc.setLineWidth(0.2); doc.circle(cx,cy,44,'S');
+  doc.setDrawColor(Math.round(GOLD[0]*0.12),Math.round(GOLD[1]*0.12),Math.round(GOLD[2]*0.12)); doc.setLineWidth(0.15); doc.circle(cx,cy,33,'S');
+  eggOfLife(cx,cy,22,[32,14,68],0.14);
 
-  // Ornate rule + "prepared for"
-  doc.setDrawColor(DIM[0],DIM[1],DIM[2]); doc.setLineWidth(0.15);
-  doc.line(W/2-32,H/2-43,W/2-5,H/2-43); doc.line(W/2+5,H/2-43,W/2+32,H/2-43);
-  doc.setFillColor(DIM[0],DIM[1],DIM[2]); doc.circle(W/2,H/2-43,1.3,'F');
-  doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(MUTED[0],MUTED[1],MUTED[2]);
-  doc.text('P R E P A R E D   F O R', W/2, H/2-36, {align:'center'});
+  // Title in Times Roman (elegant serif, matches app's Georgia)
+  doc.setFont('times','bold'); doc.setFontSize(28); doc.setTextColor(252,250,255);
+  doc.text('CELESTIAL BLUEPRINT', W/2, 48, {align:'center'});
+  doc.setFont('courier','normal'); doc.setFontSize(8.5); doc.setTextColor(PURPLE[0],PURPLE[1],PURPLE[2]);
+  doc.text((tier?tier.name:'The Initiation').toUpperCase(), W/2, 57, {align:'center'});
 
-  // Client name
-  var displayName = (p.fullName||p.firstName||'Seeker').toUpperCase();
-  doc.setFont('helvetica','bold'); doc.setFontSize(displayName.length>18?17:24); doc.setTextColor(WHITE[0],WHITE[1],WHITE[2]);
-  doc.text(displayName, W/2, H/2-22, {align:'center'});
+  // "Prepared for" in Courier monospace
+  doc.setFont('courier','normal'); doc.setFontSize(5.5); doc.setTextColor(MUTED[0],MUTED[1],MUTED[2]);
+  doc.text('P R E P A R E D   F O R', W/2, H/2-40, {align:'center'});
+  doc.setDrawColor(Math.round(GOLD[0]*0.3),Math.round(GOLD[1]*0.3),Math.round(GOLD[2]*0.3)); doc.setLineWidth(0.15);
+  doc.line(W/2-22,H/2-37,W/2-3,H/2-37); doc.line(W/2+3,H/2-37,W/2+22,H/2-37);
+  doc.setFillColor(Math.round(GOLD[0]*0.5),Math.round(GOLD[1]*0.5),Math.round(GOLD[2]*0.5)); doc.circle(W/2,H/2-37,1,'F');
 
-  // Key identifiers
-  var pdfTc = p.tarotCard || TAROT_PATHS[1];
-  var pdfCa = p.codexArchetype || 'The Integrator';
-  var keyNums = [];
+  // Client name in Times (big elegant serif)
+  var displayName=(p.fullName||p.firstName||'Seeker').toUpperCase();
+  doc.setFont('times','bold'); doc.setFontSize(displayName.length>18?17:26); doc.setTextColor(252,250,255);
+  doc.text(displayName, W/2, H/2-24, {align:'center'});
+
+  // Key identifiers in Courier (app-style data labels)
+  var pdfTc=p.tarotCard||TAROT_PATHS[1];
+  var pdfCa=p.codexArchetype||'The Integrator';
+  var keyNums=[];
   if(p.lifePath) keyNums.push('Life Path '+p.lifePath);
   if(p.sunSign) keyNums.push(p.sunSign.sign);
   if(p.tree) keyNums.push(p.tree.name);
-  doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(GOLD[0],GOLD[1],GOLD[2]);
-  doc.text(keyNums.join('  \u00b7  '), W/2, H/2-10, {align:'center'});
-  doc.setFontSize(8); doc.setTextColor(PURPLE[0],PURPLE[1],PURPLE[2]);
-  doc.text(pdfCa.toUpperCase()+'  \u00b7  '+pdfTc.card.toUpperCase(), W/2, H/2-3, {align:'center'});
-  doc.setFontSize(7); doc.setTextColor(DIM[0],DIM[1],DIM[2]);
-  doc.text('ASTROLOGY  \u00b7  NUMEROLOGY  \u00b7  KABBALAH  \u00b7  TAROT  \u00b7  SACRED GEOMETRY', W/2, H/2+3, {align:'center'});
+  doc.setFont('courier','normal'); doc.setFontSize(7.5); doc.setTextColor(GOLD[0],GOLD[1],GOLD[2]);
+  doc.text(keyNums.join('  ·  '), W/2, H/2-12, {align:'center'});
+  doc.setFontSize(7); doc.setTextColor(PURPLE[0],PURPLE[1],PURPLE[2]);
+  doc.text(pdfCa.toUpperCase()+'  ·  '+pdfTc.card.toUpperCase(), W/2, H/2-5, {align:'center'});
+  doc.setFontSize(5.2); doc.setTextColor(Math.round(DIM[0]*1.8),Math.round(DIM[1]*1.8),Math.round(DIM[2]*1.8));
+  doc.text('ASTROLOGY  ·  NUMEROLOGY  ·  KABBALAH  ·  TAROT  ·  SACRED GEOMETRY', W/2, H/2+1.5, {align:'center'});
 
   // Lower Egg of Life decoration
-  eggOfLife(W/2,H/2+68,17,GHOST,0.12);
+  eggOfLife(W/2,H/2+66,16,[22,10,52],0.12);
 
-  // Generated date
-  var now = new Date();
-  doc.setFont('helvetica','normal'); doc.setFontSize(6); doc.setTextColor(DIM[0],DIM[1],DIM[2]);
-  doc.text(now.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}).toUpperCase(), W/2, H-7, {align:'center'});
+  // Generated date in Courier
+  var now=new Date();
+  doc.setFont('courier','normal'); doc.setFontSize(5.5); doc.setTextColor(Math.round(DIM[0]*1.8),Math.round(DIM[1]*1.8),Math.round(DIM[2]*1.8));
+  doc.text(now.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}).toUpperCase(), W/2, H-8, {align:'center'});
 
   // ===== CONTENT PAGES =====
-  var PAGE_ROMS = ['I','II','III','IV','V','VI','VII','VIII','IX'];
-  var totalPdf = 1 + pagesToDeliver.length;
+  var PAGE_ROMS=['I','II','III','IV','V','VI','VII','VIII','IX'];
+  var totalPdf=1+pagesToDeliver.length;
 
   pagesToDeliver.forEach(function(pageContent, idx) {
     doc.addPage();
-    var meta = PAGE_META[idx]||{sys:'READING',layer:'SECTION '+(idx+1),title:'Your Reading',color:PURPLE};
-    var col = meta.color;
+    var meta=PAGE_META[idx]||{sys:'READING',layer:'SECTION '+(idx+1),title:'Your Reading',color:PURPLE};
+    var col=meta.color;
 
-    pdfBg(); pdfStars((idx+1)*1013, 75);
+    pdfBg(); pdfStars((idx+1)*1013, 80);
 
-    // Left accent stripe
-    var colDark = [Math.max(Math.floor(col[0]*0.2),8), Math.max(Math.floor(col[1]*0.2),4), Math.max(Math.floor(col[2]*0.2),30)];
-    doc.setFillColor(colDark[0],colDark[1],colDark[2]); doc.rect(0,0,5,H,'F');
-    doc.setFillColor(col[0],col[1],col[2]); doc.rect(0,0,5,2.5,'F');
-    doc.setDrawColor(col[0],col[1],col[2]); doc.setLineWidth(0.12); doc.line(5,2.5,5,H-12);
+    // Atmospheric faint rings right edge
+    doc.setDrawColor(GHOST[0],GHOST[1],GHOST[2]); doc.setLineWidth(0.18);
+    doc.circle(W+22,38,55,'S'); doc.circle(W+22,38,40,'S');
 
-    // Top bar (full width)
-    doc.setFillColor(col[0],col[1],col[2]); doc.rect(5,0,W-5,2.5,'F');
+    // Full-page panel card — the central visual match to the app
+    doc.setFillColor(GHOST[0],GHOST[1],GHOST[2]);
+    doc.roundedRect(6,6,W-12,H-20,3,3,'F');
+    doc.setDrawColor(Math.round(col[0]*0.3),Math.round(col[1]*0.3),Math.round(col[2]*0.3)); doc.setLineWidth(0.28);
+    doc.roundedRect(6,6,W-12,H-20,3,3,'S');
+    // Color accent strip at top of card
+    doc.setFillColor(col[0],col[1],col[2]);
+    doc.rect(6,6,W-12,2.2,'F');
 
-    // Faint concentric arc watermark clipping off right edge
-    doc.setDrawColor(GHOST[0],GHOST[1],GHOST[2]); doc.setLineWidth(0.15);
-    doc.circle(W,32,28,'S'); doc.circle(W,32,19,'S'); doc.circle(W,32,10,'S');
+    // Category label — COURIER MONOSPACE (core app identity)
+    doc.setFont('courier','bold'); doc.setFontSize(5);
+    doc.setTextColor(col[0],col[1],col[2]);
+    doc.text(meta.sys+'  ·  '+meta.layer, 14, 17);
+    // Roman numeral right-aligned in Courier
+    doc.setFont('courier','normal'); doc.setFontSize(7);
+    doc.setTextColor(Math.round(col[0]*0.6),Math.round(col[1]*0.6),Math.round(col[2]*0.6));
+    doc.text(PAGE_ROMS[idx]||String(idx+1), W-14, 17, {align:'right'});
 
-    // Section label + roman numeral
-    doc.setFont('helvetica','bold'); doc.setFontSize(6); doc.setTextColor(col[0],col[1],col[2]);
-    doc.text(meta.sys+'  \u00b7  '+meta.layer, 12, 17);
-    doc.setFont('helvetica','bold'); doc.setFontSize(7.5);
-    doc.text(PAGE_ROMS[idx]||String(idx+1), W-12, 17, {align:'right'});
+    // Page title — TIMES ROMAN (elegant serif, mirrors app's Georgia)
+    doc.setFont('times','bold'); doc.setFontSize(20);
+    doc.setTextColor(252,250,255);
+    doc.text(meta.title, 14, 28);
 
-    // Page title
-    doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor(WHITE[0],WHITE[1],WHITE[2]);
-    doc.text(meta.title, 12, 30);
+    // Divider
+    pdfDivider(14, W-14, 33, col);
 
-    // Ornate divider
-    pdfDivider(12, W-12, 39, col);
-
-    // Right-column diagram placement
+    // Right-column diagram
     var DIAG_MAP={1:'astro',2:'num',3:'geo',5:'tol'};
     var diagType=DIAG_MAP[idx];
-    var DX=112,DY=44,DW=W-DX-10,DH=112; // diagram box: x=112, y=44, w=88, h=112
-    var diagBot=DY+DH+8;                   // y below which text expands to full width
+    var DX=111,DY=37,DW=W-DX-11,DH=118;
+    var diagBot=DY+DH+6;
 
     if(diagType){
+      // Diagram inner card (nested panel like app)
+      doc.setFillColor(BG[0],BG[1],BG[2]);
+      doc.roundedRect(DX-2,DY-2,DW+4,DH+4,2,2,'F');
+      doc.setDrawColor(Math.round(col[0]*0.25),Math.round(col[1]*0.25),Math.round(col[2]*0.25)); doc.setLineWidth(0.2);
+      doc.roundedRect(DX-2,DY-2,DW+4,DH+4,2,2,'S');
+
       var sephId2=(p.treePosition&&p.treePosition.sephId)?p.treePosition.sephId:(p.tree&&p.tree.sephId)?p.tree.sephId:6;
       if(diagType==='astro'){
-        _pdfAstroWheel(DX+DW/2, DY+DH/2, DW/2-3, DW/4, (p.sunSign?p.sunSign.sign:'Aries'));
+        _pdfAstroWheel(DX+DW/2,DY+DH/2-5,DW/2-4,DW/4,(p.sunSign?p.sunSign.sign:'Aries'));
       } else if(diagType==='num'){
-        _pdfNumPanel(DX, DY, DW, DH, p);
+        _pdfNumPanel(DX,DY,DW,DH,p);
       } else if(diagType==='geo'){
-        _pdfSacredGeo(DX+DW/2, DY+DH*0.44, DW*0.225, p);
+        _pdfSacredGeo(DX+DW/2,DY+DH*0.44,DW*0.22,p);
       } else if(diagType==='tol'){
-        _pdfTreePanel(DX, DY, DW, DH, sephId2);
+        _pdfTreePanel(DX,DY,DW,DH,sephId2);
       }
     }
 
-    // Body text — narrow (left column) while beside diagram, full-width below it
+    // Body text — Times Roman for elegant readability
     var body=(pageContent||'Your reading is being prepared.').trim();
-    doc.setTextColor(WHITE[0],WHITE[1],WHITE[2]);
-    var curY=48, lh=6.2, maxY=H-18;
+    var BODYC=[232,224,255]; // exact app body text color #e8e0ff
+    var curY=37,lh=6.3,maxY=H-24;
     var paras=body.split(/\n\n+/).filter(function(s){return s.trim().length>10;});
 
     paras.forEach(function(para,pi){
       if(curY>maxY) return;
       if(pi>0) curY+=3.5;
       if(curY>maxY) return;
-      var colW=diagType&&curY<diagBot?(DX-18):(W-26);
+      var cw=diagType&&curY<diagBot?(DX-19):(W-28);
       if(pi===0){
-        doc.setFontSize(10.5); doc.setFont('helvetica','bold');
-        doc.setTextColor(WHITE[0],WHITE[1],WHITE[2]);
+        doc.setFont('times','bold'); doc.setFontSize(11.5);
+        doc.setTextColor(252,250,255);
       } else {
-        doc.setFontSize(10); doc.setFont('helvetica','normal');
-        doc.setTextColor(WHITE[0],WHITE[1],WHITE[2]);
+        doc.setFont('times','normal'); doc.setFontSize(10.5);
+        doc.setTextColor(BODYC[0],BODYC[1],BODYC[2]);
       }
-      var lines=doc.splitTextToSize(para.trim().replace(/\n/g,' '),colW);
+      var lines=doc.splitTextToSize(para.trim().replace(/\n/g,' '),cw);
       lines.forEach(function(line){
         if(curY>maxY) return;
-        // Switch to full width once we pass the diagram
-        var cw2=diagType&&curY<diagBot?(DX-18):(W-26);
-        if(cw2!==colW){colW=cw2;lines=doc.splitTextToSize(para.trim().replace(/\n/g,' '),colW);}
-        doc.text(line,12,curY); curY+=lh;
+        var cw2=diagType&&curY<diagBot?(DX-19):(W-28);
+        if(cw2!==cw){cw=cw2;}
+        doc.text(line,14,curY); curY+=lh;
       });
     });
 
     // Bottom ornament
-    if(curY<maxY-6){
-      doc.setDrawColor(DIM[0],DIM[1],DIM[2]); doc.setLineWidth(0.15);
-      doc.line(12,maxY,W/2-4,maxY); doc.line(W/2+4,maxY,W-12,maxY);
-      doc.setFillColor(DIM[0],DIM[1],DIM[2]); doc.circle(W/2,maxY,1.2,'F');
+    if(curY<maxY-4){
+      doc.setDrawColor(Math.round(col[0]*0.28),Math.round(col[1]*0.28),Math.round(col[2]*0.28)); doc.setLineWidth(0.12);
+      doc.line(14,maxY,W/2-5,maxY); doc.line(W/2+5,maxY,W-14,maxY);
+      doc.setFillColor(Math.round(col[0]*0.4),Math.round(col[1]*0.4),Math.round(col[2]*0.4)); doc.circle(W/2,maxY,1,'F');
     }
 
     pdfFooter(idx+2, totalPdf);
