@@ -330,7 +330,30 @@ body {
 
     <h1 data-id="8" class="gradient-title font-serif text-3xl md:text-5xl font-bold leading-tight mb-5" style="line-height:1.2;">What Your Name and Birthday Have Already Been Trying to Tell You</h1>
 
-    <p data-id="9" class="mb-10" style="color:var(--text-muted); max-width:520px; font-size:0.95rem; line-height:1.7;">Five ancient systems — Numerology, Astrology, Kabbalah, Tarot, and Sacred Geometry — have always been speaking your name. Enter your details and hear what they've been trying to tell you.</p>
+    <p data-id="9" class="mb-6" style="color:var(--text-muted); max-width:540px; font-size:0.95rem; line-height:1.75;">Your birth date and name carry encoded frequencies that five ancient systems have always been able to read — until now, they have never been read together as one unified portrait.</p>
+
+    <div class="mb-10" style="max-width:540px;width:100%;display:flex;flex-direction:column;gap:0.55rem;text-align:left;">
+      <div style="display:flex;gap:0.75rem;align-items:flex-start;padding:0.6rem 0.9rem;background:rgba(176,138,255,0.06);border-left:2px solid #b08aff;border-radius:0 8px 8px 0;">
+        <span style="font-size:1.1rem;flex-shrink:0;">🔢</span>
+        <div><span style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.2em;color:#b08aff;">NUMEROLOGY</span><br><span style="font-size:0.82rem;color:#9b8ec4;line-height:1.5;">Your birth digits reduce to a Life Path number — the master frequency of your existence, your gifts, your life's core theme.</span></div>
+      </div>
+      <div style="display:flex;gap:0.75rem;align-items:flex-start;padding:0.6rem 0.9rem;background:rgba(201,168,76,0.06);border-left:2px solid #c9a84c;border-radius:0 8px 8px 0;">
+        <span style="font-size:1.1rem;flex-shrink:0;">♈</span>
+        <div><span style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.2em;color:#c9a84c;">ASTROLOGY</span><br><span style="font-size:0.82rem;color:#9b8ec4;line-height:1.5;">Your Sun sign reveals the archetypal myth you are living — the element, modality, and planetary ruler shaping your identity.</span></div>
+      </div>
+      <div style="display:flex;gap:0.75rem;align-items:flex-start;padding:0.6rem 0.9rem;background:rgba(255,158,210,0.05);border-left:2px solid #ff9ed2;border-radius:0 8px 8px 0;">
+        <span style="font-size:1.1rem;flex-shrink:0;">🌳</span>
+        <div><span style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.2em;color:#ff9ed2;">KABBALAH · TREE OF LIFE</span><br><span style="font-size:0.82rem;color:#9b8ec4;line-height:1.5;">Your Life Path places you at one of ten divine Sephirot — your energetic address in creation on the ancient Tree of Life.</span></div>
+      </div>
+      <div style="display:flex;gap:0.75rem;align-items:flex-start;padding:0.6rem 0.9rem;background:rgba(80,220,200,0.05);border-left:2px solid #50dcc8;border-radius:0 8px 8px 0;">
+        <span style="font-size:1.1rem;flex-shrink:0;">🃏</span>
+        <div><span style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.2em;color:#50dcc8;">TAROT</span><br><span style="font-size:0.82rem;color:#9b8ec4;line-height:1.5;">Through the ancient Hebrew letter–Major Arcana mapping, your encoded frequency walks a specific path of the 22 cards.</span></div>
+      </div>
+      <div style="display:flex;gap:0.75rem;align-items:flex-start;padding:0.6rem 0.9rem;background:rgba(201,168,76,0.04);border-left:2px solid rgba(201,168,76,0.5);border-radius:0 8px 8px 0;">
+        <span style="font-size:1.1rem;flex-shrink:0;">⬡</span>
+        <div><span style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.2em;color:#c9a84c;">SACRED GEOMETRY</span><br><span style="font-size:0.82rem;color:#9b8ec4;line-height:1.5;">You are not a list of traits. You are a living mandala — an Egg of Life where all five systems activate different nodes of your soul's field.</span></div>
+      </div>
+    </div>
 
     <div data-id="10" class="cosmic-card w-full" style="max-width:420px;">
       <label data-id="11" class="label-mono block mb-2">FIRST NAME</label>
@@ -362,51 +385,36 @@ body {
 
 <!-- ===== SCREEN REVEAL: PERSONALIZED NARRATED REVEAL ===== -->
 <div id="screen-reveal" class="screen">
-  <div style="max-width:520px;width:100%;padding:2rem 1.5rem;margin:0 auto;display:flex;flex-direction:column;align-items:center;min-height:100vh;justify-content:center;">
+  <div style="max-width:520px;width:100%;padding:2rem 1.5rem;margin:0 auto;display:flex;flex-direction:column;align-items:center;padding-top:2.5rem;padding-bottom:3rem;">
 
     <p class="label-mono mb-3" style="color:var(--accent-gold);font-size:0.6rem;letter-spacing:0.4em;">✦ YOUR BLUEPRINT ✦</p>
     <h2 id="reveal-name" class="gradient-title font-serif text-3xl font-bold mb-4" style="line-height:1.1;text-align:center;"></h2>
 
     <!-- Orb with Life Path number -->
-    <div class="reading-orb" id="reveal-orb" style="margin:0.8rem 0;">
+    <div class="reading-orb" id="reveal-orb" style="margin:0.6rem 0;">
       <span class="lp-number" id="reveal-lp-number"></span>
     </div>
 
-    <!-- 5-card row: LP · Sign · Sephirah · Tarot · Archetype -->
-    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;justify-content:center;margin:0.8rem 0;">
-      <div style="text-align:center;padding:0.5rem 0.8rem;background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.22);border-radius:10px;">
-        <div style="font-size:0.48rem;letter-spacing:0.2em;color:#c9a84c;margin-bottom:0.2rem;">LIFE PATH</div>
-        <div id="reveal-lp-label" style="font:700 0.9rem Georgia,serif;color:#f0d070;"></div>
-      </div>
-      <div style="text-align:center;padding:0.5rem 0.8rem;background:rgba(176,138,255,0.07);border:1px solid rgba(176,138,255,0.22);border-radius:10px;">
-        <div style="font-size:0.48rem;letter-spacing:0.2em;color:#b08aff;margin-bottom:0.2rem;">SUN SIGN</div>
-        <div id="reveal-sign-label" style="font:700 0.9rem Georgia,serif;color:#e8e0ff;"></div>
-      </div>
-      <div style="text-align:center;padding:0.5rem 0.8rem;background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.18);border-radius:10px;">
-        <div style="font-size:0.48rem;letter-spacing:0.2em;color:#ffd700;margin-bottom:0.2rem;">SEPHIRAH</div>
-        <div id="reveal-seph-label" style="font:700 0.9rem Georgia,serif;color:#f0d070;"></div>
-      </div>
-      <div style="text-align:center;padding:0.5rem 0.8rem;background:rgba(80,220,200,0.06);border:1px solid rgba(80,220,200,0.2);border-radius:10px;">
-        <div style="font-size:0.48rem;letter-spacing:0.2em;color:#50dcc8;margin-bottom:0.2rem;">TAROT</div>
-        <div id="reveal-tarot-label" style="font:700 0.9rem Georgia,serif;color:#b0f0e8;"></div>
-      </div>
-      <div style="text-align:center;padding:0.5rem 0.8rem;background:rgba(255,158,210,0.06);border:1px solid rgba(255,158,210,0.2);border-radius:10px;">
-        <div style="font-size:0.48rem;letter-spacing:0.2em;color:#ff9ed2;margin-bottom:0.2rem;">ARCHETYPE</div>
-        <div id="reveal-archetype-label" style="font:700 0.9rem Georgia,serif;color:#ffe0f0;"></div>
-      </div>
+    <!-- Waveform + status (always visible) -->
+    <div class="waveform mt-3" id="reveal-waveform">
+      <div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div>
+      <div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div>
+      <div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div>
+      <div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div>
     </div>
+    <p id="reveal-status" class="mt-2 mb-4" style="color:var(--text-muted);font-size:0.78rem;letter-spacing:0.15em;text-align:center;">Channeling your blueprint...</p>
 
-    <!-- Waveform -->
-    <div class="waveform mt-4" id="reveal-waveform">
-      <div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div>
-      <div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div>
-      <div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div>
-      <div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div>
-    </div>
-    <p id="reveal-status" class="mt-3" style="color:var(--text-muted);font-size:0.78rem;letter-spacing:0.15em;text-align:center;">Preparing your reading...</p>
+    <!-- PANEL 1: Numerology breakdown -->
+    <div id="reveal-numerology-panel" style="width:100%;margin-bottom:1rem;opacity:0;transition:opacity 1.2s ease;"></div>
+
+    <!-- PANEL 2: Astrology wheel -->
+    <div id="reveal-astro-panel" style="width:100%;margin-bottom:1rem;opacity:0;transition:opacity 1.2s ease;"></div>
+
+    <!-- PANEL 3: Tree of Life -->
+    <div id="reveal-tol-panel" style="width:100%;margin-bottom:1rem;opacity:0;transition:opacity 1.2s ease;"></div>
 
     <!-- Skip button (appears after 20 seconds) -->
-    <button id="reveal-skip-btn" class="skip-btn" style="display:none;margin-top:1.8rem;">Continue →</button>
+    <button id="reveal-skip-btn" class="skip-btn" style="display:none;margin-top:1rem;">Continue →</button>
 
   </div>
 </div>
@@ -1377,7 +1385,21 @@ function generatePartnershipPDF(p1, p2, pages) {
 
   var fn1 = p1.firstName.toLowerCase().replace(/[^a-z]/g,'');
   var fn2 = p2.firstName.toLowerCase().replace(/[^a-z]/g,'');
-  doc.save('circles-squared-partnership-'+fn1+'-'+fn2+'.pdf');
+  var partnerFilename = 'circles-squared-partnership-'+fn1+'-'+fn2+'.pdf';
+  try {
+    var blob = doc.output('blob');
+    var blobUrl = URL.createObjectURL(blob);
+    var link = document.createElement('a');
+    link.href = blobUrl;
+    link.download = partnerFilename;
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setTimeout(function(){ URL.revokeObjectURL(blobUrl); }, 60000);
+  } catch(e) {
+    doc.save(partnerFilename);
+  }
 }
 
 // ===========================
@@ -2577,7 +2599,13 @@ function showSuccessScreen(buyerName, buyerEmail, orderId, tier) {
 
   document.getElementById('payment-success').classList.add('show');
 
-  setTimeout(function() { generateAndDownloadPDF(); }, 1500);
+  var minDelay = new Promise(function(res) { setTimeout(res, 1500); });
+  Promise.all([_readingPromise || Promise.resolve(), minDelay]).then(function() {
+    if (!window._allPages || !window._allPages.filter(function(pg) { return pg; }).length) {
+      window._allPages = parseReadingPages(getFallbackReading());
+    }
+    generateAndDownloadPDF();
+  });
 }
 
 document.getElementById('close-success-overlay').addEventListener('click', function() {
@@ -2586,7 +2614,23 @@ document.getElementById('close-success-overlay').addEventListener('click', funct
 });
 
 document.getElementById('download-pdf-btn').addEventListener('click', function() {
-  generateAndDownloadPDF();
+  var allReady = window._allPages && window._allPages.filter(function(pg) { return pg; }).length;
+  if (!allReady && _readingPromise) {
+    var btn = document.getElementById('download-pdf-btn');
+    btn.textContent = '⏳ Preparing your PDF...';
+    btn.disabled = true;
+    _readingPromise.then(function() {
+      if (!window._allPages || !window._allPages.filter(function(pg) { return pg; }).length) {
+        window._allPages = parseReadingPages(getFallbackReading());
+      }
+      generateAndDownloadPDF();
+      btn.innerHTML = '📄 Download Your PDF Blueprint';
+      btn.disabled = false;
+    });
+  } else {
+    if (!allReady) window._allPages = parseReadingPages(getFallbackReading());
+    generateAndDownloadPDF();
+  }
 });
 
 // ===========================
@@ -2851,7 +2895,21 @@ function generateAndDownloadPDF() {
   });
 
   var fname = (p.firstName||'reading').toLowerCase().replace(/[^a-z]/g,'');
-  doc.save('circles-squared-'+fname+'-'+(tier?tier.slug:'reading')+'.pdf');
+  var filename = 'circles-squared-'+fname+'-'+(tier?tier.slug:'reading')+'.pdf';
+  try {
+    var blob = doc.output('blob');
+    var blobUrl = URL.createObjectURL(blob);
+    var link = document.createElement('a');
+    link.href = blobUrl;
+    link.download = filename;
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setTimeout(function(){ URL.revokeObjectURL(blobUrl); }, 60000);
+  } catch(e) {
+    doc.save(filename);
+  }
 }
 
 // ===========================
@@ -2984,21 +3042,28 @@ var _revealSkipTimer = null;
 
 function initRevealScreen() {
   var p = window._readingProfile;
-  var lpData = LP_DATA[p.lifePath] || LP_DATA[reduceNum(p.lifePath,false)] || LP_DATA[6];
 
   document.getElementById('reveal-name').textContent = p.firstName.toUpperCase();
   document.getElementById('reveal-lp-number').textContent = p.lifePath;
-  document.getElementById('reveal-lp-label').textContent = p.lifePath + ' — ' + lpData.title;
-  document.getElementById('reveal-sign-label').textContent = p.sunSign.symbol + ' ' + p.sunSign.sign;
-  document.getElementById('reveal-seph-label').textContent = p.tree.name;
-  var revTarot = p.tarotCard || TAROT_PATHS[1];
-  var revArchetype = p.codexArchetype || 'The Integrator';
-  var revTarotEl = document.getElementById('reveal-tarot-label');
-  if(revTarotEl) revTarotEl.textContent = revTarot.card;
-  var revArchEl = document.getElementById('reveal-archetype-label');
-  if(revArchEl) revArchEl.textContent = revArchetype;
   document.getElementById('reveal-status').textContent = 'Channeling your blueprint...';
   document.getElementById('reveal-skip-btn').style.display = 'none';
+
+  // Build and inject the three visualization panels
+  var numEl = document.getElementById('reveal-numerology-panel');
+  var astroEl = document.getElementById('reveal-astro-panel');
+  var tolEl = document.getElementById('reveal-tol-panel');
+  if (numEl) numEl.innerHTML = buildNumerologyPanel(p);
+  if (astroEl) astroEl.innerHTML = buildAstrologyWheel(p);
+  if (tolEl) tolEl.innerHTML = buildTreeOfLifeSVG(p);
+
+  // Fade all three panels in together immediately
+  requestAnimationFrame(function() {
+    requestAnimationFrame(function() {
+      if (numEl) numEl.style.opacity = '1';
+      if (astroEl) astroEl.style.opacity = '1';
+      if (tolEl) tolEl.style.opacity = '1';
+    });
+  });
 
   _revealSkipTimer = setTimeout(function() {
     var btn = document.getElementById('reveal-skip-btn');
@@ -3011,6 +3076,195 @@ function initRevealScreen() {
   } else {
     speakLongText(script, onRevealComplete);
   }
+}
+
+// ===========================
+// REVEAL PANEL BUILDERS
+// ===========================
+
+function buildNumerologyPanel(p) {
+  var month = p.month, day = p.day, year = p.year;
+  var digits = (String(month) + String(day) + String(year)).split('').map(Number);
+  var sum1 = digits.reduce(function(a, b) { return a + b; }, 0);
+
+  // Build reduction chain
+  var steps = [];
+  steps.push({ label: digits.join(' + '), result: sum1 });
+  var n = sum1;
+  while (n >= 10 && n !== 11 && n !== 22 && n !== 33) {
+    var digs = String(n).split('').map(Number);
+    var next = digs.reduce(function(a, b) { return a + b; }, 0);
+    steps.push({ label: digs.join(' + '), result: next });
+    n = next;
+  }
+  var isMasterLP = (n === 11 || n === 22 || n === 33);
+
+  // Hidden master calculation
+  var hm = p.hiddenMaster;
+  var mNames = ['','January','February','March','April','May','June','July','August','September','October','November','December'];
+
+  var html = '<div style="background:rgba(176,138,255,0.06);border:1px solid rgba(176,138,255,0.22);border-radius:14px;padding:1.1rem 1.2rem;width:100%;box-sizing:border-box;">';
+  html += '<div style="font-family:\'Courier New\',monospace;font-size:0.55rem;letter-spacing:0.35em;color:#b08aff;margin-bottom:0.75rem;">NUMEROLOGY · LIFE PATH CALCULATION</div>';
+
+  // Birth date label
+  html += '<div style="font-family:\'Courier New\',monospace;font-size:0.78rem;color:#c9a84c;margin-bottom:0.6rem;">' + mNames[month] + ' ' + day + ', ' + year + '</div>';
+
+  // Digit sum row
+  html += '<div style="font-family:\'Courier New\',monospace;font-size:0.82rem;color:#9b8ec4;margin-bottom:0.3rem;">';
+  html += digits.join(' + ') + ' <span style="color:#b08aff;">=</span> <span style="color:#e8e0ff;font-weight:700;">' + sum1 + '</span>';
+  html += '</div>';
+
+  // Reduction steps
+  for (var i = 1; i < steps.length; i++) {
+    var s = steps[i];
+    var isLast = (i === steps.length - 1);
+    html += '<div style="font-family:\'Courier New\',monospace;font-size:0.82rem;margin-bottom:0.3rem;padding-left:0.8rem;border-left:2px solid rgba(176,138,255,0.2);">';
+    html += '<span style="color:#6a5a8a;">↓  </span>';
+    html += '<span style="color:' + (isLast ? '#c9a84c' : '#9b8ec4') + ';">' + s.label + ' = </span>';
+    html += '<span style="color:' + (isLast ? '#f0d070' : '#e8e0ff') + ';font-weight:' + (isLast ? '700' : '400') + ';">' + s.result + '</span>';
+    html += '</div>';
+  }
+
+  // Life Path result
+  html += '<div style="margin-top:0.8rem;padding:0.6rem 0.9rem;background:rgba(201,168,76,0.12);border-radius:10px;display:flex;align-items:center;justify-content:space-between;">';
+  html += '<div><div style="font-family:\'Courier New\',monospace;font-size:0.52rem;letter-spacing:0.2em;color:#c9a84c;margin-bottom:0.15rem;">LIFE PATH</div>';
+  var lpData2 = LP_DATA[n] || LP_DATA[reduceNum(n, false)] || LP_DATA[6];
+  html += '<div style="font-size:0.78rem;color:#9b8ec4;">' + lpData2.title + '</div></div>';
+  html += '<div style="font:700 1.8rem Georgia,serif;color:#f0d070;">' + n + (isMasterLP ? ' <span style="font-size:1rem;color:#c9a84c;">✦</span>' : '') + '</div>';
+  html += '</div>';
+
+  // Hidden master number
+  if (hm) {
+    var yearDigs2 = String(year).split('').map(Number).reduce(function(a, b) { return a + b; }, 0);
+    var yearRed2 = reduceNum(yearDigs2, false);
+    html += '<div style="margin-top:0.6rem;padding:0.55rem 0.9rem;background:rgba(255,158,210,0.08);border:1px solid rgba(255,158,210,0.3);border-radius:10px;">';
+    html += '<div style="font-family:\'Courier New\',monospace;font-size:0.52rem;letter-spacing:0.2em;color:#ff9ed2;margin-bottom:0.4rem;">HIDDEN MASTER NUMBER</div>';
+    html += '<div style="font-family:\'Courier New\',monospace;font-size:0.78rem;color:#9b8ec4;margin-bottom:0.25rem;">Month <span style="color:#e8e0ff;">' + month + '</span> + Day <span style="color:#e8e0ff;">' + day + '</span> + Year reduced <span style="color:#e8e0ff;">' + yearRed2 + '</span></div>';
+    html += '<div style="font-family:\'Courier New\',monospace;font-size:0.82rem;color:#9b8ec4;">' + month + ' + ' + day + ' + ' + yearRed2 + ' = <span style="color:#ffd4ec;font-weight:700;font-size:1.05rem;">' + hm + ' ✦</span></div>';
+    html += '</div>';
+  }
+
+  // Expression number from name
+  if (p.expression) {
+    html += '<div style="margin-top:0.5rem;font-family:\'Courier New\',monospace;font-size:0.7rem;color:#7a6a9a;">Expression number (name) → <span style="color:#b08aff;font-weight:700;">' + p.expression + '</span></div>';
+  }
+
+  html += '</div>';
+  return html;
+}
+
+function buildAstrologyWheel(p) {
+  var ZODIAC_ORDER = [
+    { sign:'Aries',       symbol:'♈', element:'Fire',  color:'#ff7070' },
+    { sign:'Taurus',      symbol:'♉', element:'Earth', color:'#88cc66' },
+    { sign:'Gemini',      symbol:'♊', element:'Air',   color:'#ffdd55' },
+    { sign:'Cancer',      symbol:'♋', element:'Water', color:'#55bbee' },
+    { sign:'Leo',         symbol:'♌', element:'Fire',  color:'#ff7070' },
+    { sign:'Virgo',       symbol:'♍', element:'Earth', color:'#88cc66' },
+    { sign:'Libra',       symbol:'♎', element:'Air',   color:'#ffdd55' },
+    { sign:'Scorpio',     symbol:'♏', element:'Water', color:'#55bbee' },
+    { sign:'Sagittarius', symbol:'♐', element:'Fire',  color:'#ff7070' },
+    { sign:'Capricorn',   symbol:'♑', element:'Earth', color:'#88cc66' },
+    { sign:'Aquarius',    symbol:'♒', element:'Air',   color:'#ffdd55' },
+    { sign:'Pisces',      symbol:'♓', element:'Water', color:'#55bbee' }
+  ];
+
+  var userSignName = p.sunSign.sign;
+  var userIdx = ZODIAC_ORDER.findIndex(function(s) { return s.sign === userSignName; });
+  var cx = 150, cy = 150, outerR = 128, innerR = 68, labelR = 105, cx2 = 150, cy2 = 150;
+
+  var svg = ['<svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:280px;height:auto;display:block;margin:0 auto;">'];
+  svg.push('<defs><filter id="asglow"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>');
+  svg.push('<circle cx="150" cy="150" r="131" fill="rgba(5,2,25,0.92)" stroke="rgba(201,168,76,0.12)" stroke-width="0.6"/>');
+
+  for (var i = 0; i < 12; i++) {
+    var startDeg = i * 30 - 90;
+    var endDeg = startDeg + 30;
+    var sr = startDeg * Math.PI / 180, er = endDeg * Math.PI / 180;
+    var x1o = cx + outerR * Math.cos(sr), y1o = cy + outerR * Math.sin(sr);
+    var x2o = cx + outerR * Math.cos(er), y2o = cy + outerR * Math.sin(er);
+    var x1i = cx + innerR * Math.cos(sr), y1i = cy + innerR * Math.sin(sr);
+    var x2i = cx + innerR * Math.cos(er), y2i = cy + innerR * Math.sin(er);
+    var isUser = (i === userIdx);
+    var sign = ZODIAC_ORDER[i];
+    var sliceFill = isUser ? 'rgba(201,168,76,0.22)' : 'rgba(255,255,255,0.015)';
+    var sliceStroke = isUser ? sign.color : 'rgba(176,138,255,0.15)';
+    var pth = 'M ' + x1i.toFixed(2) + ' ' + y1i.toFixed(2) + ' L ' + x1o.toFixed(2) + ' ' + y1o.toFixed(2) + ' A ' + outerR + ' ' + outerR + ' 0 0 1 ' + x2o.toFixed(2) + ' ' + y2o.toFixed(2) + ' L ' + x2i.toFixed(2) + ' ' + y2i.toFixed(2) + ' A ' + innerR + ' ' + innerR + ' 0 0 0 ' + x1i.toFixed(2) + ' ' + y1i.toFixed(2) + ' Z';
+    svg.push('<path d="' + pth + '" fill="' + sliceFill + '" stroke="' + sliceStroke + '" stroke-width="' + (isUser ? '1.3' : '0.4') + '"' + (isUser ? ' filter="url(#asglow)"' : '') + '/>');
+
+    var midRad = (startDeg + 15) * Math.PI / 180;
+    var lx = cx + labelR * Math.cos(midRad), ly = cy + labelR * Math.sin(midRad);
+    svg.push('<text x="' + lx.toFixed(1) + '" y="' + (ly - 4).toFixed(1) + '" text-anchor="middle" fill="' + (isUser ? '#f0d070' : sign.color) + '" font-size="' + (isUser ? '13' : '9') + '" opacity="' + (isUser ? '1' : '0.55') + '">' + sign.symbol + '</text>');
+    svg.push('<text x="' + lx.toFixed(1) + '" y="' + (ly + 7).toFixed(1) + '" text-anchor="middle" fill="' + (isUser ? '#f0d070' : '#5a4a7a') + '" font-size="' + (isUser ? '5.5' : '4.2') + '" font-family="\'Courier New\',monospace">' + sign.sign.slice(0, 3).toUpperCase() + '</text>');
+  }
+
+  // Inner center circle
+  svg.push('<circle cx="' + cx2 + '" cy="' + cy2 + '" r="' + (innerR - 3) + '" fill="rgba(3,1,20,0.98)" stroke="rgba(201,168,76,0.35)" stroke-width="1"/>');
+  svg.push('<text x="150" y="138" text-anchor="middle" fill="#c9a84c" font-size="5.5" font-family="\'Courier New\',monospace" letter-spacing="0.15em">SUN IN</text>');
+  svg.push('<text x="150" y="154" text-anchor="middle" fill="#f0d070" font-size="17" font-family="Georgia,serif">' + p.sunSign.symbol + '</text>');
+  svg.push('<text x="150" y="166" text-anchor="middle" fill="#e8e0ff" font-size="7.5" font-family="Georgia,serif" font-weight="bold">' + userSignName + '</text>');
+  svg.push('</svg>');
+
+  var html = '<div style="background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.2);border-radius:14px;padding:1rem;width:100%;box-sizing:border-box;text-align:center;">';
+  html += '<div style="font-family:\'Courier New\',monospace;font-size:0.55rem;letter-spacing:0.35em;color:#c9a84c;margin-bottom:0.6rem;">ASTROLOGY · SOLAR POSITION</div>';
+  html += svg.join('');
+  html += '<div style="font-size:0.78rem;color:#9b8ec4;margin-top:0.5rem;">';
+  html += p.sunSign.element + ' · ' + (p.sunSign.modality || '') + (p.sunSign.modality ? ' · ' : '') + 'Ruled by ' + p.sunSign.planet;
+  html += '</div>';
+  html += '</div>';
+  return html;
+}
+
+function buildTreeOfLifeSVG(p) {
+  var sephId = (p.treePosition && p.treePosition.sephId) ? p.treePosition.sephId : (p.tree ? p.tree.sephId : 6);
+  var userSeph = SEPHIROTH.find(function(s) { return s.id === sephId; }) || SEPHIROTH[5];
+
+  // Scale original coords (x:80-320, y:45-430) into a 280x380 viewport
+  var VW = 280, VH = 380;
+  function tx(x) { return Math.round(14 + (x - 80) * (VW - 28) / (320 - 80)); }
+  function ty(y) { return Math.round(20 + (y - 45) * (VH - 55) / (430 - 45)); }
+
+  var svg = ['<svg viewBox="0 0 ' + VW + ' ' + VH + '" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:280px;height:auto;display:block;margin:0 auto;">'];
+  svg.push('<defs><filter id="tsglow"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>');
+
+  // Draw the 22 paths
+  PATHS_22.forEach(function(pair) {
+    var a = SEPHIROTH.find(function(s) { return s.id === pair[0]; });
+    var b = SEPHIROTH.find(function(s) { return s.id === pair[1]; });
+    if (!a || !b) return;
+    var isUserPath = (a.id === sephId || b.id === sephId);
+    svg.push('<line x1="' + tx(a.x) + '" y1="' + ty(a.y) + '" x2="' + tx(b.x) + '" y2="' + ty(b.y) + '" stroke="' + (isUserPath ? 'rgba(201,168,76,0.4)' : 'rgba(176,138,255,0.1)') + '" stroke-width="' + (isUserPath ? '1.4' : '0.6') + '"/>');
+  });
+
+  // Draw each Sephirah
+  SEPHIROTH.forEach(function(seph) {
+    var x = tx(seph.x), y = ty(seph.y);
+    var isUser = (seph.id === sephId);
+    var r = isUser ? 19 : 14;
+
+    if (isUser) {
+      svg.push('<circle cx="' + x + '" cy="' + y + '" r="' + (r + 9) + '" fill="rgba(201,168,76,0.1)" filter="url(#tsglow)"/>');
+    }
+    svg.push('<circle cx="' + x + '" cy="' + y + '" r="' + r + '" fill="rgba(3,1,20,0.97)" stroke="' + (isUser ? '#f0d070' : seph.color) + '" stroke-width="' + (isUser ? '1.8' : '0.7') + '"/>');
+
+    // Number inside circle
+    svg.push('<text x="' + x + '" y="' + (y - 3) + '" text-anchor="middle" dominant-baseline="middle" fill="' + (isUser ? '#f0d070' : seph.color) + '" font-size="' + (isUser ? '8' : '6.5') + '" font-family="Georgia,serif" font-weight="bold">' + seph.number + '</text>');
+
+    // Name below circle
+    var nameY = y + r + 8;
+    svg.push('<text x="' + x + '" y="' + nameY + '" text-anchor="middle" fill="' + (isUser ? '#f0d070' : 'rgba(176,138,255,0.55)') + '" font-size="' + (isUser ? '7' : '5.8') + '" font-family="\'Courier New\',monospace" font-weight="' + (isUser ? 'bold' : 'normal') + '">' + seph.name + '</text>');
+  });
+
+  svg.push('</svg>');
+
+  var html = '<div style="background:rgba(176,138,255,0.05);border:1px solid rgba(176,138,255,0.2);border-radius:14px;padding:1rem;width:100%;box-sizing:border-box;text-align:center;">';
+  html += '<div style="font-family:\'Courier New\',monospace;font-size:0.55rem;letter-spacing:0.35em;color:#b08aff;margin-bottom:0.6rem;">KABBALAH · TREE OF LIFE</div>';
+  html += svg.join('');
+  html += '<div style="margin-top:0.5rem;">';
+  html += '<div style="font-size:0.85rem;color:#c9a84c;font-weight:700;">' + userSeph.name + ' · ' + userSeph.meaning + '</div>';
+  html += '<div style="font-size:0.75rem;color:#8a7aaa;margin-top:0.25rem;line-height:1.5;">' + (userSeph.description || '') + '</div>';
+  html += '</div></div>';
+  return html;
 }
 
 function buildEggOfLifeMandala(p) {
