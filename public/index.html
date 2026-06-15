@@ -2272,16 +2272,16 @@ async function doReading() {
     + 'Tarot Path ' + tc.path + ': ' + tc.card + ' (' + tc.letter + ') \u2014 ' + tc.archetype + '\n'
     + (p.hiddenMaster ? 'Hidden Master Number: ' + p.hiddenMaster + '\n' : '')
     + 'Personal Year 2026: ' + p.personalYear2026 + '\n'
-    + '\nWrite exactly 9 sections with ===PAGE_N_START=== and ===PAGE_N_END=== delimiters on their own lines. Each section 3\u20135 substantial paragraphs.\n\n'
-    + 'Page 1 \u2014 IDENTITY ESSENCE: Open with their Codex Archetype ("' + ca + '"). Synthesize Life Path, Sun Sign, and Sephirah into one unified portrait of who they are. This is the center of their mandala.\n'
-    + 'Page 2 \u2014 ARCHETYPAL SIGNATURE: Weave Tarot (' + tc.card + '), Kabbalistic path (' + tc.letter + '), and ' + p.sunSign.sign + ' Sun into one mythic narrative. The archetype they are living.\n'
-    + 'Page 3 \u2014 FREQUENCY PATTERN: Life Path ' + p.lifePath + ', Expression ' + (p.expression||'?') + ', Soul Urge ' + (p.soulUrge||'?') + ', gematria ' + (p.gematria?p.gematria.total:'?') + ' as vibrational harmonics. How the name\'s encoded frequency confirms the soul\'s design.\n'
-    + 'Page 4 \u2014 THE FIELD GEOMETRY: Their identity as a living Egg of Life mandala \u2014 8 circles, each a system. Which circles light up? How do their chart lines activate specific nodes? Sacred geometry as a living map of their soul.\n'
-    + 'Page 5 \u2014 SHADOW & GIFT: The specific shadow of ' + tc.card + ' and ' + p.sunSign.sign + ', and the exact gift that emerges when integrated. Deeply personal and specific.\n'
-    + 'Page 6 \u2014 THE HIDDEN ARCHITECTURE: Kabbalah paths connected to ' + p.tree.name + (p.hiddenMaster ? ', Hidden Master Number ' + p.hiddenMaster : '') + '. The deeper Tree of Life architecture revealing purpose.\n'
-    + 'Page 7 \u2014 TIMING & CYCLES: Personal Year ' + p.personalYear2026 + ' in 2026. What this cycle activates for ' + ca + '. The cosmic timing of this chapter.\n'
-    + 'Page 8 \u2014 RELATIONAL GEOMETRY: How Life Path ' + p.lifePath + ' and ' + tc.card + ' interact in love and partnership. The relational field they emanate. Natural soul connections.\n'
-    + 'Page 9 \u2014 CAREER, PURPOSE & AIN SOPH AUR: What this soul is building. Career expression, evolutionary purpose. Close with Celestia\'s personal blessing invoking AIN SOPH AUR.';
+    + '\nWrite exactly 9 sections with ===PAGE_N_START=== and ===PAGE_N_END=== delimiters on their own lines (each delimiter on its own line, no other text on that line). Each section: 5\u20136 rich, deeply personal paragraphs. Every paragraph must reference ' + p.firstName + ' by name at least once and cite the specific numbers or symbols from their profile. No generic affirmations. Celestia speaks with warm authority, poetic depth, and precision.\n\n'
+    + 'Page 1 \u2014 IDENTITY ESSENCE: Open with the exact phrase "' + p.firstName + ', you are ' + ca + '." Then paint a full-portrait synthesis: how Life Path ' + p.lifePath + ' (' + lpTitle + ') shapes the core drive, how ' + p.sunSign.sign + ' Sun infuses it with elemental character (' + p.sunSign.element + ', ruled by ' + p.sunSign.planet + '), and how ' + p.tree.name + ' on the Tree of Life places this soul at a specific energetic address in creation. Explain what the Codex Archetype ' + ca + ' means as a living identity \u2014 not a label but a mandate. End by naming the specific gift this soul arrived with.\n'
+    + 'Page 2 \u2014 ARCHETYPAL SIGNATURE: Explore the full mythic narrative. ' + tc.card + ' (Path ' + tc.path + ', letter ' + tc.letter + ') is the archetype ' + p.firstName + ' is living. Explain what this card means as a life-force not just a symbol, how the ' + p.sunSign.sign + ' Sun amplifies or challenges this path, and how the Kabbalistic letter ' + tc.letter + ' encodes a specific teaching in their very name. Name the mythic figures, gods, or archetypes associated with this path. Describe what it feels like to embody ' + tc.card + ' fully vs. when it is suppressed.\n'
+    + 'Page 3 \u2014 FREQUENCY PATTERN: Decode the name. Life Path ' + p.lifePath + ' is the birth frequency. Expression ' + (p.expression||'?') + ' is the gift encoded in every letter of "' + p.firstName + '". Soul Urge ' + (p.soulUrge||'?') + ' is the private longing beneath the surface. Gematria total ' + (p.gematria?p.gematria.total:'?') + ' reducing to ' + (p.gematria?p.gematria.reduced:'?') + ' is the name\'s sacred numerical signature. Show how all four harmonize \u2014 they are different instruments playing the same song. Explain what happens when ' + p.firstName + ' aligns with vs. resists this frequency.\n'
+    + 'Page 4 \u2014 THE FIELD GEOMETRY: ' + p.firstName + '\'s identity is a living Egg of Life \u2014 eight interlocking circles of force. Map which nodes are most activated: ' + p.tree.name + ' (Kabbalah), ' + tc.card + ' (Tarot), ' + p.sunSign.sign + ' (Astrology), Life Path ' + p.lifePath + ' (Numerology), gematria ' + (p.gematria?p.gematria.reduced:'?') + ' (Gematria), and Sacred Geometry as the container. Explain what it means that these five systems converge on a single being. Describe the energetic field this soul radiates and how others experience it. Name the specific intersection points where power concentrates.\n'
+    + 'Page 5 \u2014 SHADOW & GIFT: Be specific and unflinching. The shadow of ' + tc.card + ' for someone with ' + p.sunSign.sign + ' energy is specific \u2014 name it precisely. Describe the exact pattern that repeats when this shadow is unconscious. Then name the exact gift that emerges when it is integrated. Include what the ' + p.tree.name + ' position on the Tree reveals about the specific initiation ' + p.firstName + ' is moving through. This section should feel like someone finally named something the reader has always felt but never had words for.\n'
+    + 'Page 6 \u2014 THE HIDDEN ARCHITECTURE: The paths flowing into and out of ' + p.tree.name + ' on the Tree of Life are the hidden curriculum of ' + p.firstName + '\'s spiritual life. Name the specific adjacent Sephiroth and what each corridor of initiation teaches. ' + (p.hiddenMaster ? 'Hidden Master Number ' + p.hiddenMaster + ' layers a second frequency over everything \u2014 explain what this master vibration demands and how it interacts with Life Path ' + p.lifePath + '. ' : '') + 'Discuss the Hebrew letter system encoded in the name and Tarot path. Explain what the deeper architecture reveals about purpose that the surface numbers only hint at.\n'
+    + 'Page 7 \u2014 TIMING & CYCLES: Personal Year ' + p.personalYear2026 + ' in 2026 has a specific energetic quality \u2014 describe it fully. What is this year asking ' + p.firstName + ' to do, release, begin, or complete? How does Personal Year ' + p.personalYear2026 + ' interact with the Codex Archetype ' + ca + '? Name the specific opportunities and risks of this cycle. Describe the 9-year cycle this year sits within and where ' + p.firstName + ' is in that larger arc. What decisions made in 2026 will echo for years to come?\n'
+    + 'Page 8 \u2014 RELATIONAL GEOMETRY: Describe the full relational field ' + p.firstName + ' emanates. Life Path ' + p.lifePath + ' creates a specific type of partner dynamic \u2014 explain it in depth. The ' + tc.card + ' archetype shapes how ' + p.firstName + ' shows up in love, what they unconsciously seek, and what they need to feel truly met. Describe the element (' + p.sunSign.element + ') in relationship: what it attracts, what it resists. Name the Life Paths and archetypes most naturally resonant with ' + p.firstName + '. Include what sacred partnership looks like for this Codex Archetype.\n'
+    + 'Page 9 \u2014 CAREER, PURPOSE & AIN SOPH AUR: What is ' + p.firstName + ' building in this lifetime? Use Expression ' + (p.expression||'?') + ' and Life Path ' + p.lifePath + ' to map the specific domains where this soul is meant to contribute. Name the career fields, creative expressions, leadership roles, or service paths aligned with ' + ca + '. Describe the legacy this soul is here to leave. Close with Celestia\'s full personal blessing to ' + p.firstName + ' invoking AIN SOPH AUR \u2014 warm, specific, and sacred. This closing should feel like a blessing received from the oracle herself.';
 
   window._readingText = await generateReading(prompt);
   window._allPages = parseReadingPages(window._readingText);
@@ -2720,6 +2720,7 @@ function generateAndDownloadPDF() {
     {sys:'AIN SOPH AUR',layer:'SYNTHESIS · BLESSING',title:'The Limitless Light',color:ROSE}
   ];
 
+  var WHITE=[252,250,255];
   var GHOST=[18,8,52];
 
   function pdfBg() {
@@ -2743,6 +2744,232 @@ function generateAndDownloadPDF() {
     doc.circle(cx,cy,r,'S');
     for(var i=0;i<6;i++){var a=i*Math.PI/3; doc.circle(cx+r*Math.cos(a),cy+r*Math.sin(a),r,'S');}
     doc.circle(cx,cy,r*2,'S');
+  }
+
+  // ---- PDF DIAGRAM HELPERS (right-column insets) ----
+
+  function _pdfAstroWheel(cx,cy,outerR,innerR,signName) {
+    var ZNAMES=['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'];
+    var ZABBR=['ARI','TAU','GEM','CAN','LEO','VIR','LIB','SCO','SAG','CAP','AQU','PIS'];
+    var ZCLR=[[210,75,65],[90,175,65],[205,190,55],[65,165,210],[210,75,65],[90,175,65],[205,190,55],[65,165,210],[210,75,65],[90,175,65],[205,190,55],[65,165,210]];
+    var col=GOLD;
+    var userIdx=Math.max(0,ZNAMES.indexOf(signName));
+    // Outer decorative ring
+    doc.setDrawColor(col[0]*0.55,col[1]*0.55,col[2]*0.55); doc.setLineWidth(0.2); doc.circle(cx,cy,outerR+3,'S');
+    // Main ring
+    doc.setDrawColor(col[0]*0.45,col[1]*0.45,col[2]*0.45); doc.setLineWidth(0.4); doc.circle(cx,cy,outerR,'S');
+    // Inner ring
+    doc.setDrawColor(DIM[0],DIM[1],DIM[2]); doc.setLineWidth(0.25); doc.circle(cx,cy,innerR,'S');
+    // 12 segments
+    for(var i=0;i<12;i++){
+      var isU=(i===userIdx),ec=ZCLR[i];
+      var spokeA=(i*30-90)*Math.PI/180;
+      var sx1=cx+innerR*Math.cos(spokeA),sy1=cy+innerR*Math.sin(spokeA);
+      var sx2=cx+outerR*Math.cos(spokeA),sy2=cy+outerR*Math.sin(spokeA);
+      doc.setDrawColor(isU?col[0]:Math.round(ec[0]*0.32),isU?col[1]:Math.round(ec[1]*0.32),isU?col[2]:Math.round(ec[2]*0.32));
+      doc.setLineWidth(isU?0.5:0.15); doc.line(sx1,sy1,sx2,sy2);
+      // Segment label
+      var midA=(i*30+15-90)*Math.PI/180,lR=(outerR+innerR)*0.5;
+      var lx=cx+lR*Math.cos(midA),ly=cy+lR*Math.sin(midA);
+      if(isU){
+        doc.setDrawColor(col[0],col[1],col[2]); doc.setLineWidth(0.3); doc.circle(lx,ly,4.6,'S');
+        doc.setFontSize(5.2); doc.setFont('helvetica','bold'); doc.setTextColor(col[0],col[1],col[2]);
+      } else {
+        doc.setFontSize(3.8); doc.setFont('helvetica','normal');
+        doc.setTextColor(Math.round(ec[0]*0.52),Math.round(ec[1]*0.52),Math.round(ec[2]*0.52));
+      }
+      doc.text(ZABBR[i],lx,ly+1.4,{align:'center'});
+    }
+    // Center fill
+    doc.setFillColor(BG[0],BG[1],BG[2]); doc.circle(cx,cy,innerR-0.5,'F');
+    doc.setDrawColor(col[0],col[1],col[2]); doc.setLineWidth(0.4); doc.circle(cx,cy,innerR-0.5,'S');
+    // Center text
+    doc.setFont('helvetica','normal'); doc.setFontSize(4.5); doc.setTextColor(WHITE[0]*0.75,WHITE[1]*0.75,WHITE[2]*0.75);
+    doc.text('SUN IN',cx,cy-3.5,{align:'center'});
+    doc.setFont('helvetica','bold'); doc.setFontSize(signName.length>9?5.5:7);
+    doc.setTextColor(col[0],col[1],col[2]);
+    doc.text(signName.toUpperCase(),cx,cy+2.5,{align:'center'});
+    var ELEMMAP=['FIRE','EARTH','AIR','WATER','FIRE','EARTH','AIR','WATER','FIRE','EARTH','AIR','WATER'];
+    var elc=ZCLR[userIdx];
+    doc.setFont('helvetica','normal'); doc.setFontSize(3.8);
+    doc.setTextColor(Math.round(elc[0]*0.7),Math.round(elc[1]*0.7),Math.round(elc[2]*0.7));
+    doc.text(ELEMMAP[userIdx]||'',cx,cy+7.2,{align:'center'});
+    // Pointer tick at user's sign
+    var mA=(userIdx*30+15-90)*Math.PI/180;
+    doc.setDrawColor(col[0],col[1],col[2]); doc.setLineWidth(0.55);
+    doc.line(cx+(outerR+0.5)*Math.cos(mA),cy+(outerR+0.5)*Math.sin(mA),cx+(outerR+4)*Math.cos(mA),cy+(outerR+4)*Math.sin(mA));
+    // Label below wheel
+    doc.setFont('helvetica','bold'); doc.setFontSize(4.8); doc.setTextColor(col[0],col[1],col[2]);
+    doc.text('NATAL SUN PLACEMENT',cx,cy+outerR+9,{align:'center'});
+  }
+
+  function _pdfNumPanel(x,y,w,h,pp) {
+    var col=ROSE;
+    doc.setFillColor(GHOST[0],GHOST[1],GHOST[2]); doc.rect(x,y,w,h,'F');
+    doc.setDrawColor(col[0],col[1],col[2]); doc.setLineWidth(0.4); doc.rect(x,y,w,h,'S');
+    // Corner accents
+    doc.setLineWidth(0.6);
+    doc.line(x,y,x+5,y); doc.line(x,y,x,y+5);
+    doc.line(x+w,y,x+w-5,y); doc.line(x+w,y,x+w,y+5);
+    doc.line(x,y+h,x+5,y+h); doc.line(x,y+h,x,y+h-5);
+    doc.line(x+w,y+h,x+w-5,y+h); doc.line(x+w,y+h,x+w,y+h-5);
+    // Title
+    doc.setFont('helvetica','bold'); doc.setFontSize(5.5); doc.setTextColor(col[0],col[1],col[2]);
+    doc.text('NUMEROLOGY  ·  LIFE PATH',x+w/2,y+6.5,{align:'center'});
+    doc.setDrawColor(col[0]*0.35,col[1]*0.35,col[2]*0.35); doc.setLineWidth(0.2); doc.line(x+6,y+9,x+w-6,y+9);
+    var cy2=y+14;
+    // Birth date
+    var MN=['','JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+    doc.setFont('helvetica','bold'); doc.setFontSize(6.5); doc.setTextColor(GOLD[0],GOLD[1],GOLD[2]);
+    doc.text((MN[pp.month]||pp.month)+' '+pp.day+', '+pp.year,x+w/2,cy2,{align:'center'});
+    cy2+=5.5;
+    // Digit breakdown
+    var allDig=(String(pp.month)+String(pp.day)+String(pp.year)).split('').map(Number);
+    var sum1=allDig.reduce(function(a,b){return a+b;},0);
+    doc.setFont('helvetica','normal'); doc.setFontSize(4.8); doc.setTextColor(WHITE[0],WHITE[1],WHITE[2]);
+    var dRow=allDig.join('+')+'='+sum1;
+    doc.splitTextToSize(dRow,w-12).forEach(function(l){doc.text(l,x+w/2,cy2,{align:'center'});cy2+=4.5;});
+    cy2+=1;
+    // Reduction steps
+    var n=sum1;
+    while(n>=10&&n!==11&&n!==22&&n!==33){
+      var ds=String(n).split('').map(Number),nxt=ds.reduce(function(a,b){return a+b;},0);
+      doc.setFontSize(4.5); doc.setTextColor(col[0]*0.75,col[1]*0.75,col[2]*0.75);
+      doc.text(n+' >> '+ds.join('+')+' = '+nxt,x+w/2,cy2,{align:'center'});
+      cy2+=4.2; n=nxt;
+    }
+    cy2+=3;
+    // Life Path box
+    doc.setFillColor(BG[0],BG[1],BG[2]); doc.rect(x+5,cy2-3.5,w-10,12,'F');
+    doc.setDrawColor(GOLD[0],GOLD[1],GOLD[2]); doc.setLineWidth(0.3); doc.rect(x+5,cy2-3.5,w-10,12,'S');
+    doc.setFont('helvetica','bold'); doc.setFontSize(5); doc.setTextColor(WHITE[0]*0.8,WHITE[1]*0.8,WHITE[2]*0.8);
+    doc.text('LIFE PATH',x+10,cy2+3);
+    doc.setFontSize(11); doc.setTextColor(GOLD[0],GOLD[1],GOLD[2]);
+    doc.text(String(n)+(n===11||n===22||n===33?' (M)':''),x+w-8,cy2+4,{align:'right'});
+    cy2+=16;
+    // Hidden Master box
+    if(pp.hiddenMaster){
+      doc.setFillColor(BG[0],BG[1],BG[2]); doc.rect(x+5,cy2-3,w-10,11,'F');
+      doc.setDrawColor(col[0],col[1],col[2]); doc.setLineWidth(0.25); doc.rect(x+5,cy2-3,w-10,11,'S');
+      doc.setFont('helvetica','bold'); doc.setFontSize(4.5); doc.setTextColor(col[0],col[1],col[2]);
+      doc.text('HIDDEN MASTER',x+10,cy2+2);
+      doc.setFontSize(9); doc.setTextColor(col[0],col[1],col[2]);
+      doc.text(String(pp.hiddenMaster)+' **',x+w-8,cy2+2.5,{align:'right'});
+      cy2+=14;
+    }
+    // Secondary numbers (if space remains)
+    if(cy2<y+h-14){
+      doc.setDrawColor(DIM[0],DIM[1],DIM[2]); doc.setLineWidth(0.15); doc.line(x+6,cy2,x+w-6,cy2);
+      cy2+=5;
+      var sec=[];
+      if(pp.expression) sec.push({l:'EXPRESSION',v:pp.expression});
+      if(pp.soulUrge) sec.push({l:'SOUL URGE',v:pp.soulUrge});
+      if(pp.gematria) sec.push({l:'GEMATRIA',v:pp.gematria.reduced});
+      sec.forEach(function(s){
+        if(cy2>y+h-5) return;
+        doc.setFont('helvetica','normal'); doc.setFontSize(4.5); doc.setTextColor(WHITE[0]*0.65,WHITE[1]*0.65,WHITE[2]*0.65);
+        doc.text(s.l,x+9,cy2);
+        doc.setFont('helvetica','bold'); doc.setFontSize(5.5); doc.setTextColor(GOLD[0],GOLD[1],GOLD[2]);
+        doc.text(String(s.v),x+w-8,cy2,{align:'right'});
+        cy2+=6.5;
+      });
+    }
+  }
+
+  function _pdfSacredGeo(cx,cy,outerR,pp) {
+    var col=TEAL;
+    // Base Egg of Life circles (very dim)
+    doc.setDrawColor(GHOST[0]*2,GHOST[1]*2,GHOST[2]*1.5); doc.setLineWidth(0.12);
+    doc.circle(cx,cy,outerR,'S');
+    for(var i=0;i<6;i++){var a=i*Math.PI/3; doc.circle(cx+outerR*Math.cos(a),cy+outerR*Math.sin(a),outerR,'S');}
+    doc.circle(cx,cy,outerR*2,'S');
+    // 6 system nodes at petal positions
+    var NAS=[270,330,30,90,150,210];
+    var SYS=[
+      {l:'ASTRO', v:(pp.sunSign?pp.sunSign.sign.slice(0,3).toUpperCase():'---'), c:GOLD},
+      {l:'TAROT', v:(pp.tarotCard?pp.tarotCard.card.replace('The ','').slice(0,6):'---'), c:PURPLE},
+      {l:'KABB.', v:(pp.tree?pp.tree.name.slice(0,6):'---'), c:ROSE},
+      {l:'GEOM.', v:'EGG', c:col},
+      {l:'L. PATH', v:String(pp.lifePath||'?'), c:GOLD},
+      {l:'GEMA.', v:(pp.gematria?String(pp.gematria.reduced):'?'), c:PURPLE}
+    ];
+    var nr=7.8;
+    for(var j=0;j<6;j++){
+      var ang=NAS[j]*Math.PI/180;
+      var nx=cx+outerR*Math.cos(ang),ny=cy+outerR*Math.sin(ang);
+      var sys=SYS[j],sc=sys.c;
+      // Dim spoke
+      doc.setDrawColor(sc[0]*0.25,sc[1]*0.25,sc[2]*0.25); doc.setLineWidth(0.1); doc.line(cx,cy,nx,ny);
+      // Node
+      doc.setFillColor(BG[0],BG[1],BG[2]); doc.circle(nx,ny,nr,'F');
+      doc.setDrawColor(sc[0],sc[1],sc[2]); doc.setLineWidth(0.45); doc.circle(nx,ny,nr,'S');
+      doc.setFont('helvetica','bold'); doc.setFontSize(3.6); doc.setTextColor(sc[0],sc[1],sc[2]);
+      doc.text(sys.l,nx,ny-2,{align:'center'});
+      doc.setFontSize(5.2); doc.setTextColor(WHITE[0],WHITE[1],WHITE[2]);
+      doc.text(sys.v,nx,ny+3.2,{align:'center'});
+    }
+    // Center node (Codex Archetype)
+    var cn=11,ca=(pp.codexArchetype||'Integrator'),caW=ca.split(' ');
+    doc.setFillColor(BG[0],BG[1],BG[2]); doc.circle(cx,cy,cn,'F');
+    doc.setDrawColor(col[0],col[1],col[2]); doc.setLineWidth(0.55); doc.circle(cx,cy,cn,'S');
+    doc.setFont('helvetica','bold'); doc.setFontSize(3.8); doc.setTextColor(col[0],col[1],col[2]);
+    doc.text('CODEX',cx,cy-4.5,{align:'center'});
+    doc.setFontSize(4.8); doc.setTextColor(GOLD[0],GOLD[1],GOLD[2]);
+    if(caW.length<=2){
+      doc.text(ca.slice(0,12),cx,cy+1.5,{align:'center'});
+    } else {
+      var mid2=Math.ceil(caW.length/2);
+      doc.text(caW.slice(0,mid2).join(' ').slice(0,11),cx,cy-0.5,{align:'center'});
+      doc.text(caW.slice(mid2).join(' ').slice(0,11),cx,cy+4.2,{align:'center'});
+    }
+    // Label below
+    doc.setFont('helvetica','bold'); doc.setFontSize(4.8); doc.setTextColor(col[0],col[1],col[2]);
+    doc.text('EGG OF LIFE  ·  LIVING MANDALA',cx,cy+outerR*2+8,{align:'center'});
+  }
+
+  function _pdfTreePanel(bx,by,bw,bh,sephId) {
+    var col=ROSE;
+    function tx(x){return bx+(x-80)*(bw-10)/(320-80)+5;}
+    function ty(y){return by+(y-45)*(bh-12)/(430-45)+6;}
+    // Parse seph hex color
+    function schex(h){
+      if(!h||h==='#ffffff') return [185,175,215];
+      var r=parseInt(h.slice(1,3),16)||80,g=parseInt(h.slice(3,5),16)||60,b=parseInt(h.slice(5,7),16)||130;
+      return [r,g,b];
+    }
+    // Paths
+    PATHS_22.forEach(function(pair){
+      var a=SEPHIROTH.find(function(s){return s.id===pair[0];});
+      var b=SEPHIROTH.find(function(s){return s.id===pair[1];});
+      if(!a||!b) return;
+      var act=(a.id===sephId||b.id===sephId);
+      doc.setDrawColor(act?GOLD[0]:DIM[0]*1.2,act?GOLD[1]:DIM[1]*1.2,act?GOLD[2]:DIM[2]*1.2);
+      doc.setLineWidth(act?0.4:0.15); doc.line(tx(a.x),ty(a.y),tx(b.x),ty(b.y));
+    });
+    // Sephirot
+    SEPHIROTH.forEach(function(seph){
+      var sx=tx(seph.x),sy=ty(seph.y);
+      var isU=(seph.id===sephId),r=isU?5.2:3.5;
+      var sc=schex(seph.color);
+      if(isU){
+        doc.setDrawColor(GOLD[0],GOLD[1],GOLD[2]); doc.setLineWidth(0.18);
+        doc.circle(sx,sy,r+5,'S'); doc.circle(sx,sy,r+8,'S');
+      }
+      doc.setFillColor(BG[0],BG[1],BG[2]); doc.circle(sx,sy,r,'F');
+      doc.setDrawColor(isU?GOLD[0]:sc[0],isU?GOLD[1]:sc[1],isU?GOLD[2]:sc[2]);
+      doc.setLineWidth(isU?0.65:0.25); doc.circle(sx,sy,r,'S');
+      // Number
+      doc.setFont('helvetica',isU?'bold':'normal'); doc.setFontSize(isU?4.8:3.5);
+      doc.setTextColor(isU?GOLD[0]:sc[0],isU?GOLD[1]:sc[1],isU?GOLD[2]:sc[2]);
+      doc.text(String(seph.number),sx,sy+1.4,{align:'center'});
+      // Name
+      doc.setFontSize(isU?4.2:3); doc.setFont('helvetica','normal');
+      doc.setTextColor(isU?GOLD[0]:Math.min(DIM[0]*1.6,200),isU?GOLD[1]:Math.min(DIM[1]*1.6,200),isU?GOLD[2]:Math.min(DIM[2]*1.5,200));
+      doc.text(seph.name,sx,sy+r+3.8,{align:'center'});
+    });
+    // Title below
+    doc.setFont('helvetica','bold'); doc.setFontSize(5); doc.setTextColor(col[0],col[1],col[2]);
+    doc.text('TREE OF LIFE',bx+bw/2,by+bh+5,{align:'center'});
   }
 
   function pdfDivider(x1,x2,y,col) {
@@ -2864,31 +3091,55 @@ function generateAndDownloadPDF() {
     // Ornate divider
     pdfDivider(12, W-12, 39, col);
 
-    // Body text
-    var body = (pageContent||'Your reading is being prepared.').trim();
+    // Right-column diagram placement
+    var DIAG_MAP={1:'astro',2:'num',3:'geo',5:'tol'};
+    var diagType=DIAG_MAP[idx];
+    var DX=112,DY=44,DW=W-DX-10,DH=112; // diagram box: x=112, y=44, w=88, h=112
+    var diagBot=DY+DH+8;                   // y below which text expands to full width
+
+    if(diagType){
+      var sephId2=(p.treePosition&&p.treePosition.sephId)?p.treePosition.sephId:(p.tree&&p.tree.sephId)?p.tree.sephId:6;
+      if(diagType==='astro'){
+        _pdfAstroWheel(DX+DW/2, DY+DH/2, DW/2-3, DW/4, (p.sunSign?p.sunSign.sign:'Aries'));
+      } else if(diagType==='num'){
+        _pdfNumPanel(DX, DY, DW, DH, p);
+      } else if(diagType==='geo'){
+        _pdfSacredGeo(DX+DW/2, DY+DH*0.44, DW*0.225, p);
+      } else if(diagType==='tol'){
+        _pdfTreePanel(DX, DY, DW, DH, sephId2);
+      }
+    }
+
+    // Body text — narrow (left column) while beside diagram, full-width below it
+    var body=(pageContent||'Your reading is being prepared.').trim();
     doc.setTextColor(WHITE[0],WHITE[1],WHITE[2]);
-    var maxW=W-26, curY=48, lh=5.9, maxY=H-18;
-    var paras = body.split(/\n\n+/).filter(function(s){return s.trim().length>10;});
+    var curY=48, lh=6.2, maxY=H-18;
+    var paras=body.split(/\n\n+/).filter(function(s){return s.trim().length>10;});
 
     paras.forEach(function(para,pi){
       if(curY>maxY) return;
       if(pi>0) curY+=3.5;
+      if(curY>maxY) return;
+      var colW=diagType&&curY<diagBot?(DX-18):(W-26);
       if(pi===0){
-        doc.setFontSize(10); doc.setFont('helvetica','bold');
-        doc.setTextColor(WHITE[0]+12,WHITE[1]+12,WHITE[2]+12);
+        doc.setFontSize(10.5); doc.setFont('helvetica','bold');
+        doc.setTextColor(WHITE[0],WHITE[1],WHITE[2]);
       } else {
-        doc.setFontSize(9.5); doc.setFont('helvetica','normal');
+        doc.setFontSize(10); doc.setFont('helvetica','normal');
         doc.setTextColor(WHITE[0],WHITE[1],WHITE[2]);
       }
-      var lines = doc.splitTextToSize(para.trim().replace(/\n/g,' '), maxW);
+      var lines=doc.splitTextToSize(para.trim().replace(/\n/g,' '),colW);
       lines.forEach(function(line){
         if(curY>maxY) return;
-        doc.text(line, 12, curY); curY+=lh;
+        // Switch to full width once we pass the diagram
+        var cw2=diagType&&curY<diagBot?(DX-18):(W-26);
+        if(cw2!==colW){colW=cw2;lines=doc.splitTextToSize(para.trim().replace(/\n/g,' '),colW);}
+        doc.text(line,12,curY); curY+=lh;
       });
     });
 
-    // Bottom ornament (if whitespace remains)
-    if(curY < maxY-6) {
+    // Bottom ornament
+    if(curY<maxY-6){
       doc.setDrawColor(DIM[0],DIM[1],DIM[2]); doc.setLineWidth(0.15);
       doc.line(12,maxY,W/2-4,maxY); doc.line(W/2+4,maxY,W-12,maxY);
       doc.setFillColor(DIM[0],DIM[1],DIM[2]); doc.circle(W/2,maxY,1.2,'F');
