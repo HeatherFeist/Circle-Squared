@@ -1386,20 +1386,7 @@ function generatePartnershipPDF(p1, p2, pages) {
   var fn1 = p1.firstName.toLowerCase().replace(/[^a-z]/g,'');
   var fn2 = p2.firstName.toLowerCase().replace(/[^a-z]/g,'');
   var partnerFilename = 'circles-squared-partnership-'+fn1+'-'+fn2+'.pdf';
-  try {
-    var blob = doc.output('blob');
-    var blobUrl = URL.createObjectURL(blob);
-    var link = document.createElement('a');
-    link.href = blobUrl;
-    link.download = partnerFilename;
-    link.style.display = 'none';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    setTimeout(function(){ URL.revokeObjectURL(blobUrl); }, 60000);
-  } catch(e) {
-    doc.save(partnerFilename);
-  }
+  _openPDF(doc, partnerFilename);
 }
 
 // ===========================
@@ -2599,12 +2586,20 @@ function showSuccessScreen(buyerName, buyerEmail, orderId, tier) {
 
   document.getElementById('payment-success').classList.add('show');
 
-  var minDelay = new Promise(function(res) { setTimeout(res, 1500); });
-  Promise.all([_readingPromise || Promise.resolve(), minDelay]).then(function() {
-    if (!window._allPages || !window._allPages.filter(function(pg) { return pg; }).length) {
+  // Mark download button as loading, then ready once reading resolves
+  var dlBtn = document.getElementById('download-pdf-btn');
+  if (dlBtn) {
+    dlBtn.innerHTML = '⏳ Preparing your PDF...';
+    dlBtn.disabled = true;
+  }
+  (_readingPromise || Promise.resolve()).then(function() {
+    if (!window._allPages || !window._allPages.filter(function(pg) { return pg && pg.trim().length > 20; }).length) {
       window._allPages = parseReadingPages(getFallbackReading());
     }
-    generateAndDownloadPDF();
+    if (dlBtn) {
+      dlBtn.innerHTML = '📄 Download Your PDF Blueprint';
+      dlBtn.disabled = false;
+    }
   });
 }
 
@@ -2696,7 +2691,15 @@ function generateAndDownloadPDF() {
   var allPgs = window._allPages || [];
   var numPgs = tier ? tier.pages : 3;
   var pagesToDeliver = allPgs.slice(0, numPgs);
-  if (!pagesToDeliver.length) { alert('Your reading content is not ready yet.'); return; }
+
+  // Check pages actually have content (not just empty strings)
+  var hasContent = pagesToDeliver.some(function(pg) { return pg && pg.trim().length > 50; });
+  if (!hasContent) {
+    var fb = parseReadingPages(getFallbackReading());
+    window._allPages = fb;
+    pagesToDeliver = fb.slice(0, numPgs);
+  }
+  if (!pagesToDeliver.length) { alert('Your reading is not ready yet — please try again in a moment.'); return; }
 
   var doc = new jsPDFLib({ orientation:'portrait', unit:'mm', format:'a4' });
   var W=210, H=297;
@@ -2896,17 +2899,29 @@ function generateAndDownloadPDF() {
 
   var fname = (p.firstName||'reading').toLowerCase().replace(/[^a-z]/g,'');
   var filename = 'circles-squared-'+fname+'-'+(tier?tier.slug:'reading')+'.pdf';
+  _openPDF(doc, filename);
+}
+
+function _openPDF(doc, filename) {
+  var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   try {
     var blob = doc.output('blob');
-    var blobUrl = URL.createObjectURL(blob);
-    var link = document.createElement('a');
-    link.href = blobUrl;
-    link.download = filename;
-    link.style.display = 'none';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    setTimeout(function(){ URL.revokeObjectURL(blobUrl); }, 60000);
+    var url = URL.createObjectURL(blob);
+    if (isIOS) {
+      // iOS Safari can't trigger file downloads — open PDF in new tab
+      // User can tap Share → Save to Files from there
+      var newTab = window.open(url, '_blank');
+      if (!newTab) { doc.save(filename); }
+    } else {
+      var a = document.createElement('a');
+      a.href = url; a.download = filename;
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+    setTimeout(function() { URL.revokeObjectURL(url); }, 120000);
   } catch(e) {
     doc.save(filename);
   }
