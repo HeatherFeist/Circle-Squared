@@ -584,6 +584,18 @@ body {
       </button>
       <div data-id="242" style="font-size:0.68rem;color:#3a2a5a;margin-top:0.35rem;">Downloads instantly to your device</div>
     </div>
+        <div style="margin-top:0.8rem;text-align:center;">
+      <button id="listen-blueprint-btn" disabled style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.85rem 2rem;background:linear-gradient(135deg,rgba(176,138,255,0.12),rgba(201,168,76,0.12));border:1px solid rgba(176,138,255,0.35);color:#b08aff;font-weight:700;font-size:0.92rem;border-radius:50px;cursor:pointer;width:100%;max-width:340px;justify-content:center;opacity:0.45;transition:opacity 0.4s,box-shadow 0.4s;">&#x1F50A; Listen to Your Blueprint</button>
+      <div style="font-size:0.68rem;color:#3a2a5a;margin-top:0.35rem;">Celestia reads your highlights aloud</div>
+    </div>
+    <div id="narration-progress" style="display:none;margin-top:1rem;padding:1rem 1.2rem;background:rgba(8,4,35,0.85);border:1px solid rgba(176,138,255,0.22);border-radius:12px;text-align:center;">
+      <div id="narration-wave" class="waveform" style="margin-bottom:0.6rem;">
+        <div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div>
+        <div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div>
+        <div class="waveform-bar"></div><div class="waveform-bar"></div>
+      </div>
+      <div id="narration-status" style="font-size:0.8rem;color:#e8e0ff;line-height:1.6;"></div>
+    </div>
     <button data-id="243" id="close-success-overlay" class="cta-btn" style="margin-top:1.2rem;">✦ View My Full Reading</button>
   </div>
 </div>
@@ -720,6 +732,14 @@ body {
       <button id="partner-generate-btn" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.6rem 1.4rem;background:linear-gradient(135deg,#ff9ed2,#ff6ab4);color:#0a0015;font-weight:700;font-size:0.82rem;border:none;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;width:100%;justify-content:center;">💞 Generate Partnership Reading</button>
       <div id="partner-status" style="font-size:0.75rem;color:#ff9ed2;min-height:1.5em;margin-top:0.5rem;text-align:center;"></div>
       <button id="partner-pdf-btn" style="display:none;margin-top:0.5rem;padding:0.6rem 1.4rem;background:linear-gradient(135deg,#c9a84c,#f0d070);color:#0a0015;font-weight:700;font-size:0.82rem;border:none;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;width:100%;">📄 Download Partnership PDF</button>
+      <button id="partner-listen-btn" style="display:none;margin-top:0.5rem;padding:0.6rem 1.4rem;background:linear-gradient(135deg,rgba(255,158,210,0.15),rgba(176,138,255,0.15));border:1px solid rgba(255,158,210,0.35);color:#ff9ed2;font-weight:700;font-size:0.82rem;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;width:100%;">&#x1F50A; Listen to Partnership Reading</button>
+      <div id="partner-narration-progress" style="display:none;margin-top:0.7rem;padding:0.8rem 1rem;background:rgba(8,4,35,0.85);border:1px solid rgba(255,158,210,0.22);border-radius:10px;text-align:center;">
+        <div id="partner-narration-wave" class="waveform" style="margin-bottom:0.5rem;">
+          <div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div>
+          <div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div>
+        </div>
+        <div id="partner-narration-status" style="font-size:0.75rem;color:#e8e0ff;line-height:1.6;"></div>
+      </div>
     </div>
 
   </div>
@@ -1765,12 +1785,14 @@ document.getElementById('partner-generate-btn').addEventListener('click', async 
     window._partnerPages = pages;
     status.textContent = '✅ Partnership reading ready for ' + fn1 + ' & ' + fn2 + ' (' + AXIS_CONFIGS[axisConf].symbol + ' ' + AXIS_CONFIGS[axisConf].name + ')';
     pdfBtn.style.display = 'block';
+    document.getElementById('partner-listen-btn').style.display = 'block';
   } catch(e) {
     status.textContent = '⚠️ AI unavailable — using fallback reading.';
     var p1 = window._partnerP1, p2 = window._partnerP2;
     if (p1 && p2) {
       window._partnerPages = parseReadingPages(getPartnershipFallback(p1, p2));
       pdfBtn.style.display = 'block';
+      document.getElementById('partner-listen-btn').style.display = 'block';
     }
   }
 });
@@ -2721,6 +2743,12 @@ function showSuccessScreen(buyerName, buyerEmail, orderId, tier) {
       dlBtn.innerHTML = '📄 Download Your PDF Blueprint';
       dlBtn.disabled = false;
     }
+    var listenBtn = document.getElementById('listen-blueprint-btn');
+    if (listenBtn) {
+      listenBtn.disabled = false;
+      listenBtn.style.opacity = '1';
+      listenBtn.style.boxShadow = '0 0 20px rgba(176,138,255,0.3)';
+    }
   });
 }
 
@@ -2747,6 +2775,115 @@ document.getElementById('download-pdf-btn').addEventListener('click', function()
     if (!allReady) window._allPages = parseReadingPages(getFallbackReading());
     generateAndDownloadPDF();
   }
+});
+
+// ===========================
+// NARRATE BLUEPRINT READING
+// ===========================
+var PAGE_VOICE_META = [
+  {title:'Who You Are', color:'#b08aff'},
+  {title:'The Myth You Are Living', color:'#c9a84c'},
+  {title:'Your Name''s Hidden Code', color:'#ff9ed2'},
+  {title:'Your Living Mandala', color:'#50dcc8'},
+  {title:'The Teaching in the Dark', color:'#c9a84c'},
+  {title:'The Deeper Tree', color:'#ff9ed2'},
+  {title:'The Cosmic Season', color:'#b08aff'},
+  {title:'How You Love', color:'#c9a84c'},
+  {title:'Your Blessing', color:'#b08aff'}
+];
+
+async function narrateBlueprintReading() {
+  var pages = window._allPages || [];
+  var numPages = selectedTier ? selectedTier.pages : 3;
+  var pagesToRead = pages.slice(0, numPages);
+  var statusEl = document.getElementById('narration-status');
+  var progressEl = document.getElementById('narration-progress');
+  var waveEl = document.getElementById('narration-wave');
+  var listenBtn = document.getElementById('listen-blueprint-btn');
+  listenBtn.disabled = true;
+  listenBtn.textContent = 'Celestia is speaking...';
+  progressEl.style.display = 'block';
+  if (waveEl) waveEl.classList.remove('paused');
+  for (var i = 0; i < pagesToRead.length; i++) {
+    var pageContent = pagesToRead[i];
+    if (!pageContent || !pageContent.trim()) continue;
+    var meta = PAGE_VOICE_META[i] || {title: 'Section ' + (i+1), color: '#e8e0ff'};
+    statusEl.innerHTML = '<span style="font-family:Courier New,monospace;font-size:0.58rem;letter-spacing:0.3em;color:' + meta.color + ';">SECTION ' + (i+1) + ' OF ' + pagesToRead.length + '</span><br><span style="font:700 0.9rem Georgia,serif;color:#e8e0ff;">' + meta.title + '</span>';
+    var paras = pageContent.split(/\n\n+/).filter(function(p){ return p.trim().length > 20; });
+    var highlight = paras.slice(0, 2).join(' ').replace(/\n/g, ' ').trim();
+    if (!highlight) continue;
+    var spoken = 'Section ' + (i+1) + '. ' + meta.title + '. ' + highlight;
+    await new Promise(function(resolve) { speakLongText(preprocessForSpeech(spoken), resolve); });
+    await new Promise(function(resolve) { setTimeout(resolve, 900); });
+  }
+  statusEl.innerHTML = '<span style="font-family:Courier New,monospace;font-size:0.58rem;letter-spacing:0.3em;color:#c9a84c;">READING COMPLETE</span><br><span style="color:#88dd99;font-size:0.82rem;">Your full blueprint is ready to download.</span>';
+  if (waveEl) waveEl.classList.add('paused');
+  listenBtn.disabled = false;
+  listenBtn.textContent = '🔊 Listen Again';
+}
+
+document.getElementById('listen-blueprint-btn').addEventListener('click', function() {
+  var pages = window._allPages;
+  if (!pages || !pages.filter(function(p){return p;}).length) {
+    document.getElementById('narration-status').textContent = 'Your reading is still being prepared. Please wait a moment.';
+    document.getElementById('narration-progress').style.display = 'block';
+    return;
+  }
+  narrateBlueprintReading();
+});
+
+// ===========================
+// NARRATE PARTNERSHIP READING
+// ===========================
+var PARTNER_PAGE_TITLES = [
+  'The Field Between You',
+  'The Axis of Your Union',
+  'Where You Strengthen Each Other',
+  'The Shadow Pattern',
+  'Your Sacred Purpose Together',
+  'A Blessing for Your Path'
+];
+
+async function narratePartnershipReading() {
+  var pages = window._partnerPages || [];
+  var p1name = window._partnerP1 ? window._partnerP1.firstName : '';
+  var p2name = window._partnerP2 ? window._partnerP2.firstName : '';
+  var statusEl = document.getElementById('partner-narration-status');
+  var progressEl = document.getElementById('partner-narration-progress');
+  var waveEl = document.getElementById('partner-narration-wave');
+  var listenBtn = document.getElementById('partner-listen-btn');
+  listenBtn.disabled = true;
+  listenBtn.textContent = 'Celestia is speaking...';
+  progressEl.style.display = 'block';
+  if (waveEl) waveEl.classList.remove('paused');
+  var opener = p1name && p2name ? (p1name + ' and ' + p2name + '. ') : '';
+  await new Promise(function(resolve) { speakLongText(preprocessForSpeech(opener + 'Here is what the field between you reveals.'), resolve); });
+  await new Promise(function(resolve) { setTimeout(resolve, 600); });
+  for (var i = 0; i < Math.min(pages.length, 6); i++) {
+    var pageContent = pages[i];
+    if (!pageContent || !pageContent.trim()) continue;
+    var title = PARTNER_PAGE_TITLES[i] || 'Section ' + (i+1);
+    statusEl.innerHTML = '<span style="font-family:Courier New,monospace;font-size:0.55rem;letter-spacing:0.3em;color:#ff9ed2;">SECTION ' + (i+1) + ' OF 6</span><br><span style="font:700 0.85rem Georgia,serif;color:#e8e0ff;">' + title + '</span>';
+    var paras = pageContent.split(/\n\n+/).filter(function(p){ return p.trim().length > 20; });
+    var highlight = paras.slice(0, 2).join(' ').replace(/\n/g, ' ').trim();
+    if (!highlight) continue;
+    var spoken = title + '. ' + highlight;
+    await new Promise(function(resolve) { speakLongText(preprocessForSpeech(spoken), resolve); });
+    await new Promise(function(resolve) { setTimeout(resolve, 900); });
+  }
+  statusEl.innerHTML = '<span style="font-family:Courier New,monospace;font-size:0.55rem;letter-spacing:0.3em;color:#c9a84c;">READING COMPLETE</span><br><span style="color:#88dd99;font-size:0.78rem;">Download your Partnership PDF above.</span>';
+  if (waveEl) waveEl.classList.add('paused');
+  listenBtn.disabled = false;
+  listenBtn.textContent = '🔊 Listen Again';
+}
+
+document.getElementById('partner-listen-btn').addEventListener('click', function() {
+  if (!window._partnerPages || !window._partnerPages.filter(function(p){return p;}).length) {
+    document.getElementById('partner-narration-status').textContent = 'Generate the reading first.';
+    document.getElementById('partner-narration-progress').style.display = 'block';
+    return;
+  }
+  narratePartnershipReading();
 });
 
 // ===========================
