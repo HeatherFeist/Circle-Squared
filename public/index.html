@@ -6,7 +6,7 @@
 <title>Circles Squared — Unified Metaphysical Reading</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/lucide@latest" defer></script>
-<script src="https://www.paypal.com/sdk/js?client-id=ASrj3y9nxc2VwvvvZ7KZRbhCxYYjdtjY8H71RH-lpCNTNZhNhiKBga0l-_ukYo_9myQntZLneCjNAdY6&currency=USD&components=buttons&intent=capture"></script>
+
 <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -547,8 +547,8 @@ body {
       <input data-id="215" type="email" id="modal-email" placeholder="your@email.com" class="cosmic-input" autocomplete="email" />
       <div data-id="216" class="validation-msg" id="val-modal-email"></div>
     </div>
-    <div data-id="217" id="paypal-button-container" style="border-radius:12px;overflow:hidden;min-height:50px;"></div>
-    <div data-id="218" style="font-size:0.68rem;color:#3a2a5a;margin-top:0.5rem;">🔒 Secure PayPal checkout · All major cards accepted</div>
+    <button id="square-checkout-btn" style="display:inline-flex;align-items:center;justify-content:center;gap:0.5rem;padding:0.9rem 2rem;background:linear-gradient(135deg,#006AFF,#00a6ff);color:#fff;font-weight:700;font-size:0.95rem;border:none;border-radius:50px;cursor:pointer;width:100%;box-shadow:0 0 25px rgba(0,106,255,0.35);transition:box-shadow 0.3s;">&#x2756; Proceed to Secure Checkout</button>
+    <div style="font-size:0.68rem;color:#3a2a5a;margin-top:0.5rem;">&#x1F512; Secure Square checkout &middot; All major cards accepted</div>
   </div>
 </div>
 
@@ -2639,7 +2639,7 @@ function openPaymentModal(slug) {
   document.getElementById('val-modal-email').textContent = '';
   document.getElementById('payment-modal').classList.add('show');
 
-  renderPayPalButton('paypal-button-container', selectedTier.price, selectedTier.name);
+  // Square checkout handled by square-checkout-btn click handler
 }
 
 document.getElementById('close-payment-modal').addEventListener('click', function() {
@@ -2647,68 +2647,33 @@ document.getElementById('close-payment-modal').addEventListener('click', functio
 });
 
 // ===========================
-// PAYPAL (CHANGE 2 — polling retry)
+// SQUARE CHECKOUT
 // ===========================
-function renderPayPalButton(containerId, amount, tierName) {
-  var container = document.getElementById(containerId);
-  if (!container) return;
-  container.innerHTML = '';
+var SQUARE_LINKS = {
+  'initiation': 'https://square.link/u/hmFNvTqn',
+  'unveiling':  'https://square.link/u/Q22hm6Yg',
+  'blueprint':  'https://square.link/u/kbAvRDTL',
+  'partnership':'https://square.link/u/gXbjV2R3'
+};
 
-  function tryRender(attemptsLeft) {
-    if (typeof paypal === 'undefined' || !paypal.Buttons) {
-      if (attemptsLeft <= 0) {
-        container.innerHTML = '<p style="color:#ff9ed2;text-align:center;font-size:0.85rem;padding:1rem;">PayPal could not load. Please refresh the page and try again.</p>';
-        return;
-      }
-      container.innerHTML = '<p style="color:#9b8ec4;text-align:center;font-size:0.8rem;padding:1rem;">\u23F3 Loading payment...</p>';
-      setTimeout(function(){ tryRender(attemptsLeft - 1); }, 800);
-      return;
-    }
-    container.innerHTML = '';
-    try {
-      paypal.Buttons({
-        style: { layout: 'vertical', color: 'gold', shape: 'pill', label: 'pay', height: 48 },
-        createOrder: function(data, actions) {
-          var email = document.getElementById('modal-email').value.trim();
-          if (!email || !email.includes('@')) {
-            document.getElementById('val-modal-email').textContent = 'Please enter your email for PDF delivery.';
-            document.getElementById('modal-email').focus();
-            return new Promise(function(resolve, reject) { reject(new Error('Email required')); });
-          }
-          document.getElementById('val-modal-email').textContent = '';
-          return actions.order.create({
-            purchase_units: [{
-              amount: { value: String(amount), currency_code: 'USD' },
-              description: 'Circles Squared \u2014 ' + tierName
-            }]
-          });
-        },
-        onApprove: function(data, actions) {
-          return actions.order.capture().then(function(details) {
-            var buyerName = (details.payer && details.payer.name) ? details.payer.name.given_name : window._readingProfile.firstName;
-            var buyerEmail = document.getElementById('modal-email').value.trim();
-            var orderId = details.id || data.orderID || 'CS-' + Date.now();
-            document.getElementById('payment-modal').classList.remove('show');
-            showSuccessScreen(buyerName, buyerEmail, orderId, selectedTier);
-          });
-        },
-        onError: function(err) {
-          console.error('PayPal error:', err);
-          container.innerHTML = '<p style="color:#ff9ed2;text-align:center;font-size:0.85rem;padding:1rem;">Payment error. Please try again or refresh.</p>';
-        },
-        onCancel: function() {
-          container.innerHTML = '';
-          tryRender(0);
-        }
-      }).render('#' + containerId);
-    } catch(e) {
-      console.error('PayPal render error:', e);
-      container.innerHTML = '<p style="color:#ff9ed2;text-align:center;font-size:0.85rem;padding:1rem;">Payment could not render. Please refresh.</p>';
-    }
+document.getElementById('square-checkout-btn').addEventListener('click', function() {
+  var email = document.getElementById('modal-email').value.trim();
+  if (!email || !email.includes('@')) {
+    document.getElementById('val-modal-email').textContent = 'Please enter your email for PDF delivery.';
+    document.getElementById('modal-email').focus();
+    return;
   }
-
-  tryRender(8);
-}
+  document.getElementById('val-modal-email').textContent = '';
+  if (!selectedTier) return;
+  var squareUrl = SQUARE_LINKS[selectedTier.slug];
+  if (!squareUrl) { alert('Checkout link not available. Please try again.'); return; }
+  try {
+    sessionStorage.setItem('cs_pending_profile', JSON.stringify(window._readingProfile));
+    sessionStorage.setItem('cs_pending_tier', selectedTier.slug);
+    sessionStorage.setItem('cs_pending_email', email);
+  } catch(e) {}
+  window.location.href = squareUrl;
+});
 
 function showSuccessScreen(buyerName, buyerEmail, orderId, tier) {
   logPurchase(buyerName, buyerEmail, orderId, tier);
@@ -3509,7 +3474,7 @@ document.getElementById('reset-btn').addEventListener('click', function() {
   document.getElementById('main-tree-svg').innerHTML = '';
   document.getElementById('main-tree-user-label').innerHTML = '';
   document.getElementById('tierCards').innerHTML = '';
-  document.getElementById('paypal-button-container').innerHTML = '';
+  document.getElementById('modal-email').value = ''; // square — clear email on reset
   document.getElementById('mute-btn').textContent = '🔊';
 
   // Re-show offer elements if hidden by unlockFullReading
@@ -3991,9 +3956,63 @@ document.getElementById('gate-submit-btn').addEventListener('click', function() 
 // ── END REVEAL / EMAIL SCREEN ────────────────────────────────────────
 
 // ===========================
+// SQUARE PAYMENT RETURN RESTORE
+// ===========================
+function restoreAfterSquareReturn(tierSlug) {
+  var profileJson = sessionStorage.getItem('cs_pending_profile');
+  var email = sessionStorage.getItem('cs_pending_email') || '';
+  if (!profileJson) { showScreen('hook'); return; }
+  try { window._readingProfile = JSON.parse(profileJson); } catch(e) { showScreen('hook'); return; }
+  var tier = TIERS.find(function(t) { return t.slug === tierSlug; });
+  if (!tier) { showScreen('hook'); return; }
+  selectedTier = tier;
+  _readingReady = false;
+  _readingPromise = doReading().then(function(){ _readingReady = true; }).catch(function(){ _readingReady = true; });
+  showScreen('reveal');
+  var p = window._readingProfile;
+  document.getElementById('reading-name').textContent = p.firstName ? p.firstName.toUpperCase() : '';
+  document.getElementById('reading-lp-number').textContent = p.lifePath || '';
+  if (p.sunSign) document.getElementById('reading-sign-label').textContent = p.sunSign.symbol + ' ' + p.sunSign.sign;
+  if (p.tree) document.getElementById('reading-seph-label').textContent = p.tree.name + ' — ' + p.tree.meaning;
+  var tc = p.tarotCard; var ca = p.codexArchetype;
+  var tlEl = document.getElementById('reading-tarot-label');
+  if (tlEl && tc) tlEl.textContent = '❖ ' + tc.card + ' · Path ' + tc.path + ' · ' + tc.letter;
+  var acEl = document.getElementById('reading-archetype-label');
+  if (acEl && ca) acEl.textContent = '✦ Codex Archetype: ' + ca + ' ✦';
+  var tolSection = document.getElementById('tol-section');
+  if (tolSection) tolSection.style.display = 'block';
+  if (p.treePosition) buildInteractiveTree(p.treePosition.sephId, 'main-tree-svg');
+  var lbl = document.getElementById('main-tree-user-label');
+  if (lbl && p.treePosition) {
+    var sd = SEPHIROTH.find(function(s){ return s.id === p.treePosition.sephId; });
+    if (sd) lbl.innerHTML = '<div style="display:inline-block;padding:0.5rem 1.2rem;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.25);border-radius:50px;"><span style="font-family:Courier New,monospace;font-size:0.65rem;letter-spacing:0.25em;color:#c9a84c;">YOUR SEPHIRAH: </span><span style="font:700 0.85rem Georgia,serif;color:#f0d070;">'+sd.name+'</span><span style="color:#5a4a7a;font-size:0.75rem;"> — '+sd.meaning+'</span></div>';
+  }
+  var mandalaEl = document.getElementById('egg-mandala-svg');
+  if (mandalaEl) mandalaEl.innerHTML = buildEggOfLifeMandala(p);
+  renderTierCards();
+  var waveform = document.getElementById('waveform');
+  if (waveform) waveform.classList.add('paused');
+  var oracleStatus = document.getElementById('oracle-status');
+  if (oracleStatus) oracleStatus.textContent = 'Payment confirmed. Your blueprint is ready.';
+  var orderId = 'SQ-' + Date.now();
+  showSuccessScreen(p.firstName, email, orderId, tier);
+  try {
+    window.history.replaceState({}, '', window.location.pathname);
+    sessionStorage.removeItem('cs_pending_profile');
+    sessionStorage.removeItem('cs_pending_tier');
+    sessionStorage.removeItem('cs_pending_email');
+  } catch(e) {}
+}
+
+// ===========================
 // INIT
 // ===========================
-showScreen('hook');
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var paidTier = params.get('paid');
+  if (paidTier) { restoreAfterSquareReturn(paidTier); }
+  else { showScreen('hook'); }
+})();
 </script>
 </body>
 </html>
