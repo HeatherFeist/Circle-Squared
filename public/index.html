@@ -333,8 +333,13 @@ body {
     <p data-id="9" class="mb-10" style="color:var(--text-muted); max-width:520px; font-size:0.95rem; line-height:1.7;">Your numbers hold a pattern. Your stars confirm it. The Tree of Life names it. Enter your details and discover what it all means.</p>
 
     <div data-id="10" class="cosmic-card w-full" style="max-width:420px;">
-      <label data-id="11" class="label-mono block mb-2">FIRST NAME</label>
-      <input data-id="12" id="hook-firstname" type="text" class="cosmic-input mb-4" placeholder="Your first name" autocomplete="given-name" />
+      <label data-id="11" class="label-mono block mb-2">FULL BIRTH NAME</label>
+      <input data-id="12" id="hook-fullname" type="text" class="cosmic-input mb-1" placeholder="e.g. Sarah Michelle Johnson" autocomplete="name" />
+      <p class="mb-4" style="color:var(--text-muted); font-size:0.72rem; opacity:0.75;">As it appears on your birth certificate — this powers your core numbers.</p>
+
+      <label class="label-mono block mb-2">NAME YOU GO BY <span style="opacity:0.6;text-transform:none;letter-spacing:0;">(optional)</span></label>
+      <input id="hook-usedname" type="text" class="cosmic-input mb-1" placeholder="e.g. Sam — leave blank to use your first name" autocomplete="nickname" />
+      <p class="mb-4" style="color:var(--text-muted); font-size:0.72rem; opacity:0.75;">The name you're actually called — this powers your living-identity numbers.</p>
 
       <label data-id="13" class="label-mono block mb-2">DATE OF BIRTH</label>
       <div data-id="14" class="flex gap-2 mb-1">
@@ -365,21 +370,25 @@ body {
   <div data-id="37" style="max-width:520px;width:100%;padding:2rem 1.5rem;margin:0 auto;display:flex;flex-direction:column;align-items:center;min-height:100vh;justify-content:center;">
 
     <!-- Progress dots -->
-    <div data-id="38" id="edu-dots" style="display:flex;gap:8px;margin-bottom:2rem;">
+    <div data-id="38" id="edu-dots" style="display:flex;gap:8px;margin-bottom:2rem;flex-wrap:wrap;justify-content:center;">
       <div data-id="39" class="edu-dot active" data-idx="0"></div>
       <div data-id="40" class="edu-dot" data-idx="1"></div>
       <div data-id="41" class="edu-dot" data-idx="2"></div>
+      <div class="edu-dot" data-idx="3"></div>
+      <div class="edu-dot" data-idx="4"></div>
+      <div class="edu-dot" data-idx="5"></div>
+      <div class="edu-dot" data-idx="6"></div>
     </div>
 
     <!-- Panel container -->
     <div data-id="42" id="edu-panels" style="width:100%;position:relative;min-height:480px;">
 
-      <!-- PANEL 0: NUMEROLOGY -->
+      <!-- PANEL 0: PYTHAGOREAN NUMEROLOGY -->
       <div data-id="43" class="edu-panel active" id="edu-panel-0">
         <div data-id="44" style="text-align:center;margin-bottom:1.2rem;">
-          <div data-id="45" style="font-family:'Courier New',monospace;font-size:0.55rem;letter-spacing:0.5em;color:#c9a84c;margin-bottom:0.4rem;">✦ THE FIRST SYSTEM ✦</div>
-          <h2 data-id="46" style="font:700 1.6rem Georgia,serif;background:linear-gradient(135deg,#c9a84c,#f0d070);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:0 0 0.5rem;">Numerology</h2>
-          <p data-id="47" style="color:#9b8ec4;font-size:0.88rem;line-height:1.6;margin:0;">Every name and birth date vibrates at a unique frequency. Numerology decodes these vibrations into a Life Path number — a blueprint revealing your soul's purpose, natural strengths, and life lessons.</p>
+          <div data-id="45" style="font-family:'Courier New',monospace;font-size:0.55rem;letter-spacing:0.5em;color:#c9a84c;margin-bottom:0.4rem;">✦ LAYER 1 OF 7 ✦</div>
+          <h2 data-id="46" style="font:700 1.6rem Georgia,serif;background:linear-gradient(135deg,#c9a84c,#f0d070);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:0 0 0.5rem;">Pythagorean Numerology</h2>
+          <p data-id="47" style="color:#9b8ec4;font-size:0.88rem;line-height:1.6;margin:0;">Every birth name and birth date vibrates at a unique frequency. Numerology decodes these vibrations into a Life Path number — the blueprint of your soul's purpose, natural strengths, and life lessons. This is the foundation every other layer builds on.</p>
         </div>
 
         <!-- Animated number grid -->
@@ -393,12 +402,78 @@ body {
         </div>
       </div>
 
-      <!-- PANEL 1: TREE OF LIFE -->
-      <div data-id="53" class="edu-panel" id="edu-panel-1">
+      <!-- PANEL 1: CHALDEAN NUMEROLOGY -->
+      <div class="edu-panel" id="edu-panel-1">
+        <div style="text-align:center;margin-bottom:1.2rem;">
+          <div style="font-family:'Courier New',monospace;font-size:0.55rem;letter-spacing:0.5em;color:#88dd99;margin-bottom:0.4rem;">✦ LAYER 2 OF 7 ✦</div>
+          <h2 style="font:700 1.6rem Georgia,serif;background:linear-gradient(135deg,#88dd99,#c9a84c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:0 0 0.5rem;">Chaldean Numerology</h2>
+          <p style="color:#9b8ec4;font-size:0.88rem;line-height:1.6;margin:0;">Your birth name reveals your soul's blueprint — but the name people actually call you carries its own living vibration. Chaldean numerology reads that identity exactly as it's spoken into the world today.</p>
+        </div>
+        <div id="chaldean-anim" style="display:flex;justify-content:center;flex-wrap:wrap;gap:10px;margin:1.2rem 0;"></div>
+        <div style="text-align:center;margin-top:1rem;padding:1rem;background:rgba(136,221,153,0.08);border:1px solid rgba(136,221,153,0.2);border-radius:12px;">
+          <div style="font-size:0.72rem;letter-spacing:0.2em;color:#88dd99;margin-bottom:0.5rem;">COMPOUND NUMBER ARCHETYPE</div>
+          <div id="chaldean-demo-text" style="font-family:'Courier New',monospace;color:#e8e0ff;font-size:0.9rem;min-height:2rem;"></div>
+          <div id="chaldean-demo-result" style="font-size:1.3rem;font-weight:700;color:#c9a84c;margin-top:0.5rem;opacity:0;transition:opacity 0.8s;"></div>
+        </div>
+      </div>
+
+      <!-- PANEL 2: GEMATRIA -->
+      <div class="edu-panel" id="edu-panel-2">
+        <div style="text-align:center;margin-bottom:1.2rem;">
+          <div style="font-family:'Courier New',monospace;font-size:0.55rem;letter-spacing:0.5em;color:#7ab0ff;margin-bottom:0.4rem;">✦ LAYER 3 OF 7 ✦</div>
+          <h2 style="font:700 1.6rem Georgia,serif;background:linear-gradient(135deg,#7ab0ff,#b08aff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:0 0 0.5rem;">Gematria</h2>
+          <p style="color:#9b8ec4;font-size:0.88rem;line-height:1.6;margin:0;">Three parallel methods decode the numeric resonance hidden inside language itself. When two or three methods land on the same digit, that's not coincidence — that's your name's field confirming itself.</p>
+        </div>
+        <div id="gematria-anim" style="display:flex;justify-content:center;gap:12px;margin:1.2rem 0;flex-wrap:wrap;"></div>
+        <div id="gematria-resonance" style="text-align:center;margin-top:0.5rem;color:#7ab0ff;font-size:0.82rem;font-style:italic;min-height:1.4rem;"></div>
+      </div>
+
+      <!-- PANEL 3: ASTROLOGY -->
+      <div class="edu-panel" id="edu-panel-3">
+        <div style="text-align:center;margin-bottom:1rem;">
+          <div style="font-family:'Courier New',monospace;font-size:0.55rem;letter-spacing:0.5em;color:#ff9ed2;margin-bottom:0.4rem;">✦ LAYER 4 OF 7 ✦</div>
+          <h2 style="font:700 1.6rem Georgia,serif;background:linear-gradient(135deg,#ff9ed2,#b08aff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:0 0 0.5rem;">Astrology</h2>
+          <p style="color:#9b8ec4;font-size:0.88rem;line-height:1.6;margin:0;">At the moment you were born, the planets held specific positions in the sky. These cosmic alignments — your natal chart — shape your personality, your emotional patterns, and even which elemental zone of the geometry ahead belongs to you.</p>
+        </div>
+
+        <!-- Animated zodiac wheel -->
+        <div style="display:flex;justify-content:center;margin:0.8rem 0;">
+          <svg id="edu-zodiac-svg" viewBox="-120 -120 240 240" width="240" height="240" style="overflow:visible;">
+            <circle cx="0" cy="0" r="110" fill="none" stroke="rgba(176,138,255,0.2)" stroke-width="1"/>
+            <circle cx="0" cy="0" r="90" fill="none" stroke="rgba(176,138,255,0.15)" stroke-width="1"/>
+            <circle cx="0" cy="0" r="22" fill="rgba(255,215,0,0.15)" stroke="#ffd700" stroke-width="1.5"/>
+            <text x="0" y="6" text-anchor="middle" fill="#ffd700" font-size="18">☀</text>
+            <g id="edu-zodiac-signs"></g>
+            <circle cx="0" cy="0" r="60" fill="none" stroke="rgba(201,168,76,0.12)" stroke-width="1" stroke-dasharray="4,4"/>
+            <circle cx="0" cy="0" r="78" fill="none" stroke="rgba(176,138,255,0.12)" stroke-width="1" stroke-dasharray="4,4"/>
+            <g id="edu-planet-mercury"><circle cx="60" cy="0" r="5" fill="#b8b8b8"/><text x="60" y="4" text-anchor="middle" fill="#fff" font-size="8">☿</text></g>
+            <g id="edu-planet-venus"><circle cx="-78" cy="0" r="6" fill="#ffccaa"/><text x="-78" y="4" text-anchor="middle" fill="#fff" font-size="9">♀</text></g>
+          </svg>
+        </div>
+
+        <!-- Element display -->
+        <div id="edu-element-display" style="display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;margin-top:0.8rem;"></div>
+      </div>
+
+      <!-- PANEL 4: METATRON'S CUBE -->
+      <div class="edu-panel" id="edu-panel-4">
+        <div style="text-align:center;margin-bottom:1rem;">
+          <div style="font-family:'Courier New',monospace;font-size:0.55rem;letter-spacing:0.5em;color:#ffd700;margin-bottom:0.4rem;">✦ LAYER 5 OF 7 ✦</div>
+          <h2 style="font:700 1.6rem Georgia,serif;background:linear-gradient(135deg,#ffd700,#e8e0ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:0 0 0.5rem;">Metatron's Cube</h2>
+          <p style="color:#9b8ec4;font-size:0.88rem;line-height:1.6;margin:0;">Thirteen points — the ten Sephiroth plus the three Veils beyond them — connect to form seventy-eight lines. Seventy-eight lines. Seventy-eight Tarot cards. This geometry is the floor the Tree of Life stands on.</p>
+        </div>
+        <div style="display:flex;justify-content:center;">
+          <svg id="edu-cube-svg" viewBox="-100 -100 200 200" width="220" height="220" style="overflow:visible;"></svg>
+        </div>
+        <div id="edu-cube-caption" style="text-align:center;margin-top:0.9rem;color:#ffd700;font-size:0.8rem;font-family:'Courier New',monospace;letter-spacing:0.12em;min-height:1.4rem;"></div>
+      </div>
+
+      <!-- PANEL 5: TREE OF LIFE -->
+      <div data-id="53" class="edu-panel" id="edu-panel-5">
         <div data-id="54" style="text-align:center;margin-bottom:1rem;">
-          <div data-id="55" style="font-family:'Courier New',monospace;font-size:0.55rem;letter-spacing:0.5em;color:#b08aff;margin-bottom:0.4rem;">✦ THE SECOND SYSTEM ✦</div>
+          <div data-id="55" style="font-family:'Courier New',monospace;font-size:0.55rem;letter-spacing:0.5em;color:#b08aff;margin-bottom:0.4rem;">✦ LAYER 6 OF 7 ✦</div>
           <h2 data-id="56" style="font:700 1.6rem Georgia,serif;background:linear-gradient(135deg,#e8e0ff,#b08aff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:0 0 0.5rem;">The Tree of Life</h2>
-          <p data-id="57" style="color:#9b8ec4;font-size:0.88rem;line-height:1.6;margin:0;">The Kabbalistic Tree of Life maps the ten divine attributes — called Sephiroth — through which the infinite expresses itself. Your numerology places you at a specific point on this cosmic map.</p>
+          <p data-id="57" style="color:#9b8ec4;font-size:0.88rem;line-height:1.6;margin:0;">The Kabbalistic Tree of Life overlays directly onto the Cube you just saw — its ten Sephiroth are ten of the thirteen points, and its twenty-two paths are twenty-two of the seventy-eight lines. Your numerology places you at a specific point on this map.</p>
         </div>
 
         <!-- Animated SVG Tree of Life -->
@@ -490,31 +565,15 @@ body {
         <div data-id="127" id="edu-seph-tip" style="text-align:center;min-height:2.2rem;margin-top:0.5rem;color:#c9a84c;font-size:0.8rem;font-style:italic;transition:opacity 0.4s;"></div>
       </div>
 
-      <!-- PANEL 2: ASTROLOGY -->
-      <div data-id="128" class="edu-panel" id="edu-panel-2">
-        <div data-id="129" style="text-align:center;margin-bottom:1rem;">
-          <div data-id="130" style="font-family:'Courier New',monospace;font-size:0.55rem;letter-spacing:0.5em;color:#ff9ed2;margin-bottom:0.4rem;">✦ THE THIRD SYSTEM ✦</div>
-          <h2 data-id="131" style="font:700 1.6rem Georgia,serif;background:linear-gradient(135deg,#ff9ed2,#b08aff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:0 0 0.5rem;">Astrology</h2>
-          <p data-id="132" style="color:#9b8ec4;font-size:0.88rem;line-height:1.6;margin:0;">At the moment you were born, the planets held specific positions in the sky. These cosmic alignments — your natal chart — shape your personality, emotional patterns, and destiny across this lifetime.</p>
+      <!-- PANEL 6: TAROT -->
+      <div class="edu-panel" id="edu-panel-6">
+        <div style="text-align:center;margin-bottom:1rem;">
+          <div style="font-family:'Courier New',monospace;font-size:0.55rem;letter-spacing:0.5em;color:#ff9ed2;margin-bottom:0.4rem;">✦ LAYER 7 OF 7 · CAPSTONE ✦</div>
+          <h2 style="font:700 1.6rem Georgia,serif;background:linear-gradient(135deg,#ff9ed2,#ffd700);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:0 0 0.5rem;">Tarot</h2>
+          <p style="color:#9b8ec4;font-size:0.88rem;line-height:1.6;margin:0;">Every number you've just seen collapses into a single image. The 22 Major Arcana ride the Tree's paths; the 56 Minor Arcana live on the Cube's remaining lines. Numerology gave you the math — Tarot gives it a face.</p>
         </div>
-
-        <!-- Animated zodiac wheel -->
-        <div data-id="133" style="display:flex;justify-content:center;margin:0.8rem 0;">
-          <svg data-id="134" id="edu-zodiac-svg" viewBox="-120 -120 240 240" width="240" height="240" style="overflow:visible;">
-            <circle data-id="135" cx="0" cy="0" r="110" fill="none" stroke="rgba(176,138,255,0.2)" stroke-width="1"/>
-            <circle data-id="136" cx="0" cy="0" r="90" fill="none" stroke="rgba(176,138,255,0.15)" stroke-width="1"/>
-            <circle data-id="137" cx="0" cy="0" r="22" fill="rgba(255,215,0,0.15)" stroke="#ffd700" stroke-width="1.5"/>
-            <text data-id="138" x="0" y="6" text-anchor="middle" fill="#ffd700" font-size="18">☀</text>
-            <g data-id="139" id="edu-zodiac-signs"></g>
-            <circle data-id="140" cx="0" cy="0" r="60" fill="none" stroke="rgba(201,168,76,0.12)" stroke-width="1" stroke-dasharray="4,4"/>
-            <circle data-id="141" cx="0" cy="0" r="78" fill="none" stroke="rgba(176,138,255,0.12)" stroke-width="1" stroke-dasharray="4,4"/>
-            <g data-id="142" id="edu-planet-mercury"><circle data-id="143" cx="60" cy="0" r="5" fill="#b8b8b8"/><text data-id="144" x="60" y="4" text-anchor="middle" fill="#fff" font-size="8">☿</text></g>
-            <g data-id="145" id="edu-planet-venus"><circle data-id="146" cx="-78" cy="0" r="6" fill="#ffccaa"/><text data-id="147" x="-78" y="4" text-anchor="middle" fill="#fff" font-size="9">♀</text></g>
-          </svg>
-        </div>
-
-        <!-- Element display -->
-        <div data-id="148" id="edu-element-display" style="display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;margin-top:0.8rem;"></div>
+        <div id="tarot-anim" style="display:flex;justify-content:center;gap:0.8rem;flex-wrap:wrap;margin:1.2rem 0;"></div>
+        <div id="tarot-connect-text" style="text-align:center;color:#c9b8e8;font-size:0.85rem;line-height:1.8;margin-top:1rem;padding:0 0.5rem;"></div>
       </div>
 
     </div><!-- /edu-panels -->
@@ -561,6 +620,7 @@ body {
       </div>
       <p data-id="170" id="reading-sign-label" class="mt-5 font-serif" style="color:var(--accent-gold);font-size:1.1rem;"></p>
       <p data-id="171" id="reading-seph-label" class="mt-1" style="color:var(--text-muted);font-size:0.85rem;font-style:italic;"></p>
+      <p id="reading-trump-label" class="mt-1" style="color:#ff9ed2;font-size:0.8rem;font-style:italic;"></p>
 
       <!-- Waveform visualizer -->
       <div data-id="172" class="waveform mt-8" id="waveform">
@@ -1097,6 +1157,117 @@ var PATHS_22 = [
 ];
 
 // ===========================
+// W3BB CODEX SECTION 5.4/6.2 — THE 22 PATHS + MAJOR ARCANA
+// Path numbers 11-32, each connecting two Sephiroth (by SEPHIROTH id 1-10),
+// each carrying one Major Arcana card with its W3BB activation keyword.
+// ===========================
+var PATH_TABLE = [
+  {num:11,a:1,b:2,card:'The Fool',numeral:'0',keyword:'Liberation'},
+  {num:12,a:1,b:3,card:'The Magician',numeral:'I',keyword:'Manifestation'},
+  {num:13,a:1,b:6,card:'The High Priestess',numeral:'II',keyword:'Intuition'},
+  {num:14,a:2,b:3,card:'The Empress',numeral:'III',keyword:'Abundance'},
+  {num:15,a:2,b:6,card:'The Emperor',numeral:'IV',keyword:'Authority'},
+  {num:16,a:2,b:4,card:'The Hierophant',numeral:'V',keyword:'Tradition'},
+  {num:17,a:3,b:6,card:'The Lovers',numeral:'VI',keyword:'Discernment'},
+  {num:18,a:3,b:5,card:'The Chariot',numeral:'VII',keyword:'Willforce'},
+  {num:19,a:4,b:5,card:'Strength',numeral:'VIII',keyword:'Integration'},
+  {num:20,a:4,b:6,card:'The Hermit',numeral:'IX',keyword:'Seeking'},
+  {num:21,a:4,b:7,card:'Wheel of Fortune',numeral:'X',keyword:'Cyclicity'},
+  {num:22,a:5,b:6,card:'Justice',numeral:'XI',keyword:'Equilibrium'},
+  {num:23,a:5,b:8,card:'The Hanged Man',numeral:'XII',keyword:'Surrender'},
+  {num:24,a:6,b:7,card:'Death',numeral:'XIII',keyword:'Transition'},
+  {num:25,a:6,b:9,card:'Temperance',numeral:'XIV',keyword:'Alchemy'},
+  {num:26,a:6,b:8,card:'The Devil',numeral:'XV',keyword:'Bondage / Shadow'},
+  {num:27,a:7,b:8,card:'The Tower',numeral:'XVI',keyword:'Disruption'},
+  {num:28,a:7,b:9,card:'The Star',numeral:'XVII',keyword:'Aspiration'},
+  {num:29,a:7,b:10,card:'The Moon',numeral:'XVIII',keyword:'Illusion'},
+  {num:30,a:8,b:9,card:'The Sun',numeral:'XIX',keyword:'Radiance'},
+  {num:31,a:8,b:10,card:'Judgement',numeral:'XX',keyword:'Resurrection'},
+  {num:32,a:9,b:10,card:'The World',numeral:'XXI',keyword:'Completion'}
+];
+function pathByNumber(n){ return PATH_TABLE.find(function(p){ return p.num===n; }); }
+function pathBetween(sephA,sephB){ return PATH_TABLE.find(function(p){ return (p.a===sephA&&p.b===sephB)||(p.a===sephB&&p.b===sephA); }); }
+
+// W3BB CODEX SECTION 5.5 — Primary Path / Life Path Trump Card
+// Standard rule: mapped = (base mod 22) + 11, clamped [11,32].
+// Master-Number exception (confirmed against calibration reading): when the
+// Life Path is a Master Number whose elevated Sephirah connects directly to
+// Kether (11->Chokmah via Path 11, 33->Tiphareth via Path 13), that direct
+// Kether-bridge path is used instead of the formula. 22 and 44 have no such
+// direct Kether path, so they fall back to the formula using their base digit.
+function primaryPathForLP(lp){
+  var KETHER_BRIDGE = { 11:11, 33:13 };
+  if (KETHER_BRIDGE[lp]) return { path: pathByNumber(KETHER_BRIDGE[lp]), viaKetherBridge:true };
+  var MASTER_BASE = { 22:4, 44:8 };
+  var base = MASTER_BASE[lp] || lp;
+  var mapped = (base % 22) + 11;
+  if (mapped < 11) mapped = 11;
+  if (mapped > 32) mapped = 32;
+  return { path: pathByNumber(mapped), viaKetherBridge:false };
+}
+// W3BB CODEX SECTION 6.4 Step 5d — Shadow Card: the path from the Soul
+// Sephirah toward the nearest lower Sephirah in the direction of Malkuth.
+var NEXT_LOWER_SEPH = {1:6,2:4,3:5,4:7,5:8,6:9,7:10,8:10,9:10,10:null};
+function shadowCardFor(soulSephId){
+  var lower = NEXT_LOWER_SEPH[soulSephId];
+  if (!lower) return null;
+  return pathBetween(soulSephId, lower) || null;
+}
+
+// ===========================
+// METATRON'S CUBE — 13 nodes (10 Sephiroth + 3 Veils), 78 lines
+// 22 lines = the Tree paths above (Major Arcana). The remaining 56 lines
+// carry the Minor Arcana: Soul Card + Court Card per person, as calibrated
+// against a real delivered W3BB partnership reading.
+// ===========================
+var VEILS = [
+  {id:11, name:'Ain', meaning:'Nothingness — the absolute void beyond all limitation'},
+  {id:12, name:'Ain Soph', meaning:'The Limitless — boundless potential before will'},
+  {id:13, name:'Ain Soph Aur', meaning:'The Limitless Light — radiant potential on the verge of emanation'}
+];
+// Classical element -> Platonic solid -> Tarot suit (Plato's Timaeus correspondence)
+var ELEMENT_TO_SOLID = {
+  Fire:  {solid:'Tetrahedron', suit:'Wands'},
+  Earth: {solid:'Cube',        suit:'Pentacles'},
+  Air:   {solid:'Octahedron',  suit:'Swords'},
+  Water: {solid:'Icosahedron', suit:'Cups'}
+};
+// W3BB CODEX SECTION 6.3 — Minor Arcana keyword per Sephirah number (1-10) per suit
+var MINOR_KEYWORDS = {
+  Wands:    ['Root of Fire','Dominion','Virtue','Completion','Strife','Victory','Valor','Swiftness','Strength','Oppression'],
+  Cups:     ['Root of Water','Love','Abundance','Luxury','Disappointment','Pleasure','Debauch','Indolence','Happiness','Satiety'],
+  Swords:   ['Root of Air','Peace','Sorrow','Truce','Defeat','Science','Futility','Interference','Cruelty','Ruin'],
+  Pentacles:['Root of Earth','Change','Work','Power','Worry','Success','Failure','Prudence','Gain','Wealth']
+};
+var ORDINAL_WORDS = ['Ace','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten'];
+function pipCardName(sephNumber, suit){
+  var idx = Math.max(1, Math.min(10, sephNumber)) - 1;
+  return ORDINAL_WORDS[idx] + ' of ' + suit;
+}
+function pipKeyword(sephNumber, suit){
+  var idx = Math.max(1, Math.min(10, sephNumber)) - 1;
+  return (MINOR_KEYWORDS[suit]||[])[idx] || '';
+}
+// Court Card rank by pillar of the anchoring Sephirah (Section 6.3: Kings=Chokmah/Right,
+// Queens=Binah/Left, Knights=Tiphareth-Yesod axis/Middle, Pages=Malkuth), generalized
+// to every Sephirah via its pillar so any Soul Sephirah resolves to exactly one rank.
+var SEPH_PILLAR = {1:'Middle',2:'Right',3:'Left',4:'Right',5:'Left',6:'Middle',7:'Right',8:'Left',9:'Middle',10:'Malkuth'};
+function courtRankForSephId(sephId){
+  var p = SEPH_PILLAR[sephId];
+  if (p==='Malkuth') return 'Page';
+  if (p==='Right') return 'King';
+  if (p==='Left') return 'Queen';
+  return 'Knight';
+}
+function soulCardFor(soulSephId, suit){
+  return { name: pipCardName(soulSephId, suit), keyword: pipKeyword(soulSephId, suit), suit: suit, sephId: soulSephId };
+}
+function courtCardFor(soulSephId, suit){
+  var rank = courtRankForSephId(soulSephId);
+  return { name: rank + ' of ' + suit, rank: rank, suit: suit, veil: 'Ain Soph Aur' };
+}
+
+// ===========================
 // POPULATE DROPDOWNS
 // ===========================
 (function(){
@@ -1382,35 +1553,110 @@ var TIERS = [
 // ===========================
 // NUMEROLOGY CALCULATIONS
 // ===========================
-function reduceNum(n,keepMaster){
-  if(keepMaster&&(n===11||n===22||n===33))return n;
-  if(n<10)return n;
-  var s=0;String(n).split('').forEach(function(d){s+=parseInt(d);});
-  return reduceNum(s,keepMaster);
+// W3BB CODEX — universal digit_sum reduction engine.
+// Always stops at Master Numbers (11, 22, 33, 44) wherever they arise in the
+// reduction chain — this is the single source of truth for every reduction
+// in the Codex (Pythagorean, Chaldean, and Reduced Gematria alike).
+function digitSum(n){
+  n = Math.abs(Math.round(n));
+  while(n>9 && n!==11 && n!==22 && n!==33 && n!==44){
+    n = String(n).split('').reduce(function(a,b){return a+parseInt(b,10);},0);
+  }
+  return n;
 }
+// Legacy name kept for call sites below; keepMaster=false forces a full
+// reduction past any Master Number (used only where the Codex explicitly
+// wants a plain single digit, e.g. an already-preserved value being
+// re-examined).
+function reduceNum(n,keepMaster){
+  if(keepMaster) return digitSum(n);
+  var s = digitSum(n);
+  if(s===11) return 2; if(s===22) return 4; if(s===33) return 6; if(s===44) return 8;
+  return s;
+}
+// W3BB HIDDEN MASTER METHOD — Life Path Number
+// LPN = digit_sum( (month + day, RAW/unreduced compound) + digit_sum(year) )
+// This is the live production formula (confirmed against calibration reading),
+// which surfaces Master Numbers far more often than a fully-stepwise reduction.
 function calcLifePath(month,day,year){
-  var digits = (String(month)+String(day)+String(year)).split('').map(Number);
-  var sum = digits.reduce(function(a,b){return a+b;},0);
-  return reduceNum(sum,true);
+  var Yr = digitSum(year);
+  return digitSum(month+day+Yr);
 }
 function calcHiddenMaster(month,day,year){
-  var yearDigits=String(year).split('').map(Number).reduce(function(a,b){return a+b;},0);
-  var yearReduced=reduceNum(yearDigits,false);
-  var total=month+day+yearReduced;
-  if(total===11||total===22||total===33)return total; return null;
+  var lp = calcLifePath(month,day,year);
+  return (lp===11||lp===22||lp===33||lp===44) ? lp : null;
 }
+// W3BB HIDDEN MASTER METHOD — Personal Year Number
+// PYN = digit_sum( (month + day, RAW/unreduced compound) + digit_sum(current year) )
 function calcPersonalYear(month,day,year){
-  var sum=month+day+String(year).split('').reduce(function(a,b){return a+parseInt(b);},0);
-  while(sum>9&&sum!==11&&sum!==22&&sum!==33){sum=String(sum).split('').reduce(function(a,b){return a+parseInt(b);},0);}
-  return sum;
+  var CYr = digitSum(year);
+  return digitSum(month+day+CYr);
 }
+// W3BB CODEX SECTION 2.2 — Birthday Number
+function calcBirthdayNumber(day){
+  return digitSum(day);
+}
+var MASTER_NUMBER_DATA = {
+  11:{title:'The Illuminated Messenger',quality:'Heightened intuition, spiritual channel, visionary sensitivity, inspirational leadership.'},
+  22:{title:'The Master Builder',quality:'Practical idealism, large-scale manifestation, structural genius, enduring legacy creation.'},
+  33:{title:'The Master Teacher',quality:"Unconditional service, compassionate wisdom, healing presence, elevated creative expression."},
+  44:{title:'The Master Healer',quality:'Structural mastery in service of universal healing — the amplified force of two Master Builders fused into one continuous frequency of legacy and repair.'}
+};
 var PYTH={A:1,B:2,C:3,D:4,E:5,F:6,G:7,H:8,I:9,J:1,K:2,L:3,M:4,N:5,O:6,P:7,Q:8,R:9,S:1,T:2,U:3,V:4,W:5,X:6,Y:7,Z:8};
 var VOWELS_MAP={A:1,E:1,I:1,O:1,U:1};
 function nameVal(name,onlyV,onlyC){var sum=0;name.toUpperCase().split('').forEach(function(c){var v=PYTH[c];if(!v)return;if(onlyV&&!VOWELS_MAP[c])return;if(onlyC&&VOWELS_MAP[c])return;sum+=v;});return sum;}
-function calcExpression(fn){return reduceNum(nameVal(fn,false,false),true);}
-function calcSoulUrge(fn){return reduceNum(nameVal(fn,true,false),true);}
-function calcPersonality(fn){return reduceNum(nameVal(fn,false,true),true);}
-function calcGematria(word){var sum=0;word.toUpperCase().split('').forEach(function(c){var v=c.charCodeAt(0)-64;if(v>=1&&v<=26)sum+=v;});return{total:sum,reduced:reduceNum(sum,true)};}
+function calcExpression(fn){return digitSum(nameVal(fn,false,false));}
+function calcSoulUrge(fn){return digitSum(nameVal(fn,true,false));}
+function calcPersonality(fn){return digitSum(nameVal(fn,false,true));}
+
+// ===========================
+// W3BB CODEX SECTION 3 — CHALDEAN NUMEROLOGY (Used/Known Name)
+// ===========================
+var CHALDEAN={A:1,I:1,J:1,Q:1,Y:1,B:2,K:2,R:2,C:3,G:3,L:3,S:3,D:4,M:4,T:4,E:5,H:5,N:5,X:5,U:6,V:6,W:6,O:7,Z:7,F:8,P:8};
+var CHALDEAN_COMPOUND_ARCHETYPES={
+  10:'Wheel of Completion',11:'Veiled Light',12:'The Sacrifice',13:'Transformation Portal',14:'The Alchemist',
+  15:'The Magnetist',16:'The Awakening Strike',17:'The Star of Promise',18:'The Mirror Deception',19:'The Solar Radiance',
+  20:'The Judgement Gate',21:'The Crown of Victory',22:'The Architect of Form',23:'The Royal Seal',24:'The Harmonic Union',
+  25:'The Inner Seeker',26:'The Dual Crown',27:'The Wand of Power',28:'The Test of Strength',29:'The Initiatory Trial',
+  30:'The Lamp of Solitude',31:"The Hermit's Path",32:'The Web of Fate',33:'The Sacred Flame',34:"The Warrior's Rest",
+  35:'The Ship of Commerce',36:'The Exalted Mind',37:'The Heartstone',38:'The Divided Path',39:'The Creative Pinnacle',
+  40:'The Crossroads',41:'The Determined Will',42:'The Expanded Vision',43:'The Upheaval',44:'The Structural Foundation',
+  45:'The Elder Wisdom',46:'The Throne',47:'The Covenant',48:'The Scales of Time',49:'The Resolved Cycle',
+  50:'The New Dawn',51:'The Sword of Steel',52:'The Spiral Return'
+};
+function chaldeanCompoundArchetype(n){
+  if(n<10) return null;
+  if(n>52){ var r=n; while(r>52){ r = digitSum(r); if(r<10) break; } return CHALDEAN_COMPOUND_ARCHETYPES[r]||null; }
+  return CHALDEAN_COMPOUND_ARCHETYPES[n]||null;
+}
+function calcChaldeanName(name){
+  var sum=0; name.toUpperCase().split('').forEach(function(c){ var v=CHALDEAN[c]; if(v) sum+=v; });
+  return { compound: sum, reduced: digitSum(sum), archetype: chaldeanCompoundArchetype(sum) };
+}
+function harmonicCheck(cnnReduced, lpn, en){
+  if(cnnReduced===lpn) return { flag:'Name-Soul Alignment', detail:'Your living name vibrates at the exact frequency of your Life Path.' };
+  if(cnnReduced===en) return { flag:'Name-Expression Alignment', detail:'Your living name vibrates at the exact frequency of your Expression Number.' };
+  var gap = Math.abs(lpn - cnnReduced);
+  return { flag:'Growth Tension', detail:'A numeric gap of '+gap+' between your Life Path and your living name—a productive tension driving growth.', gap:gap };
+}
+
+// ===========================
+// W3BB CODEX SECTION 4 — GEMATRIA (three methods run as one battery)
+// ===========================
+var SG_MAP={A:1,B:2,C:3,D:4,E:5,F:6,G:7,H:8,I:9,J:10,K:20,L:30,M:40,N:50,O:60,P:70,Q:80,R:90,S:100,T:200,U:300,V:400,W:500,X:600,Y:700,Z:800};
+var OG_MAP={A:1,B:2,C:3,D:4,E:5,F:6,G:7,H:8,I:9,J:10,K:11,L:12,M:13,N:14,O:15,P:16,Q:17,R:18,S:19,T:20,U:21,V:22,W:23,X:24,Y:25,Z:26};
+function calcStandardGematria(word){ var sum=0; word.toUpperCase().split('').forEach(function(c){ if(SG_MAP[c]) sum+=SG_MAP[c]; }); return sum; }
+function calcOrdinalGematria(word){ var sum=0; word.toUpperCase().split('').forEach(function(c){ if(OG_MAP[c]) sum+=OG_MAP[c]; }); return sum; }
+function calcReducedGematria(word){
+  var sum=0; word.toUpperCase().split('').forEach(function(c){ if(OG_MAP[c]) sum+=digitSum(OG_MAP[c]); });
+  return digitSum(sum);
+}
+function calcGematriaBattery(word){
+  var sg=calcStandardGematria(word), og=calcOrdinalGematria(word), rg=calcReducedGematria(word);
+  return { sg:sg, og:og, rg:rg, sgReduced:digitSum(sg), ogReduced:digitSum(og) };
+}
+// Legacy alias — old call sites used calcGematria(word) -> {total,reduced} (Ordinal Gematria)
+function calcGematria(word){ var og=calcOrdinalGematria(word); return { total:og, reduced:digitSum(og) }; }
 
 function getSunSign(month,day){
   var signs=[
@@ -1447,14 +1693,17 @@ var LP_MEANINGS = {
   9: "You are here to complete. To gather wisdom from every experience, distill it into something universal, and offer it back to the world without attachment. You are the oldest soul in the room. Act accordingly.",
   11: "You carry the rare frequency of spiritual illumination. You see and feel more than most \u2014 and that is not a burden, it is your assignment. You are here to illuminate the path for others.",
   22: "You carry the extraordinary ability to turn visionary dreams into physical reality on a scale that serves humanity. You are the architect of the impossible, the master builder.",
-  33: "The rarest of all master frequencies. Unconditional love is not your aspiration \u2014 it is your soul's native language and the vibration that heals everything it touches."
+  33: "The rarest of all master frequencies. Unconditional love is not your aspiration \u2014 it is your soul's native language and the vibration that heals everything it touches.",
+  44: "The amplified force of two Master Builders fused into one continuous frequency. You are here to construct systems, institutions, and legacies whose ultimate purpose is healing on a scale most souls never attempt."
 };
 
 // ===========================
-// SEPHIRAH ASSIGNMENTS
+// SEPHIRAH ASSIGNMENTS \u2014 W3BB CODEX SECTION 5.3
+// Standard placement for 1-9; Master Numbers elevate their base Sephirah
+// (11->Chokmah, 22->Chesed, 33->Tiphareth, 44->Hod) rather than reducing.
 // ===========================
 function getSephirahForLP(lp) {
-  var map = {
+  var BASE = {
     1: { name:'Kether', meaning:'the undivided source, the first light', sephId:1 },
     2: { name:'Chokmah', meaning:'the original impulse, the father principle', sephId:2 },
     3: { name:'Binah', meaning:'the great mother, the womb of form', sephId:3 },
@@ -1463,12 +1712,15 @@ function getSephirahForLP(lp) {
     6: { name:'Tiphareth', meaning:'the heart of the Tree, the solar center, the self', sephId:6 },
     7: { name:'Netzach', meaning:'desire, nature, the instinctual soul', sephId:7 },
     8: { name:'Hod', meaning:'intellect, communication, the crafted mind', sephId:8 },
-    9: { name:'Yesod', meaning:'the dream, the unconscious, the reflective self', sephId:9 },
-    11: { name:"Da'ath", meaning:'the hidden sephirah, the abyss between worlds', sephId:6 },
-    22: { name:'Malkuth', meaning:'the manifest world, the body of God', sephId:10 },
-    33: { name:'AIN SOPH AUR', meaning:'the limitless light above the Tree', sephId:1 }
+    9: { name:'Yesod', meaning:'the dream, the unconscious, the reflective self', sephId:9 }
   };
-  return map[lp] || map[reduceNum(lp,false)] || map[6];
+  var MASTER_ELEVATION = { 11:2, 22:4, 33:6, 44:8 };
+  if (MASTER_ELEVATION[lp]) {
+    var base = BASE[MASTER_ELEVATION[lp]];
+    var md = MASTER_NUMBER_DATA[lp];
+    return { name: base.name, meaning: base.meaning + ' \u2014 elevated to ' + md.title, sephId: base.sephId, elevated:true, masterNumber:lp };
+  }
+  return BASE[lp] || BASE[digitSum(lp)] || BASE[6];
 }
 
 var ELEMENT_LP_INTERACTION = {
@@ -1484,7 +1736,8 @@ var ELEMENT_LP_INTERACTION = {
     9: "Fire at the end of the cycle creates a purifier. Your compassion burns clean.",
     11: "Fire amplifies your illumination. You are a beacon that cannot be ignored.",
     22: "Fire and master building together create unstoppable momentum.",
-    33: "Fire and unconditional love create a force of pure spiritual transformation."
+    33: "Fire and unconditional love create a force of pure spiritual transformation.",
+    44: "Fire fused with structural mastery builds institutions that burn away suffering at the root."
   },
   Water: {
     1: "Water beneath leadership creates intuitive command \u2014 you lead by feeling the current.",
@@ -1498,7 +1751,8 @@ var ELEMENT_LP_INTERACTION = {
     9: "Water at the completion carries the memory of every soul it has touched.",
     11: "Water amplifies your psychic gifts. You feel the future before it arrives.",
     22: "Water and the master builder create someone who shapes reality through pure feeling.",
-    33: "Water and unconditional love together are the ocean of compassion itself."
+    33: "Water and unconditional love together are the ocean of compassion itself.",
+    44: "Water flowing through structural mastery becomes an irrigation system for entire communities' healing."
   },
   Air: {
     1: "Air fuels your leadership with vision \u2014 you see paths that others cannot conceive.",
@@ -1512,7 +1766,8 @@ var ELEMENT_LP_INTERACTION = {
     9: "Air at the completion creates a teacher whose ideas outlive every generation.",
     11: "Air and illumination together create a visionary whose insights change paradigms.",
     22: "Air and the master builder create someone who manifests through pure thought.",
-    33: "Air and unconditional love create a communicator of divine truth."
+    33: "Air and unconditional love create a communicator of divine truth.",
+    44: "Air fused with structural mastery makes ideas that build lasting, healing institutions."
   },
   Earth: {
     1: "Earth grounds your leadership in reality \u2014 you build empires that last.",
@@ -1526,7 +1781,8 @@ var ELEMENT_LP_INTERACTION = {
     9: "Earth at the completion creates a legacy \u2014 something you leave behind in the soil itself.",
     11: "Earth grounds your illumination, making your spiritual gifts practical and real.",
     22: "Earth and master building together are the ultimate combination for manifesting vision.",
-    33: "Earth and unconditional love create a healer whose presence alone is medicine."
+    33: "Earth and unconditional love create a healer whose presence alone is medicine.",
+    44: "Earth is the native ground of this frequency — you build the literal, physical structures that heal generations."
   }
 };
 
@@ -1545,7 +1801,8 @@ var LP_DATA = {
   9:{title:'The Humanitarian',teaser:LP_MEANINGS[9],gift:'Universal compassion'},
   11:{title:'The Illuminator \u2726',teaser:LP_MEANINGS[11],gift:'Spiritual illumination'},
   22:{title:'The Master Builder \u2726',teaser:LP_MEANINGS[22],gift:'Manifesting the impossible'},
-  33:{title:'The Master Teacher \u2726',teaser:LP_MEANINGS[33],gift:'Unconditional love actualized'}
+  33:{title:'The Master Teacher \u2726',teaser:LP_MEANINGS[33],gift:'Unconditional love actualized'},
+  44:{title:'The Master Healer \u2726',teaser:LP_MEANINGS[44],gift:'Structural mastery in service of healing'}
 };
 
 var SIGN_TEASERS={
@@ -1694,40 +1951,66 @@ function showSephPanel(containerId, seph, userSephId) {
 // HOOK SCREEN HANDLER (CHANGE 1 — now goes to edu screen)
 // ===========================
 document.getElementById('hook-btn').addEventListener('click', function(){
-  var firstName = document.getElementById('hook-firstname').value.trim();
+  var fullBirthName = document.getElementById('hook-fullname').value.trim().replace(/\s+/g,' ');
+  var usedNameRaw = document.getElementById('hook-usedname').value.trim();
   var month = document.getElementById('hook-month').value;
   var day = document.getElementById('hook-day').value;
   var year = document.getElementById('hook-year').value;
   var valEl = document.getElementById('val-hook');
   valEl.textContent = '';
 
-  if (!firstName) { valEl.textContent = 'Please enter your first name.'; return; }
+  if (!fullBirthName) { valEl.textContent = 'Please enter your full birth name.'; return; }
   if (!month || !day || !year) { valEl.textContent = 'Please select your full date of birth.'; return; }
 
   month = parseInt(month); day = parseInt(day); year = parseInt(year);
   var dob = year + '-' + String(month).padStart(2,'0') + '-' + String(day).padStart(2,'0');
+  var firstName = fullBirthName.split(' ')[0];
+  var usedName = usedNameRaw || firstName;
 
+  // ── LAYER 1: Pythagorean Numerology (birth architecture — full birth name) ──
   var lp = calcLifePath(month, day, year);
-  var sunSign = getSunSign(month, day);
   var sephInfo = getSephirahForLP(lp);
   var hiddenMaster = calcHiddenMaster(month, day, year);
-  var expression = calcExpression(firstName);
-  var soulUrge = calcSoulUrge(firstName);
-  var personality = calcPersonality(firstName);
-  var gematria = calcGematria(firstName);
+  var expression = calcExpression(fullBirthName);
+  var soulUrge = calcSoulUrge(fullBirthName);
+  var personality = calcPersonality(fullBirthName);
+  var birthdayNumber = calcBirthdayNumber(day);
   var personalYear2026 = calcPersonalYear(month, day, 2026);
-  var lpData = LP_DATA[lp] || LP_DATA[reduceNum(lp,false)] || LP_DATA[6];
+  var lpData = LP_DATA[lp] || LP_DATA[digitSum(lp)] || LP_DATA[6];
+
+  // ── LAYER 2: Chaldean Numerology (used/known name) ──
+  var chaldean = calcChaldeanName(usedName);
+  var harmonic = harmonicCheck(chaldean.reduced, lp, expression);
+
+  // ── LAYER 3: Gematria (three-method battery on used name) ──
+  var gematriaBattery = calcGematriaBattery(usedName);
+  var gematria = calcGematria(firstName); // legacy field, kept for back-compat
+
+  // ── LAYER 4: Astrology ──
+  var sunSign = getSunSign(month, day);
+
+  // ── LAYER 5: Tree of Life + LAYER 6: Tarot / Metatron's Cube ──
+  var primary = primaryPathForLP(lp);
+  var lifePathTrumpCard = primary.path;
+  var elementSuit = (ELEMENT_TO_SOLID[sunSign.element]||ELEMENT_TO_SOLID.Fire).suit;
+  var soulCard = soulCardFor(sephInfo.sephId, elementSuit);
+  var courtCard = courtCardFor(sephInfo.sephId, elementSuit);
+  var shadowCardPath = shadowCardFor(sephInfo.sephId);
 
   window._readingProfile = {
-    firstName: firstName, fullName: firstName, dob: dob,
+    firstName: firstName, fullName: fullBirthName, fullBirthName: fullBirthName, usedName: usedName, dob: dob,
     month: month, day: day, year: year,
     lifePath: lp, lpTitle: lpData.title, lpTeaser: lpData.teaser, lpGift: lpData.gift,
     sunSign: sunSign, tree: sephInfo,
     treePosition: { sephId: sephInfo.sephId },
     hiddenMaster: hiddenMaster,
     expression: expression, soulUrge: soulUrge,
-    personality: personality, gematria: gematria,
-    personalYear2026: personalYear2026
+    personality: personality, birthdayNumber: birthdayNumber, gematria: gematria,
+    personalYear2026: personalYear2026,
+    chaldean: chaldean, harmonic: harmonic,
+    gematriaBattery: gematriaBattery,
+    primaryPath: primary, lifePathTrumpCard: lifePathTrumpCard,
+    elementSuit: elementSuit, soulCard: soulCard, courtCard: courtCard, shadowCardPath: shadowCardPath
   };
 
   // CHANGE 1: Show edu screen first instead of generating
@@ -1801,15 +2084,21 @@ function getFallbackReading(){
   fb += 'On the Kabbalistic Tree of Life, your Life Path of '+p.lifePath+' resonates at the sphere of '+p.tree.name+' \u2014 '+p.tree.meaning+'.\n\nThis is not merely a symbolic placement. Each Sephirah represents a specific quality of divine consciousness \u2014 and your soul chose to incarnate through this particular lens.\n';
   fb += '===PAGE_3_END===\n\n';
   fb += '===PAGE_4_START===\n';
-  fb += 'Your Expression Number is '+(p.expression||'unknown')+' \u2014 '+expData.title+'. While your Life Path reveals the road you walk, your Expression Number reveals the gifts you were given to walk it with.\n\nYour Soul Urge of '+(p.soulUrge||'unknown')+' reveals what your heart secretly longs for. The tension between your Expression and your Soul Urge is the engine of your spiritual evolution.\n';
+  fb += 'Your Expression Number is '+(p.expression||'unknown')+' \u2014 '+expData.title+'. While your Life Path reveals the road you walk, your Expression Number reveals the gifts you were given to walk it with.\n\nYour Soul Urge of '+(p.soulUrge||'unknown')+' reveals what your heart secretly longs for. The tension between your Expression and your Soul Urge is the engine of your spiritual evolution.\n\n';
+  if (p.chaldean) {
+    fb += 'The name '+p.usedName+' \u2014 as you are actually known and called \u2014 carries a Chaldean compound of '+p.chaldean.compound+(p.chaldean.archetype?', the archetype of "'+p.chaldean.archetype+'"':'')+', reducing to '+p.chaldean.reduced+'. ';
+    fb += (p.harmonic ? p.harmonic.detail : '') + '\n';
+  }
   fb += '===PAGE_4_END===\n\n';
   fb += '===PAGE_5_START===\n';
   fb += 'The shadow side of your '+p.sunSign.sign+' nature holds teachings just as valuable as the light. Every gift carries a corresponding challenge.\n\nYour highest expression as a '+p.sunSign.sign+' is the capacity to transcend your shadow. Recognizing this pattern is the first step toward mastering it.\n';
   fb += '===PAGE_5_END===\n\n';
   fb += '===PAGE_6_START===\n';
-  fb += 'The twenty-two paths on the Tree of Life connect the ten Sephiroth. The paths leading to '+p.tree.name+' are specifically significant for your soul\'s journey.\n\n';
+  fb += 'The twenty-two paths on the Tree of Life connect the ten Sephiroth, and each one carries a Major Arcana card. Your Life Path Trump Card is '+(p.lifePathTrumpCard?p.lifePathTrumpCard.numeral+' \u00b7 '+p.lifePathTrumpCard.card:'')+' \u2014 the mythic archetype governing your central life narrative, activated by '+(p.lifePathTrumpCard?p.lifePathTrumpCard.keyword:'')+'.\n\n';
   if(p.hiddenMaster){fb += 'Your Hidden Master Number is '+p.hiddenMaster+'. This number does not appear on the surface \u2014 it emerges only through the Sacred Addition Method.\n\n';}
-  fb += 'The Hebrew letters associated with these paths each carry their own vibrational teaching.\n';
+  if (p.gematriaBattery) {
+    fb += 'Run through the three sacred systems of Gematria, the name you carry today returns Standard '+p.gematriaBattery.sg+', Ordinal '+p.gematriaBattery.og+', and Reduced '+p.gematriaBattery.rg+' \u2014 a linguistic field confirming what your numbers already told you.\n';
+  }
   fb += '===PAGE_6_END===\n\n';
   fb += '===PAGE_7_START===\n';
   fb += 'Your Personality Number is '+(p.personality||'unknown')+' \u2014 the impression you make before you speak a single word.\n\nYour Personal Year in 2026 is '+py+'. This means you are entering a cycle that specifically favors '+(py<=3?'new beginnings and creative expression':py<=6?'building and deepening relationships':'completion and preparing for a major new chapter')+'.\n';
@@ -1818,7 +2107,11 @@ function getFallbackReading(){
   fb += 'In matters of love and partnership, your Life Path '+p.lifePath+' is most naturally aligned with Life Paths '+(p.lifePath<=3?'3, 5, and 7':p.lifePath<=6?'2, 4, and 8':'1, 6, and 9')+'.\n\nYour '+p.sunSign.sign+' nature adds another layer to your romantic blueprint. The cosmic timing of your current chapter favors deep, transformative connections.\n';
   fb += '===PAGE_8_END===\n\n';
   fb += '===PAGE_9_START===\n';
-  fb += 'Above the Tree of Life itself radiate the Three Veils: AIN, AIN SOPH, and AIN SOPH AUR. These are the infinite potential from which all creation springs.\n\nYour complete chart \u2014 Life Path '+p.lifePath+', Expression '+(p.expression||'unknown')+', '+p.sunSign.sign+' Sun, and '+p.tree.name+' on the Tree \u2014 all point toward the same essential truth: you are a soul of extraordinary purpose.\n\n'+p.firstName+', I am Celestia, and it has been my honor to read your chart. Go now with the knowledge that you are not random \u2014 you are sacred mathematics made flesh. Blessings upon every step of your journey.\n';
+  fb += 'Above the Tree of Life itself radiate the Three Veils: AIN, AIN SOPH, and AIN SOPH AUR \u2014 the infinite potential from which all creation springs, and the outermost points of Metatron\'s Cube, the geometry of thirteen nodes and seventy-eight lines the Tree itself stands upon.\n\n';
+  if (p.soulCard && p.courtCard) {
+    fb += 'On that Cube, your Soul Card is the '+p.soulCard.name+' \u2014 '+p.soulCard.keyword+' \u2014 describing the inner texture of your soul\'s desire. Your Court Card, the '+p.courtCard.name+', anchors on the line running from your own soul center all the way to '+p.courtCard.veil+', the outermost Veil of Limitless Light.\n\n';
+  }
+  fb += 'Your complete chart \u2014 Life Path '+p.lifePath+', Expression '+(p.expression||'unknown')+', '+p.sunSign.sign+' Sun, and '+p.tree.name+' on the Tree \u2014 all point toward the same essential truth: you are a soul of extraordinary purpose.\n\n'+p.firstName+', I am Celestia, and it has been my honor to read your chart. Go now with the knowledge that you are not random \u2014 you are sacred mathematics made flesh. Blessings upon every step of your journey.\n';
   fb += '===PAGE_9_END===';
   return fb;
 }
@@ -1849,15 +2142,21 @@ async function doReading() {
   var p = window._readingProfile;
   var lpTitle = (LP_DATA[p.lifePath]||LP_DATA[reduceNum(p.lifePath,false)]||LP_DATA[6]).title;
 
-  var prompt = 'Generate a complete 9-section metaphysical reading for ' + p.firstName + '. '
-    + 'Date of birth: ' + p.dob + '. Life Path: ' + p.lifePath + ' (' + lpTitle + '). '
-    + 'Expression: ' + (p.expression||'unknown') + '. Soul Urge: ' + (p.soulUrge||'unknown') + '. '
+  var prompt = 'Generate a complete 9-section metaphysical reading for ' + p.firstName + ', using the W3BB Unified Codex (Pythagorean Numerology, Chaldean Numerology, Gematria, Astrology, Metatron\'s Cube, the Kabbalistic Tree of Life, and Tarot \u2014 seven layered systems). '
+    + 'Full birth name: ' + p.fullBirthName + '. Name used/called: ' + p.usedName + '. Date of birth: ' + p.dob + '. '
+    + 'Life Path: ' + p.lifePath + ' (' + lpTitle + '). '
+    + 'Expression: ' + (p.expression||'unknown') + '. Soul Urge: ' + (p.soulUrge||'unknown') + '. Personality: ' + (p.personality||'unknown') + '. Birthday Number: ' + (p.birthdayNumber||'unknown') + '. '
+    + (p.chaldean ? 'Chaldean Name Number: compound ' + p.chaldean.compound + (p.chaldean.archetype ? ' ("' + p.chaldean.archetype + '")' : '') + ', reduces to ' + p.chaldean.reduced + '. ' + (p.harmonic ? p.harmonic.flag + ' \u2014 ' + p.harmonic.detail + ' ' : '') : '')
+    + (p.gematriaBattery ? 'Gematria on used name: Standard ' + p.gematriaBattery.sg + ', Ordinal ' + p.gematriaBattery.og + ', Reduced ' + p.gematriaBattery.rg + '. ' : '')
     + 'Sun Sign: ' + p.sunSign.sign + ' (' + p.sunSign.element + ', ruled by ' + p.sunSign.planet + '). '
-    + 'Tree of Life: ' + p.tree.name + ' \u2014 ' + p.tree.meaning + '. '
+    + 'Soul Sephirah on the Tree of Life: ' + p.tree.name + ' \u2014 ' + p.tree.meaning + '. '
+    + (p.lifePathTrumpCard ? 'Life Path Trump Card (Major Arcana, Path ' + p.lifePathTrumpCard.num + '): ' + p.lifePathTrumpCard.numeral + ' ' + p.lifePathTrumpCard.card + ', keyword ' + p.lifePathTrumpCard.keyword + '. ' : '')
+    + (p.soulCard ? 'Soul Card (Metatron\'s Cube, Minor Arcana): ' + p.soulCard.name + ' \u2014 ' + p.soulCard.keyword + '. ' : '')
+    + (p.courtCard ? 'Court Card (Metatron\'s Cube): ' + p.courtCard.name + ', anchored on the line to ' + p.courtCard.veil + '. ' : '')
     + (p.hiddenMaster ? 'Hidden Master Number: ' + p.hiddenMaster + '. ' : '')
     + 'Personal Year 2026: ' + p.personalYear2026 + '. '
-    + '\n\nWrite exactly 9 sections with ===PAGE_N_START=== and ===PAGE_N_END=== delimiters. Each section ~1 page. Rich, personal, poetic, second-person. Be specific to the exact numbers. '
-    + '\nPage 1: Life Path. Page 2: Sun Sign. Page 3: Tree of Life. Page 4: Expression + Soul Urge. Page 5: Shadow & Gift. Page 6: Paths + Hidden Master. Page 7: Personality + Karmic + Personal Year 2026. Page 8: Romantic Compatibility. Page 9: AIN SOPH AUR + Synthesis + Closing Blessing.';
+    + '\n\nWrite exactly 9 sections with ===PAGE_N_START=== and ===PAGE_N_END=== delimiters. Each section ~1 page. Rich, personal, poetic, second-person. Be specific to the exact numbers and cards given \u2014 never invent different ones. '
+    + '\nPage 1: Life Path. Page 2: Sun Sign. Page 3: Tree of Life (Soul Sephirah). Page 4: Expression + Soul Urge + Chaldean Name/Harmonic Check. Page 5: Shadow & Gift. Page 6: Life Path Trump Card + Hidden Master + Gematria resonance. Page 7: Personality + Personal Year 2026. Page 8: Romantic Compatibility. Page 9: Metatron\'s Cube (Soul Card + Court Card) + Synthesis + Closing Blessing.';
 
   window._readingText = await generateReading(prompt);
   window._allPages = parseReadingPages(window._readingText);
@@ -1882,6 +2181,8 @@ function startOracleReading() {
   document.getElementById('reading-lp-number').textContent = lp;
   document.getElementById('reading-sign-label').textContent = sign.symbol + ' ' + sign.sign;
   document.getElementById('reading-seph-label').textContent = seph.name + ' \u2014 ' + seph.meaning;
+  var trumpLabel = document.getElementById('reading-trump-label');
+  if (trumpLabel) trumpLabel.textContent = p.lifePathTrumpCard ? ('\u2726 ' + p.lifePathTrumpCard.numeral + ' \u00b7 ' + p.lifePathTrumpCard.card) : '';
 
   // Reset waveform
   var waveform = document.getElementById('waveform');
@@ -1932,8 +2233,9 @@ function startOracleReading() {
     + lpMeaning + "\n\n"
     + "Your Sun in " + sign.sign + " confirms this. " + sign.sign + " is a " + element + " sign \u2014 and that " + element + " energy " + elementInteraction + "\n\n"
     + "And on the Kabbalistic Tree of Life, your numbers place you at " + seph.name + " \u2014 the sphere of " + seph.meaning + ". This is not metaphor. This is the architecture of your soul.\n\n"
+    + (p.lifePathTrumpCard ? ("Your Life Path Trump Card is " + p.lifePathTrumpCard.card + " \u2014 " + p.lifePathTrumpCard.keyword + ". The mythic image that carries everything I've just told you.\n\n") : "")
     + p.firstName + ", I have only shown you the door.\n\n"
-    + "What lies behind it \u2014 your Expression Number, your Soul Urge, your Shadow and your Gift, your Karmic Debt, your Personal Year for 2026, your Romantic Compatibility, and a complete closing blessing written only for you \u2014 that is your full Blueprint.\n\n"
+    + "What lies behind it \u2014 your Expression Number, your Chaldean name vibration, your Gematria resonance, your Shadow and your Gift, your Personal Year for 2026, your Metatron's Cube position, your Romantic Compatibility, and a complete closing blessing written only for you \u2014 that is your full Blueprint.\n\n"
     + "And it's waiting.";
 
   // Clean text for speech — replace double newlines with pauses
@@ -2169,8 +2471,8 @@ function unlockFullReading() {
   var unlockedPages = selectedTier ? window._allPages.slice(0, selectedTier.pages) : window._allPages.slice(0, 3);
   var PAGE_LABELS = [
     '\u2726 NUMEROLOGY \u00b7 LAYER 1', '\u2609 ASTROLOGY \u00b7 LAYER 1', '\ud83c\udf33 TREE OF LIFE \u00b7 LAYER 1',
-    '\u2726 NUMEROLOGY \u00b7 LAYER 2', '\u2609 ASTROLOGY \u00b7 LAYER 2', '\ud83c\udf33 TREE OF LIFE \u00b7 LAYER 2',
-    '\u2726 NUMEROLOGY \u00b7 LAYER 3', '\u2609 ASTROLOGY \u00b7 LAYER 3', '\ud83c\udf33 TREE OF LIFE \u00b7 LAYER 3'
+    '\u2726 NUMEROLOGY + CHALDEAN \u00b7 LAYER 2', '\u2609 ASTROLOGY \u00b7 LAYER 2', '\ud83c\udccf TAROT + GEMATRIA \u00b7 LAYER 2',
+    '\u2726 NUMEROLOGY \u00b7 LAYER 3', '\u2609 ASTROLOGY \u00b7 LAYER 3', '\u26b2 METATRON\'S CUBE \u00b7 LAYER 3'
   ];
 
   var readingContainer = document.createElement('div');
@@ -2237,12 +2539,12 @@ function generateAndDownloadPDF() {
     {sys:'NUMEROLOGY',layer:'LAYER I',title:'Life Path',color:PURPLE},
     {sys:'ASTROLOGY',layer:'LAYER I',title:'Sun Sign',color:GOLD},
     {sys:'TREE OF LIFE',layer:'LAYER I',title:'The Sephirah',color:ROSE},
-    {sys:'NUMEROLOGY',layer:'LAYER II',title:'Expression & Soul Urge',color:PURPLE},
+    {sys:'NUMEROLOGY + CHALDEAN',layer:'LAYER II',title:'Expression, Soul Urge & Living Name',color:PURPLE},
     {sys:'ASTROLOGY',layer:'LAYER II',title:'Shadow & Gift',color:GOLD},
-    {sys:'TREE OF LIFE',layer:'LAYER II',title:'The Paths & Hidden Master',color:ROSE},
-    {sys:'NUMEROLOGY',layer:'LAYER III',title:'Karmic Synthesis',color:PURPLE},
+    {sys:'TAROT + GEMATRIA',layer:'LAYER II',title:'The Trump Card & Hidden Master',color:ROSE},
+    {sys:'NUMEROLOGY',layer:'LAYER III',title:'Personality & Personal Year',color:PURPLE},
     {sys:'ASTROLOGY',layer:'LAYER III',title:'Romantic Compatibility',color:GOLD},
-    {sys:'TREE OF LIFE',layer:'LAYER III',title:'AIN SOPH AUR',color:ROSE}
+    {sys:"METATRON'S CUBE",layer:'LAYER III',title:'AIN SOPH AUR & Synthesis',color:ROSE}
   ];
 
   function pdfBg(){doc.setFillColor(BG[0],BG[1],BG[2]);doc.rect(0,0,W,H,'F');doc.setFillColor(BG2[0],BG2[1],BG2[2]);doc.rect(0,0,W,55,'F');}
@@ -2272,7 +2574,8 @@ function generateAndDownloadPDF() {
   doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(GOLD[0],GOLD[1],GOLD[2]);
   doc.text(keyNums.join('  \u00b7  '), W/2, H/2-10, {align:'center'});
   doc.setFontSize(7); doc.setTextColor(DIM[0],DIM[1],DIM[2]);
-  doc.text('PYTHAGOREAN NUMEROLOGY  \u00b7  WESTERN ASTROLOGY  \u00b7  KABBALISTIC TREE OF LIFE', W/2, H/2+2, {align:'center'});
+  doc.setFontSize(6.5);
+  doc.text('NUMEROLOGY  \u00b7  CHALDEAN  \u00b7  GEMATRIA  \u00b7  ASTROLOGY  \u00b7  METATRON\'S CUBE  \u00b7  TREE OF LIFE  \u00b7  TAROT', W/2, H/2+2, {align:'center'});
 
   // CONTENT PAGES
   var totalPdf = 1 + pagesToDeliver.length;
@@ -2320,7 +2623,8 @@ document.getElementById('reset-btn').addEventListener('click', function() {
   selectedTier = null;
   isMuted = false;
 
-  document.getElementById('hook-firstname').value = '';
+  document.getElementById('hook-fullname').value = '';
+  document.getElementById('hook-usedname').value = '';
   document.getElementById('hook-month').value = '';
   document.getElementById('hook-day').value = '';
   document.getElementById('hook-year').value = '';
@@ -2332,6 +2636,8 @@ document.getElementById('reset-btn').addEventListener('click', function() {
   document.getElementById('reading-lp-number').textContent = '';
   document.getElementById('reading-sign-label').textContent = '';
   document.getElementById('reading-seph-label').textContent = '';
+  var trumpLabelReset = document.getElementById('reading-trump-label');
+  if (trumpLabelReset) trumpLabelReset.textContent = '';
 
   // Re-show orb section if hidden by unlockFullReading
   var readingOrb = document.getElementById('reading-orb');
@@ -2376,13 +2682,17 @@ document.getElementById('reset-btn').addEventListener('click', function() {
 // EDU SCREEN (CHANGE 1)
 // ===========================
 var EDU_NARRATION = [
-  "Before we begin your personal reading, let me show you the three ancient systems that form your blueprint. The first is Numerology. Every name and birth date carries a unique vibrational frequency. By reducing your numbers to a single digit, we uncover your Life Path — the master thread of your soul's entire journey. This is the most important number in your chart.",
-  "The second system is the Kabbalistic Tree of Life. This ancient mystical map shows ten divine spheres, called Sephiroth, through which consciousness descends from the infinite into physical form. Your numerology places you at one of these spheres — a specific point on the cosmic map that reveals the quality of consciousness your soul chose to embody in this lifetime.",
-  "The third system is Astrology. At the exact moment you were born, the planets held specific positions in the sky. These cosmic alignments shaped your personality, your emotional patterns, and your deepest purpose. Together — your numbers, your Tree position, and your stars — they form one complete portrait of your soul. And yours is now ready."
+  "Before we begin your personal reading, let me show you the seven layered systems that form your blueprint, each one built on top of the last. The first is Pythagorean Numerology. Every birth name and birth date carries a unique vibrational frequency. By reducing your numbers, we uncover your Life Path — the master thread of your soul's entire journey.",
+  "The second layer is Chaldean Numerology. Your birth name reveals your soul's design, but the name you actually go by carries its own living vibration — how your identity is being spoken into the world right now. We compare the two to find where they align, and where the tension between them is quietly doing its work.",
+  "The third layer is Gematria — three parallel methods that decode the numeric resonance hidden inside language itself. When two or three of those methods land on the same digit, that's your name's field confirming itself from more than one angle.",
+  "The fourth layer is Astrology. At the exact moment you were born, the planets held specific positions in the sky. Your sun sign's element doesn't just shape your personality — it determines which elemental zone of the geometry ahead is yours.",
+  "The fifth layer is Metatron's Cube. Thirteen points — the ten Sephiroth plus the three Veils beyond them — connect to form seventy-eight lines. Seventy-eight lines. Seventy-eight Tarot cards. This sacred geometry is the floor everything else stands on.",
+  "The sixth layer is the Kabbalistic Tree of Life, which overlays directly onto that Cube. Ten divine spheres, called Sephiroth, connected by twenty-two paths — through which consciousness descends from the infinite into physical form. Your numerology places you at one of these spheres.",
+  "The seventh and final layer is Tarot — the capstone that ties every number you've just seen into a single image. The twenty-two Major Arcana ride the Tree's paths. The fifty-six Minor Arcana live on the Cube's remaining lines. Numerology gave you the math. Tarot gives it a face. And now, yours is ready."
 ];
 var _eduTransitioned = false;
 var _eduIdx = 0;
-var _eduTotal = 3;
+var _eduTotal = 7;
 var _eduAutoTimer = null;
 var _eduAutoMs = 14000;
 var _eduBarRaf = null;
@@ -2391,9 +2701,13 @@ function initEduScreen() {
   _eduTransitioned = false;
   _eduIdx = 0;
   initNumerologyAnim();
+  initChaldeanAnim();
+  initGematriaAnim();
   initTreeAnim();
   initZodiacAnim();
   initElementDisplay();
+  initCubeAnim();
+  initTarotAnim();
   showEduPanel(0);
 }
 
@@ -2411,8 +2725,9 @@ function showEduPanel(idx) {
   var isLast = idx === _eduTotal - 1;
   document.getElementById('edu-next-btn').style.display = isLast ? 'none' : 'inline-block';
   document.getElementById('edu-begin-btn').style.display = isLast ? 'block' : 'none';
-  if (idx === 1) animateTreeIn();
-  if (idx === 2) animateZodiac();
+  if (idx === 3) animateZodiac();
+  if (idx === 4) animateCubeIn();
+  if (idx === 5) animateTreeIn();
   startEduNarration(idx);
 }
 
@@ -2504,7 +2819,8 @@ function initNumerologyAnim() {
     {n:1, label:'Leader'}, {n:2, label:'Healer'}, {n:3, label:'Creator'},
     {n:4, label:'Builder'}, {n:5, label:'Freedom'}, {n:6, label:'Nurturer'},
     {n:7, label:'Mystic'}, {n:8, label:'Power'}, {n:9, label:'Visionary'},
-    {n:11, label:'Illuminator'}, {n:22, label:'Master Builder'}
+    {n:11, label:'Illuminator'}, {n:22, label:'Master Builder'},
+    {n:33, label:'Master Teacher'}, {n:44, label:'Master Healer'}
   ];
   nums.forEach(function(item, i) {
     var el = document.createElement('div');
@@ -2536,7 +2852,165 @@ function initNumerologyAnim() {
   }, 1400);
 }
 
-// --- Panel 1: Tree of Life animation ---
+// --- Panel 1: Chaldean Numerology animation ---
+function initChaldeanAnim() {
+  var grid = document.getElementById('chaldean-anim');
+  var demo = document.getElementById('chaldean-demo-text');
+  var res = document.getElementById('chaldean-demo-result');
+  if (!grid || !demo || !res) return;
+  grid.innerHTML = '';
+  res.style.opacity = '0';
+
+  var word = 'ORACLE';
+  var letters = word.split('');
+  letters.forEach(function(ch, i) {
+    var v = CHALDEAN[ch] || 0;
+    var el = document.createElement('div');
+    el.style.cssText = 'width:48px;height:48px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid rgba(136,221,153,0.3);border-radius:9px;background:rgba(136,221,153,0.07);opacity:0;transform:scale(0.7);transition:opacity 0.45s,transform 0.45s;';
+    el.innerHTML = '<div style="font-size:1.1rem;font-weight:700;color:#88dd99;font-family:Georgia,serif;">' + ch + '</div><div style="font-size:0.6rem;color:#9b8ec4;">' + v + '</div>';
+    grid.appendChild(el);
+    setTimeout(function(){ el.style.opacity='1'; el.style.transform='scale(1)'; }, 100 + i * 130);
+  });
+
+  var chal = calcChaldeanName(word);
+  var sumExpr = letters.map(function(ch){ return CHALDEAN[ch] || 0; }).join(' + ');
+  var steps = [word + ' = ' + sumExpr, '= ' + chal.compound + ' (compound)', chal.archetype ? '"' + chal.archetype + '"' : ''];
+  var si = 0;
+  demo.textContent = steps[0];
+  var interval = setInterval(function(){
+    si++;
+    if (si >= steps.length) {
+      clearInterval(interval);
+      demo.textContent = chal.compound + ' → ' + (chal.archetype || '') + ' → reduces to ' + chal.reduced;
+      res.style.opacity = '1';
+      res.textContent = (chal.archetype || '') + ' ✦';
+      return;
+    }
+    demo.textContent = steps[si];
+  }, 1300);
+}
+
+// --- Panel 2: Gematria animation ---
+function initGematriaAnim() {
+  var grid = document.getElementById('gematria-anim');
+  var note = document.getElementById('gematria-resonance');
+  if (!grid || !note) return;
+  grid.innerHTML = '';
+  note.textContent = '';
+
+  var word = 'ORACLE';
+  var battery = calcGematriaBattery(word);
+  var methods = [
+    { label:'Standard', value: battery.sg, color:'#7ab0ff' },
+    { label:'Ordinal', value: battery.og, color:'#b08aff' },
+    { label:'Reduced', value: battery.rg, color:'#c9a84c' }
+  ];
+  methods.forEach(function(m, i) {
+    var el = document.createElement('div');
+    el.style.cssText = 'min-width:96px;padding:0.8rem 1rem;text-align:center;border:1px solid ' + m.color + '44;border-radius:12px;background:' + m.color + '11;opacity:0;transform:translateY(10px);transition:opacity 0.5s,transform 0.5s;';
+    el.innerHTML = '<div style="font-size:0.62rem;letter-spacing:0.15em;color:' + m.color + ';margin-bottom:0.3rem;">' + m.label.toUpperCase() + '</div><div style="font-size:1.5rem;font-weight:700;color:#e8e0ff;font-family:Georgia,serif;">' + m.value + '</div>';
+    grid.appendChild(el);
+    setTimeout(function(){ el.style.opacity='1'; el.style.transform='translateY(0)'; }, 150 + i * 220);
+  });
+
+  setTimeout(function(){
+    note.textContent = '"' + word + '" → Ordinal reduces to ' + digitSum(battery.og) + ', Reduced lands on ' + battery.rg + ' — a resonance.';
+  }, 900);
+}
+
+// --- Panel: Metatron's Cube animation ---
+var CUBE_POINTS = null;
+function buildCubePoints() {
+  if (CUBE_POINTS) return CUBE_POINTS;
+  var pts = [{x:0,y:0,seph:1}]; // center = Kether
+  var innerOrder = [2,3,4,5,7,8]; // Chokmah,Binah,Chesed,Geburah,Netzach,Hod around inner hex
+  var R1 = 42;
+  for (var i=0;i<6;i++){
+    var a = (Math.PI/3)*i - Math.PI/2;
+    pts.push({x:Math.cos(a)*R1, y:Math.sin(a)*R1, seph:innerOrder[i]});
+  }
+  var R2 = 78;
+  var outerOrder = ['veil','6','veil','9','veil','10']; // 3 veils interleaved with remaining sephiroth
+  for (var j=0;j<6;j++){
+    var a2 = (Math.PI/3)*j - Math.PI/2 + Math.PI/6;
+    pts.push({x:Math.cos(a2)*R2, y:Math.sin(a2)*R2, seph:outerOrder[j]});
+  }
+  CUBE_POINTS = pts;
+  return pts;
+}
+function initCubeAnim() {
+  var svg = document.getElementById('edu-cube-svg');
+  if (!svg) return;
+  svg.innerHTML = '';
+  var pts = buildCubePoints();
+  var ns = 'http://www.w3.org/2000/svg';
+  var linesG = document.createElementNS(ns,'g');
+  linesG.setAttribute('id','edu-cube-lines');
+  linesG.setAttribute('opacity','0');
+  for (var i=0;i<pts.length;i++){
+    for (var j=i+1;j<pts.length;j++){
+      var line = document.createElementNS(ns,'line');
+      line.setAttribute('x1',pts[i].x); line.setAttribute('y1',pts[i].y);
+      line.setAttribute('x2',pts[j].x); line.setAttribute('y2',pts[j].y);
+      line.setAttribute('stroke','rgba(255,215,0,0.18)');
+      line.setAttribute('stroke-width','0.5');
+      linesG.appendChild(line);
+    }
+  }
+  svg.appendChild(linesG);
+  var nodesG = document.createElementNS(ns,'g');
+  pts.forEach(function(p){
+    var isVeil = p.seph === 'veil';
+    var c = document.createElementNS(ns,'circle');
+    c.setAttribute('cx',p.x); c.setAttribute('cy',p.y);
+    c.setAttribute('r', isVeil ? '4' : '6');
+    c.setAttribute('fill', isVeil ? 'rgba(255,255,255,0.5)' : 'rgba(255,215,0,0.7)');
+    c.setAttribute('stroke', isVeil ? '#ffffff' : '#ffd700');
+    c.setAttribute('stroke-width','1');
+    c.setAttribute('opacity','0');
+    nodesG.appendChild(c);
+  });
+  svg.appendChild(nodesG);
+}
+function animateCubeIn() {
+  var linesG = document.getElementById('edu-cube-lines');
+  var svg = document.getElementById('edu-cube-svg');
+  if (linesG) { linesG.style.transition = 'opacity 1.2s ease'; setTimeout(function(){ linesG.setAttribute('opacity','1'); },100); }
+  if (svg) {
+    var nodes = svg.querySelectorAll('circle');
+    nodes.forEach(function(c,i){
+      c.style.transition = 'opacity 0.4s';
+      setTimeout(function(){ c.setAttribute('opacity','1'); }, 200 + i*60);
+    });
+  }
+  var caption = document.getElementById('edu-cube-caption');
+  if (caption) {
+    setTimeout(function(){ caption.textContent = '13 NODES  ·  78 LINES  ·  78 TAROT CARDS'; }, 1400);
+  }
+}
+
+// --- Panel 6: Tarot capstone animation ---
+function initTarotAnim() {
+  var grid = document.getElementById('tarot-anim');
+  var connect = document.getElementById('tarot-connect-text');
+  if (!grid || !connect) return;
+  grid.innerHTML = '';
+  var sample = [
+    PATH_TABLE[1], PATH_TABLE[8], PATH_TABLE[13], PATH_TABLE[17]
+  ]; // The Magician, Strength, Death, The Star — illustrative spread
+  sample.forEach(function(p, i){
+    var el = document.createElement('div');
+    el.style.cssText = 'width:84px;height:120px;border-radius:8px;border:1px solid rgba(255,158,210,0.35);background:linear-gradient(160deg,rgba(255,158,210,0.1),rgba(176,138,255,0.08));display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0.4rem;opacity:0;transform:translateY(14px) rotate(' + (i%2?3:-3) + 'deg);transition:opacity 0.5s,transform 0.5s;';
+    el.innerHTML = '<div style="font-size:0.62rem;color:#ffd700;font-family:Courier New,monospace;">' + p.numeral + '</div><div style="font-size:0.72rem;color:#e8e0ff;font-weight:700;margin-top:0.3rem;line-height:1.2;">' + p.card + '</div><div style="font-size:0.58rem;color:#ff9ed2;margin-top:0.3rem;font-style:italic;">' + p.keyword + '</div>';
+    grid.appendChild(el);
+    setTimeout(function(){ el.style.opacity='1'; el.style.transform='translateY(0) rotate(0deg)'; }, 150 + i*180);
+  });
+  setTimeout(function(){
+    connect.textContent = 'Your Life Path becomes a Sephirah. Your Sephirah becomes a Path. Your Path becomes a card. Seven systems, one story — and it\'s yours.';
+  }, 1100);
+}
+
+// --- Panel 5: Tree of Life animation ---
 function initTreeAnim() {}
 function animateTreeIn() {
   var nodes = document.querySelectorAll('.edu-seph');
