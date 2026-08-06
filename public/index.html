@@ -336,6 +336,9 @@ body {
       <label data-id="11" class="label-mono block mb-2">FIRST NAME</label>
       <input data-id="12" id="hook-firstname" type="text" class="cosmic-input mb-4" placeholder="Your first name" autocomplete="given-name" />
 
+      <label data-id="12a" class="label-mono block mb-2">FULL NAME AT BIRTH <span style="opacity:0.55;text-transform:none;letter-spacing:0;font-weight:400;">(optional — for your complete name chart)</span></label>
+      <input data-id="12b" id="hook-fullname" type="text" class="cosmic-input mb-4" placeholder="Full legal name as on birth certificate" autocomplete="name" />
+
       <label data-id="13" class="label-mono block mb-2">DATE OF BIRTH</label>
       <div data-id="14" class="flex gap-2 mb-1">
         <select data-id="15" id="hook-month" class="cosmic-select flex-1">
@@ -1388,16 +1391,32 @@ function reduceNum(n,keepMaster){
   var s=0;String(n).split('').forEach(function(d){s+=parseInt(d);});
   return reduceNum(s,keepMaster);
 }
+// W3BB Compound Method (PRIMARY Life Path). Month and Day are held as a compound
+// BEFORE any reduction and added to the reduced Year, then reduced while preserving
+// Master Numbers. The tens-place value stays intact (October = 10, not 1) so a Master
+// hidden in the compound total can surface (e.g. 10 + 21 + 2 = 33). Deterministic:
+// the same date always yields the same value, and only ~3% of dates produce a Master.
 function calcLifePath(month,day,year){
-  var digits = (String(month)+String(day)+String(year)).split('').map(Number);
-  var sum = digits.reduce(function(a,b){return a+b;},0);
-  return reduceNum(sum,true);
-}
-function calcHiddenMaster(month,day,year){
   var yearDigits=String(year).split('').map(Number).reduce(function(a,b){return a+b;},0);
   var yearReduced=reduceNum(yearDigits,false);
-  var total=month+day+yearReduced;
-  if(total===11||total===22||total===33)return total; return null;
+  var total=parseInt(month)+parseInt(day)+yearReduced;
+  return reduceNum(total,true);
+}
+// Base resonance (co-active SECONDARY layer): plain digit-by-digit reduction to a
+// single digit. For a Master Life Path this is the "ground note" (e.g. 33 -> 6).
+function calcBaseResonance(month,day,year){
+  var digits=(String(month)+String(day)+String(year)).split('').map(Number);
+  var sum=digits.reduce(function(a,b){return a+b;},0);
+  return reduceNum(sum,false);
+}
+// Hidden Master: a Master Number (11/22/33) surfacing in the NAME field
+// (Expression / Soul Urge / Personality / reduced Gematria). Mirrors the Codex
+// "hidden/secondary master" (e.g. the 11 confirmed across Heather's name streams).
+// Meaningful only when the full legal name is supplied.
+function calcNameHiddenMaster(fullName){
+  var streams=[calcExpression(fullName),calcSoulUrge(fullName),calcPersonality(fullName),calcGematria(fullName).reduced];
+  for(var i=0;i<streams.length;i++){ if(streams[i]===11||streams[i]===22||streams[i]===33) return streams[i]; }
+  return null;
 }
 function calcPersonalYear(month,day,year){
   var sum=month+day+String(year).split('').reduce(function(a,b){return a+parseInt(b);},0);
@@ -1695,6 +1714,7 @@ function showSephPanel(containerId, seph, userSephId) {
 // ===========================
 document.getElementById('hook-btn').addEventListener('click', function(){
   var firstName = document.getElementById('hook-firstname').value.trim();
+  var fullName = document.getElementById('hook-fullname').value.trim();
   var month = document.getElementById('hook-month').value;
   var day = document.getElementById('hook-day').value;
   var year = document.getElementById('hook-year').value;
@@ -1707,21 +1727,28 @@ document.getElementById('hook-btn').addEventListener('click', function(){
   month = parseInt(month); day = parseInt(day); year = parseInt(year);
   var dob = year + '-' + String(month).padStart(2,'0') + '-' + String(day).padStart(2,'0');
 
+  // Name-field numbers use the full legal name (Codex standard); fall back to the
+  // first name only when a full name wasn't provided.
+  var nameForCalc = fullName || firstName;
+
   var lp = calcLifePath(month, day, year);
+  var baseResonance = calcBaseResonance(month, day, year);
   var sunSign = getSunSign(month, day);
   var sephInfo = getSephirahForLP(lp);
-  var hiddenMaster = calcHiddenMaster(month, day, year);
-  var expression = calcExpression(firstName);
-  var soulUrge = calcSoulUrge(firstName);
-  var personality = calcPersonality(firstName);
-  var gematria = calcGematria(firstName);
+  var expression = calcExpression(nameForCalc);
+  var soulUrge = calcSoulUrge(nameForCalc);
+  var personality = calcPersonality(nameForCalc);
+  var gematria = calcGematria(nameForCalc);
+  var hiddenMaster = calcNameHiddenMaster(nameForCalc);
   var personalYear2026 = calcPersonalYear(month, day, 2026);
   var lpData = LP_DATA[lp] || LP_DATA[reduceNum(lp,false)] || LP_DATA[6];
 
   window._readingProfile = {
-    firstName: firstName, fullName: firstName, dob: dob,
+    firstName: firstName, fullName: fullName || firstName, dob: dob,
     month: month, day: day, year: year,
-    lifePath: lp, lpTitle: lpData.title, lpTeaser: lpData.teaser, lpGift: lpData.gift,
+    lifePath: lp, baseResonance: baseResonance,
+    isMasterLifePath: (lp===11||lp===22||lp===33),
+    lpTitle: lpData.title, lpTeaser: lpData.teaser, lpGift: lpData.gift,
     sunSign: sunSign, tree: sephInfo,
     treePosition: { sephId: sephInfo.sephId },
     hiddenMaster: hiddenMaster,
@@ -1790,9 +1817,11 @@ function getFallbackReading(){
   var lpData=LP_DATA[p.lifePath]||LP_DATA[reduceNum(p.lifePath,false)]||LP_DATA[6];
   var expData=LP_DATA[p.expression]||LP_DATA[reduceNum(p.expression||0,false)]||LP_DATA[6];
   var py=p.personalYear2026||calcPersonalYear(p.month,p.day,2026);
+  // Master Life Paths don't fit the single-digit compatibility buckets; use the base resonance.
+  var lpBucket = p.isMasterLifePath ? (p.baseResonance||reduceNum(p.lifePath,false)) : p.lifePath;
   var fb = '';
   fb += '===PAGE_1_START===\n';
-  fb += p.firstName+', your Life Path '+p.lifePath+' as '+lpData.title+' reveals a soul of remarkable depth and purpose. '+lpData.teaser+'\n\nYour gift is '+lpData.gift+'. This is not something you learned \u2014 it is something you arrived with. The universe does not assign these numbers randomly. They are chosen by the soul before incarnation.\n\nThe challenge of your path is not a punishment \u2014 it is the resistance that builds the muscle of your gift.\n';
+  fb += p.firstName+', your Life Path '+p.lifePath+' as '+lpData.title+' reveals a soul of remarkable depth and purpose.'+(p.isMasterLifePath?' As a Master Number, it also carries a base resonance of '+p.baseResonance+' — the co-active ground note that steadies the master frequency.':'')+' '+lpData.teaser+'\n\nYour gift is '+lpData.gift+'. This is not something you learned \u2014 it is something you arrived with. The universe does not assign these numbers randomly. They are chosen by the soul before incarnation.\n\nThe challenge of your path is not a punishment \u2014 it is the resistance that builds the muscle of your gift.\n';
   fb += '===PAGE_1_END===\n\n';
   fb += '===PAGE_2_START===\n';
   fb += 'As a '+p.sunSign.sign+' '+p.sunSign.symbol+', governed by '+p.sunSign.planet+', you move through the world with the elemental force of '+p.sunSign.element+'. '+(SIGN_TEASERS[p.sunSign.sign]||'')+'\n\nYour '+p.sunSign.element+' nature gives you a specific way of processing reality. The modality of your sign \u2014 '+p.sunSign.modality+' \u2014 reveals how you initiate change in the world.\n';
@@ -1808,14 +1837,14 @@ function getFallbackReading(){
   fb += '===PAGE_5_END===\n\n';
   fb += '===PAGE_6_START===\n';
   fb += 'The twenty-two paths on the Tree of Life connect the ten Sephiroth. The paths leading to '+p.tree.name+' are specifically significant for your soul\'s journey.\n\n';
-  if(p.hiddenMaster){fb += 'Your Hidden Master Number is '+p.hiddenMaster+'. This number does not appear on the surface \u2014 it emerges only through the Sacred Addition Method.\n\n';}
+  if(p.hiddenMaster){fb += 'Your Hidden Master Number is '+p.hiddenMaster+'. This master frequency does not define your surface path \u2014 it emerges from the hidden architecture of your full name, confirmed across independent letter streams.\n\n';}
   fb += 'The Hebrew letters associated with these paths each carry their own vibrational teaching.\n';
   fb += '===PAGE_6_END===\n\n';
   fb += '===PAGE_7_START===\n';
   fb += 'Your Personality Number is '+(p.personality||'unknown')+' \u2014 the impression you make before you speak a single word.\n\nYour Personal Year in 2026 is '+py+'. This means you are entering a cycle that specifically favors '+(py<=3?'new beginnings and creative expression':py<=6?'building and deepening relationships':'completion and preparing for a major new chapter')+'.\n';
   fb += '===PAGE_7_END===\n\n';
   fb += '===PAGE_8_START===\n';
-  fb += 'In matters of love and partnership, your Life Path '+p.lifePath+' is most naturally aligned with Life Paths '+(p.lifePath<=3?'3, 5, and 7':p.lifePath<=6?'2, 4, and 8':'1, 6, and 9')+'.\n\nYour '+p.sunSign.sign+' nature adds another layer to your romantic blueprint. The cosmic timing of your current chapter favors deep, transformative connections.\n';
+  fb += 'In matters of love and partnership, your Life Path '+p.lifePath+' is most naturally aligned with Life Paths '+(lpBucket<=3?'3, 5, and 7':lpBucket<=6?'2, 4, and 8':'1, 6, and 9')+'.\n\nYour '+p.sunSign.sign+' nature adds another layer to your romantic blueprint. The cosmic timing of your current chapter favors deep, transformative connections.\n';
   fb += '===PAGE_8_END===\n\n';
   fb += '===PAGE_9_START===\n';
   fb += 'Above the Tree of Life itself radiate the Three Veils: AIN, AIN SOPH, and AIN SOPH AUR. These are the infinite potential from which all creation springs.\n\nYour complete chart \u2014 Life Path '+p.lifePath+', Expression '+(p.expression||'unknown')+', '+p.sunSign.sign+' Sun, and '+p.tree.name+' on the Tree \u2014 all point toward the same essential truth: you are a soul of extraordinary purpose.\n\n'+p.firstName+', I am Celestia, and it has been my honor to read your chart. Go now with the knowledge that you are not random \u2014 you are sacred mathematics made flesh. Blessings upon every step of your journey.\n';
@@ -1850,11 +1879,12 @@ async function doReading() {
   var lpTitle = (LP_DATA[p.lifePath]||LP_DATA[reduceNum(p.lifePath,false)]||LP_DATA[6]).title;
 
   var prompt = 'Generate a complete 9-section metaphysical reading for ' + p.firstName + '. '
-    + 'Date of birth: ' + p.dob + '. Life Path: ' + p.lifePath + ' (' + lpTitle + '). '
-    + 'Expression: ' + (p.expression||'unknown') + '. Soul Urge: ' + (p.soulUrge||'unknown') + '. '
+    + 'Date of birth: ' + p.dob + '. Life Path: ' + p.lifePath + ' (' + lpTitle + ')' + (p.isMasterLifePath ? ', base resonance ' + p.baseResonance : '') + '. '
+    + 'Full name: ' + (p.fullName||p.firstName) + '. '
+    + 'Expression: ' + (p.expression||'unknown') + '. Soul Urge: ' + (p.soulUrge||'unknown') + '. Personality: ' + (p.personality||'unknown') + '. '
     + 'Sun Sign: ' + p.sunSign.sign + ' (' + p.sunSign.element + ', ruled by ' + p.sunSign.planet + '). '
     + 'Tree of Life: ' + p.tree.name + ' \u2014 ' + p.tree.meaning + '. '
-    + (p.hiddenMaster ? 'Hidden Master Number: ' + p.hiddenMaster + '. ' : '')
+    + (p.hiddenMaster ? 'Hidden Master Number (name field): ' + p.hiddenMaster + '. ' : '')
     + 'Personal Year 2026: ' + p.personalYear2026 + '. '
     + '\n\nWrite exactly 9 sections with ===PAGE_N_START=== and ===PAGE_N_END=== delimiters. Each section ~1 page. Rich, personal, poetic, second-person. Be specific to the exact numbers. '
     + '\nPage 1: Life Path. Page 2: Sun Sign. Page 3: Tree of Life. Page 4: Expression + Soul Urge. Page 5: Shadow & Gift. Page 6: Paths + Hidden Master. Page 7: Personality + Karmic + Personal Year 2026. Page 8: Romantic Compatibility. Page 9: AIN SOPH AUR + Synthesis + Closing Blessing.';
