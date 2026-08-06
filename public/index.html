@@ -338,7 +338,7 @@ body {
       <p class="mb-4" style="color:var(--text-muted); font-size:0.72rem; opacity:0.75;">As it appears on your birth certificate — this powers your core numbers.</p>
 
       <label class="label-mono block mb-2">NAME YOU GO BY <span style="opacity:0.6;text-transform:none;letter-spacing:0;">(optional)</span></label>
-      <input id="hook-usedname" type="text" class="cosmic-input mb-1" placeholder="e.g. Sam — leave blank to use your first name" autocomplete="nickname" />
+      <input id="hook-usedname" type="text" class="cosmic-input mb-1" placeholder="e.g. Sam — leave blank to use your full birth name" autocomplete="nickname" />
       <p class="mb-4" style="color:var(--text-muted); font-size:0.72rem; opacity:0.75;">The name you're actually called — this powers your living-identity numbers.</p>
 
       <label data-id="13" class="label-mono block mb-2">DATE OF BIRTH</label>
@@ -1190,13 +1190,34 @@ function pathBetween(sephA,sephB){ return PATH_TABLE.find(function(p){ return (p
 
 // W3BB CODEX SECTION 5.5 — Primary Path / Life Path Trump Card
 // Standard rule: mapped = (base mod 22) + 11, clamped [11,32].
-// Master-Number exception (confirmed against calibration reading): when the
-// Life Path is a Master Number whose elevated Sephirah connects directly to
-// Kether (11->Chokmah via Path 11, 33->Tiphareth via Path 13), that direct
-// Kether-bridge path is used instead of the formula. 22 and 44 have no such
-// direct Kether path, so they fall back to the formula using their base digit.
+// Life Path 33 (Codex Logic V05, Sections 7.1-7.2): 33 is explicitly "Beyond
+// the 22-card sequence" — The World (XXI) + The Lovers (VI) as CO-ACTIVE base
+// arcana, not a single path. It is returned as a combined pseudo-path so
+// every existing consumer (.card/.numeral/.keyword/.num) keeps working; the
+// two real constituent paths are also exposed via .coActive for anyone who
+// needs them individually.
+// Master-Number exception for 11 (Kether Bridge, confirmed against
+// calibration reading): elevated Sephirah connects directly to Kether via
+// Path 11. 22 and 44 have no such direct Kether path, so they fall back to
+// the formula using their base digit.
 function primaryPathForLP(lp){
-  var KETHER_BRIDGE = { 11:11, 33:13 };
+  if (lp === 33) {
+    var world = pathByNumber(32);   // Yesod-Malkuth — The World (XXI)
+    var lovers = pathByNumber(17);  // Binah-Tiphareth — The Lovers (VI)
+    return {
+      path: {
+        num: world.num + ' & ' + lovers.num,
+        a: lovers.a, b: world.b,
+        card: world.card + ' + ' + lovers.card,
+        numeral: world.numeral + ' + ' + lovers.numeral,
+        keyword: world.keyword + ' / ' + lovers.keyword
+      },
+      coActive: [world, lovers],
+      viaKetherBridge: false,
+      masterCoActive: true
+    };
+  }
+  var KETHER_BRIDGE = { 11:11 };
   if (KETHER_BRIDGE[lp]) return { path: pathByNumber(KETHER_BRIDGE[lp]), viaKetherBridge:true };
   var MASTER_BASE = { 22:4, 44:8 };
   var base = MASTER_BASE[lp] || lp;
@@ -1641,6 +1662,55 @@ function harmonicCheck(cnnReduced, lpn, en){
 }
 
 // ===========================
+// W3BB CODEX SECTION 3.2/3.4 — HIDDEN MASTER AUDIT (four-step procedure)
+// Compiles every compound subtotal produced while working a full legal name
+// — every name-part total, every vowel/consonant block total, and the grand
+// totals across all parts — BEFORE any digit reduction, across BOTH the
+// Pythagorean and Chaldean letter systems. Flags any compound that equals
+// 11, 22, or 33 as a Hidden Master, exactly as the Codex surfaces e.g.
+// Nicholas's 22★ (BRADSHAW Chaldean consonants) and Heather's quadruple
+// 11★ name-field confirmation. Distinct from the overt Life Path Master
+// (which is the primary/surface value, not "hidden").
+function hiddenMasterAudit(fullName){
+  var parts = (fullName||'').trim().split(/\s+/).filter(Boolean);
+  var systems = [ { label:'Pythagorean', map:PYTH }, { label:'Chaldean', map:CHALDEAN } ];
+  function isMaster(n){ return n===11||n===22||n===33; }
+  function partVal(part, map, onlyV, onlyC){
+    var sum=0;
+    part.toUpperCase().split('').forEach(function(c){
+      var v=map[c]; if(!v) return;
+      if(onlyV && !VOWELS_MAP[c]) return;
+      if(onlyC && VOWELS_MAP[c]) return;
+      sum+=v;
+    });
+    return sum;
+  }
+  var results=[];
+  systems.forEach(function(sys){
+    var fullTotals=[], vowelTotals=[], consonantTotals=[];
+    parts.forEach(function(part){
+      var f=partVal(part,sys.map,false,false), v=partVal(part,sys.map,true,false), c=partVal(part,sys.map,false,true);
+      fullTotals.push(f); vowelTotals.push(v); consonantTotals.push(c);
+      if(isMaster(f)) results.push({system:sys.label,stream:'Name-part (all letters)',part:part,value:f});
+      if(isMaster(v)) results.push({system:sys.label,stream:'Name-part vowels',part:part,value:v});
+      if(isMaster(c)) results.push({system:sys.label,stream:'Name-part consonants',part:part,value:c});
+    });
+    var sum=function(arr){return arr.reduce(function(a,b){return a+b;},0);};
+    var fullSum=sum(fullTotals), vowelSum=sum(vowelTotals), consonantSum=sum(consonantTotals);
+    if(isMaster(fullSum)) results.push({system:sys.label,stream:'Full name total',part:parts.join(' '),value:fullSum});
+    if(isMaster(vowelSum)) results.push({system:sys.label,stream:'Full name vowels',part:parts.join(' '),value:vowelSum});
+    if(isMaster(consonantSum)) results.push({system:sys.label,stream:'Full name consonants',part:parts.join(' '),value:consonantSum});
+  });
+  return results;
+}
+function formatNameHiddenMasters(list){
+  if(!list || !list.length) return '';
+  return list.map(function(r){
+    return r.value+'★ ('+r.system+' '+r.stream.toLowerCase()+(r.part?', "'+r.part+'"':'')+')';
+  }).join('; ');
+}
+
+// ===========================
 // W3BB CODEX SECTION 4 — GEMATRIA (three methods run as one battery)
 // ===========================
 var SG_MAP={A:1,B:2,C:3,D:4,E:5,F:6,G:7,H:8,I:9,J:10,K:20,L:30,M:40,N:50,O:60,P:70,Q:80,R:90,S:100,T:200,U:300,V:400,W:500,X:600,Y:700,Z:800};
@@ -1965,7 +2035,11 @@ document.getElementById('hook-btn').addEventListener('click', function(){
   month = parseInt(month); day = parseInt(day); year = parseInt(year);
   var dob = year + '-' + String(month).padStart(2,'0') + '-' + String(day).padStart(2,'0');
   var firstName = fullBirthName.split(' ')[0];
-  var usedName = usedNameRaw || firstName;
+  // Codex Logic V05 computes Chaldean + Gematria from the FULL legal name.
+  // "Used Name" is an optional override for a living-identity reading (e.g. a
+  // nickname); left blank, it must fall back to the full birth name — not
+  // just the first name — so results match the calibration doc by default.
+  var usedName = usedNameRaw || fullBirthName;
 
   // ── LAYER 1: Pythagorean Numerology (birth architecture — full birth name) ──
   var lp = calcLifePath(month, day, year);
@@ -1977,6 +2051,9 @@ document.getElementById('hook-btn').addEventListener('click', function(){
   var birthdayNumber = calcBirthdayNumber(day);
   var personalYear2026 = calcPersonalYear(month, day, 2026);
   var lpData = LP_DATA[lp] || LP_DATA[digitSum(lp)] || LP_DATA[6];
+  // Section 3.2/3.4 Hidden Master audit — always run on the FULL birth name
+  // (the birth-blueprint identity), independent of the used-name layer.
+  var nameHiddenMasters = hiddenMasterAudit(fullBirthName);
 
   // ── LAYER 2: Chaldean Numerology (used/known name) ──
   var chaldean = calcChaldeanName(usedName);
@@ -2003,7 +2080,7 @@ document.getElementById('hook-btn').addEventListener('click', function(){
     lifePath: lp, lpTitle: lpData.title, lpTeaser: lpData.teaser, lpGift: lpData.gift,
     sunSign: sunSign, tree: sephInfo,
     treePosition: { sephId: sephInfo.sephId },
-    hiddenMaster: hiddenMaster,
+    hiddenMaster: hiddenMaster, nameHiddenMasters: nameHiddenMasters,
     expression: expression, soulUrge: soulUrge,
     personality: personality, birthdayNumber: birthdayNumber, gematria: gematria,
     personalYear2026: personalYear2026,
@@ -2096,6 +2173,7 @@ function getFallbackReading(){
   fb += '===PAGE_6_START===\n';
   fb += 'The twenty-two paths on the Tree of Life connect the ten Sephiroth, and each one carries a Major Arcana card. Your Life Path Trump Card is '+(p.lifePathTrumpCard?p.lifePathTrumpCard.numeral+' \u00b7 '+p.lifePathTrumpCard.card:'')+' \u2014 the mythic archetype governing your central life narrative, activated by '+(p.lifePathTrumpCard?p.lifePathTrumpCard.keyword:'')+'.\n\n';
   if(p.hiddenMaster){fb += 'Your Hidden Master Number is '+p.hiddenMaster+'. This number does not appear on the surface \u2014 it emerges only through the Sacred Addition Method.\n\n';}
+  if(p.nameHiddenMasters && p.nameHiddenMasters.length){fb += 'A deeper audit of your full birth name surfaces additional Hidden Master frequencies, distinct from your Life Path: '+formatNameHiddenMasters(p.nameHiddenMasters)+'. These are secondary master frequencies woven into the architecture of your name \u2014 confirmed independently of your surface path.\n\n';}
   if (p.gematriaBattery) {
     fb += 'Run through the three sacred systems of Gematria, the name you carry today returns Standard '+p.gematriaBattery.sg+', Ordinal '+p.gematriaBattery.og+', and Reduced '+p.gematriaBattery.rg+' \u2014 a linguistic field confirming what your numbers already told you.\n';
   }
@@ -2154,6 +2232,7 @@ async function doReading() {
     + (p.soulCard ? 'Soul Card (Metatron\'s Cube, Minor Arcana): ' + p.soulCard.name + ' \u2014 ' + p.soulCard.keyword + '. ' : '')
     + (p.courtCard ? 'Court Card (Metatron\'s Cube): ' + p.courtCard.name + ', anchored on the line to ' + p.courtCard.veil + '. ' : '')
     + (p.hiddenMaster ? 'Hidden Master Number: ' + p.hiddenMaster + '. ' : '')
+    + (p.nameHiddenMasters && p.nameHiddenMasters.length ? 'Name-field Hidden Masters (independent of Life Path): ' + formatNameHiddenMasters(p.nameHiddenMasters) + '. ' : '')
     + 'Personal Year 2026: ' + p.personalYear2026 + '. '
     + '\n\nWrite exactly 9 sections with ===PAGE_N_START=== and ===PAGE_N_END=== delimiters. Each section ~1 page. Rich, personal, poetic, second-person. Be specific to the exact numbers and cards given \u2014 never invent different ones. '
     + '\nPage 1: Life Path. Page 2: Sun Sign. Page 3: Tree of Life (Soul Sephirah). Page 4: Expression + Soul Urge + Chaldean Name/Harmonic Check. Page 5: Shadow & Gift. Page 6: Life Path Trump Card + Hidden Master + Gematria resonance. Page 7: Personality + Personal Year 2026. Page 8: Romantic Compatibility. Page 9: Metatron\'s Cube (Soul Card + Court Card) + Synthesis + Closing Blessing.';
