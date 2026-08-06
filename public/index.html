@@ -1665,16 +1665,18 @@ function harmonicCheck(cnnReduced, lpn, en){
 // W3BB CODEX SECTION 3.2/3.4 — HIDDEN MASTER AUDIT (four-step procedure)
 // Compiles every compound subtotal produced while working a full legal name
 // — every name-part total, every vowel/consonant block total, and the grand
-// totals across all parts — BEFORE any digit reduction, across BOTH the
-// Pythagorean and Chaldean letter systems. Flags any compound that equals
-// 11, 22, or 33 as a Hidden Master, exactly as the Codex surfaces e.g.
-// Nicholas's 22★ (BRADSHAW Chaldean consonants) and Heather's quadruple
-// 11★ name-field confirmation. Distinct from the overt Life Path Master
-// (which is the primary/surface value, not "hidden").
+// totals across all parts — across BOTH the Pythagorean and Chaldean letter
+// systems. A compound is flagged as a Hidden Master when REDUCING it lands
+// on 11, 22, or 33 (matching every worked example in Section 3.3, e.g.
+// "38 -> 3+8 = 11", "92 -> 9+2 = 11", "47 -> 4+7 = 11" — none of those raw
+// compounds equal 11 outright; each REDUCES to it). Checking raw equality
+// only (an earlier version of this function) misses exactly these
+// canonical streams, so this uses the codebase's own digitSum(), which
+// already stops as soon as a reduction hits a Master Number.
 function hiddenMasterAudit(fullName){
   var parts = (fullName||'').trim().split(/\s+/).filter(Boolean);
   var systems = [ { label:'Pythagorean', map:PYTH }, { label:'Chaldean', map:CHALDEAN } ];
-  function isMaster(n){ return n===11||n===22||n===33; }
+  function isMaster(n){ var r=digitSum(n); return r===11||r===22||r===33; }
   function partVal(part, map, onlyV, onlyC){
     var sum=0;
     part.toUpperCase().split('').forEach(function(c){
@@ -1686,27 +1688,31 @@ function hiddenMasterAudit(fullName){
     return sum;
   }
   var results=[];
+  function record(sys,stream,part,raw){
+    results.push({system:sys,stream:stream,part:part,raw:raw,master:digitSum(raw)});
+  }
   systems.forEach(function(sys){
     var fullTotals=[], vowelTotals=[], consonantTotals=[];
     parts.forEach(function(part){
       var f=partVal(part,sys.map,false,false), v=partVal(part,sys.map,true,false), c=partVal(part,sys.map,false,true);
       fullTotals.push(f); vowelTotals.push(v); consonantTotals.push(c);
-      if(isMaster(f)) results.push({system:sys.label,stream:'Name-part (all letters)',part:part,value:f});
-      if(isMaster(v)) results.push({system:sys.label,stream:'Name-part vowels',part:part,value:v});
-      if(isMaster(c)) results.push({system:sys.label,stream:'Name-part consonants',part:part,value:c});
+      if(isMaster(f)) record(sys.label,'Name-part (all letters)',part,f);
+      if(isMaster(v)) record(sys.label,'Name-part vowels',part,v);
+      if(isMaster(c)) record(sys.label,'Name-part consonants',part,c);
     });
     var sum=function(arr){return arr.reduce(function(a,b){return a+b;},0);};
     var fullSum=sum(fullTotals), vowelSum=sum(vowelTotals), consonantSum=sum(consonantTotals);
-    if(isMaster(fullSum)) results.push({system:sys.label,stream:'Full name total',part:parts.join(' '),value:fullSum});
-    if(isMaster(vowelSum)) results.push({system:sys.label,stream:'Full name vowels',part:parts.join(' '),value:vowelSum});
-    if(isMaster(consonantSum)) results.push({system:sys.label,stream:'Full name consonants',part:parts.join(' '),value:consonantSum});
+    if(isMaster(fullSum)) record(sys.label,'Full name total',parts.join(' '),fullSum);
+    if(isMaster(vowelSum)) record(sys.label,'Full name vowels',parts.join(' '),vowelSum);
+    if(isMaster(consonantSum)) record(sys.label,'Full name consonants',parts.join(' '),consonantSum);
   });
   return results;
 }
 function formatNameHiddenMasters(list){
   if(!list || !list.length) return '';
   return list.map(function(r){
-    return r.value+'★ ('+r.system+' '+r.stream.toLowerCase()+(r.part?', "'+r.part+'"':'')+')';
+    var trail = (r.raw===r.master) ? String(r.raw) : (r.raw+'→'+r.master);
+    return trail+'★ ('+r.system+' '+r.stream.toLowerCase()+(r.part?', "'+r.part+'"':'')+')';
   }).join('; ');
 }
 
