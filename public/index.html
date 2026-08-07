@@ -1914,7 +1914,7 @@ function showScreen(name){
 // ===========================
 // TREE OF LIFE SVG BUILDER
 // ===========================
-function buildInteractiveTree(userSephId, containerId) {
+function buildInteractiveTree(userSephId, containerId, trumpPaths) {
   var container = document.getElementById(containerId); if (!container) return;
   var svgW = 400, svgH = 490;
   var svgEl = document.createElementNS('http://www.w3.org/2000/svg','svg');
@@ -1922,17 +1922,27 @@ function buildInteractiveTree(userSephId, containerId) {
   svgEl.setAttribute('width','100%');
   svgEl.setAttribute('style','max-width:400px;display:block;margin:0 auto;');
 
+  // Trump Card path(s) -- from primaryPathForLP(), 1 path normally, 2 for a
+  // Master 33 co-active reading -- get the strongest highlight of all: this
+  // is the one mythic archetype governing the person's central life
+  // narrative, distinct from the softer "touches your Sephirah" highlight.
+  var trumpNums = (trumpPaths||[]).filter(Boolean).map(function(tp){ return tp.num; });
+  var trumpBadges = [];
+
   PATHS_22.forEach(function(path) {
     var a = SEPHIROTH.find(function(s){return s.id===path[0];});
     var b = SEPHIROTH.find(function(s){return s.id===path[1];});
     if (!a||!b) return;
+    var pathEntry = pathBetween(path[0], path[1]);
+    var isTrumpPath = pathEntry && trumpNums.indexOf(pathEntry.num) !== -1;
     var isUserPath = (path[0]===userSephId||path[1]===userSephId);
     var line = document.createElementNS('http://www.w3.org/2000/svg','line');
     line.setAttribute('x1',a.x); line.setAttribute('y1',a.y);
     line.setAttribute('x2',b.x); line.setAttribute('y2',b.y);
-    line.setAttribute('stroke', isUserPath ? 'rgba(201,168,76,0.55)' : 'rgba(176,138,255,0.2)');
-    line.setAttribute('stroke-width', isUserPath ? '1.8' : '1');
-    if (isUserPath) {
+    line.setAttribute('stroke', isTrumpPath ? '#f0d070' : (isUserPath ? 'rgba(201,168,76,0.55)' : 'rgba(176,138,255,0.2)'));
+    line.setAttribute('stroke-width', isTrumpPath ? '3' : (isUserPath ? '1.8' : '1'));
+    if (isTrumpPath) { line.style.filter = 'drop-shadow(0 0 4px rgba(240,208,112,0.75))'; }
+    if (isUserPath || isTrumpPath) {
       var anim = document.createElementNS('http://www.w3.org/2000/svg','animate');
       anim.setAttribute('attributeName','stroke-opacity');
       anim.setAttribute('values','0.5;1;0.5');
@@ -1941,6 +1951,12 @@ function buildInteractiveTree(userSephId, containerId) {
       line.appendChild(anim);
     }
     svgEl.appendChild(line);
+    if (isTrumpPath) {
+      var mx=(a.x+b.x)/2, my=(a.y+b.y)/2;
+      var dx=b.x-a.x, dy=b.y-a.y, len=Math.hypot(dx,dy)||1;
+      var px=-dy/len, py=dx/len, off=14;
+      trumpBadges.push({ x: mx+px*off, y: my+py*off, numeral: pathEntry.numeral, card: pathEntry.card });
+    }
   });
 
   SEPHIROTH.forEach(function(seph) {
@@ -1992,6 +2008,30 @@ function buildInteractiveTree(userSephId, containerId) {
 
     svgEl.appendChild(g);
   });
+
+  // Trump Card numeral badge(s) -- drawn last so they sit on top of every
+  // node and path. At most 2 ever show (1 normally, 2 for Master 33), so
+  // there's no crowding the way a full 22-card diagram would have.
+  trumpBadges.forEach(function(b) {
+    var g = document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.style.cursor = 'default';
+    var c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.setAttribute('cx',b.x); c.setAttribute('cy',b.y); c.setAttribute('r','12');
+    c.setAttribute('fill','#0a0420'); c.setAttribute('stroke','#f0d070'); c.setAttribute('stroke-width','1.6');
+    g.appendChild(c);
+    var t = document.createElementNS('http://www.w3.org/2000/svg','text');
+    t.setAttribute('x',b.x); t.setAttribute('y', b.y+3.5);
+    t.setAttribute('text-anchor','middle'); t.setAttribute('font-size','9');
+    t.setAttribute('font-family','Georgia,serif'); t.setAttribute('font-weight','700');
+    t.setAttribute('fill','#f0d070'); t.setAttribute('pointer-events','none');
+    t.textContent = b.numeral;
+    g.appendChild(t);
+    var title = document.createElementNS('http://www.w3.org/2000/svg','title');
+    title.textContent = b.numeral + ' · ' + b.card;
+    g.appendChild(title);
+    svgEl.appendChild(g);
+  });
+
   container.innerHTML = '';
   container.appendChild(svgEl);
 }
@@ -2075,6 +2115,12 @@ document.getElementById('hook-btn').addEventListener('click', function(){
   // ── LAYER 5: Tree of Life + LAYER 6: Tarot / Metatron's Cube ──
   var primary = primaryPathForLP(lp);
   var lifePathTrumpCard = primary.path;
+  // The real, individually-addressable path(s) the Trump Card lands on --
+  // coActive is only populated for Master 33 (two paths at once); every
+  // other Life Path resolves to primary.path itself, a single real
+  // PATH_TABLE entry. Normalizing to an array lets the Tree diagram light
+  // up exactly the path(s) this person's Life Path actually landed on.
+  var trumpPaths = primary.coActive || [primary.path];
   var elementSuit = (ELEMENT_TO_SOLID[sunSign.element]||ELEMENT_TO_SOLID.Fire).suit;
   var soulCard = soulCardFor(sephInfo.sephId, elementSuit);
   var courtCard = courtCardFor(sephInfo.sephId, elementSuit);
@@ -2092,7 +2138,7 @@ document.getElementById('hook-btn').addEventListener('click', function(){
     personalYear2026: personalYear2026,
     chaldean: chaldean, harmonic: harmonic,
     gematriaBattery: gematriaBattery,
-    primaryPath: primary, lifePathTrumpCard: lifePathTrumpCard,
+    primaryPath: primary, lifePathTrumpCard: lifePathTrumpCard, trumpPaths: trumpPaths,
     elementSuit: elementSuit, soulCard: soulCard, courtCard: courtCard, shadowCardPath: shadowCardPath
   };
 
@@ -2294,15 +2340,18 @@ function startOracleReading() {
   var tolSection = document.getElementById('tol-section');
   tolSection.style.display = 'block';
   var userSephId = p.treePosition.sephId;
-  buildInteractiveTree(userSephId, 'main-tree-svg');
+  buildInteractiveTree(userSephId, 'main-tree-svg', p.trumpPaths);
   var labelEl = document.getElementById('main-tree-user-label');
   if (labelEl) {
     var sephData = SEPHIROTH.find(function(s){ return s.id === userSephId; });
     if (sephData) {
+      var trumpCardNames = (p.trumpPaths||[]).filter(Boolean).map(function(tp){ return tp.numeral+' '+tp.card; }).join(' + ');
       labelEl.innerHTML = '<div style="display:inline-block;padding:0.5rem 1.2rem;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.25);border-radius:50px;">'
         + '<span style="font-family:Courier New,monospace;font-size:0.65rem;letter-spacing:0.25em;color:#c9a84c;">YOUR SEPHIRAH: </span>'
         + '<span style="font:700 0.85rem Georgia,serif;color:#f0d070;">'+sephData.name+'</span>'
-        + '<span style="color:#5a4a7a;font-size:0.75rem;"> \u2014 '+sephData.meaning+'</span></div>';
+        + '<span style="color:#5a4a7a;font-size:0.75rem;"> \u2014 '+sephData.meaning+'</span></div>'
+        + (trumpCardNames ? '<div style="margin-top:0.5rem;font-size:0.72rem;color:#c9b8e8;"><span style="color:#f0d070;">&#9733; Trump Card:</span> '+trumpCardNames+'</div>' : '')
+        + (p.soulCard && p.courtCard ? '<div style="margin-top:0.3rem;font-size:0.72rem;color:#c9b8e8;">Soul Card: <span style="color:#e8e0ff;">'+p.soulCard.name+'</span> &nbsp;&middot;&nbsp; Court Card: <span style="color:#e8e0ff;">'+p.courtCard.name+'</span></div>' : '');
     }
   }
 
