@@ -1299,7 +1299,8 @@ function courtCardFor(soulSephId, suit){
     daySelect.appendChild(opt);
   }
   var yearSelect = document.getElementById('hook-year');
-  for (var y = 2010; y >= 1940; y--) {
+  var currentYear = new Date().getFullYear();
+  for (var y = currentYear; y >= 1940; y--) {
     var opt2 = document.createElement('option');
     opt2.value = y; opt2.textContent = y;
     yearSelect.appendChild(opt2);
