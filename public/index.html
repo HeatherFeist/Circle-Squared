@@ -237,6 +237,17 @@ body {
 .tol-panel.open { transform: translateY(0); opacity: 1; }
 .tol-wrapper { position: relative; overflow: hidden; border-radius: 16px; }
 
+/* Sacred Geometry layered reveal (Codex Logic V06 §16.4) */
+.sg-stage { opacity: 0; transition: opacity 1.3s ease; }
+.sg-stage.sg-visible { opacity: 1; }
+.sg-draw { stroke-dasharray: 1 1; transition: stroke-dashoffset 1.3s ease, opacity 1.3s ease; }
+.sg-capstone-line { animation: sgCapstonePulse 2.6s ease-in-out infinite; }
+@keyframes sgCapstonePulse {
+  0%,100% { filter: drop-shadow(0 0 4px rgba(240,208,112,0.7)); stroke-opacity: 0.75; }
+  50% { filter: drop-shadow(0 0 12px rgba(240,208,112,1)); stroke-opacity: 1; }
+}
+.sg-veil-echo { stroke-dasharray: 2 3; }
+
 /* ===== READING ORB BREATHE ===== */
 @keyframes orbBreathe {
   0%, 100% { transform: scale(1.0); box-shadow: 0 0 40px rgba(201,168,76,0.4), 0 0 80px rgba(176,138,255,0.2); }
@@ -532,6 +543,23 @@ body {
           <div data-id="198" class="tol-panel"></div>
         </div>
         <div data-id="199" id="main-tree-user-label" style="text-align:center;margin-top:0.8rem;"></div>
+      </div>
+
+      <!-- Sacred Geometry Layered Build — Codex Logic V06 §14/§16: literal
+           Cartesian construction (Flower/Fruit of Life → Tree+Veils →
+           Metatron's Cube → Tarot capstone). This is additive to, and a
+           different geometric layer from, the Egg of Life mandala above
+           (§14.5: numerological angle-division mandala — do not conflate). -->
+      <div id="sacred-geometry-section" style="display:none;width:100%;max-width:520px;margin:0 auto 2rem;padding:0 1rem;">
+        <div style="text-align:center;margin-bottom:1rem;">
+          <div style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.4em;color:#c9a84c;margin-bottom:0.3rem;">✦ THE FULL SACRED GEOMETRY ✦</div>
+          <h3 style="font:700 1.2rem Georgia,serif;background:linear-gradient(135deg,#e8e0ff,#b08aff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:0 0 0.3rem;">Flower of Life → Metatron&rsquo;s Cube</h3>
+          <p style="color:#8a7aaa;font-size:0.8rem;font-style:italic;margin:0;">The literal geometry beneath your Tree position — watch it build, layer by layer.</p>
+        </div>
+        <div id="sacred-geometry-svg-wrapper" class="cosmic-card" style="padding:1.2rem 0.5rem 0.5rem;">
+          <div id="sacred-geometry-svg"></div>
+        </div>
+        <div id="sacred-geometry-caption" style="text-align:center;margin-top:0.8rem;"></div>
       </div>
 
       <div data-id="200" class="divider w-full mt-4">✦ ─────── ✦</div>
@@ -2639,6 +2667,310 @@ function showSephPanel(containerId, seph, userSephId) {
 }
 
 // ===========================
+// SACRED GEOMETRY — LITERAL HEX-LATTICE CONSTRUCTION
+// Codex Logic V06, Part XIV (§14.1-§14.4) + Part XVI (§16.4 delivery order).
+// This is layer (2) of §14.5's two-layer distinction — a real, computed
+// Cartesian point-and-line construction (Flower/Fruit of Life, the Three
+// Veils, the Tree's 22 named paths, and Metatron's Cube's 78 lines).
+// It is NOT the numerological angle-division mandala built by
+// buildEggOfLifeMandala() above (§9.3/§11.3/§14.5) — that mandala divides
+// 360° by a subject's Life Path/Expression/Hidden Master number and is
+// abstract sacred-number geometry, not a drawing of anything physical.
+// The two are kept as separate, clearly-labeled visuals per §14.5's
+// explicit instruction not to conflate them.
+//
+// Geometry is computed from functions (ring distance = r and r*sqrt(3),
+// angles read directly off §14.1-§14.3), not a hardcoded coordinate table,
+// so it stays correct if the radius or viewBox ever changes.
+// ===========================
+
+// Angle convention matches the Codex's own clock-face convention (§14.2:
+// "Ain: 0° (12 o'clock)", "Ain Soph Aur: 120° (4 o'clock)", "Ain Soph:
+// 240° (8 o'clock)") — 0° is straight up, angle increases clockwise.
+function sgPolarPoint(cx, cy, radius, angleDeg) {
+  var rad = angleDeg * Math.PI / 180;
+  return { x: cx + radius * Math.sin(rad), y: cy - radius * Math.cos(rad), angle: angleDeg };
+}
+
+// §14.1 — The Verified Hex-Lattice. All circles share radius r.
+function sgBuildLattice(cx, cy, r) {
+  var ring1Angles = [0, 60, 120, 180, 240, 300];
+  var ring2Angles = [30, 90, 150, 210, 270, 330];
+  var ring3Angles = [0, 60, 120, 180, 240, 300]; // same angular family as Ring 1, distance 2r
+  return {
+    r: r,
+    ring0: [sgPolarPoint(cx, cy, 0, 0)],
+    ring1: ring1Angles.map(function(a) { return sgPolarPoint(cx, cy, r, a); }),
+    ring2: ring2Angles.map(function(a) { return sgPolarPoint(cx, cy, r * Math.sqrt(3), a); }),
+    ring3: ring3Angles.map(function(a) { return sgPolarPoint(cx, cy, r * 2, a); })
+  };
+}
+
+// §14.3 — Sephirah placement on the Fruit of Life (Ring0+Ring1+Ring2, 13
+// points). Ring 1's 60°/180°/300° carry Chokmah/Tiphareth/Binah exactly as
+// the Codex table pairs them; Ring 1's 0°/120°/240° are the open Veil
+// echoes (§14.2). Ring 2's angle order (30,90,150,210,270,330) is paired
+// 1:1, in table order, with (Chesed,Netzach,Yesod,Malkuth,Hod,Geburah) —
+// this is the literal §14.3 table row, taken as written.
+//
+// OPEN GEOMETRIC TENSION (flagged in the Codex itself, not silently
+// resolved here): §14.3's own "hard lattice constraint" note says Ring 1
+// and Ring 2 are offset 30° by construction, so Yesod/Malkuth can't sit on
+// a true vertical middle-pillar axis under Tiphareth, and describes
+// "Ring 2's 90°/270°" as their closest symmetric approximation — but the
+// literal table pairing above instead lands Yesod at 150° and Malkuth at
+// 210° (the pair actually symmetric about Tiphareth's 180° under this
+// clock convention). Both readings appear in the source document; this
+// build follows the literal table pairing per the calibration guidance to
+// read the table directly rather than reconcile the tension silently.
+var SG_RING1_MAP = [
+  { angle: 0,   veil: 'Ain' },
+  { angle: 60,  sephId: 2 },   // Chokmah
+  { angle: 120, veil: 'AinSophAur' },
+  { angle: 180, sephId: 6 },   // Tiphareth
+  { angle: 240, veil: 'AinSoph' },
+  { angle: 300, sephId: 3 }    // Binah
+];
+var SG_RING2_MAP = [
+  { angle: 30,  sephId: 4 },  // Chesed
+  { angle: 90,  sephId: 7 },  // Netzach
+  { angle: 150, sephId: 9 },  // Yesod
+  { angle: 210, sephId: 10 }, // Malkuth
+  { angle: 270, sephId: 8 },  // Hod
+  { angle: 330, sephId: 5 }   // Geburah
+];
+
+// Build the 13 Fruit-of-Life / Metatron's-Cube points, each carrying its
+// Sephirah id (or Veil-echo tag) so the rest of the diagram can reference
+// them by stable index 0-12.
+function sgBuildFruitPoints(lattice) {
+  var pts = [];
+  pts.push({ idx: 0, x: lattice.ring0[0].x, y: lattice.ring0[0].y, sephId: 1, veil: null }); // Kether
+  var ring1ByAngle = {}; lattice.ring1.forEach(function(p) { ring1ByAngle[p.angle] = p; });
+  var ring2ByAngle = {}; lattice.ring2.forEach(function(p) { ring2ByAngle[p.angle] = p; });
+  SG_RING1_MAP.forEach(function(m) {
+    var p = ring1ByAngle[m.angle];
+    pts.push({ idx: pts.length, x: p.x, y: p.y, sephId: m.sephId || null, veil: m.veil || null });
+  });
+  SG_RING2_MAP.forEach(function(m) {
+    var p = ring2ByAngle[m.angle];
+    pts.push({ idx: pts.length, x: p.x, y: p.y, sephId: m.sephId, veil: null });
+  });
+  return pts; // length 13, C(13,2) = 78 possible connecting lines
+}
+
+// §14.4 — Metatron's Cube: complete graph over the 13 Fruit-of-Life
+// points. Returns { treeLines: [...], cubeLines: [...] } where treeLines
+// are the 22 named Tree paths (reusing PATH_TABLE/pathBetween — no
+// duplicate table) and cubeLines are the remaining 56.
+function sgBuildCubeLines(fruitPoints) {
+  var sephIdToIdx = {};
+  fruitPoints.forEach(function(p) { if (p.sephId) sephIdToIdx[p.sephId] = p.idx; });
+  var namedPairKeys = {};
+  var treeLines = [];
+  PATH_TABLE.forEach(function(path) {
+    var ia = sephIdToIdx[path.a], ib = sephIdToIdx[path.b];
+    if (ia === undefined || ib === undefined) return;
+    var lo = Math.min(ia, ib), hi = Math.max(ia, ib);
+    namedPairKeys[lo + '-' + hi] = true;
+    treeLines.push({ a: fruitPoints[lo], b: fruitPoints[hi], path: path });
+  });
+  var cubeLines = [];
+  for (var i = 0; i < fruitPoints.length; i++) {
+    for (var j = i + 1; j < fruitPoints.length; j++) {
+      if (namedPairKeys[i + '-' + j]) continue;
+      cubeLines.push({ a: fruitPoints[i], b: fruitPoints[j] });
+    }
+  }
+  return { treeLines: treeLines, cubeLines: cubeLines }; // 22 + 56 = 78
+}
+
+// Renders one <line> (with a fade + stroke-draw transition class) into an
+// SVG namespace element, appended to `group`.
+function sgLine(group, x1, y1, x2, y2, opts) {
+  var el = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+  el.setAttribute('x1', x1.toFixed(2)); el.setAttribute('y1', y1.toFixed(2));
+  el.setAttribute('x2', x2.toFixed(2)); el.setAttribute('y2', y2.toFixed(2));
+  el.setAttribute('stroke', opts.stroke || 'rgba(176,138,255,0.3)');
+  el.setAttribute('stroke-width', opts.width || '1');
+  if (opts.dash) el.setAttribute('stroke-dasharray', opts.dash);
+  if (opts.className) el.setAttribute('class', opts.className);
+  if (opts.opacity !== undefined) el.setAttribute('stroke-opacity', opts.opacity);
+  group.appendChild(el);
+  return el;
+}
+function sgCircle(group, cx, cy, r, opts) {
+  var el = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  el.setAttribute('cx', cx.toFixed(2)); el.setAttribute('cy', cy.toFixed(2)); el.setAttribute('r', r);
+  el.setAttribute('fill', opts.fill || 'none');
+  el.setAttribute('stroke', opts.stroke || 'rgba(176,138,255,0.3)');
+  el.setAttribute('stroke-width', opts.width || '1');
+  if (opts.className) el.setAttribute('class', opts.className);
+  group.appendChild(el);
+  return el;
+}
+function sgText(group, x, y, str, opts) {
+  var el = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  el.setAttribute('x', x.toFixed(2)); el.setAttribute('y', y.toFixed(2));
+  el.setAttribute('text-anchor', opts.anchor || 'middle');
+  el.setAttribute('font-size', opts.size || '7');
+  el.setAttribute('font-family', opts.font || "'Courier New',monospace");
+  el.setAttribute('fill', opts.fill || '#e8e0ff');
+  if (opts.weight) el.setAttribute('font-weight', opts.weight);
+  el.setAttribute('pointer-events', 'none');
+  el.textContent = str;
+  group.appendChild(el);
+  return el;
+}
+function sgGroup(svgEl, id) {
+  var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  g.setAttribute('id', id);
+  g.setAttribute('class', 'sg-stage');
+  svgEl.appendChild(g);
+  return g;
+}
+
+// Builds the full layered SVG for one subject's reading and wires up the
+// §16.4 staged reveal (Flower -> Fruit -> Tree+Veils -> Cube -> Capstone).
+// containerId: element to receive the <svg>. captionId (optional): element
+// to receive the Soul/Court Card capstone label text.
+function buildSacredGeometryDiagram(p, containerId, captionId) {
+  var container = document.getElementById(containerId);
+  if (!container) return;
+
+  var VW = 320, VH = 320, cx = 160, cy = 160;
+  var R = 22; // base circle radius r (§14.1) — everything else derives from this
+  var lattice = sgBuildLattice(cx, cy, R);
+  var fruitPoints = sgBuildFruitPoints(lattice);
+  var cube = sgBuildCubeLines(fruitPoints);
+
+  var sephId = (p.treePosition && p.treePosition.sephId) || (p.tree && p.tree.sephId) || 6;
+  var trumpPaths = (p.trumpPaths || []).filter(Boolean);
+  var trumpNums = trumpPaths.map(function(tp) { return tp.num; });
+
+  var svgEl = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svgEl.setAttribute('viewBox', '0 0 ' + VW + ' ' + VH);
+  svgEl.setAttribute('width', '100%');
+  svgEl.setAttribute('style', 'max-width:420px;display:block;margin:0 auto;');
+  svgEl.setAttribute('id', containerId + '-inner');
+
+  var defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+  defs.innerHTML = '<filter id="' + containerId + '-glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
+  svgEl.appendChild(defs);
+
+  // ---- STAGE 1: Flower of Life — all 19 circles, faint (§14.1, §16.4 step 1) ----
+  var gFlower = sgGroup(svgEl, containerId + '-stage-flower');
+  lattice.ring3.forEach(function(pt) {
+    sgCircle(gFlower, pt.x, pt.y, R, { stroke: 'rgba(176,138,255,0.18)', width: '0.6' });
+  });
+  // Ring0/1/2 also get their base faint Flower circle here; Stage 2 draws a
+  // brighter circle on top of the same 13 centers to make the Fruit "pop".
+  fruitPoints.forEach(function(pt) {
+    sgCircle(gFlower, pt.x, pt.y, R, { stroke: 'rgba(176,138,255,0.18)', width: '0.6' });
+  });
+
+  // ---- STAGE 2: Fruit of Life — inner 13 circles, stronger stroke (§16.4 step 2) ----
+  var gFruit = sgGroup(svgEl, containerId + '-stage-fruit');
+  fruitPoints.forEach(function(pt) {
+    sgCircle(gFruit, pt.x, pt.y, R, { stroke: 'rgba(201,168,76,0.55)', width: '1.3', className: 'sg' });
+  });
+
+  // ---- STAGE 3: Tree of Life + Veils (§14.2/§14.3, §16.4 step 3) ----
+  var gTree = sgGroup(svgEl, containerId + '-stage-tree');
+  // 22 named Tree paths, reusing PATH_TABLE/pathBetween — no duplicate table.
+  cube.treeLines.forEach(function(line) {
+    sgLine(gTree, line.a.x, line.a.y, line.b.x, line.b.y, {
+      stroke: 'rgba(201,168,76,0.5)', width: '1.1'
+    });
+  });
+  // Sephirah node markers, reusing SEPHIROTH for color/name.
+  fruitPoints.forEach(function(pt) {
+    if (!pt.sephId) return;
+    var seph = SEPHIROTH.find(function(s) { return s.id === pt.sephId; });
+    if (!seph) return;
+    var isUser = (pt.sephId === sephId);
+    sgCircle(gTree, pt.x, pt.y, isUser ? 8 : 5.5, {
+      fill: isUser ? seph.glow : seph.color, stroke: isUser ? seph.glow : (seph.glow + '99'),
+      width: isUser ? '1.6' : '0.9'
+    });
+    if (isUser) {
+      var pulse = sgCircle(gTree, pt.x, pt.y, 11, { stroke: seph.glow, width: '1' });
+      pulse.style.filter = 'drop-shadow(0 0 4px ' + seph.glow + ')';
+    }
+  });
+  // Three Veils on an outer containing circle at 0/120/240 (§14.2), with
+  // radial echo lines back to the open Ring-1 positions (§14.2).
+  var VEIL_R = R * 2 + R + 42; // outside the full 19-circle Flower's outer edge
+  var veilAngles = { Ain: 0, AinSophAur: 120, AinSoph: 240 };
+  var ring1ByAngle = {}; lattice.ring1.forEach(function(pt) { ring1ByAngle[pt.angle] = pt; });
+  Object.keys(veilAngles).forEach(function(key) {
+    var ang = veilAngles[key];
+    var vp = sgPolarPoint(cx, cy, VEIL_R, ang);
+    var echo = ring1ByAngle[ang];
+    sgLine(gTree, vp.x, vp.y, echo.x, echo.y, {
+      stroke: 'rgba(232,224,255,0.28)', width: '0.8', className: 'sg-veil-echo'
+    });
+    var veilMeta = VEILS.find(function(v) { return key === 'Ain' ? v.name === 'Ain' : (key === 'AinSophAur' ? v.name === 'Ain Soph Aur' : v.name === 'Ain Soph'); });
+    var label = veilMeta ? veilMeta.name : key;
+    if (key === 'AinSoph') {
+      // §14.2: Ain Soph is NOT a point — it is the dark medium itself, not
+      // a competing shape. No circle is drawn for it; only its label and
+      // its echo line back into the lattice.
+      sgText(gTree, vp.x, vp.y, label.toUpperCase(), { size: '5.5', fill: 'rgba(232,224,255,0.35)' });
+    } else {
+      sgCircle(gTree, vp.x, vp.y, 9, { fill: '#0a0420', stroke: '#f0d070', width: '1.2' });
+      sgText(gTree, vp.x, vp.y + 15, label.toUpperCase(), { size: '5.5', fill: '#c9a84c' });
+    }
+  });
+
+  // ---- STAGE 4: Metatron's Cube — remaining 56 lines, subdued (§14.4, §16.4 step 4) ----
+  var gCube = sgGroup(svgEl, containerId + '-stage-cube');
+  cube.cubeLines.forEach(function(line) {
+    sgLine(gCube, line.a.x, line.a.y, line.b.x, line.b.y, {
+      stroke: 'rgba(80,220,200,0.14)', width: '0.45'
+    });
+  });
+
+  // ---- STAGE 5: Tarot capstone — subject's landed path(s) light up (§16.2/§16.3, §16.4 step 5) ----
+  var gCapstone = sgGroup(svgEl, containerId + '-stage-capstone');
+  cube.treeLines.forEach(function(line) {
+    if (trumpNums.indexOf(line.path.num) === -1) return;
+    sgLine(gCapstone, line.a.x, line.a.y, line.b.x, line.b.y, {
+      stroke: '#f0d070', width: '3', className: 'sg-capstone-line'
+    });
+  });
+
+  container.innerHTML = '';
+  container.appendChild(svgEl);
+
+  // Soul/Court Card capstone label (§16.3), placed near the diagram.
+  if (captionId) {
+    var capEl = document.getElementById(captionId);
+    if (capEl) {
+      var trumpNames = trumpPaths.map(function(tp) { return tp.numeral + ' ' + tp.card; }).join(' + ');
+      capEl.innerHTML = (trumpNames ? '<div style="font-size:0.78rem;color:#f0d070;margin-bottom:0.3rem;"><span style="color:#c9a84c;">&#9733; Landed Path:</span> ' + trumpNames + '</div>' : '')
+        + (p.soulCard && p.courtCard ? '<div style="font-size:0.75rem;color:#c9b8e8;">Soul Card: <span style="color:#e8e0ff;">' + p.soulCard.name + '</span> &nbsp;&middot;&nbsp; Court Card: <span style="color:#e8e0ff;">' + p.courtCard.name + '</span></div>' : '');
+    }
+  }
+
+  // §16.4 staged reveal: fade each layer in after the previous.
+  sgRevealStages(svgEl, containerId, [
+    containerId + '-stage-flower', containerId + '-stage-fruit',
+    containerId + '-stage-tree', containerId + '-stage-cube', containerId + '-stage-capstone'
+  ]);
+}
+
+function sgRevealStages(svgEl, containerId, stageIds) {
+  var STEP_MS = 900;
+  stageIds.forEach(function(id, i) {
+    setTimeout(function() {
+      var g = document.getElementById(id);
+      if (g) g.classList.add('sg-visible');
+    }, i * STEP_MS);
+  });
+}
+
+// ===========================
 // HOOK SCREEN HANDLER (CHANGE 1 — now goes to edu screen)
 // ===========================
 document.getElementById('hook-btn').addEventListener('click', function(){
@@ -2958,6 +3290,11 @@ function startOracleReading() {
   tolSection.style.display = 'block';
   var userSephId = p.treePosition.sephId;
   buildInteractiveTree(userSephId, 'main-tree-svg', p.trumpPaths);
+  var sgSection = document.getElementById('sacred-geometry-section');
+  if (sgSection) {
+    sgSection.style.display = 'block';
+    buildSacredGeometryDiagram(p, 'sacred-geometry-svg', 'sacred-geometry-caption');
+  }
   var labelEl = document.getElementById('main-tree-user-label');
   if (labelEl) {
     var sephData = SEPHIROTH.find(function(s){ return s.id === userSephId; });
@@ -3955,6 +4292,12 @@ document.getElementById('reset-btn').addEventListener('click', function() {
   document.getElementById('tol-section').style.display = 'none';
   document.getElementById('main-tree-svg').innerHTML = '';
   document.getElementById('main-tree-user-label').innerHTML = '';
+  var sgSectionReset = document.getElementById('sacred-geometry-section');
+  if (sgSectionReset) {
+    sgSectionReset.style.display = 'none';
+    document.getElementById('sacred-geometry-svg').innerHTML = '';
+    document.getElementById('sacred-geometry-caption').innerHTML = '';
+  }
   document.getElementById('tierCards').innerHTML = '';
   document.getElementById('modal-email').value = ''; // square — clear email on reset
   document.getElementById('mute-btn').textContent = '🔊';
@@ -4466,6 +4809,11 @@ function restoreAfterSquareReturn(tierSlug) {
   var tolSection = document.getElementById('tol-section');
   if (tolSection) tolSection.style.display = 'block';
   if (p.treePosition) buildInteractiveTree(p.treePosition.sephId, 'main-tree-svg', p.trumpPaths);
+  var sgSection2 = document.getElementById('sacred-geometry-section');
+  if (sgSection2) {
+    sgSection2.style.display = 'block';
+    buildSacredGeometryDiagram(p, 'sacred-geometry-svg', 'sacred-geometry-caption');
+  }
   var lbl = document.getElementById('main-tree-user-label');
   if (lbl && p.treePosition) {
     var sd = SEPHIROTH.find(function(s){ return s.id === p.treePosition.sephId; });
