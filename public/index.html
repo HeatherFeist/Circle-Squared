@@ -1061,10 +1061,13 @@ async function speakLongText(fullText, onFinish) {
 }
 
 // Free-intro speak function — uses the distinct "el_intro_voice_id" ElevenLabs
-// voice (same account/key as the paid narration) when explicitly configured.
-// If no API key or no intro voice is saved, falls back through the exact same
-// chain as the paid narration (AppSDK, then browser TTS, then silent) —
-// it does not fall back to the paid el_voice_id.
+// voice when explicitly configured in admin settings. If no separate intro
+// voice was picked but an ElevenLabs key IS saved, it falls back to the same
+// paid-narration voice (el_voice_id) rather than skipping ElevenLabs entirely —
+// most owners will just save a key without bothering to pick a second voice,
+// and hitting browser TTS (or silence) in that case reads as "no voice at all."
+// Only when there's no ElevenLabs key at all does it fall through to the
+// AppSDK/browser TTS chain.
 async function speakIntroText(fullText, onFinish) {
   fullText = preprocessForSpeech(fullText);
   if (isMuted) { if (onFinish) onFinish(); return; }
@@ -1072,9 +1075,9 @@ async function speakIntroText(fullText, onFinish) {
   _speakCancelled = false;
 
   var apiKey = localStorage.getItem('el_api_key');
-  var introVoiceId = localStorage.getItem('el_intro_voice_id');
+  var introVoiceId = localStorage.getItem('el_intro_voice_id') || localStorage.getItem('el_voice_id') || '21m00Tcm4TlvDq8ikWAM';
 
-  if (apiKey && introVoiceId) {
+  if (apiKey) {
     var elSuccess = await _trySpeakElevenLabsChunks(fullText, apiKey, introVoiceId);
     if (!_speakCancelled && elSuccess && onFinish) onFinish();
     else if (!_speakCancelled && !elSuccess) {
