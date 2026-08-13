@@ -555,30 +555,20 @@ body {
 
       <div data-id="190" id="tierCards" class="flex flex-col gap-4 w-full mb-8"></div>
 
-      <!-- Tree of Life Interactive Section -->
-      <div data-id="191" id="tol-section" style="display:none;width:100%;max-width:520px;margin:0 auto 2rem;padding:0 1rem;">
-        <div data-id="192" style="text-align:center;margin-bottom:1rem;">
-          <div data-id="193" style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.4em;color:#c9a84c;margin-bottom:0.3rem;">✦ KABBALISTIC TREE OF LIFE ✦</div>
-          <h3 data-id="194" style="font:700 1.2rem Georgia,serif;background:linear-gradient(135deg,#e8e0ff,#b08aff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:0 0 0.3rem;">Your Position on the Tree</h3>
-          <p data-id="195" style="color:#8a7aaa;font-size:0.8rem;font-style:italic;margin:0;">Tap any sphere to explore. Your position glows gold.</p>
-        </div>
-        <div data-id="196" id="main-tree-svg-wrapper" class="tol-wrapper cosmic-card" style="padding:1.2rem 0.5rem 0.5rem;">
-          <div data-id="197" id="main-tree-svg"></div>
-          <div data-id="198" class="tol-panel"></div>
-        </div>
-        <div data-id="199" id="main-tree-user-label" style="text-align:center;margin-top:0.8rem;"></div>
-      </div>
-
       <!-- Sacred Geometry Layered Build — Codex Logic V06 §14/§16: literal
-           Cartesian construction (Flower/Fruit of Life → Tree+Veils →
-           Metatron's Cube → Tarot capstone). This is additive to, and a
-           different geometric layer from, the Egg of Life mandala above
-           (§14.5: numerological angle-division mandala — do not conflate). -->
+           Cartesian construction (Flower of Life → Fruit of Life → Tree of
+           Life + Veils → Metatron's Cube → Tarot capstone), one continuous
+           nested diagram. This is the sole Tree/geometry visual on this
+           screen — the old standalone tap-a-sphere Tree diagram was folded
+           into this so the reveal shows one stacked image, not two separate
+           ones. This is additive to, and a different geometric layer from,
+           the Egg of Life mandala above (§14.5: numerological angle-division
+           mandala — do not conflate). -->
       <div id="sacred-geometry-section" style="display:none;width:100%;max-width:520px;margin:0 auto 2rem;padding:0 1rem;">
         <div style="text-align:center;margin-bottom:1rem;">
           <div style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.4em;color:#c9a84c;margin-bottom:0.3rem;">✦ THE FULL SACRED GEOMETRY ✦</div>
-          <h3 style="font:700 1.2rem Georgia,serif;background:linear-gradient(135deg,#e8e0ff,#b08aff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:0 0 0.3rem;">Flower of Life → Metatron&rsquo;s Cube</h3>
-          <p style="color:#8a7aaa;font-size:0.8rem;font-style:italic;margin:0;">The literal geometry beneath your Tree position — watch it build, layer by layer.</p>
+          <h3 style="font:700 1.2rem Georgia,serif;background:linear-gradient(135deg,#e8e0ff,#b08aff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:0 0 0.3rem;">Flower of Life → Tree of Life → Metatron&rsquo;s Cube</h3>
+          <p style="color:#8a7aaa;font-size:0.8rem;font-style:italic;margin:0;">One living mandala — watch it build, layer by layer, then your chart lands on the map.</p>
         </div>
         <div id="sacred-geometry-svg-wrapper" class="cosmic-card" style="padding:1.2rem 0.5rem 0.5rem;">
           <div id="sacred-geometry-svg"></div>
@@ -3212,12 +3202,16 @@ function buildSacredGeometryDiagram(p, containerId, captionId) {
   container.innerHTML = '';
   container.appendChild(svgEl);
 
-  // Soul/Court Card capstone label (§16.3), placed near the diagram.
+  // Sephirah + Soul/Court Card capstone label (§16.3), placed near the
+  // diagram. Carries forward the "Your Sephirah" line the old standalone
+  // Tree of Life label used to show, now that this diagram is the only one.
   if (captionId) {
     var capEl = document.getElementById(captionId);
     if (capEl) {
+      var capSeph = SEPHIROTH.find(function(s) { return s.id === sephId; });
       var trumpNames = trumpPaths.map(function(tp) { return tp.numeral + ' ' + tp.card; }).join(' + ');
-      capEl.innerHTML = (trumpNames ? '<div style="font-size:0.78rem;color:#f0d070;margin-bottom:0.3rem;"><span style="color:#c9a84c;">&#9733; Landed Path:</span> ' + trumpNames + '</div>' : '')
+      capEl.innerHTML = (capSeph ? '<div style="font-size:0.78rem;color:#f0d070;margin-bottom:0.3rem;"><span style="color:#c9a84c;">&#9733; Your Sephirah:</span> ' + capSeph.name + ' <span style="color:#8a7aaa;">— ' + capSeph.meaning + '</span></div>' : '')
+        + (trumpNames ? '<div style="font-size:0.78rem;color:#f0d070;margin-bottom:0.3rem;"><span style="color:#c9a84c;">&#9733; Landed Path:</span> ' + trumpNames + '</div>' : '')
         + (p.soulCard && p.courtCard ? '<div style="font-size:0.75rem;color:#c9b8e8;">Soul Card: <span style="color:#e8e0ff;">' + p.soulCard.name + '</span> &nbsp;&middot;&nbsp; Court Card: <span style="color:#e8e0ff;">' + p.courtCard.name + '</span></div>' : '');
     }
   }
@@ -3598,28 +3592,14 @@ function startOracleReading() {
   // Prepare the offer section
   document.getElementById('offer-heading').textContent = 'There Is More Waiting For You, ' + p.firstName;
 
-  // Build Tree of Life
-  var tolSection = document.getElementById('tol-section');
-  tolSection.style.display = 'block';
-  var userSephId = p.treePosition.sephId;
-  buildInteractiveTree(userSephId, 'main-tree-svg', p.trumpPaths);
+  // Build the single sacred-geometry diagram (Flower of Life \u2192 Fruit of
+  // Life \u2192 Tree of Life + Veils \u2192 Metatron's Cube \u2192 Tarot capstone). This
+  // replaced the old standalone tap-a-sphere Tree of Life diagram, which
+  // used to render as a separate, disconnected section here.
   var sgSection = document.getElementById('sacred-geometry-section');
   if (sgSection) {
     sgSection.style.display = 'block';
     buildSacredGeometryDiagram(p, 'sacred-geometry-svg', 'sacred-geometry-caption');
-  }
-  var labelEl = document.getElementById('main-tree-user-label');
-  if (labelEl) {
-    var sephData = SEPHIROTH.find(function(s){ return s.id === userSephId; });
-    if (sephData) {
-      var trumpCardNames = (p.trumpPaths||[]).filter(Boolean).map(function(tp){ return tp.numeral+' '+tp.card; }).join(' + ');
-      labelEl.innerHTML = '<div style="display:inline-block;padding:0.5rem 1.2rem;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.25);border-radius:50px;">'
-        + '<span style="font-family:Courier New,monospace;font-size:0.65rem;letter-spacing:0.25em;color:#c9a84c;">YOUR SEPHIRAH: </span>'
-        + '<span style="font:700 0.85rem Georgia,serif;color:#f0d070;">'+sephData.name+'</span>'
-        + '<span style="color:#5a4a7a;font-size:0.75rem;"> \u2014 '+sephData.meaning+'</span></div>'
-        + (trumpCardNames ? '<div style="margin-top:0.5rem;font-size:0.72rem;color:#c9b8e8;"><span style="color:#f0d070;">&#9733; Trump Card:</span> '+trumpCardNames+'</div>' : '')
-        + (p.soulCard && p.courtCard ? '<div style="margin-top:0.3rem;font-size:0.72rem;color:#c9b8e8;">Soul Card: <span style="color:#e8e0ff;">'+p.soulCard.name+'</span> &nbsp;&middot;&nbsp; Court Card: <span style="color:#e8e0ff;">'+p.courtCard.name+'</span></div>' : '');
-    }
   }
 
   // Render tier cards
@@ -4611,9 +4591,6 @@ document.getElementById('reset-btn').addEventListener('click', function() {
   var pricingEl = document.getElementById('reading-pricing');
   if (pricingEl) { pricingEl.style.display = 'none'; pricingEl.style.opacity = '0'; pricingEl.style.transform = 'translateY(20px)'; pricingEl.style.pointerEvents = 'none'; }
 
-  document.getElementById('tol-section').style.display = 'none';
-  document.getElementById('main-tree-svg').innerHTML = '';
-  document.getElementById('main-tree-user-label').innerHTML = '';
   var sgSectionReset = document.getElementById('sacred-geometry-section');
   if (sgSectionReset) {
     sgSectionReset.style.display = 'none';
@@ -5160,18 +5137,10 @@ function restoreAfterSquareReturn(tierSlug) {
   if (acEl && ca) acEl.textContent = '✦ Codex Archetype: ' + ca + ' ✦';
   var trumpLabelEl = document.getElementById('reading-trump-label');
   if (trumpLabelEl) trumpLabelEl.textContent = p.lifePathTrumpCard ? ('✦ ' + p.lifePathTrumpCard.numeral + ' · ' + p.lifePathTrumpCard.card) : '';
-  var tolSection = document.getElementById('tol-section');
-  if (tolSection) tolSection.style.display = 'block';
-  if (p.treePosition) buildInteractiveTree(p.treePosition.sephId, 'main-tree-svg', p.trumpPaths);
   var sgSection2 = document.getElementById('sacred-geometry-section');
   if (sgSection2) {
     sgSection2.style.display = 'block';
     buildSacredGeometryDiagram(p, 'sacred-geometry-svg', 'sacred-geometry-caption');
-  }
-  var lbl = document.getElementById('main-tree-user-label');
-  if (lbl && p.treePosition) {
-    var sd = SEPHIROTH.find(function(s){ return s.id === p.treePosition.sephId; });
-    if (sd) lbl.innerHTML = '<div style="display:inline-block;padding:0.5rem 1.2rem;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.25);border-radius:50px;"><span style="font-family:Courier New,monospace;font-size:0.65rem;letter-spacing:0.25em;color:#c9a84c;">YOUR SEPHIRAH: </span><span style="font:700 0.85rem Georgia,serif;color:#f0d070;">'+sd.name+'</span><span style="color:#5a4a7a;font-size:0.75rem;"> — '+sd.meaning+'</span></div>';
   }
   var mandalaEl = document.getElementById('egg-mandala-svg');
   if (mandalaEl) mandalaEl.innerHTML = buildEggOfLifeMandala(p);
