@@ -686,78 +686,73 @@ body {
     <div data-id="264" id="adminPurchaseList" style="display:flex;flex-direction:column;gap:0.7rem;"></div>
     <div data-id="265" id="adminEmptyState" style="text-align:center;padding:3rem;color:#3a2a5a;font-style:italic;display:none;">No purchases recorded yet.</div>
 
-    <!-- ===== ELEVENLABS VOICE SETTINGS ===== -->
+    <!-- ===== AZURE AI SPEECH VOICE SETTINGS ===== -->
     <div data-id="266" style="margin-top:2rem;border-top:1px solid rgba(176,138,255,0.15);padding-top:1.5rem;">
-      <div data-id="267" style="font-family:'Courier New',monospace;font-size:0.62rem;letter-spacing:0.4em;color:#c9a84c;margin-bottom:0.3rem;">🎙️ VOICE SETTINGS (ELEVENLABS)</div>
-      <div data-id="268" style="font:700 1.1rem Georgia,serif;color:#e8e0ff;margin-bottom:0.6rem;">Voice Settings (ElevenLabs)</div>
-      <p data-id="269" style="font-size:0.8rem;color:#8a7aaa;line-height:1.6;margin-bottom:1rem;">Enter your ElevenLabs API key below. It is stored only in your browser's local storage — never in any file or server.</p>
+      <div data-id="267" style="font-family:'Courier New',monospace;font-size:0.62rem;letter-spacing:0.4em;color:#c9a84c;margin-bottom:0.3rem;">🎙️ VOICE SETTINGS (AZURE AI SPEECH)</div>
+      <div data-id="268" style="font:700 1.1rem Georgia,serif;color:#e8e0ff;margin-bottom:0.6rem;">Voice Settings (Azure AI Speech)</div>
+      <p data-id="269" style="font-size:0.8rem;color:#8a7aaa;line-height:1.6;margin-bottom:1rem;">Enter your Azure Cognitive Services Speech key and region below. Both are required. Stored only in your browser's local storage — never in any file or server.</p>
 
       <div data-id="270" style="margin-bottom:0.8rem;">
         <label data-id="271" style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#c9a84c;display:block;margin-bottom:0.4rem;">API KEY</label>
-        <input data-id="272" type="password" id="el-api-key-input" class="cosmic-input" placeholder="sk_..." style="font-family:'Courier New',monospace;font-size:0.88rem;" />
+        <input data-id="272" type="password" id="azure-api-key-input" class="cosmic-input" placeholder="Azure Speech subscription key" style="font-family:'Courier New',monospace;font-size:0.88rem;" />
+      </div>
+
+      <div style="margin-bottom:0.8rem;">
+        <label style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#c9a84c;display:block;margin-bottom:0.4rem;">REGION</label>
+        <input type="text" id="azure-region-input" class="cosmic-input" placeholder="e.g. eastus, westeurope" style="font-family:'Courier New',monospace;font-size:0.88rem;" />
       </div>
 
       <div data-id="273" style="margin-bottom:1rem;">
         <label data-id="274" style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#c9a84c;display:block;margin-bottom:0.4rem;">VOICE</label>
-        <select data-id="275" id="el-voice-select" class="cosmic-select" style="width:100%;">
+        <select data-id="275" id="azure-voice-select" class="cosmic-select" style="width:100%;">
           <optgroup label="— FEMALE VOICES —">
-            <option value="21m00Tcm4TlvDq8ikWAM">Rachel — Warm American ✦ Recommended</option>
-            <option value="piTKgcLEGmPE4e6mEKli">Nicole — Soft &amp; Whispery</option>
-            <option value="jsCqWAovK2LkecY7zXl4">Freya — Flowing British</option>
-            <option value="XB0fDUnXU5powFXDhCwa">Charlotte — Rich &amp; Commanding</option>
-            <option value="AZnzlk1XvdvUeBnXmlld">Domi — Confident &amp; Bold</option>
-            <option value="MF3mGyEYCl7XYWbV9V6O">Elli — Bright &amp; Articulate</option>
-            <option value="ThT5KcBeYPX3keUQqHPh">Dorothy — Clear British</option>
-            <option value="EXAVITQu4vr4xnSDxMaL">Bella — Soulful &amp; Intimate</option>
+            <option value="en-US-AriaNeural">Aria — Warm American ✦ Recommended</option>
+            <option value="en-US-JennyNeural">Jenny — Friendly American</option>
+            <option value="en-US-SaraNeural">Sara — Soft American</option>
+            <option value="en-GB-SoniaNeural">Sonia — Crisp British</option>
+            <option value="en-AU-NatashaNeural">Natasha — Warm Australian</option>
+            <option value="en-IE-EmilyNeural">Emily — Irish Mystique</option>
           </optgroup>
           <optgroup label="— MALE VOICES —">
-            <option value="onwK4e9ZLuTAKqWW03F9">Daniel — Deep British Authority</option>
-            <option value="pNInz6obpgDQGcFmaJgB">Adam — Deep American Baritone</option>
-            <option value="TxGEqnHWrfWFTfGW9XjX">Josh — Rich &amp; Resonant</option>
-            <option value="N2lVS1w4EtoT3dr4eOWO">Callum — Calm British</option>
-            <option value="D38z5RcWu1voky8WS1ja">Fin — Irish Mystique</option>
-            <option value="ErXwobaYiN019PkySvjV">Antoni — Warm &amp; Well-Rounded</option>
-            <option value="IKne3meq5aSn9XLyUdCD">Charlie — Australian Warmth</option>
-            <option value="VR6AewLTigWG4xSOukaG">Arnold — Crisp &amp; Authoritative</option>
+            <option value="en-US-GuyNeural">Guy — Deep American Baritone</option>
+            <option value="en-US-DavisNeural">Davis — Rich &amp; Resonant American</option>
+            <option value="en-GB-RyanNeural">Ryan — Calm British</option>
+            <option value="en-AU-WilliamNeural">William — Australian Warmth</option>
+            <option value="en-IE-ConnorNeural">Connor — Irish Authority</option>
           </optgroup>
         </select>
       </div>
 
       <div data-id="280" style="display:flex;gap:0.6rem;margin-bottom:0.6rem;flex-wrap:wrap;">
-        <button data-id="281" id="el-save-btn" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.55rem 1.2rem;background:linear-gradient(135deg,#c9a84c,#f0d070);color:#0a0015;font-weight:700;font-size:0.82rem;border:none;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;">💾 Save Key</button>
-        <button data-id="282" id="el-test-btn" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.55rem 1.2rem;background:none;border:1px solid rgba(176,138,255,0.3);color:#b08aff;font-size:0.82rem;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;">🔊 Test Voice</button>
+        <button data-id="281" id="azure-save-btn" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.55rem 1.2rem;background:linear-gradient(135deg,#c9a84c,#f0d070);color:#0a0015;font-weight:700;font-size:0.82rem;border:none;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;">💾 Save Key</button>
+        <button data-id="282" id="azure-test-btn" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.55rem 1.2rem;background:none;border:1px solid rgba(176,138,255,0.3);color:#b08aff;font-size:0.82rem;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;">🔊 Test Voice</button>
       </div>
-      <div data-id="283" id="el-status" style="font-size:0.75rem;color:#5a4a7a;min-height:1.2em;margin-top:0.3rem;"></div>
+      <div data-id="283" id="azure-status" style="font-size:0.75rem;color:#5a4a7a;min-height:1.2em;margin-top:0.3rem;"></div>
 
-      <!-- Free Intro Voice — separate voice for the free reveal-screen narration, same ElevenLabs account/key -->
+      <!-- Free Intro Voice — separate voice for the free reveal-screen narration, same Azure account/key/region -->
       <div data-id="284" style="margin-top:1.4rem;padding-top:1.2rem;border-top:1px dashed rgba(176,138,255,0.15);">
         <div data-id="285" style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#c9a84c;display:block;margin-bottom:0.4rem;">FREE INTRO VOICE</div>
-        <p data-id="286" style="font-size:0.78rem;color:#8a7aaa;line-height:1.6;margin-bottom:0.6rem;">Optional — a distinct voice that narrates the free blueprint reveal (before the paywall). Uses the same API key above. Leave unset to use silent/browser fallback for the intro instead of ElevenLabs.</p>
-        <select data-id="287" id="el-intro-voice-select" class="cosmic-select" style="width:100%;margin-bottom:0.6rem;">
+        <p data-id="286" style="font-size:0.78rem;color:#8a7aaa;line-height:1.6;margin-bottom:0.6rem;">Optional — a distinct voice that narrates the free blueprint reveal (before the paywall). Uses the same API key and region above. Leave unset to fall back to the paid narration voice.</p>
+        <select data-id="287" id="azure-intro-voice-select" class="cosmic-select" style="width:100%;margin-bottom:0.6rem;">
           <option value="">— None (use fallback voice) —</option>
           <optgroup label="— FEMALE VOICES —">
-            <option value="21m00Tcm4TlvDq8ikWAM">Rachel — Warm American ✦ Recommended</option>
-            <option value="piTKgcLEGmPE4e6mEKli">Nicole — Soft &amp; Whispery</option>
-            <option value="jsCqWAovK2LkecY7zXl4">Freya — Flowing British</option>
-            <option value="XB0fDUnXU5powFXDhCwa">Charlotte — Rich &amp; Commanding</option>
-            <option value="AZnzlk1XvdvUeBnXmlld">Domi — Confident &amp; Bold</option>
-            <option value="MF3mGyEYCl7XYWbV9V6O">Elli — Bright &amp; Articulate</option>
-            <option value="ThT5KcBeYPX3keUQqHPh">Dorothy — Clear British</option>
-            <option value="EXAVITQu4vr4xnSDxMaL">Bella — Soulful &amp; Intimate</option>
+            <option value="en-US-AriaNeural">Aria — Warm American ✦ Recommended</option>
+            <option value="en-US-JennyNeural">Jenny — Friendly American</option>
+            <option value="en-US-SaraNeural">Sara — Soft American</option>
+            <option value="en-GB-SoniaNeural">Sonia — Crisp British</option>
+            <option value="en-AU-NatashaNeural">Natasha — Warm Australian</option>
+            <option value="en-IE-EmilyNeural">Emily — Irish Mystique</option>
           </optgroup>
           <optgroup label="— MALE VOICES —">
-            <option value="onwK4e9ZLuTAKqWW03F9">Daniel — Deep British Authority</option>
-            <option value="pNInz6obpgDQGcFmaJgB">Adam — Deep American Baritone</option>
-            <option value="TxGEqnHWrfWFTfGW9XjX">Josh — Rich &amp; Resonant</option>
-            <option value="N2lVS1w4EtoT3dr4eOWO">Callum — Calm British</option>
-            <option value="D38z5RcWu1voky8WS1ja">Fin — Irish Mystique</option>
-            <option value="ErXwobaYiN019PkySvjV">Antoni — Warm &amp; Well-Rounded</option>
-            <option value="IKne3meq5aSn9XLyUdCD">Charlie — Australian Warmth</option>
-            <option value="VR6AewLTigWG4xSOukaG">Arnold — Crisp &amp; Authoritative</option>
+            <option value="en-US-GuyNeural">Guy — Deep American Baritone</option>
+            <option value="en-US-DavisNeural">Davis — Rich &amp; Resonant American</option>
+            <option value="en-GB-RyanNeural">Ryan — Calm British</option>
+            <option value="en-AU-WilliamNeural">William — Australian Warmth</option>
+            <option value="en-IE-ConnorNeural">Connor — Irish Authority</option>
           </optgroup>
         </select>
-        <button data-id="288" id="el-intro-test-btn" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.55rem 1.2rem;background:none;border:1px solid rgba(176,138,255,0.3);color:#b08aff;font-size:0.82rem;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;">🔊 Test Intro Voice</button>
-        <div data-id="289" id="el-intro-status" style="font-size:0.75rem;color:#5a4a7a;min-height:1.2em;margin-top:0.4rem;"></div>
+        <button data-id="288" id="azure-intro-test-btn" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.55rem 1.2rem;background:none;border:1px solid rgba(176,138,255,0.3);color:#b08aff;font-size:0.82rem;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;">🔊 Test Intro Voice</button>
+        <div data-id="289" id="azure-intro-status" style="font-size:0.75rem;color:#5a4a7a;min-height:1.2em;margin-top:0.4rem;"></div>
       </div>
     </div>
 
@@ -897,30 +892,70 @@ var isMuted = false;
 var currentAudio = null;
 var _speakCancelled = false;
 
-// Core ElevenLabs TTS function — fetches audio and plays it
-async function elevenLabsSpeak(text, apiKey, voiceId) {
-  var response = await fetch('https://api.elevenlabs.io/v1/text-to-speech/' + voiceId, {
-    method: 'POST',
-    headers: {
-      'Accept': 'audio/mpeg',
-      'Content-Type': 'application/json',
-      'xi-api-key': apiKey
-    },
-    body: JSON.stringify({
-      text: text,
-      model_id: 'eleven_turbo_v2_5',
-      voice_settings: {
-        stability: 0.55,
-        similarity_boost: 0.75,
-        style: 0.35,
-        use_speaker_boost: true
-      }
-    })
-  });
-  if (!response.ok) {
-    var errText = await response.text();
-    throw new Error('ElevenLabs ' + response.status + ': ' + errText);
+// XML-escape text before inserting it into an SSML document — Azure's TTS
+// endpoint parses the request body as XML, so unescaped &, <, >, ", ' in
+// user-supplied/generated text (e.g. a name with an ampersand) would break
+// the request or silently mangle the speech. ElevenLabs took plain text and
+// never needed this; it's a new failure mode specific to the SSML approach.
+function escapeXmlForSsml(text) {
+  return String(text == null ? '' : text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
+
+// Core Azure AI Speech (Cognitive Services) TTS function — builds an SSML
+// document, POSTs it to the regional TTS REST endpoint, and plays the
+// returned audio bytes. Mirrors the old elevenLabsSpeak's fetch/blob/Audio
+// playback mechanics — only the request shape changes:
+//   - Auth is a subscription key on the Ocp-Apim-Subscription-Key header
+//     (works directly against the TTS endpoint; no separate bearer-token
+//     exchange call is required for this endpoint).
+//   - Both an API key AND a region are required (ElevenLabs only needed a key).
+//   - The body is SSML/XML, not JSON — text must be XML-escaped first.
+//   - The response is raw audio bytes (not JSON), same as ElevenLabs.
+async function azureSpeak(text, apiKey, region, voiceId) {
+  if (!apiKey || !region || !voiceId) {
+    throw new Error('Azure TTS: missing apiKey, region, or voiceId');
   }
+  var langMatch = /^([a-zA-Z]{2,3}-[a-zA-Z]{2,4})/.exec(voiceId);
+  var lang = langMatch ? langMatch[1] : 'en-US';
+  var ssml = "<speak version='1.0' xml:lang='" + lang + "'>" +
+    "<voice xml:lang='" + lang + "' name='" + voiceId + "'>" +
+    escapeXmlForSsml(text) +
+    "</voice></speak>";
+  var endpoint = 'https://' + region + '.tts.speech.microsoft.com/cognitiveservices/v1';
+
+  var response;
+  try {
+    response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Ocp-Apim-Subscription-Key': apiKey,
+        'Content-Type': 'application/ssml+xml',
+        'X-Microsoft-OutputFormat': 'audio-16khz-128kbitrate-mono-mp3',
+        'User-Agent': 'CirclesSquaredOracle'
+      },
+      body: ssml
+    });
+  } catch (networkErr) {
+    console.error('[Azure TTS] network/fetch error — check region is reachable and correctly spelled:', networkErr);
+    throw new Error('Azure TTS network error: ' + (networkErr && networkErr.message ? networkErr.message : networkErr));
+  }
+
+  if (!response.ok) {
+    var errText = '';
+    try { errText = await response.text(); } catch (readErr) { /* ignore */ }
+    // A wrong/missing region typically surfaces as a DNS failure at fetch()
+    // (caught above) or a 401/403 here if the region doesn't match the key's
+    // resource. A malformed SSML body (e.g. unescaped XML) typically surfaces
+    // as a 400 Bad Request with an XML-parsing message in errText.
+    console.error('[Azure TTS] ' + response.status + ' ' + response.statusText + ' — ' + errText);
+    throw new Error('Azure TTS ' + response.status + ': ' + (errText || response.statusText));
+  }
+
   var blob = await response.blob();
   var url = URL.createObjectURL(blob);
   var audio = new Audio(url);
@@ -995,15 +1030,17 @@ function browserSpeak(text, onEnd) {
   else { window.speechSynthesis.onvoiceschanged = go; }
 }
 
-// Shared ElevenLabs chunking helper — splits text into pieces under 2400 chars
-// and speaks them in order. Returns true if all chunks played successfully,
-// false if a chunk errored (caller decides whether to fall back).
-async function _trySpeakElevenLabsChunks(fullText, apiKey, voiceId) {
+// Shared Azure chunking helper — splits text into pieces under 1800 chars
+// (conservative vs. ElevenLabs' 2400: SSML wrapper adds overhead and Azure's
+// per-request practical limits are tighter) and speaks them in order via
+// azureSpeak. Returns true if all chunks played successfully, false if a
+// chunk errored (caller decides whether to fall back).
+async function _trySpeakAzureChunks(fullText, apiKey, region, voiceId) {
   var sentences = fullText.match(/[^.!?]+[.!?]+/g) || [fullText];
   var chunks = [];
   var current = '';
   for (var i = 0; i < sentences.length; i++) {
-    if ((current + sentences[i]).length > 2400 && current.length > 0) {
+    if ((current + sentences[i]).length > 1800 && current.length > 0) {
       chunks.push(current.trim());
       current = sentences[i];
     } else {
@@ -1016,9 +1053,9 @@ async function _trySpeakElevenLabsChunks(fullText, apiKey, voiceId) {
   for (var j = 0; j < chunks.length; j++) {
     if (_speakCancelled || isMuted) break;
     try {
-      await elevenLabsSpeak(chunks[j], apiKey, voiceId);
+      await azureSpeak(chunks[j], apiKey, region, voiceId);
     } catch(e) {
-      console.warn('ElevenLabs chunk error:', e);
+      console.error('[Azure TTS] chunk error:', e);
       success = false;
       break;
     }
@@ -1027,36 +1064,37 @@ async function _trySpeakElevenLabsChunks(fullText, apiKey, voiceId) {
   return success;
 }
 
-// Main speak function — uses ElevenLabs if key is saved, else AppSDK, else browser fallback
+// Main speak function — uses Azure AI Speech if key+region are saved, else AppSDK, else browser fallback
 async function speakLongText(fullText, onFinish) {
   fullText = preprocessForSpeech(fullText);
   if (isMuted) { if (onFinish) onFinish(); return; }
   stopSpeech();
   _speakCancelled = false;
 
-  var apiKey = localStorage.getItem('el_api_key');
-  var voiceId = localStorage.getItem('el_voice_id') || '21m00Tcm4TlvDq8ikWAM';
+  var apiKey = localStorage.getItem('azure_api_key');
+  var region = localStorage.getItem('azure_region');
+  var voiceId = localStorage.getItem('azure_voice_id') || 'en-US-AriaNeural';
 
-  if (apiKey) {
-    var elSuccess = await _trySpeakElevenLabsChunks(fullText, apiKey, voiceId);
-    if (!_speakCancelled && elSuccess && onFinish) onFinish();
-    else if (!_speakCancelled && !elSuccess) {
-      // ElevenLabs failed — fall through to AppSDK / browser
+  if (apiKey && region) {
+    var azSuccess = await _trySpeakAzureChunks(fullText, apiKey, region, voiceId);
+    if (!_speakCancelled && azSuccess && onFinish) onFinish();
+    else if (!_speakCancelled && !azSuccess) {
+      // Azure failed — fall through to AppSDK / browser
       await _fallbackSpeakLong(fullText, onFinish);
     }
   } else {
-    // No ElevenLabs key — try AppSDK, then browser
+    // No Azure key/region configured — try AppSDK, then browser
     await _fallbackSpeakLong(fullText, onFinish);
   }
 }
 
-// Free-intro speak function — uses the distinct "el_intro_voice_id" ElevenLabs
+// Free-intro speak function — uses the distinct "azure_intro_voice_id" Azure
 // voice when explicitly configured in admin settings. If no separate intro
-// voice was picked but an ElevenLabs key IS saved, it falls back to the same
-// paid-narration voice (el_voice_id) rather than skipping ElevenLabs entirely —
+// voice was picked but Azure credentials ARE saved, it falls back to the same
+// paid-narration voice (azure_voice_id) rather than skipping Azure entirely —
 // most owners will just save a key without bothering to pick a second voice,
 // and hitting browser TTS (or silence) in that case reads as "no voice at all."
-// Only when there's no ElevenLabs key at all does it fall through to the
+// Only when there are no Azure credentials at all does it fall through to the
 // AppSDK/browser TTS chain.
 async function speakIntroText(fullText, onFinish) {
   fullText = preprocessForSpeech(fullText);
@@ -1064,13 +1102,14 @@ async function speakIntroText(fullText, onFinish) {
   stopSpeech();
   _speakCancelled = false;
 
-  var apiKey = localStorage.getItem('el_api_key');
-  var introVoiceId = localStorage.getItem('el_intro_voice_id') || localStorage.getItem('el_voice_id') || '21m00Tcm4TlvDq8ikWAM';
+  var apiKey = localStorage.getItem('azure_api_key');
+  var region = localStorage.getItem('azure_region');
+  var introVoiceId = localStorage.getItem('azure_intro_voice_id') || localStorage.getItem('azure_voice_id') || 'en-US-AriaNeural';
 
-  if (apiKey) {
-    var elSuccess = await _trySpeakElevenLabsChunks(fullText, apiKey, introVoiceId);
-    if (!_speakCancelled && elSuccess && onFinish) onFinish();
-    else if (!_speakCancelled && !elSuccess) {
+  if (apiKey && region) {
+    var azSuccess = await _trySpeakAzureChunks(fullText, apiKey, region, introVoiceId);
+    if (!_speakCancelled && azSuccess && onFinish) onFinish();
+    else if (!_speakCancelled && !azSuccess) {
       await _fallbackSpeakLong(fullText, onFinish);
     }
   } else {
@@ -1124,15 +1163,16 @@ async function speakText(text) {
   stopSpeech();
   _speakCancelled = false;
 
-  var apiKey = localStorage.getItem('el_api_key');
-  var voiceId = localStorage.getItem('el_voice_id') || '21m00Tcm4TlvDq8ikWAM';
+  var apiKey = localStorage.getItem('azure_api_key');
+  var region = localStorage.getItem('azure_region');
+  var voiceId = localStorage.getItem('azure_voice_id') || 'en-US-AriaNeural';
 
-  if (apiKey) {
+  if (apiKey && region) {
     try {
-      await elevenLabsSpeak(text, apiKey, voiceId);
+      await azureSpeak(text, apiKey, region, voiceId);
       return;
     } catch(e) {
-      console.warn('ElevenLabs short speak error:', e);
+      console.error('[Azure TTS] short speak error:', e);
     }
   }
 
@@ -1873,35 +1913,45 @@ function logPurchase(buyerName, buyerEmail, orderId, tier) {
 }
 
 // ===========================
-// ELEVENLABS ADMIN SETTINGS
+// AZURE AI SPEECH ADMIN SETTINGS
 // ===========================
-function loadElevenLabsSettings() {
-  var savedKey = localStorage.getItem('el_api_key');
-  var savedVoice = localStorage.getItem('el_voice_id') || '21m00Tcm4TlvDq8ikWAM';
-  var savedIntroVoice = localStorage.getItem('el_intro_voice_id') || '';
-  var keyInput = document.getElementById('el-api-key-input');
-  var voiceSelect = document.getElementById('el-voice-select');
-  var introVoiceSelect = document.getElementById('el-intro-voice-select');
+function loadAzureSettings() {
+  var savedKey = localStorage.getItem('azure_api_key');
+  var savedRegion = localStorage.getItem('azure_region') || '';
+  var savedVoice = localStorage.getItem('azure_voice_id') || 'en-US-AriaNeural';
+  var savedIntroVoice = localStorage.getItem('azure_intro_voice_id') || '';
+  var keyInput = document.getElementById('azure-api-key-input');
+  var regionInput = document.getElementById('azure-region-input');
+  var voiceSelect = document.getElementById('azure-voice-select');
+  var introVoiceSelect = document.getElementById('azure-intro-voice-select');
   if (keyInput && savedKey) keyInput.value = savedKey;
+  if (regionInput) regionInput.value = savedRegion;
   if (voiceSelect) voiceSelect.value = savedVoice;
   if (introVoiceSelect) introVoiceSelect.value = savedIntroVoice;
 }
 
-document.getElementById('el-save-btn').addEventListener('click', function() {
-  var key = document.getElementById('el-api-key-input').value.trim();
-  var voice = document.getElementById('el-voice-select').value;
-  var introVoice = document.getElementById('el-intro-voice-select').value;
-  var status = document.getElementById('el-status');
+document.getElementById('azure-save-btn').addEventListener('click', function() {
+  var key = document.getElementById('azure-api-key-input').value.trim();
+  var region = document.getElementById('azure-region-input').value.trim();
+  var voice = document.getElementById('azure-voice-select').value;
+  var introVoice = document.getElementById('azure-intro-voice-select').value;
+  var status = document.getElementById('azure-status');
   if (!key) {
     status.textContent = '⚠️ Please enter your API key.';
     status.style.color = '#ff9ed2';
     return;
   }
-  localStorage.setItem('el_api_key', key);
-  localStorage.setItem('el_voice_id', voice);
-  if (introVoice) localStorage.setItem('el_intro_voice_id', introVoice);
-  else localStorage.removeItem('el_intro_voice_id');
-  status.textContent = '✅ Key saved successfully! Voice will use ElevenLabs on next reading.';
+  if (!region) {
+    status.textContent = '⚠️ Please enter your Azure region (e.g. eastus).';
+    status.style.color = '#ff9ed2';
+    return;
+  }
+  localStorage.setItem('azure_api_key', key);
+  localStorage.setItem('azure_region', region);
+  localStorage.setItem('azure_voice_id', voice);
+  if (introVoice) localStorage.setItem('azure_intro_voice_id', introVoice);
+  else localStorage.removeItem('azure_intro_voice_id');
+  status.textContent = '✅ Key saved successfully! Voice will use Azure AI Speech on next reading.';
   status.style.color = '#c9a84c';
 });
 
@@ -1927,33 +1977,36 @@ document.getElementById('astro-save-btn').addEventListener('click', function() {
   status.style.color = '#c9a84c';
 });
 
-document.getElementById('el-test-btn').addEventListener('click', async function() {
-  var status = document.getElementById('el-status');
-  var key = localStorage.getItem('el_api_key');
-  var voice = localStorage.getItem('el_voice_id') || '21m00Tcm4TlvDq8ikWAM';
-  if (!key) {
-    status.textContent = '⚠️ Save your API key first.';
+document.getElementById('azure-test-btn').addEventListener('click', async function() {
+  var status = document.getElementById('azure-status');
+  var key = localStorage.getItem('azure_api_key');
+  var region = localStorage.getItem('azure_region');
+  var voice = localStorage.getItem('azure_voice_id') || 'en-US-AriaNeural';
+  if (!key || !region) {
+    status.textContent = '⚠️ Save your API key and region first.';
     status.style.color = '#ff9ed2';
     return;
   }
   status.textContent = '🎙️ Testing voice...';
   status.style.color = '#b08aff';
   try {
-    await elevenLabsSpeak('The oracle is ready. Your blueprint awaits.', key, voice);
+    await azureSpeak('The oracle is ready. Your blueprint awaits.', key, region, voice);
     status.textContent = '✅ Voice test successful!';
     status.style.color = '#c9a84c';
   } catch(e) {
-    status.textContent = '❌ Error: ' + (e.message || 'Check your API key and try again.');
+    console.error('[Azure TTS] test voice error:', e);
+    status.textContent = '❌ Error: ' + (e.message || 'Check your API key/region and try again.');
     status.style.color = '#ff9ed2';
   }
 });
 
-document.getElementById('el-intro-test-btn').addEventListener('click', async function() {
-  var status = document.getElementById('el-intro-status');
-  var key = localStorage.getItem('el_api_key');
-  var voice = document.getElementById('el-intro-voice-select').value || localStorage.getItem('el_intro_voice_id');
-  if (!key) {
-    status.textContent = '⚠️ Save your API key first.';
+document.getElementById('azure-intro-test-btn').addEventListener('click', async function() {
+  var status = document.getElementById('azure-intro-status');
+  var key = localStorage.getItem('azure_api_key');
+  var region = localStorage.getItem('azure_region');
+  var voice = document.getElementById('azure-intro-voice-select').value || localStorage.getItem('azure_intro_voice_id');
+  if (!key || !region) {
+    status.textContent = '⚠️ Save your API key and region first.';
     status.style.color = '#ff9ed2';
     return;
   }
@@ -1965,11 +2018,12 @@ document.getElementById('el-intro-test-btn').addEventListener('click', async fun
   status.textContent = '🎙️ Testing intro voice...';
   status.style.color = '#b08aff';
   try {
-    await elevenLabsSpeak('Your name and your birth date carry a hidden frequency. Let’s see what it reveals.', key, voice);
+    await azureSpeak('Your name and your birth date carry a hidden frequency. Let’s see what it reveals.', key, region, voice);
     status.textContent = '✅ Voice test successful!';
     status.style.color = '#c9a84c';
   } catch(e) {
-    status.textContent = '❌ Error: ' + (e.message || 'Check your API key and try again.');
+    console.error('[Azure TTS] test intro voice error:', e);
+    status.textContent = '❌ Error: ' + (e.message || 'Check your API key/region and try again.');
     status.style.color = '#ff9ed2';
   }
 });
@@ -2021,8 +2075,8 @@ function showAdminPanel() {
       }).join('');
     }
   }
-  // Load ElevenLabs settings when admin panel opens
-  loadElevenLabsSettings();
+  // Load Azure AI Speech settings when admin panel opens
+  loadAzureSettings();
   // Load FreeAstroAPI (Ascendant) settings when admin panel opens
   loadAstroSettings();
   panel.style.display = 'block';
