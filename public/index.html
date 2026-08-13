@@ -2504,7 +2504,29 @@ function harmonicCheck(cnnReduced, lpn, en){
 function hiddenMasterAudit(fullName){
   var parts = (fullName||'').trim().split(/\s+/).filter(Boolean);
   var systems = [ { label:'Pythagorean', map:PYTH }, { label:'Chaldean', map:CHALDEAN } ];
-  function isMaster(n){ var r=digitSum(n); return r===11||r===22||r===33; }
+  // Section 3.2 "zero-in-the-tenths-place wildcard" (Codex Logic V06): a raw
+  // compound ending in a trailing zero (20, 30, 40, ... 110, 220, 330, ...)
+  // is tested two ways before being ruled non-master. Path 1 is the normal
+  // digitSum() reduction (zero retained, e.g. 220 -> 2+2+0 -> 4). Path 2
+  // drops the trailing zero as a place-value truncation (220/10 -> 22) and
+  // reduces THAT — this is not the same as omitting the digit "0" from a
+  // digit-sum (which is always a no-op, since summing in a zero changes
+  // nothing); it's testing whether a master number is sitting one decimal
+  // place up, masked by a trailing placeholder zero digitSum's own digit-
+  // by-digit pass can't see past. If either path lands on 11/22/33, the
+  // Hidden Master is confirmed. Returns the confirmed master value (or
+  // null), plus whether it took the zero-dropped path, so callers/records
+  // can note the confirmation type per the Codex's own audit procedure.
+  function masterValue(n){
+    var r = digitSum(n);
+    if (r===11||r===22||r===33) return { master:r, viaZeroDrop:false };
+    if (n % 10 === 0 && n >= 20) {
+      var dropped = digitSum(n / 10);
+      if (dropped===11||dropped===22||dropped===33) return { master:dropped, viaZeroDrop:true };
+    }
+    return null;
+  }
+  function isMaster(n){ return !!masterValue(n); }
   function partVal(part, map, onlyV, onlyC){
     var sum=0;
     part.toUpperCase().split('').forEach(function(c){
@@ -2517,7 +2539,9 @@ function hiddenMasterAudit(fullName){
   }
   var results=[];
   function record(sys,stream,part,raw){
-    results.push({system:sys,stream:stream,part:part,raw:raw,master:digitSum(raw)});
+    var mv = masterValue(raw);
+    if (!mv) return;
+    results.push({system:sys,stream:stream + (mv.viaZeroDrop ? ' (zero-dropped)' : ''),part:part,raw:raw,master:mv.master});
   }
   systems.forEach(function(sys){
     var fullTotals=[], vowelTotals=[], consonantTotals=[];
