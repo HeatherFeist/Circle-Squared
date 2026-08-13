@@ -422,7 +422,7 @@ body {
         <input type="checkbox" id="hook-no-birthtime" style="width:16px;height:16px;accent-color:var(--accent-gold,#c9a84c);" />
         <span style="font-size:0.78rem;color:var(--text-muted);">I don't know my exact birth time</span>
       </label>
-      <p class="mb-4" style="color:var(--text-muted); font-size:0.72rem; opacity:0.75;">Your Ascendant (Rising Sign) needs an exact time and place. Skip it and your reading proceeds normally without it.</p>
+      <p class="mb-4" style="color:var(--text-muted); font-size:0.72rem; opacity:0.75;">Your Ascendant (Rising Sign) needs an exact time and place. Your Moon sign only needs a place — we can still estimate it from a noon default if you check this box. Skip either and your reading proceeds normally without them.</p>
 
       <button data-id="34" id="hook-btn" class="cta-btn w-full mt-5" style="font-size:1.05rem;">✦ Reveal My Blueprint</button>
       <p data-id="35" class="text-center mt-3" style="color:var(--text-muted); font-size:0.72rem; opacity:0.7;">🔒 Your information is never stored or shared.</p>
@@ -579,6 +579,34 @@ body {
           <div id="sacred-geometry-svg"></div>
         </div>
         <div id="sacred-geometry-caption" style="text-align:center;margin-top:0.8rem;"></div>
+      </div>
+
+      <!-- Personal Tone — ambient, loopable meditation audio synthesized
+           client-side (Web Audio API, no external files, no API dependency)
+           from this chart's Sun/Moon/Ascendant notes (Paul Foster Case
+           Musical Qabalah), zodiac-attributed Tarot melody notes, and the
+           person's numerology numbers as rhythm counts. New, additive,
+           optional feature — degrades gracefully to a single sustained Sun
+           tone when nothing else is available. See buildPersonalToneScore()
+           and the PersonalTone playback engine below. -->
+      <div id="personal-tone-section" style="width:100%;max-width:520px;margin:0 auto 2rem;padding:0 1rem;">
+        <div style="text-align:center;margin-bottom:1rem;">
+          <div style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.4em;color:var(--accent-gold,#c9a84c);margin-bottom:0.3rem;">✦ YOUR PERSONAL TONE ✦</div>
+          <h3 style="font:700 1.2rem Georgia,serif;background:linear-gradient(135deg,#e8e0ff,#b08aff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:0 0 0.3rem;">A Meditation Built From Your Chart</h3>
+          <p style="color:#8a7aaa;font-size:0.8rem;font-style:italic;margin:0;">An ambient, loopable tone woven from your Sun, Moon &amp; Rising notes, your Tarot melody, and the rhythm of your numbers. Optional — press play whenever you like.</p>
+        </div>
+        <div class="cosmic-card" style="padding:1.2rem 1rem;text-align:center;">
+          <div id="tone-controls" style="display:flex;align-items:center;justify-content:center;gap:0.75rem;flex-wrap:wrap;">
+            <button id="tone-play-btn" type="button" class="cta-btn" style="padding:0.6rem 1.4rem;font-size:0.85rem;">▶ Play</button>
+            <button id="tone-stop-btn" type="button" class="skip-btn" style="padding:0.6rem 1.2rem;font-size:0.85rem;" disabled>■ Stop</button>
+            <label style="display:flex;align-items:center;gap:0.4rem;font-size:0.72rem;color:var(--text-muted);">
+              Volume
+              <input id="tone-volume" type="range" min="0" max="100" value="55" style="width:90px;accent-color:var(--accent-gold,#c9a84c);" />
+            </label>
+          </div>
+          <p id="tone-caption" style="color:var(--text-muted);font-size:0.72rem;margin-top:0.8rem;opacity:0.85;"></p>
+          <p id="tone-approx-note" style="color:var(--accent-gold,#c9a84c);font-size:0.68rem;margin-top:0.4rem;opacity:0.85;display:none;"></p>
+        </div>
       </div>
 
       <div data-id="200" class="divider w-full mt-4">✦ ─────── ✦</div>
@@ -1933,14 +1961,18 @@ function courtCardFor(soulSephId, suit){
   if (noTimeCheckbox) {
     noTimeCheckbox.addEventListener('change', function() {
       var row = document.getElementById('hook-birthtime-row');
-      var placeInput = document.getElementById('hook-birthplace');
       var disabled = noTimeCheckbox.checked;
       if (row) row.style.opacity = disabled ? '0.4' : '1';
       ['hook-time-hour','hook-time-minute','hook-time-ampm'].forEach(function(id){
         var el = document.getElementById(id);
         if (el) el.disabled = disabled;
       });
-      if (placeInput) placeInput.disabled = disabled;
+      // NOTE: Birth place is intentionally left enabled here even when exact
+      // time is unknown. Only Ascendant (which changes every ~2 hours) needs
+      // a real time and stays gated behind this checkbox; Moon sign (which
+      // moves only ~0.5deg/hour) is astronomically defensible from a 12:00
+      // noon default, so it should still be attemptable from place alone.
+      // See getMoonSign() / the hook-btn handler.
     });
   }
 })();
@@ -2739,6 +2771,297 @@ async function getAscendant(year, month, day, hour, minute, place) {
 }
 
 // ===========================
+// MOON SIGN — FreeAstroAPI (optional, client-side)
+// ===========================
+// Patterned exactly after getAscendant() above: same saved API key
+// (localStorage 'astro_api_key' — one key powers both lookups), same
+// defensive multi-shape response parsing, same graceful-null-on-failure
+// contract (never throws; callers treat null as "skip this field").
+//
+// UNLIKE Ascendant, Moon sign does NOT require a real, known birth time.
+// The Moon moves only ~0.5deg/hour, so a 12:00 noon default is
+// astronomically defensible when the exact time is unknown — the Moon
+// sign itself is very unlikely to be wrong, though the exact degree within
+// the sign will drift. (Ascendant changes a full sign roughly every 2
+// hours, so the same noon-default trick would be a near-random guess
+// there — this is intentionally NOT applied to getAscendant().)
+//
+// hour/minute may be null — if either is missing, this function applies
+// the 12:00 noon default itself and marks the result viaNoonDefault:true
+// so callers can caveat the result in copy.
+//
+// FreeAstroAPI does not appear to publicly document a distinct
+// "moon sign" endpoint separate from its general planetary-positions
+// endpoint (see research note above the file's PR description). This
+// function tries a dedicated moon/sign-style endpoint first (mirroring the
+// same '/western/signs/<planet>' family as the Ascendant's
+// '/western/signs/rising'), and if that 404s/fails, falls back to a
+// general western planets endpoint and picks the Moon entry out of
+// whatever shape it returns. Both paths are parsed defensively.
+async function getMoonSign(year, month, day, hour, minute, place) {
+  var apiKey = localStorage.getItem('astro_api_key');
+  if (!apiKey) {
+    console.info('[Moon Sign] Skipped — no astro_api_key saved in admin settings.');
+    return null;
+  }
+  if (year == null || month == null || day == null || !place) {
+    console.info('[Moon Sign] Skipped — missing birth date and/or birth place.');
+    return null;
+  }
+
+  var viaNoonDefault = false;
+  if (hour == null || minute == null) {
+    hour = 12; minute = 0;
+    viaNoonDefault = true;
+  }
+
+  var requestBody = {
+    year: year, month: month, day: day, hour: hour, minute: minute,
+    city: place,
+    tz_str: 'AUTO',
+    zodiac_type: 'tropical',
+    house_system: 'placidus'
+  };
+
+  function extractSignDegree(candidateIn) {
+    var candidate = candidateIn;
+    if (candidate && candidate.data) candidate = candidate.data;
+    if (candidate && candidate.result) candidate = candidate.result;
+    if (candidate && candidate.moon && typeof candidate.moon === 'object') candidate = candidate.moon;
+    var sign = null, degree = null;
+    if (candidate) {
+      sign = candidate.sign || candidate.moon_sign || candidate.zodiac_sign || candidate.name || null;
+      var deg = candidate.degree != null ? candidate.degree
+        : candidate.norm_degree != null ? candidate.norm_degree
+        : candidate.full_degree != null ? candidate.full_degree
+        : candidate.longitude != null ? candidate.longitude
+        : null;
+      if (deg != null && !isNaN(parseFloat(deg))) degree = Math.round(parseFloat(deg) * 100) / 100;
+    }
+    return { sign: sign, degree: degree };
+  }
+
+  async function tryEndpoint(url) {
+    var response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey },
+      body: JSON.stringify(requestBody)
+    });
+    if (!response.ok) {
+      var errText = '';
+      try { errText = await response.text(); } catch (readErr) {}
+      console.info('[Moon Sign] Endpoint ' + url + ' returned ' + response.status + ': ' + errText);
+      return null;
+    }
+    var data = await response.json();
+    console.info('[Moon Sign] Raw API response from ' + url + ':', data);
+    return data;
+  }
+
+  try {
+    // First guess: a dedicated moon-sign endpoint mirroring the Ascendant's
+    // '/western/signs/rising' family.
+    var data = null;
+    try {
+      data = await tryEndpoint('https://api.freeastroapi.com/api/v1/western/signs/moon');
+    } catch (e1) {
+      console.info('[Moon Sign] Dedicated moon-sign endpoint failed, will try planets fallback:', e1);
+    }
+
+    var sign = null, degree = null;
+    if (data) {
+      var parsed = extractSignDegree(data);
+      sign = parsed.sign; degree = parsed.degree;
+    }
+
+    // Fallback: a general planets endpoint returning an array/object of
+    // planetary positions — find the Moon entry within it.
+    if (!sign) {
+      var planetsData = null;
+      try {
+        planetsData = await tryEndpoint('https://api.freeastroapi.com/api/v1/western/planets');
+      } catch (e2) {
+        console.info('[Moon Sign] Planets fallback endpoint failed:', e2);
+      }
+      if (planetsData) {
+        var list = planetsData;
+        if (list && list.data) list = list.data;
+        if (list && list.result) list = list.result;
+        if (list && list.planets) list = list.planets;
+        if (!Array.isArray(list) && list && typeof list === 'object') {
+          // Object keyed by planet name, e.g. { Moon: {...}, Sun: {...} }
+          list = list.Moon || list.moon || list;
+        }
+        var moonEntry = null;
+        if (Array.isArray(list)) {
+          moonEntry = list.find(function(entry){
+            var n = entry && (entry.name || entry.planet || entry.body);
+            return n && String(n).toLowerCase() === 'moon';
+          });
+        } else if (list && (list.sign || list.moon_sign)) {
+          moonEntry = list;
+        }
+        if (moonEntry) {
+          var parsed2 = extractSignDegree(moonEntry);
+          sign = parsed2.sign; degree = parsed2.degree;
+        }
+      }
+    }
+
+    if (!sign) {
+      console.error('[Moon Sign] Could not find a recognizable Moon sign in any API response shape tried.');
+      return null;
+    }
+
+    // Honesty flag agreed with the repo owner: when we used the noon
+    // default (not a real birth time) AND the API gave us a degree-into-sign
+    // that's very close to a sign boundary (< ~2deg), the noon default is
+    // close enough to the boundary that a real birth time could plausibly
+    // land the Moon in the adjacent sign instead. Flag it so callers can
+    // caveat the result rather than presenting it with unearned confidence.
+    var approximate = !!(viaNoonDefault && degree != null && degree < 2);
+
+    return { sign: sign, degree: degree, approximate: approximate, viaNoonDefault: viaNoonDefault };
+  } catch (e) {
+    console.error('[Moon Sign] Request failed:', e);
+    return null;
+  }
+}
+
+// ===========================
+// PERSONAL TONE — Sign -> Musical Note (Paul Foster Case, Musical Qabalah)
+// Verified this session against this app's own zodiac-attributed Tarot
+// paths in PATH_TABLE above. Only the 12 zodiac-attributed Major Arcana
+// get a note in this pass — the other 10 (7 planet + 3 element attributed:
+// The Fool, The Magician, The High Priestess, The Empress, Wheel of
+// Fortune, The Hanged Man, The Tower, The Sun, Judgement, The World) are
+// explicitly out of scope, a deliberate scoping decision for a future
+// extension. Do not add notes for them here.
+// ===========================
+var SIGN_TO_NOTE = {
+  Aries: 'C', Taurus: 'C#', Gemini: 'D', Cancer: 'D#', Leo: 'E', Virgo: 'F',
+  Libra: 'F#', Scorpio: 'G', Sagittarius: 'G#', Capricorn: 'A', Aquarius: 'A#', Pisces: 'B'
+};
+// Standard equal-temperament frequencies, A4=440Hz reference, octave 4.
+var NOTE_FREQ = {
+  C: 261.63, 'C#': 277.18, D: 293.66, 'D#': 311.13, E: 329.63, F: 349.23,
+  'F#': 369.99, G: 392.00, 'G#': 415.30, A: 440.00, 'A#': 466.16, B: 493.88
+};
+var NOTE_CHROMATIC_ORDER = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+// The 12 zodiac-attributed Major Arcana already in PATH_TABLE, by card name.
+var CARD_TO_SIGN = {
+  'The Emperor': 'Aries', 'The Hierophant': 'Taurus', 'The Lovers': 'Gemini',
+  'The Chariot': 'Cancer', 'Strength': 'Leo', 'The Hermit': 'Virgo',
+  'Justice': 'Libra', 'Death': 'Scorpio', 'Temperance': 'Sagittarius',
+  'The Devil': 'Capricorn', 'The Star': 'Aquarius', 'The Moon': 'Pisces'
+};
+function noteForSign(sign) { return (sign && SIGN_TO_NOTE[sign]) || null; }
+function freqForNote(note) { return (note && NOTE_FREQ[note]) || null; }
+function freqForSign(sign) { return freqForNote(noteForSign(sign)); }
+function noteForCardName(cardName) { return cardName ? noteForSign(CARD_TO_SIGN[cardName]) : null; }
+// A genuine musical interval, computed by semitone offset (equal
+// temperament: freq * 2^(semitones/12)) — not just repeating the same note.
+function intervalFreq(baseFreq, semitones) { return baseFreq * Math.pow(2, semitones / 12); }
+
+// Section 3.4-style "two instruments confirming the same note" search — scans
+// the already-computed reading profile for genuine numeric coincidences
+// across independent systems (reused fields only, nothing fabricated).
+function findPersonalToneHarmonyMatches(p) {
+  var candidates = [];
+  function add(source, num) { if (num != null && !isNaN(num)) candidates.push({ source: source, num: num }); }
+  add('Life Path', p.lifePath);
+  add('Expression', p.expression);
+  add('Soul Urge', p.soulUrge);
+  add('Personality', p.personality);
+  add('Birthday Number', p.birthdayNumber);
+  add('Gematria Reduced', p.gematria && p.gematria.reduced);
+  add('Gematria Battery Reduced', p.gematriaBattery && p.gematriaBattery.rg);
+  add('Chaldean Reduced', p.chaldean && p.chaldean.reduced);
+  add('Hidden Master', p.hiddenMaster);
+  (p.nameHiddenMasters || []).forEach(function(r) {
+    add('Name Hidden Master (' + r.system + ')', r.master);
+  });
+
+  var byNum = {};
+  candidates.forEach(function(c) {
+    if (!byNum[c.num]) byNum[c.num] = [];
+    byNum[c.num].push(c.source);
+  });
+  var matches = [];
+  Object.keys(byNum).forEach(function(numKey) {
+    var sources = byNum[numKey];
+    if (sources.length >= 2) matches.push({ number: parseInt(numKey, 10), sources: sources });
+  });
+  return matches;
+}
+
+// Builds the full song structure described in the Personal Tone spec, from
+// an already-computed window._readingProfile. Never returns null — every
+// profile has a Sun sign, so there is always at least a single sustained
+// tone with a rhythm.
+function buildPersonalToneScore(p) {
+  // 1. CHORD — Sun (always) + Moon (if computed) + Ascendant (if a real
+  // birth time was given). Sun sign is present on every profile, so the
+  // chord layer always has at least one note.
+  var chordNotes = [];
+  var sunNote = p.sunSign ? noteForSign(p.sunSign.sign) : null;
+  if (sunNote) chordNotes.push({ note: sunNote, freq: freqForNote(sunNote), source: 'Sun' });
+  if (p.moonSign && p.moonSign.sign) {
+    var moonNote = noteForSign(p.moonSign.sign);
+    if (moonNote) chordNotes.push({ note: moonNote, freq: freqForNote(moonNote), source: 'Moon' });
+  }
+  if (p.ascendant && p.ascendant.sign) {
+    var ascNote = noteForSign(p.ascendant.sign);
+    if (ascNote) chordNotes.push({ note: ascNote, freq: freqForNote(ascNote), source: 'Ascendant' });
+  }
+
+  // 2. MELODY — the person's other activated Tarot-archetype paths that
+  // happen to be zodiac-attributed: Trump Card path(s), Shadow Card path,
+  // and the Tarot Path card, deduped by note, in that priority order.
+  // Empty is fine — chord-only is a valid, non-error result.
+  var melodyNotes = [];
+  var seenNotes = {};
+  function addMelodyCard(card, sourceLabel) {
+    if (!card || !card.card) return;
+    var note = noteForCardName(card.card);
+    if (!note || seenNotes[note]) return;
+    seenNotes[note] = true;
+    melodyNotes.push({ note: note, freq: freqForNote(note), source: sourceLabel, card: card.card });
+  }
+  (p.trumpPaths || []).forEach(function(tp) { addMelodyCard(tp, 'Trump Card'); });
+  addMelodyCard(p.shadowCardPath, 'Shadow Card');
+  addMelodyCard(p.tarotCard, 'Tarot Path Card');
+
+  // 4. HARMONY — when two already-computed systems independently confirm
+  // the same number, mark the melody layer as carrying a harmony moment:
+  // that note sounds alongside a genuine harmonic interval (a perfect
+  // fifth, +7 semitones) rather than just repeating itself. Attached to
+  // the first melody note (the Life Path's own Trump Card, when present)
+  // since Life Path is the number most of these systems are confirming
+  // against.
+  var harmonyMatches = findPersonalToneHarmonyMatches(p);
+  if (harmonyMatches.length && melodyNotes.length) {
+    melodyNotes[0].harmony = {
+      intervalFreq: intervalFreq(melodyNotes[0].freq, 7),
+      matches: harmonyMatches
+    };
+  }
+
+  // 3. RHYTHM — Life Path, Expression, Soul Urge as direct beat/pulse
+  // counts. No external sourcing, just the numbers themselves.
+  var rhythmCounts = [p.lifePath, p.expression, p.soulUrge].filter(function(n) { return n != null && !isNaN(n) && n > 0; });
+  if (!rhythmCounts.length) rhythmCounts = [4]; // graceful fallback, never zero-length
+
+  return {
+    chordNotes: chordNotes,
+    melodyNotes: melodyNotes,
+    rhythmCounts: rhythmCounts,
+    harmonyMatches: harmonyMatches,
+    moonApproximate: !!(p.moonSign && (p.moonSign.approximate || p.moonSign.viaNoonDefault))
+  };
+}
+
+// ===========================
 // LIFE PATH MEANINGS
 // ===========================
 var LP_MEANINGS = {
@@ -3407,29 +3730,49 @@ document.getElementById('hook-btn').addEventListener('click', function(){
   // just the first name — so results match the calibration doc by default.
   var usedName = usedNameRaw || fullBirthName;
 
-  // ── OPTIONAL: Birth time + birth place (powers the Ascendant lookup) ──
+  // ── OPTIONAL: Birth time + birth place (powers Ascendant + Moon sign) ──
   // Kicked off here and awaited later inside doReading() so the screen
-  // transition below isn't blocked by a third-party network call.
+  // transition below isn't blocked by third-party network calls.
+  //
+  // Ascendant still strictly requires a REAL, known birth time — unchanged.
+  // Moon sign is different (see getMoonSign()'s comment): the Moon moves
+  // slowly enough that a 12:00 noon default is defensible when the exact
+  // time is unknown, so Moon sign is attempted whenever a birth PLACE is
+  // available, using the real time if given or a noon default otherwise.
+  // Birth place itself is therefore read regardless of the "I don't know
+  // my exact time" checkbox — only the hour/minute/AM-PM inputs are tied
+  // to that checkbox.
   window._ascendantPromise = null;
+  window._moonSignPromise = null;
   try {
     var noBirthTimeEl = document.getElementById('hook-no-birthtime');
     var skipBirthTime = !!(noBirthTimeEl && noBirthTimeEl.checked);
+    var birthPlace = document.getElementById('hook-birthplace').value.trim();
+    var hour24 = null, minute = null, hasRealTime = false;
     if (!skipBirthTime) {
       var hourRaw = document.getElementById('hook-time-hour').value;
       var minuteRaw = document.getElementById('hook-time-minute').value;
       var ampm = document.getElementById('hook-time-ampm').value;
-      var birthPlace = document.getElementById('hook-birthplace').value.trim();
-      if (hourRaw !== '' && minuteRaw !== '' && birthPlace) {
+      if (hourRaw !== '' && minuteRaw !== '') {
         var hour12 = parseInt(hourRaw, 10);
-        var minute = parseInt(minuteRaw, 10);
-        var hour24 = hour12 % 12;
+        minute = parseInt(minuteRaw, 10);
+        hour24 = hour12 % 12;
         if (ampm === 'PM') hour24 += 12;
-        window._ascendantPromise = getAscendant(year, month, day, hour24, minute, birthPlace);
+        hasRealTime = true;
       }
     }
+    if (hasRealTime && birthPlace) {
+      window._ascendantPromise = getAscendant(year, month, day, hour24, minute, birthPlace);
+    }
+    if (birthPlace) {
+      // hour24/minute are null when there's no real time — getMoonSign()
+      // applies its own 12:00 noon default and flags the result accordingly.
+      window._moonSignPromise = getMoonSign(year, month, day, hasRealTime ? hour24 : null, hasRealTime ? minute : null, birthPlace);
+    }
   } catch (ascErr) {
-    console.error('[Ascendant] Could not kick off lookup:', ascErr);
+    console.error('[Ascendant/Moon Sign] Could not kick off lookup:', ascErr);
     window._ascendantPromise = null;
+    window._moonSignPromise = null;
   }
 
   // ── LAYER 1: Pythagorean Numerology (birth architecture — full birth name) ──
@@ -3490,7 +3833,7 @@ document.getElementById('hook-btn').addEventListener('click', function(){
     gematriaBattery: gematriaBattery,
     primaryPath: primary, lifePathTrumpCard: lifePathTrumpCard, trumpPaths: trumpPaths,
     elementSuit: elementSuit, soulCard: soulCard, courtCard: courtCard, shadowCardPath: shadowCardPath,
-    ascendant: null
+    ascendant: null, moonSign: null
   };
 
   // Start AI reading in background while reveal narration plays
@@ -3648,6 +3991,17 @@ async function doReading() {
     }
   }
 
+  // Resolve the optional Moon sign lookup (kicked off on submit) the same
+  // way. getMoonSign() never throws and resolves null on any skip/failure.
+  if (window._moonSignPromise) {
+    try {
+      var moonResult = await window._moonSignPromise;
+      if (moonResult && moonResult.sign) p.moonSign = moonResult;
+    } catch (moonErr) {
+      console.error('[Moon Sign] Lookup rejected unexpectedly:', moonErr);
+    }
+  }
+
   // Richer engine additions (Codex Logic V05 layers: Chaldean, Gematria battery,
   // Life Path Trump Card / Metatron's Cube Soul & Court Cards, full Hidden Master audit)
   // woven into the same rich, page-by-page prompt template master already used.
@@ -3751,6 +4105,10 @@ function startOracleReading() {
     sgSection.style.display = 'block';
     buildSacredGeometryDiagram(p, 'sacred-geometry-svg', 'sacred-geometry-caption');
   }
+
+  // Personal Tone — prepare (but do not auto-play) the ambient meditation
+  // built from this chart. See PersonalTone engine below.
+  initPersonalTone(p);
 
   // Render tier cards
   renderTierCards();
@@ -4683,6 +5041,282 @@ function _openPDF(doc, filename) {
 }
 
 // ===========================
+// PERSONAL TONE — Web Audio playback engine
+// Sustained ambient pad (chord) + a slow melody sequence + a numerology-
+// driven rhythm + a generated short reverb, all synthesized client-side
+// via the Web Audio API. No external audio files, no external API/backend.
+// Loops indefinitely until Stop is pressed; Stop actually cancels every
+// scheduled oscillator/gain ramp, not just the UI state.
+// ===========================
+var PersonalTone = (function() {
+  var ctx = null;
+  var masterGain = null, dryGain = null, reverbGain = null, convolver = null;
+  var activeNodes = [];   // every live {osc,gain} pair, for a hard stop
+  var playToken = 0;      // bumped on stop/replay so old scheduleLoop() recursion halts
+  var playing = false;
+
+  function ensureContext() {
+    if (ctx) return ctx;
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) { console.error('[Personal Tone] Web Audio API not available in this browser.'); return null; }
+    ctx = new AC();
+    masterGain = ctx.createGain();
+    masterGain.gain.value = 0.55;
+    dryGain = ctx.createGain();
+    dryGain.gain.value = 0.75;
+    reverbGain = ctx.createGain();
+    reverbGain.gain.value = 0.35;
+    // A short generated impulse response (exponentially decaying stereo
+    // noise) stands in for a room/ambient reverb without loading any
+    // external audio asset — a ConvolverNode fed by this synthetic IR gives
+    // a smoother, more "ambient pad" tail than a feedback delay chain would
+    // without the risk of runaway feedback. (Judgment call — see PR notes.)
+    convolver = ctx.createConvolver();
+    convolver.buffer = buildImpulseResponse(ctx, 2.5, 2.2);
+    dryGain.connect(masterGain);
+    convolver.connect(reverbGain);
+    reverbGain.connect(masterGain);
+    masterGain.connect(ctx.destination);
+    return ctx;
+  }
+
+  function buildImpulseResponse(audioCtx, durationSec, decay) {
+    var rate = audioCtx.sampleRate;
+    var length = Math.max(1, Math.floor(rate * durationSec));
+    var impulse = audioCtx.createBuffer(2, length, rate);
+    for (var ch = 0; ch < 2; ch++) {
+      var data = impulse.getChannelData(ch);
+      for (var i = 0; i < length; i++) {
+        data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, decay);
+      }
+    }
+    return impulse;
+  }
+
+  function connectVoice(gainNode) {
+    gainNode.connect(dryGain);
+    gainNode.connect(convolver);
+  }
+
+  // A soft, sustained pad tone (sine wave) with a slow linear attack —
+  // never a hard gain step, so it never clicks/pops.
+  function startSustainedTone(freq, atSecOffset, level) {
+    var osc = ctx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    var gain = ctx.createGain();
+    var startAt = ctx.currentTime + atSecOffset;
+    gain.gain.setValueAtTime(0, startAt);
+    gain.gain.linearRampToValueAtTime(level, startAt + 3.5);
+    osc.connect(gain);
+    connectVoice(gain);
+    osc.start(startAt);
+    var voice = { osc: osc, gain: gain };
+    activeNodes.push(voice);
+    return voice;
+  }
+
+  // A short, soft melody note (triangle wave — gentler than square/sawtooth)
+  // with its own attack/release envelope, scheduled at a future offset.
+  function scheduleMelodyNote(freq, atSecOffset, durationSec, level) {
+    var osc = ctx.createOscillator();
+    osc.type = 'triangle';
+    osc.frequency.value = freq;
+    var gain = ctx.createGain();
+    var startAt = ctx.currentTime + atSecOffset;
+    var attack = Math.min(0.6, durationSec * 0.3);
+    var release = Math.min(0.9, durationSec * 0.4);
+    gain.gain.setValueAtTime(0, startAt);
+    gain.gain.linearRampToValueAtTime(level, startAt + attack);
+    gain.gain.setValueAtTime(level, startAt + Math.max(attack, durationSec - release));
+    gain.gain.linearRampToValueAtTime(0.0001, startAt + durationSec);
+    osc.connect(gain);
+    connectVoice(gain);
+    osc.start(startAt);
+    osc.stop(startAt + durationSec + 0.05);
+    activeNodes.push({ osc: osc, gain: gain });
+  }
+
+  function clearActiveNodes() {
+    var now = ctx ? ctx.currentTime : 0;
+    activeNodes.forEach(function(n) {
+      try {
+        n.gain.gain.cancelScheduledValues(now);
+        n.gain.gain.setValueAtTime(0.0001, now);
+        n.osc.stop(now + 0.05);
+        n.osc.disconnect();
+        n.gain.disconnect();
+      } catch (e) { /* already stopped — fine */ }
+    });
+    activeNodes = [];
+  }
+
+  function stop() {
+    playToken++; // invalidates any pending scheduleLoop() setTimeout recursion
+    clearActiveNodes();
+    playing = false;
+  }
+
+  function play(score) {
+    var audioCtx = ensureContext();
+    if (!audioCtx) return false;
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    stop(); // hard-stop anything already running before starting fresh
+    playToken++;
+    var myToken = playToken;
+    playing = true;
+
+    // --- CHORD (sustained ambient pad) ---
+    var chordVoices = [];
+    var chordLevel = score.chordNotes.length ? (0.45 / score.chordNotes.length) : 0;
+    score.chordNotes.forEach(function(n) {
+      chordVoices.push(startSustainedTone(n.freq, 0, chordLevel));
+    });
+
+    // --- RHYTHM + MELODY (+ HARMONY) ---
+    // Life Path / Expression / Soul Urge become direct beat-group counts —
+    // the melody repeats each note for a group-sized number of slow beats,
+    // cycling through the three counts. With no melody (chord-only chart),
+    // the pad itself gently pulses in groups sized the same way instead of
+    // sitting perfectly static.
+    var beatSec = 1.6; // slow, meditative pulse
+    var counts = score.rhythmCounts;
+
+    function scheduleLoop(startOffsetSec) {
+      if (myToken !== playToken) return; // stopped/replaced — halt recursion
+      var cursor = startOffsetSec;
+
+      if (score.melodyNotes.length) {
+        score.melodyNotes.forEach(function(mn, idx) {
+          var groupSize = counts[idx % counts.length];
+          for (var rep = 0; rep < groupSize; rep++) {
+            scheduleMelodyNote(mn.freq, cursor, beatSec * 0.85, 0.16);
+            // HARMONY: when two independent systems in the profile confirm
+            // the same number, sound a genuine harmonic interval (a perfect
+            // fifth, +7 semitones) alongside this note's first repetition —
+            // "two instruments confirming the same note," made audible.
+            if (mn.harmony && rep === 0) {
+              scheduleMelodyNote(mn.harmony.intervalFreq, cursor, beatSec * 0.85, 0.10);
+            }
+            cursor += beatSec;
+          }
+        });
+      } else {
+        var pulseGroup = counts[0];
+        for (var i = 0; i < pulseGroup; i++) {
+          (function(offset) {
+            chordVoices.forEach(function(v) {
+              var t0 = ctx.currentTime + offset;
+              v.gain.gain.setValueAtTime(chordLevel, t0);
+              v.gain.gain.linearRampToValueAtTime(chordLevel * 0.7, t0 + beatSec * 0.5);
+              v.gain.gain.linearRampToValueAtTime(chordLevel, t0 + beatSec);
+            });
+          })(cursor);
+          cursor += beatSec;
+        }
+      }
+
+      var loopDurationSec = Math.max(beatSec * 2, cursor - startOffsetSec);
+      // Re-schedule the next cycle so playback loops indefinitely with no
+      // gap or click between cycles.
+      setTimeout(function() {
+        if (myToken === playToken) scheduleLoop(0);
+      }, Math.max(200, (loopDurationSec - 0.2) * 1000));
+    }
+
+    scheduleLoop(0.1);
+    return true;
+  }
+
+  function setVolume(v01) {
+    if (masterGain) masterGain.gain.linearRampToValueAtTime(v01, (ctx ? ctx.currentTime : 0) + 0.05);
+  }
+
+  function isPlaying() { return playing; }
+
+  return { play: play, stop: stop, setVolume: setVolume, isPlaying: isPlaying };
+})();
+
+var _personalToneScore = null;
+
+// Builds (but does not auto-play) the Personal Tone score for the current
+// reading profile, and updates the caption/approximate-Moon caveat. Safe
+// to call multiple times (new reading, restored purchase flow, etc).
+function initPersonalTone(p) {
+  try {
+    _personalToneScore = p ? buildPersonalToneScore(p) : null;
+  } catch (e) {
+    console.error('[Personal Tone] Could not build score from profile:', e);
+    _personalToneScore = null;
+  }
+
+  var caption = document.getElementById('tone-caption');
+  if (caption) {
+    if (_personalToneScore) {
+      var s = _personalToneScore;
+      var chordDesc = s.chordNotes.map(function(n) { return n.source + ' ' + n.note; }).join(', ');
+      var melodyDesc = s.melodyNotes.length
+        ? (s.melodyNotes.length + ' melody note' + (s.melodyNotes.length === 1 ? '' : 's') + ' from your activated Tarot archetypes')
+        : 'chord only — no zodiac-attributed archetype cards activated for a melody this time';
+      caption.textContent = 'Chord: ' + chordDesc + '  ·  ' + melodyDesc + '  ·  rhythm ' + s.rhythmCounts.join('-');
+    } else {
+      caption.textContent = '';
+    }
+  }
+
+  var approxNote = document.getElementById('tone-approx-note');
+  if (approxNote) {
+    if (_personalToneScore && _personalToneScore.moonApproximate) {
+      approxNote.textContent = 'Moon sign estimated — provide an exact birth time for full accuracy.';
+      approxNote.style.display = 'block';
+    } else {
+      approxNote.style.display = 'none';
+      approxNote.textContent = '';
+    }
+  }
+
+  PersonalTone.stop();
+  var playBtn = document.getElementById('tone-play-btn');
+  var stopBtn = document.getElementById('tone-stop-btn');
+  if (playBtn) playBtn.disabled = false;
+  if (stopBtn) stopBtn.disabled = true;
+}
+
+function stopPersonalTone() {
+  PersonalTone.stop();
+  var playBtn = document.getElementById('tone-play-btn');
+  var stopBtn = document.getElementById('tone-stop-btn');
+  if (playBtn) playBtn.disabled = false;
+  if (stopBtn) stopBtn.disabled = true;
+}
+
+(function() {
+  var playBtn = document.getElementById('tone-play-btn');
+  var stopBtn = document.getElementById('tone-stop-btn');
+  var volumeEl = document.getElementById('tone-volume');
+  if (playBtn) {
+    playBtn.addEventListener('click', function() {
+      var score = _personalToneScore || (window._readingProfile && buildPersonalToneScore(window._readingProfile));
+      if (!score) { console.error('[Personal Tone] No reading profile available to build a score from.'); return; }
+      var ok = PersonalTone.play(score);
+      if (ok) {
+        playBtn.disabled = true;
+        if (stopBtn) stopBtn.disabled = false;
+        if (volumeEl) PersonalTone.setVolume(parseInt(volumeEl.value, 10) / 100);
+      }
+    });
+  }
+  if (stopBtn) {
+    stopBtn.addEventListener('click', function() { stopPersonalTone(); });
+  }
+  if (volumeEl) {
+    volumeEl.addEventListener('input', function() {
+      PersonalTone.setVolume(parseInt(volumeEl.value, 10) / 100);
+    });
+  }
+})();
+
+// ===========================
 // MUTE TOGGLE
 // ===========================
 document.getElementById('mute-btn').addEventListener('click', toggleMute);
@@ -4709,6 +5343,8 @@ document.getElementById('reset-btn').addEventListener('click', function() {
   document.getElementById('val-hook').textContent = '';
   document.getElementById('modal-email').value = '';
   window._ascendantPromise = null;
+  window._moonSignPromise = null;
+  stopPersonalTone();
   var htHour = document.getElementById('hook-time-hour'); if (htHour) htHour.value = '';
   var htMin = document.getElementById('hook-time-minute'); if (htMin) htMin.value = '';
   var htAmpm = document.getElementById('hook-time-ampm'); if (htAmpm) htAmpm.value = 'AM';
@@ -5290,6 +5926,7 @@ function restoreAfterSquareReturn(tierSlug) {
     sgSection2.style.display = 'block';
     buildSacredGeometryDiagram(p, 'sacred-geometry-svg', 'sacred-geometry-caption');
   }
+  initPersonalTone(p);
   var mandalaEl = document.getElementById('egg-mandala-svg');
   if (mandalaEl) mandalaEl.innerHTML = buildEggOfLifeMandala(p);
   renderTierCards();
