@@ -401,6 +401,29 @@ body {
       </div>
       <div data-id="33" class="validation-msg" id="val-hook"></div>
 
+      <label class="label-mono block mb-2 mt-4">BIRTH TIME <span style="opacity:0.6;text-transform:none;letter-spacing:0;">(optional — powers your Ascendant)</span></label>
+      <div id="hook-birthtime-row" class="flex gap-2 mb-1">
+        <select id="hook-time-hour" class="cosmic-select flex-1">
+          <option value="" disabled selected>Hour</option>
+        </select>
+        <select id="hook-time-minute" class="cosmic-select" style="width:80px;">
+          <option value="" disabled selected>Min</option>
+        </select>
+        <select id="hook-time-ampm" class="cosmic-select" style="width:80px;">
+          <option value="AM">AM</option>
+          <option value="PM">PM</option>
+        </select>
+      </div>
+
+      <label class="label-mono block mb-2 mt-3">BIRTH PLACE <span style="opacity:0.6;text-transform:none;letter-spacing:0;">(optional — e.g. Denver, CO)</span></label>
+      <input id="hook-birthplace" type="text" class="cosmic-input mb-1" placeholder="City, State/Country" autocomplete="off" />
+
+      <label style="display:flex;align-items:center;gap:0.5rem;margin:0.6rem 0 0.2rem;cursor:pointer;">
+        <input type="checkbox" id="hook-no-birthtime" style="width:16px;height:16px;accent-color:var(--accent-gold,#c9a84c);" />
+        <span style="font-size:0.78rem;color:var(--text-muted);">I don't know my exact birth time</span>
+      </label>
+      <p class="mb-4" style="color:var(--text-muted); font-size:0.72rem; opacity:0.75;">Your Ascendant (Rising Sign) needs an exact time and place. Skip it and your reading proceeds normally without it.</p>
+
       <button data-id="34" id="hook-btn" class="cta-btn w-full mt-5" style="font-size:1.05rem;">✦ Reveal My Blueprint</button>
       <p data-id="35" class="text-center mt-3" style="color:var(--text-muted); font-size:0.72rem; opacity:0.7;">🔒 Your information is never stored or shared.</p>
     </div>
@@ -493,6 +516,7 @@ body {
       <p id="reading-tarot-label" class="mt-1" style="color:#b08aff;font-size:0.82rem;letter-spacing:0.05em;"></p>
       <p id="reading-archetype-label" class="mt-1 font-serif" style="color:#e8d8a0;font-size:0.78rem;letter-spacing:0.12em;text-transform:uppercase;opacity:0.75;"></p>
       <p id="reading-trump-label" class="mt-1" style="color:#ff9ed2;font-size:0.8rem;font-style:italic;"></p>
+      <p id="reading-ascendant-label" class="mt-1" style="color:var(--text-muted);font-size:0.8rem;font-style:italic;"></p>
 
       <!-- Waveform visualizer -->
       <div data-id="172" class="waveform mt-8" id="waveform">
@@ -745,6 +769,23 @@ body {
         <button data-id="288" id="el-intro-test-btn" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.55rem 1.2rem;background:none;border:1px solid rgba(176,138,255,0.3);color:#b08aff;font-size:0.82rem;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;">🔊 Test Intro Voice</button>
         <div data-id="289" id="el-intro-status" style="font-size:0.75rem;color:#5a4a7a;min-height:1.2em;margin-top:0.4rem;"></div>
       </div>
+    </div>
+
+    <!-- ===== FREEASTROAPI SETTINGS (ASCENDANT) ===== -->
+    <div style="margin-top:2rem;border-top:1px solid rgba(176,138,255,0.15);padding-top:1.5rem;">
+      <div style="font-family:'Courier New',monospace;font-size:0.62rem;letter-spacing:0.4em;color:#c9a84c;margin-bottom:0.3rem;">🌅 ASCENDANT SETTINGS (FREEASTROAPI)</div>
+      <div style="font:700 1.1rem Georgia,serif;color:#e8e0ff;margin-bottom:0.6rem;">Ascendant Settings (FreeAstroAPI)</div>
+      <p style="font-size:0.8rem;color:#8a7aaa;line-height:1.6;margin-bottom:1rem;">Enter your FreeAstroAPI key below to enable Ascendant (Rising Sign) lookups when a client provides an exact birth time and place. It is stored only in your browser's local storage — never in any file or server. Without a key, readings simply proceed without an Ascendant.</p>
+
+      <div style="margin-bottom:0.8rem;">
+        <label style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#c9a84c;display:block;margin-bottom:0.4rem;">API KEY</label>
+        <input type="password" id="astro-api-key-input" class="cosmic-input" placeholder="fa_..." style="font-family:'Courier New',monospace;font-size:0.88rem;" />
+      </div>
+
+      <div style="display:flex;gap:0.6rem;margin-bottom:0.6rem;flex-wrap:wrap;">
+        <button id="astro-save-btn" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.55rem 1.2rem;background:linear-gradient(135deg,#c9a84c,#f0d070);color:#0a0015;font-weight:700;font-size:0.82rem;border:none;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;">💾 Save Key</button>
+      </div>
+      <div id="astro-status" style="font-size:0.75rem;color:#5a4a7a;min-height:1.2em;margin-top:0.3rem;"></div>
     </div>
 
     <!-- ===== CUSTOMER PDF GENERATOR ===== -->
@@ -1783,6 +1824,36 @@ function courtCardFor(soulSephId, suit){
     opt2.value = y; opt2.textContent = y;
     yearSelect.appendChild(opt2);
   }
+  var hourSelect = document.getElementById('hook-time-hour');
+  if (hourSelect) {
+    for (var h = 1; h <= 12; h++) {
+      var optH = document.createElement('option');
+      optH.value = h; optH.textContent = h;
+      hourSelect.appendChild(optH);
+    }
+  }
+  var minuteSelect = document.getElementById('hook-time-minute');
+  if (minuteSelect) {
+    for (var m = 0; m < 60; m += 1) {
+      var optM = document.createElement('option');
+      optM.value = m; optM.textContent = String(m).padStart(2,'0');
+      minuteSelect.appendChild(optM);
+    }
+  }
+  var noTimeCheckbox = document.getElementById('hook-no-birthtime');
+  if (noTimeCheckbox) {
+    noTimeCheckbox.addEventListener('change', function() {
+      var row = document.getElementById('hook-birthtime-row');
+      var placeInput = document.getElementById('hook-birthplace');
+      var disabled = noTimeCheckbox.checked;
+      if (row) row.style.opacity = disabled ? '0.4' : '1';
+      ['hook-time-hour','hook-time-minute','hook-time-ampm'].forEach(function(id){
+        var el = document.getElementById(id);
+        if (el) el.disabled = disabled;
+      });
+      if (placeInput) placeInput.disabled = disabled;
+    });
+  }
 })();
 
 // ===========================
@@ -1838,6 +1909,28 @@ document.getElementById('el-save-btn').addEventListener('click', function() {
   if (introVoice) localStorage.setItem('el_intro_voice_id', introVoice);
   else localStorage.removeItem('el_intro_voice_id');
   status.textContent = '✅ Key saved successfully! Voice will use ElevenLabs on next reading.';
+  status.style.color = '#c9a84c';
+});
+
+// ===========================
+// FREEASTROAPI ADMIN SETTINGS (ASCENDANT)
+// ===========================
+function loadAstroSettings() {
+  var savedKey = localStorage.getItem('astro_api_key');
+  var keyInput = document.getElementById('astro-api-key-input');
+  if (keyInput && savedKey) keyInput.value = savedKey;
+}
+
+document.getElementById('astro-save-btn').addEventListener('click', function() {
+  var key = document.getElementById('astro-api-key-input').value.trim();
+  var status = document.getElementById('astro-status');
+  if (!key) {
+    status.textContent = '⚠️ Please enter your API key.';
+    status.style.color = '#ff9ed2';
+    return;
+  }
+  localStorage.setItem('astro_api_key', key);
+  status.textContent = '✅ Key saved successfully! Ascendant lookups will use FreeAstroAPI on the next reading with a birth time and place.';
   status.style.color = '#c9a84c';
 });
 
@@ -1937,6 +2030,8 @@ function showAdminPanel() {
   }
   // Load ElevenLabs settings when admin panel opens
   loadElevenLabsSettings();
+  // Load FreeAstroAPI (Ascendant) settings when admin panel opens
+  loadAstroSettings();
   panel.style.display = 'block';
 }
 function exportPurchaseCSV() {
@@ -2438,6 +2533,82 @@ function getSunSign(month,day){
   ];
   for(var i=signs.length-1;i>=0;i--){if(month>signs[i].start[0]||(month===signs[i].start[0]&&day>=signs[i].start[1]))return signs[i];}
   return signs[0];
+}
+
+// ===========================
+// ASCENDANT / RISING SIGN — FreeAstroAPI (optional, client-side)
+// ===========================
+// Looks up the Ascendant (rising sign) for a given birth date/time/place using
+// FreeAstroAPI's western rising-sign endpoint. Requires an API key saved via the
+// admin panel (localStorage key 'astro_api_key') AND an exact birth time + place.
+// Returns null (never throws) when the key is missing, inputs are incomplete, or
+// the call fails for any reason — callers should treat a null result as "skip this
+// field," never as an error condition.
+async function getAscendant(year, month, day, hour, minute, place) {
+  var apiKey = localStorage.getItem('astro_api_key');
+  if (!apiKey) {
+    console.info('[Ascendant] Skipped — no astro_api_key saved in admin settings.');
+    return null;
+  }
+  if (year == null || month == null || day == null || hour == null || minute == null || !place) {
+    console.info('[Ascendant] Skipped — missing birth time and/or birth place.');
+    return null;
+  }
+  try {
+    var response = await fetch('https://api.freeastroapi.com/api/v1/western/signs/rising', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey
+      },
+      body: JSON.stringify({
+        year: year, month: month, day: day, hour: hour, minute: minute,
+        city: place,
+        tz_str: 'AUTO',
+        zodiac_type: 'tropical',
+        house_system: 'placidus'
+      })
+    });
+
+    if (!response.ok) {
+      var errText = '';
+      try { errText = await response.text(); } catch (readErr) {}
+      console.error('[Ascendant] API error ' + response.status + ': ' + errText);
+      return null;
+    }
+
+    var data = await response.json();
+    console.info('[Ascendant] Raw API response:', data);
+
+    // Response shape is not fully documented publicly — check a few plausible
+    // field-name variants defensively rather than trusting one guess.
+    var candidate = data;
+    if (candidate && candidate.data) candidate = candidate.data;
+    if (candidate && candidate.result) candidate = candidate.result;
+    if (candidate && candidate.ascendant && typeof candidate.ascendant === 'object') candidate = candidate.ascendant;
+    if (candidate && candidate.rising && typeof candidate.rising === 'object') candidate = candidate.rising;
+
+    var sign = null, degree = null;
+    if (candidate) {
+      sign = candidate.sign || candidate.rising_sign || candidate.ascendant_sign || candidate.zodiac_sign || candidate.name || null;
+      var deg = candidate.degree != null ? candidate.degree
+        : candidate.norm_degree != null ? candidate.norm_degree
+        : candidate.full_degree != null ? candidate.full_degree
+        : candidate.longitude != null ? candidate.longitude
+        : null;
+      if (deg != null && !isNaN(parseFloat(deg))) degree = Math.round(parseFloat(deg) * 100) / 100;
+    }
+
+    if (!sign) {
+      console.error('[Ascendant] Could not find a recognizable sign field in API response.', data);
+      return null;
+    }
+
+    return { sign: sign, degree: degree };
+  } catch (e) {
+    console.error('[Ascendant] Request failed:', e);
+    return null;
+  }
 }
 
 // ===========================
@@ -3089,6 +3260,31 @@ document.getElementById('hook-btn').addEventListener('click', function(){
   // just the first name — so results match the calibration doc by default.
   var usedName = usedNameRaw || fullBirthName;
 
+  // ── OPTIONAL: Birth time + birth place (powers the Ascendant lookup) ──
+  // Kicked off here and awaited later inside doReading() so the screen
+  // transition below isn't blocked by a third-party network call.
+  window._ascendantPromise = null;
+  try {
+    var noBirthTimeEl = document.getElementById('hook-no-birthtime');
+    var skipBirthTime = !!(noBirthTimeEl && noBirthTimeEl.checked);
+    if (!skipBirthTime) {
+      var hourRaw = document.getElementById('hook-time-hour').value;
+      var minuteRaw = document.getElementById('hook-time-minute').value;
+      var ampm = document.getElementById('hook-time-ampm').value;
+      var birthPlace = document.getElementById('hook-birthplace').value.trim();
+      if (hourRaw !== '' && minuteRaw !== '' && birthPlace) {
+        var hour12 = parseInt(hourRaw, 10);
+        var minute = parseInt(minuteRaw, 10);
+        var hour24 = hour12 % 12;
+        if (ampm === 'PM') hour24 += 12;
+        window._ascendantPromise = getAscendant(year, month, day, hour24, minute, birthPlace);
+      }
+    }
+  } catch (ascErr) {
+    console.error('[Ascendant] Could not kick off lookup:', ascErr);
+    window._ascendantPromise = null;
+  }
+
   // ── LAYER 1: Pythagorean Numerology (birth architecture — full birth name) ──
   var lp = calcLifePath(month, day, year);
   var sephInfo = getSephirahForLP(lp);
@@ -3146,7 +3342,8 @@ document.getElementById('hook-btn').addEventListener('click', function(){
     chaldean: chaldean, harmonic: harmonic,
     gematriaBattery: gematriaBattery,
     primaryPath: primary, lifePathTrumpCard: lifePathTrumpCard, trumpPaths: trumpPaths,
-    elementSuit: elementSuit, soulCard: soulCard, courtCard: courtCard, shadowCardPath: shadowCardPath
+    elementSuit: elementSuit, soulCard: soulCard, courtCard: courtCard, shadowCardPath: shadowCardPath,
+    ascendant: null
   };
 
   // Start AI reading in background while reveal narration plays
@@ -3220,6 +3417,9 @@ function getFallbackReading(){
 
   fb+='===PAGE_1_START===\n';
   fb+=p.firstName+', you are '+ca+'. This is not a title \u2014 it is a recognition. Your Life Path '+p.lifePath+', as '+lpData.title+', meets the '+p.sunSign.element+' current of your '+p.sunSign.sign+' Sun, and together they land you at '+p.tree.name+' on the Kabbalistic Tree of Life \u2014 '+p.tree.meaning+'. Three coordinates. One being. The center of your mandala is not above you or ahead of you. It is you.\n\n'+lpData.teaser+'\n\nYour gift \u2014 '+lpData.gift+' \u2014 is not something you earned. It is what you arrived with. When Numerology, Astrology, and Kabbalah all converge on the same essential truth about a soul, that truth becomes impossible to dismiss.\n';
+  if (p.ascendant && p.ascendant.sign) {
+    fb+='\nYour Ascendant \u2014 the sign that was rising on the eastern horizon at the exact moment you were born \u2014 is '+p.ascendant.sign+(p.ascendant.degree!=null?' at '+p.ascendant.degree+'\u00b0':'')+'. Where your Sun sign is who you are at your core, your Ascendant is the lens the world first meets you through.\n';
+  }
   fb+='===PAGE_1_END===\n\n';
 
   fb+='===PAGE_2_START===\n';
@@ -3290,6 +3490,17 @@ async function doReading() {
   var tc = p.tarotCard || TAROT_PATHS[1];
   var ca = p.codexArchetype || 'The Integrator';
 
+  // Resolve the optional Ascendant lookup (kicked off on submit) before building
+  // the prompt. getAscendant() never throws and resolves null on any skip/failure.
+  if (window._ascendantPromise) {
+    try {
+      var ascResult = await window._ascendantPromise;
+      if (ascResult && ascResult.sign) p.ascendant = ascResult;
+    } catch (ascErr) {
+      console.error('[Ascendant] Lookup rejected unexpectedly:', ascErr);
+    }
+  }
+
   // Richer engine additions (Codex Logic V05 layers: Chaldean, Gematria battery,
   // Life Path Trump Card / Metatron's Cube Soul & Court Cards, full Hidden Master audit)
   // woven into the same rich, page-by-page prompt template master already used.
@@ -3300,6 +3511,7 @@ async function doReading() {
   var gematriaBatteryLine = p.gematriaBattery ? ('Gematria Battery (used name): Standard ' + p.gematriaBattery.sg + ', Ordinal ' + p.gematriaBattery.og + ', Reduced ' + p.gematriaBattery.rg + '\n') : '';
   var nameHiddenMastersLine = (p.nameHiddenMasters && p.nameHiddenMasters.length) ? ('Name-Field Hidden Masters (independent of Life Path): ' + formatNameHiddenMasters(p.nameHiddenMasters) + '\n') : '';
   var metatronLine = (p.soulCard && p.courtCard) ? ('Metatron\'s Cube \u2014 Soul Card: ' + p.soulCard.name + ' (' + p.soulCard.keyword + '); Court Card: ' + p.courtCard.name + ', anchored to ' + p.courtCard.veil + '\n') : '';
+  var ascendantLine = (p.ascendant && p.ascendant.sign) ? ('Ascendant (Rising Sign): ' + p.ascendant.sign + (p.ascendant.degree != null ? ' at ' + p.ascendant.degree + '\u00b0' : '') + '\n') : '';
 
   var prompt = 'You are Celestia, the oracle of Circles Squared \u2014 Taurus Codex Geometry. Generate a complete 9-section reading for ' + p.firstName + ' using the unified narrative approach: weave all systems (Astrology, Pythagorean & Chaldean Numerology, Gematria/Kabbalah, Tarot, Metatron\'s Cube, Sacred Geometry) into ONE seamless identity story. Never isolate systems. Introduce each when relevant. Rich, warm, poetic, second-person prose. Be specific to the exact data.\n\n'
     + 'PROFILE:\n'
@@ -3309,6 +3521,7 @@ async function doReading() {
     + chaldeanLine
     + gematriaBatteryLine
     + 'Sun Sign: ' + p.sunSign.sign + ' (' + p.sunSign.element + ', ' + p.sunSign.modality + ', ruled by ' + p.sunSign.planet + ')\n'
+    + ascendantLine
     + 'Sephirah: ' + p.tree.name + ' \u2014 ' + p.tree.meaning + '\n'
     + 'Tarot Path ' + tc.path + ': ' + tc.card + ' (' + tc.letter + ') \u2014 ' + tc.archetype + '\n'
     + (p.lifePathTrumpCard ? ('Life Path Trump Card (Major Arcana, Path ' + p.lifePathTrumpCard.num + '): ' + p.lifePathTrumpCard.numeral + ' ' + p.lifePathTrumpCard.card + ', keyword ' + p.lifePathTrumpCard.keyword + '\n') : '')
@@ -3317,7 +3530,7 @@ async function doReading() {
     + nameHiddenMastersLine
     + 'Personal Year 2026: ' + p.personalYear2026 + '\n'
     + '\nWrite exactly 9 sections with ===PAGE_N_START=== and ===PAGE_N_END=== delimiters on their own lines (each delimiter on its own line, no other text on that line). Each section: 5\u20136 rich, deeply personal paragraphs. Every paragraph must reference ' + p.firstName + ' by name at least once and cite the specific numbers or symbols from their profile. No generic affirmations. Celestia speaks with warm authority, poetic depth, and precision.\n\n'
-    + 'Page 1 \u2014 IDENTITY ESSENCE: Open with the exact phrase "' + p.firstName + ', you are ' + ca + '." Then paint a full-portrait synthesis: how Life Path ' + p.lifePath + ' (' + lpTitle + ') shapes the core drive, how ' + p.sunSign.sign + ' Sun infuses it with elemental character (' + p.sunSign.element + ', ruled by ' + p.sunSign.planet + '), and how ' + p.tree.name + ' on the Tree of Life places this soul at a specific energetic address in creation. Explain what the Codex Archetype ' + ca + ' means as a living identity \u2014 not a label but a mandate. End by naming the specific gift this soul arrived with.\n'
+    + 'Page 1 \u2014 IDENTITY ESSENCE: Open with the exact phrase "' + p.firstName + ', you are ' + ca + '." Then paint a full-portrait synthesis: how Life Path ' + p.lifePath + ' (' + lpTitle + ') shapes the core drive, how ' + p.sunSign.sign + ' Sun infuses it with elemental character (' + p.sunSign.element + ', ruled by ' + p.sunSign.planet + ')' + (p.ascendant && p.ascendant.sign ? ', how their ' + p.ascendant.sign + ' Ascendant colors the lens the world first meets them through' : '') + ', and how ' + p.tree.name + ' on the Tree of Life places this soul at a specific energetic address in creation. Explain what the Codex Archetype ' + ca + ' means as a living identity \u2014 not a label but a mandate. End by naming the specific gift this soul arrived with.\n'
     + 'Page 2 \u2014 ARCHETYPAL SIGNATURE: Explore the full mythic narrative. ' + tc.card + ' (Path ' + tc.path + ', letter ' + tc.letter + ') is the archetype ' + p.firstName + ' is living' + (p.lifePathTrumpCard ? ', confirmed by the Life Path Trump Card ' + p.lifePathTrumpCard.numeral + ' ' + p.lifePathTrumpCard.card : '') + '. Explain what this card means as a life-force not just a symbol, how the ' + p.sunSign.sign + ' Sun amplifies or challenges this path, and how the Kabbalistic letter ' + tc.letter + ' encodes a specific teaching in their very name. Name the mythic figures, gods, or archetypes associated with this path. Describe what it feels like to embody ' + tc.card + ' fully vs. when it is suppressed.\n'
     + 'Page 3 \u2014 FREQUENCY PATTERN: Decode the name. Life Path ' + p.lifePath + ' is the birth frequency. Expression ' + (p.expression||'?') + ' is the gift encoded in every letter of "' + p.firstName + '". Soul Urge ' + (p.soulUrge||'?') + ' is the private longing beneath the surface. Gematria total ' + (p.gematria?p.gematria.total:'?') + ' reducing to ' + (p.gematria?p.gematria.reduced:'?') + ' is the name\'s sacred numerical signature.' + (p.chaldean ? ' The Chaldean compound of the name ' + p.firstName + ' is actually called by resolves to ' + p.chaldean.compound + ' (' + p.chaldean.reduced + '), a living-identity number layered atop the birth frequency.' : '') + ' Show how these harmonize \u2014 different instruments playing the same song. Explain what happens when ' + p.firstName + ' aligns with vs. resists this frequency.\n'
     + 'Page 4 \u2014 THE FIELD GEOMETRY: ' + p.firstName + '\'s identity is a living Egg of Life \u2014 eight interlocking circles of force. Map which nodes are most activated: ' + p.tree.name + ' (Kabbalah), ' + tc.card + ' (Tarot), ' + p.sunSign.sign + ' (Astrology), Life Path ' + p.lifePath + ' (Numerology), gematria ' + (p.gematria?p.gematria.reduced:'?') + ' (Gematria), and Sacred Geometry as the container. Explain what it means that these systems converge on a single being. Describe the energetic field this soul radiates and how others experience it. Name the specific intersection points where power concentrates.\n'
@@ -3358,6 +3571,8 @@ function startOracleReading() {
   if(archetypeLabelEl) archetypeLabelEl.textContent = '\u2726 Codex Archetype: ' + ca + ' \u2726';
   var trumpLabel = document.getElementById('reading-trump-label');
   if (trumpLabel) trumpLabel.textContent = p.lifePathTrumpCard ? ('\u2726 ' + p.lifePathTrumpCard.numeral + ' \u00b7 ' + p.lifePathTrumpCard.card) : '';
+  var ascendantLabel = document.getElementById('reading-ascendant-label');
+  if (ascendantLabel) ascendantLabel.textContent = (p.ascendant && p.ascendant.sign) ? ('\u2191 Rising: ' + p.ascendant.sign + (p.ascendant.degree != null ? ' (' + p.ascendant.degree + '\u00b0)' : '')) : '';
 
   // Reset waveform
   var waveform = document.getElementById('waveform');
@@ -4184,6 +4399,7 @@ function generateAndDownloadPDF() {
   var keyNums=[];
   if(p.lifePath) keyNums.push('Life Path '+p.lifePath);
   if(p.sunSign) keyNums.push(p.sunSign.sign);
+  if(p.ascendant && p.ascendant.sign) keyNums.push(p.ascendant.sign+' Rising');
   if(p.tree) keyNums.push(p.tree.name);
   doc.setFont('courier','normal'); doc.setFontSize(7.5); doc.setTextColor(GOLD[0],GOLD[1],GOLD[2]);
   doc.text(keyNums.join('  ·  '), W/2, H/2-12, {align:'center'});
@@ -4359,6 +4575,12 @@ document.getElementById('reset-btn').addEventListener('click', function() {
   document.getElementById('hook-year').value = '';
   document.getElementById('val-hook').textContent = '';
   document.getElementById('modal-email').value = '';
+  window._ascendantPromise = null;
+  var htHour = document.getElementById('hook-time-hour'); if (htHour) htHour.value = '';
+  var htMin = document.getElementById('hook-time-minute'); if (htMin) htMin.value = '';
+  var htAmpm = document.getElementById('hook-time-ampm'); if (htAmpm) htAmpm.value = 'AM';
+  var htPlace = document.getElementById('hook-birthplace'); if (htPlace) htPlace.value = '';
+  var htNoTime = document.getElementById('hook-no-birthtime'); if (htNoTime) htNoTime.checked = false;
 
   // Reset reading screen visuals
   document.getElementById('reading-name').textContent = '';
@@ -4367,6 +4589,8 @@ document.getElementById('reset-btn').addEventListener('click', function() {
   document.getElementById('reading-seph-label').textContent = '';
   var trumpLabelReset = document.getElementById('reading-trump-label');
   if (trumpLabelReset) trumpLabelReset.textContent = '';
+  var ascendantLabelReset = document.getElementById('reading-ascendant-label');
+  if (ascendantLabelReset) ascendantLabelReset.textContent = '';
 
   // Re-show orb section if hidden by unlockFullReading
   var readingOrb = document.getElementById('reading-orb');
