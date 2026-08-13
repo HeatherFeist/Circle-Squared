@@ -921,6 +921,20 @@ function escapeXmlForSsml(text) {
 //   - Both an API key AND a region are required (ElevenLabs only needed a key).
 //   - The body is SSML/XML, not JSON — text must be XML-escaped first.
 //   - The response is raw audio bytes (not JSON), same as ElevenLabs.
+// Wraps a promise so it rejects after `ms` if it hasn't settled — used below
+// to stop a stuck network request or a stalled audio.play() from hanging the
+// whole narration chain silently forever. Only guards "am I getting a
+// response at all" / "did playback actually start" — never wraps the
+// playback-duration promise itself, so a legitimately long spoken line is
+// never cut off once audio is genuinely playing.
+function _withTimeout(promise, ms, label) {
+  var timeoutId;
+  var timeoutPromise = new Promise(function(_, reject) {
+    timeoutId = setTimeout(function() { reject(new Error(label + ' timed out after ' + ms + 'ms')); }, ms);
+  });
+  return Promise.race([promise, timeoutPromise]).finally(function() { clearTimeout(timeoutId); });
+}
+
 async function azureSpeak(text, apiKey, region, voiceId) {
   if (!apiKey || !region || !voiceId) {
     throw new Error('Azure TTS: missing apiKey, region, or voiceId');
@@ -933,6 +947,11 @@ async function azureSpeak(text, apiKey, region, voiceId) {
     "</voice></speak>";
   var endpoint = 'https://' + region + '.tts.speech.microsoft.com/cognitiveservices/v1';
 
+  // 8s network timeout via AbortController — a stalled fetch() with no
+  // timeout at all was the root cause of the narration sometimes never
+  // starting: no response, no error, no fallback ever triggered.
+  var controller = new AbortController();
+  var abortTimer = setTimeout(function() { controller.abort(); }, 8000);
   var response;
   try {
     response = await fetch(endpoint, {
@@ -943,11 +962,18 @@ async function azureSpeak(text, apiKey, region, voiceId) {
         'X-Microsoft-OutputFormat': 'audio-16khz-128kbitrate-mono-mp3',
         'User-Agent': 'CirclesSquaredOracle'
       },
-      body: ssml
+      body: ssml,
+      signal: controller.signal
     });
   } catch (networkErr) {
+    if (networkErr && networkErr.name === 'AbortError') {
+      console.error('[Azure TTS] request timed out after 8s — region unreachable or Azure is slow to respond:', region);
+      throw new Error('Azure TTS timed out contacting region "' + region + '"');
+    }
     console.error('[Azure TTS] network/fetch error — check region is reachable and correctly spelled:', networkErr);
     throw new Error('Azure TTS network error: ' + (networkErr && networkErr.message ? networkErr.message : networkErr));
+  } finally {
+    clearTimeout(abortTimer);
   }
 
   if (!response.ok) {
@@ -965,7 +991,16 @@ async function azureSpeak(text, apiKey, region, voiceId) {
   var url = URL.createObjectURL(blob);
   var audio = new Audio(url);
   currentAudio = audio;
-  await audio.play();
+  // 5s timeout on *starting* playback only (e.g. a stuck autoplay-policy
+  // promise) — once playback genuinely begins, the ended/error listener
+  // below is unbounded, so long narration is never cut short.
+  try {
+    await _withTimeout(audio.play(), 5000, '[Azure TTS] audio.play()');
+  } catch (playErr) {
+    URL.revokeObjectURL(url);
+    console.error('[Azure TTS] playback failed to start:', playErr);
+    throw playErr;
+  }
   return new Promise(function(resolve, reject) {
     audio.addEventListener('ended', function() { URL.revokeObjectURL(url); resolve(); });
     audio.addEventListener('error', function(e) { URL.revokeObjectURL(url); reject(e); });
@@ -976,11 +1011,17 @@ async function azureSpeak(text, apiKey, region, voiceId) {
 async function appSdkSpeak(text) {
   if (!window.AppSDK || !window.AppSDK.ai || !window.AppSDK.ai.speak) return false;
   try {
-    var result = await AppSDK.ai.speak({ text: text, voice: 'onyx', audioFormat: 'mp3' });
+    // Same reasoning as azureSpeak's timeouts: this is a fallback path that
+    // itself must not be able to hang, or a stuck Azure call falling through
+    // to a stuck AppSDK call just moves the silent-hang bug rather than
+    // fixing it.
+    var result = await _withTimeout(
+      AppSDK.ai.speak({ text: text, voice: 'onyx', audioFormat: 'mp3' }), 8000, 'AppSDK.ai.speak'
+    );
     if (_speakCancelled) return true;
     var audio = new Audio('data:audio/' + result.format + ';base64,' + result.audio);
     currentAudio = audio;
-    await audio.play();
+    await _withTimeout(audio.play(), 5000, 'AppSDK audio.play()');
     await new Promise(function(resolve) {
       audio.addEventListener('ended', resolve);
       audio.addEventListener('error', resolve);
