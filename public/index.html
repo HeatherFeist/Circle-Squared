@@ -450,14 +450,19 @@ body {
     </div>
     <p id="reveal-status" class="mt-2 mb-4" style="color:var(--text-muted);font-size:0.78rem;letter-spacing:0.15em;text-align:center;">Channeling your blueprint...</p>
 
-    <!-- PANEL 1: Numerology breakdown -->
-    <div id="reveal-numerology-panel" style="width:100%;margin-bottom:1rem;opacity:0;transition:opacity 1.2s ease;"></div>
-
-    <!-- PANEL 2: Astrology wheel -->
-    <div id="reveal-astro-panel" style="width:100%;margin-bottom:1rem;opacity:0;transition:opacity 1.2s ease;"></div>
-
-    <!-- PANEL 3: Tree of Life -->
-    <div id="reveal-tol-panel" style="width:100%;margin-bottom:1rem;opacity:0;transition:opacity 1.2s ease;"></div>
+    <!-- The Codex diagram itself — same buildSacredGeometryDiagram() used on
+         the offer screen (Flower of Life -> Fruit of Life -> Tree of Life +
+         Veils -> Metatron's Cube -> Tarot capstone), built here with
+         options.manualReveal:true so its 5 stages fade in one at a time,
+         driven by the narration below (see initRevealScreen) instead of the
+         diagram's own fixed-cadence timer. Unique ids so this instance never
+         collides with '#sacred-geometry-svg'/'#sacred-geometry-caption' on
+         the offer screen — that instance is untouched and still reveals
+         itself automatically. -->
+    <div id="reveal-sacred-geometry-svg-wrapper" class="cosmic-card" style="width:100%;margin-bottom:1rem;padding:1.2rem 0.5rem 0.5rem;">
+      <div id="reveal-sacred-geometry-svg"></div>
+    </div>
+    <div id="reveal-sacred-geometry-caption" style="text-align:center;margin-bottom:1rem;"></div>
 
     <!-- Skip button (appears after 20 seconds) -->
     <button id="reveal-skip-btn" class="skip-btn" style="display:none;margin-top:1rem;">Continue →</button>
@@ -3147,9 +3152,10 @@ function sgGroup(svgEl, id) {
 // §16.4 staged reveal (Flower -> Fruit -> Tree+Veils -> Cube -> Capstone).
 // containerId: element to receive the <svg>. captionId (optional): element
 // to receive the Soul/Court Card capstone label text.
-function buildSacredGeometryDiagram(p, containerId, captionId) {
+function buildSacredGeometryDiagram(p, containerId, captionId, options) {
   var container = document.getElementById(containerId);
   if (!container) return;
+  options = options || {};
 
   var VW = 320, VH = 320, cx = 160, cy = 160;
   var R = 22; // base circle radius r (§14.1) — everything else derives from this
@@ -3270,11 +3276,16 @@ function buildSacredGeometryDiagram(p, containerId, captionId) {
     }
   }
 
-  // §16.4 staged reveal: fade each layer in after the previous.
-  sgRevealStages(svgEl, containerId, [
-    containerId + '-stage-flower', containerId + '-stage-fruit',
-    containerId + '-stage-tree', containerId + '-stage-cube', containerId + '-stage-capstone'
-  ]);
+  // §16.4 staged reveal: fade each layer in after the previous. When
+  // options.manualReveal is set, the caller drives each stage itself (e.g.
+  // the reveal screen, timed by narration) via sgRevealStage() below instead
+  // of this self-driving fixed-cadence loop.
+  if (!options.manualReveal) {
+    sgRevealStages(svgEl, containerId, [
+      containerId + '-stage-flower', containerId + '-stage-fruit',
+      containerId + '-stage-tree', containerId + '-stage-cube', containerId + '-stage-capstone'
+    ]);
+  }
 }
 
 function sgRevealStages(svgEl, containerId, stageIds) {
@@ -3285,6 +3296,16 @@ function sgRevealStages(svgEl, containerId, stageIds) {
       if (g) g.classList.add('sg-visible');
     }, i * STEP_MS);
   });
+}
+
+// Fades in exactly one named stage group ('flower'|'fruit'|'tree'|'cube'|
+// 'capstone') for the diagram built at containerId. Reuses the same
+// sg-visible class toggle sgRevealStages uses internally, just callable
+// per-stage on demand instead of only as a self-driving timed loop — lets
+// external narration (see initRevealScreen) drive the reveal directly.
+function sgRevealStage(containerId, stageName) {
+  var g = document.getElementById(containerId + '-stage-' + stageName);
+  if (g) g.classList.add('sg-visible');
 }
 
 // ===========================
@@ -4736,28 +4757,18 @@ function initRevealScreen() {
   document.getElementById('reveal-status').textContent = 'Channeling your blueprint...';
   document.getElementById('reveal-skip-btn').style.display = 'none';
 
-  // Build the three visualization panels' HTML up front, but keep them hidden
-  // (opacity:0) — they fade in one at a time, in step with the narration below.
-  var numEl = document.getElementById('reveal-numerology-panel');
-  var astroEl = document.getElementById('reveal-astro-panel');
-  var tolEl = document.getElementById('reveal-tol-panel');
-  if (numEl) { numEl.innerHTML = buildNumerologyPanel(p); numEl.style.opacity = '0'; }
-  if (astroEl) { astroEl.innerHTML = buildAstrologyWheel(p); astroEl.style.opacity = '0'; }
-  if (tolEl) { tolEl.innerHTML = buildTreeOfLifeSVG(p); tolEl.style.opacity = '0'; }
+  // Build the real layered sacred-geometry diagram (System B) up front, with
+  // manualReveal:true so all 5 stage groups exist in the DOM at opacity:0 —
+  // they fade in one at a time, in step with the narration below, instead of
+  // the diagram's own fixed 900ms-per-stage timer.
+  buildSacredGeometryDiagram(p, 'reveal-sacred-geometry-svg', 'reveal-sacred-geometry-caption', { manualReveal: true });
 
   _revealSkipTimer = setTimeout(function() {
     var btn = document.getElementById('reveal-skip-btn');
     if (btn) btn.style.display = 'inline-block';
   }, 20000);
 
-  function fadeIn(el) {
-    if (!el) return;
-    requestAnimationFrame(function() {
-      requestAnimationFrame(function() { el.style.opacity = '1'; });
-    });
-  }
-
-  // Sequenced reveal — each segment's visual panel fades in right as the
+  // Sequenced reveal — each segment's diagram stage fades in right as the
   // free-intro voice starts narrating it. Driven entirely by the narration's
   // own onFinish callbacks (or, when muted/no voice available, a short fixed
   // pause per step) so visuals and voice can never drift apart.
@@ -4768,9 +4779,7 @@ function initRevealScreen() {
     if (idx >= segments.length) { onRevealComplete(); return; }
     var seg = segments[idx];
     idx++;
-    if (seg.panel === 'numerology') fadeIn(numEl);
-    else if (seg.panel === 'astro') fadeIn(astroEl);
-    else if (seg.panel === 'tol') fadeIn(tolEl);
+    if (seg.stage) sgRevealStage('reveal-sacred-geometry-svg', seg.stage);
 
     if (isMuted) {
       setTimeout(playNext, seg.mutedPauseMs || 3500);
@@ -5052,55 +5061,65 @@ function buildEggOfLifeMandala(p) {
 // racing ahead or lagging behind them.
 function buildRevealScript() {
   var p = window._readingProfile;
-  var lpData = LP_DATA[p.lifePath] || LP_DATA[reduceNum(p.lifePath,false)] || LP_DATA[6];
-  var lpMeaning = LP_MEANINGS[p.lifePath] || LP_MEANINGS[reduceNum(p.lifePath,false)] || LP_MEANINGS[6];
   var seph = p.tree;
   var sign = p.sunSign;
-  var lpKey = p.lifePath;
-  if (!ELEMENT_LP_INTERACTION[sign.element] || !ELEMENT_LP_INTERACTION[sign.element][lpKey]) {
-    lpKey = reduceNum(p.lifePath, false);
-  }
-  var elementLine = (ELEMENT_LP_INTERACTION[sign.element] && ELEMENT_LP_INTERACTION[sign.element][lpKey]) || '';
-
-  var tc = p.tarotCard || TAROT_PATHS[1];
+  var trumpPaths = (p.trumpPaths || []).filter(Boolean);
+  var trumpNames = trumpPaths.map(function(tp) { return tp.numeral + ' ' + tp.card; }).join(' and ');
   var ca = p.codexArchetype || 'The Integrator';
 
+  // Five segments, one per stage of the real layered sacred-geometry diagram
+  // (buildSacredGeometryDiagram / sgRevealStage — see initRevealScreen).
+  // Blended framing per the repo owner's brief: explain the Codex system
+  // conceptually as each layer builds, but still land the subject's own
+  // numbers within each stage rather than holding them all for the end.
   return [
-    // 1. Orb + name are already on screen — a short hook while nothing new appears yet.
+    // 1. flower — whole-system framing, no personal number yet. This is the
+    // "base layer" the owner described: the Codex is made of ancient systems
+    // layered as one structure, starting with the Flower of Life.
     {
-      panel: null,
-      mutedPauseMs: 2500,
-      text: p.firstName + '. What I am about to show you was not built for everyone. '
-        + 'It was built for this exact moment — your name and your birth date, read together through five ancient systems at once.'
+      stage: 'flower',
+      mutedPauseMs: 3000,
+      text: p.firstName + ', what you are about to see is the Codex itself — one living structure, '
+        + 'built by layering ancient systems on top of one another. The base layer is the Flower of Life: '
+        + 'nineteen interlocking circles, the geometric root every other layer grows from.'
     },
-    // 2. Numerology panel fades in — narrate the Life Path calculation and meaning.
+    // 2. fruit — the inner 13 circles as the foundation the Tree and Cube
+    // stand on. Kept as its own beat (not folded into segment 1) so the
+    // Fruit gets its own moment on screen instead of rushing past it.
     {
-      panel: 'numerology',
-      mutedPauseMs: 4500,
-      text: 'The first system is Numerology. Your birth date carries a hidden frequency, and when we reduce it step by step, it converges on a single number: '
-        + p.lifePath + '. Your Life Path — known as ' + lpData.title + '. ' + lpMeaning
+      stage: 'fruit',
+      mutedPauseMs: 3000,
+      text: 'Within that flower lives the Fruit of Life — thirteen circles that hold the blueprint for everything '
+        + 'that comes next. Every Tree, every Cube, every path you will ever read in this Codex is drawn from these thirteen points.'
     },
-    // 3. Astrology wheel fades in — narrate the Sun sign.
+    // 3. tree — the Kabbalistic Tree of Life takes shape. First personal
+    // landing: Life Path number + Sephirah placement.
     {
-      panel: 'astro',
+      stage: 'tree',
       mutedPauseMs: 4000,
-      text: 'The second system is Astrology. At the moment you were born, the Sun stood in ' + sign.sign
-        + ' — a ' + sign.element + ' sign, ruled by ' + sign.planet + '.'
-        + (elementLine ? ' ' + elementLine : '')
+      text: 'Now the Kabbalistic Tree of Life rises out of the Fruit — ten Sephiroth joined by twenty-two paths. '
+        + 'Your birth date reduces to a single Life Path number, ' + p.lifePath + ', and that number places you at '
+        + seph.name + ': ' + seph.meaning + '. This is not symbolic — it is your address on the map.'
     },
-    // 4. Tree of Life fades in — narrate the Sephirah placement.
+    // 4. cube — Metatron's Cube emerges around the Tree. Second personal
+    // landing: Sun sign.
     {
-      panel: 'tol',
+      stage: 'cube',
       mutedPauseMs: 4000,
-      text: 'The third system is the Kabbalistic Tree of Life. Your Life Path places you at ' + seph.name + ': '
-        + seph.meaning + '. This is not symbolic — it is your energetic address in creation.'
+      text: 'Around the Tree, Metatron\'s Cube now emerges — seventy-eight lines connecting those same thirteen points, '
+        + 'the geometry underneath every form in creation. At the moment you were born, the Sun stood in ' + sign.sign
+        + ', a ' + sign.element + ' sign ruled by ' + sign.planet + ' — one more coordinate this Cube already holds for you.'
     },
-    // 5. No new panel — tease the remaining systems (Tarot, Sacred Geometry) and the Codex Archetype, then prompt the email gate.
+    // 5. capstone — the subject's own chart lands on the map: Tarot path,
+    // Soul Card, Court Card, Codex Archetype. Closes into the same
+    // email-gate call-to-action the old script ended on.
     {
-      panel: null,
+      stage: 'capstone',
       mutedPauseMs: 3500,
-      text: 'Two more systems are already converging on you — Tarot, and the Sacred Geometry of your living mandala. '
-        + 'Together with what you\'ve just seen, they name your Codex Archetype: ' + ca + '. '
+      text: 'And here is where you fit into all of this. Your path lights up' + (trumpNames ? ' — ' + trumpNames : '')
+        + ' — with your Soul Card, ' + (p.soulCard ? p.soulCard.name : '')
+        + ', and your Court Card, ' + (p.courtCard ? p.courtCard.name : '') + ', standing beside it. '
+        + 'Together, everything you\'ve just seen names your Codex Archetype: ' + ca + '. '
         + 'Your complete reading is ready. I just need your name and email to open it for you.'
     }
   ];
