@@ -432,7 +432,7 @@ body {
 
 <!-- ===== SCREEN REVEAL: PERSONALIZED NARRATED REVEAL ===== -->
 <div id="screen-reveal" class="screen">
-  <div style="max-width:520px;width:100%;padding:2rem 1.5rem;margin:0 auto;display:flex;flex-direction:column;align-items:center;padding-top:2.5rem;padding-bottom:3rem;">
+  <div style="max-width:640px;width:100%;padding:2rem 1.5rem;margin:0 auto;display:flex;flex-direction:column;align-items:center;padding-top:2.5rem;padding-bottom:3rem;">
 
     <p class="label-mono mb-3" style="color:var(--accent-gold);font-size:0.6rem;letter-spacing:0.4em;">✦ YOUR BLUEPRINT ✦</p>
     <h2 id="reveal-name" class="gradient-title font-serif text-3xl font-bold mb-4" style="line-height:1.1;text-align:center;"></h2>
@@ -569,7 +569,7 @@ body {
            ones. This is additive to, and a different geometric layer from,
            the Egg of Life mandala above (§14.5: numerological angle-division
            mandala — do not conflate). -->
-      <div id="sacred-geometry-section" style="display:none;width:100%;max-width:520px;margin:0 auto 2rem;padding:0 1rem;">
+      <div id="sacred-geometry-section" style="display:none;width:100%;max-width:640px;margin:0 auto 2rem;padding:0 1rem;">
         <div style="text-align:center;margin-bottom:1rem;">
           <div style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.4em;color:#c9a84c;margin-bottom:0.3rem;">✦ THE FULL SACRED GEOMETRY ✦</div>
           <h3 style="font:700 1.2rem Georgia,serif;background:linear-gradient(135deg,#e8e0ff,#b08aff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:0 0 0.3rem;">Flower of Life → Tree of Life → Metatron&rsquo;s Cube</h3>
@@ -3247,7 +3247,7 @@ function buildSacredGeometryDiagram(p, containerId, captionId, options) {
   var svgEl = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   svgEl.setAttribute('viewBox', '0 0 ' + VW + ' ' + VH);
   svgEl.setAttribute('width', '100%');
-  svgEl.setAttribute('style', 'max-width:420px;display:block;margin:0 auto;');
+  svgEl.setAttribute('style', 'max-width:600px;display:block;margin:0 auto;');
   svgEl.setAttribute('id', containerId + '-inner');
 
   var defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
@@ -5151,54 +5151,73 @@ function buildRevealScript() {
   // Blended framing per the repo owner's brief: explain the Codex system
   // conceptually as each layer builds, but still land the subject's own
   // numbers within each stage rather than holding them all for the end.
+  // Each segment (2-5) now opens by explicitly naming its geometric
+  // relationship to the layer before it — not just "here's the next system,"
+  // but "here's how it's built from what you just saw" — per the repo
+  // owner's feedback that the interconnection between systems needed to be
+  // spelled out, not just implied by the visual stacking. This mirrors how
+  // the Codex Logic V06 doc itself describes it (§14.4: "the Cube rides the
+  // Tree, which rides the Fruit, which blooms from the Flower").
   return [
     // 1. flower — whole-system framing, no personal number yet. This is the
     // "base layer" the owner described: the Codex is made of ancient systems
     // layered as one structure, starting with the Flower of Life.
     {
       stage: 'flower',
-      mutedPauseMs: 3000,
+      mutedPauseMs: 3200,
       text: p.firstName + ', what you are about to see is the Codex itself — one living structure, '
-        + 'built by layering ancient systems on top of one another. The base layer is the Flower of Life: '
-        + 'nineteen interlocking circles, the geometric root every other layer grows from.'
+        + 'not five separate systems, but five ancient languages describing the same underlying geometry. '
+        + 'They are built by layering on top of one another, each one growing out of the last. '
+        + 'The base layer is the Flower of Life: nineteen interlocking circles, the geometric root every other layer grows from.'
     },
     // 2. fruit — the inner 13 circles as the foundation the Tree and Cube
     // stand on. Kept as its own beat (not folded into segment 1) so the
     // Fruit gets its own moment on screen instead of rushing past it.
     {
       stage: 'fruit',
-      mutedPauseMs: 3000,
-      text: 'Within that flower lives the Fruit of Life — thirteen circles that hold the blueprint for everything '
-        + 'that comes next. Every Tree, every Cube, every path you will ever read in this Codex is drawn from these thirteen points.'
+      mutedPauseMs: 3200,
+      text: 'Look closer, and thirteen of those circles — the innermost ones — reveal themselves as the Fruit of Life. '
+        + 'This is not a new shape. It is the same Flower, seen at the depth where its real structure lives. '
+        + 'Every Tree, every Cube, every path you will ever read in this Codex is drawn from these exact thirteen points — '
+        + 'nothing that follows is separate from what you are looking at right now.'
     },
     // 3. tree — the Kabbalistic Tree of Life takes shape. First personal
     // landing: Life Path number + Sephirah placement.
     {
       stage: 'tree',
-      mutedPauseMs: 4000,
-      text: 'Now the Kabbalistic Tree of Life rises out of the Fruit — ten Sephiroth joined by twenty-two paths. '
-        + 'Your birth date reduces to a single Life Path number, ' + p.lifePath + ', and that number places you at '
-        + seph.name + ': ' + seph.meaning + '. This is not symbolic — it is your address on the map.'
+      mutedPauseMs: 4200,
+      text: 'Now watch those same thirteen points organize themselves into the Kabbalistic Tree of Life — '
+        + 'ten Sephiroth, joined by twenty-two paths, using no points but the ones the Fruit already gave us. '
+        + 'This is where Numerology and Kabbalah meet: your birth date reduces to a single Life Path number, '
+        + p.lifePath + ', and that number places you, specifically, at ' + seph.name + ': ' + seph.meaning + '. '
+        + 'This is not symbolic — it is your address on the map you just watched being built.'
     },
     // 4. cube — Metatron's Cube emerges around the Tree. Second personal
-    // landing: Sun sign.
+    // landing: Sun sign. Explicitly names the Tree-paths-are-a-subset-of-
+    // Cube-lines relationship rather than leaving it implicit.
     {
       stage: 'cube',
-      mutedPauseMs: 4000,
-      text: 'Around the Tree, Metatron\'s Cube now emerges — seventy-eight lines connecting those same thirteen points, '
-        + 'the geometry underneath every form in creation. At the moment you were born, the Sun stood in ' + sign.sign
-        + ', a ' + sign.element + ' sign ruled by ' + sign.planet + ' — one more coordinate this Cube already holds for you.'
+      mutedPauseMs: 4200,
+      text: 'Around the Tree, Metatron\'s Cube now emerges — and here is the part most people never get shown: '
+        + 'every one of the twenty-two paths you just saw on the Tree is already a line inside this Cube. '
+        + 'The Cube does not sit beside the Tree. It contains it — seventy-eight lines total, connecting those same '
+        + 'thirteen points, the geometry underneath every form in creation. This is where Astrology enters the same '
+        + 'structure: at the moment you were born, the Sun stood in ' + sign.sign + ', a ' + sign.element
+        + ' sign ruled by ' + sign.planet + ' — one more coordinate this Cube was already holding for you.'
     },
     // 5. capstone — the subject's own chart lands on the map: Tarot path,
-    // Soul Card, Court Card, Codex Archetype. Closes into the same
-    // email-gate call-to-action the old script ended on.
+    // Soul Card, Court Card, Codex Archetype. Opens with an explicit
+    // synthesis line tying all four prior layers together before landing
+    // Tarot as the payoff, then closes into the email-gate call-to-action.
     {
       stage: 'capstone',
-      mutedPauseMs: 3500,
-      text: 'And here is where you fit into all of this. Your path lights up' + (trumpNames ? ' — ' + trumpNames : '')
-        + ' — with your Soul Card, ' + (p.soulCard ? p.soulCard.name : '')
+      mutedPauseMs: 3800,
+      text: 'So follow it back: the Flower held the Fruit, the Fruit gave the Tree its points, the Tree\'s own paths turned out '
+        + 'to already be inside the Cube, and Astrology named one more coordinate on that same structure. '
+        + 'Five systems, one geometry — and Tarot is where it all becomes a story. Your path lights up'
+        + (trumpNames ? ' — ' + trumpNames : '') + ' — with your Soul Card, ' + (p.soulCard ? p.soulCard.name : '')
         + ', and your Court Card, ' + (p.courtCard ? p.courtCard.name : '') + ', standing beside it. '
-        + 'Together, everything you\'ve just seen names your Codex Archetype: ' + ca + '. '
+        + 'Together, everything you\'ve just seen — and everything it was built from — names your Codex Archetype: ' + ca + '. '
         + 'Your complete reading is ready. I just need your name and email to open it for you.'
     }
   ];
