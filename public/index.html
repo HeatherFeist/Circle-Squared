@@ -1401,18 +1401,43 @@ function computePartnerProfile(firstName, month, day, year) {
   var codexArchetype = getCodexArchetype(lp, sunSign.element);
   var axisRole = getAxisRole(lp);
   var lpData = LP_DATA[lp] || LP_DATA[reduceNum(lp, false)] || LP_DATA[6];
+
+  // ── Richer engine layers (same battery the solo profile computes) ──
+  // Partnership intake only collects a single name field per partner, so
+  // that name doubles as both the "used name" (Chaldean layer) and the
+  // "full birth name" (Hidden Master audit layer) — additive richness on
+  // top of the fields already returned above, none of which are removed.
+  var personality = calcPersonality(firstName);
+  var birthdayNumber = calcBirthdayNumber(day);
+  var nameHiddenMasters = hiddenMasterAudit(firstName);
+  var chaldean = calcChaldeanName(firstName);
+  var harmonic = harmonicCheck(chaldean.reduced, lp, expression);
+  var gematriaBattery = calcGematriaBattery(firstName);
+  var primary = primaryPathForLP(lp);
+  var lifePathTrumpCard = primary.path;
+  var trumpPaths = primary.coActive || [primary.path];
+  var elementSuit = (ELEMENT_TO_SOLID[sunSign.element]||ELEMENT_TO_SOLID.Fire).suit;
+  var soulCard = soulCardFor(sephInfo.sephId, elementSuit);
+  var courtCard = courtCardFor(sephInfo.sephId, elementSuit);
+  var shadowCardPath = shadowCardFor(sephInfo.sephId);
+
   return {
     firstName: firstName,
     dob: month + '/' + day + '/' + year,
     month: month, day: day, year: year,
     lifePath: lp, lpTitle: lpData.title, lpTeaser: lpData.teaser,
     sunSign: sunSign, tree: sephInfo,
-    hiddenMaster: hiddenMaster,
+    hiddenMaster: hiddenMaster, nameHiddenMasters: nameHiddenMasters,
     expression: expression, soulUrge: soulUrge,
+    personality: personality, birthdayNumber: birthdayNumber,
     gematria: gematria,
     personalYear2026: personalYear,
     tarotCard: tarotCard, codexArchetype: codexArchetype,
-    axisRole: axisRole
+    axisRole: axisRole,
+    chaldean: chaldean, harmonic: harmonic,
+    gematriaBattery: gematriaBattery,
+    primaryPath: primary, lifePathTrumpCard: lifePathTrumpCard, trumpPaths: trumpPaths,
+    elementSuit: elementSuit, soulCard: soulCard, courtCard: courtCard, shadowCardPath: shadowCardPath
   };
 }
 
@@ -1428,6 +1453,22 @@ async function doPartnershipReading(p1, p2) {
   var combinedReduced = reduceNum(combinedGem, false);
   var integrationNumber = reduceNum(combinedGem, false);
 
+  // Richer per-person texture (Chaldean compound, Trump Card, Hidden Master
+  // audit, Metatron's Cube Soul/Court Cards) — same battery the solo engine
+  // weaves in, folded into each partner's existing PROFILE line rather than
+  // restructuring the partnership-specific page sections below.
+  function richLine(p) {
+    var trump = p.lifePathTrumpCard;
+    var trumpStr = trump ? (trump.numeral + ' ' + trump.card + ' (' + trump.keyword + ')') : '';
+    var chalStr = p.chaldean ? ('Chaldean ' + p.chaldean.compound + '→' + p.chaldean.reduced + (p.chaldean.archetype ? ' ("' + p.chaldean.archetype + '")' : '')) : '';
+    var nameHM = (p.nameHiddenMasters && p.nameHiddenMasters.length) ? formatNameHiddenMasters(p.nameHiddenMasters) : '';
+    var soulCourt = (p.soulCard && p.courtCard) ? (p.soulCard.name + ' / ' + p.courtCard.name) : '';
+    return '  Trump Card: ' + trumpStr + '\n'
+      + (chalStr ? '  ' + chalStr + '\n' : '')
+      + (nameHM ? '  Name-Field Hidden Masters: ' + nameHM + '\n' : '')
+      + (soulCourt ? '  Metatron\'s Cube — Soul/Court Card: ' + soulCourt + '\n' : '');
+  }
+
   var prompt = 'You are Celestia, oracle of Circles Squared. Generate a 6-page partnership reading for '
     + p1.firstName + ' and ' + p2.firstName + ' using the Taurus Codex Geometry Tree of Life architecture. '
     + 'This is not a compatibility quiz — it is a structural reading of how two souls\' gematria fields form complementary or reinforcing roles on the Kabbalistic Tree of Life. '
@@ -1435,17 +1476,19 @@ async function doPartnershipReading(p1, p2) {
     + 'PROFILE:\n'
     + p1.firstName + ': Life Path ' + p1.lifePath + ' (' + p1.lpTitle + ') · ' + p1.sunSign.sign + ' Sun · ' + p1.tree.name + ' · ' + p1.tarotCard.card + ' · ' + p1.codexArchetype + '\n'
     + '  Axis Role: ' + axis1.title + ' — ' + axis1.pillar + '\n'
-    + '  Gematria: ' + p1.gematria.total + ' → ' + p1.gematria.reduced + (p1.hiddenMaster ? ' · Hidden Master: ' + p1.hiddenMaster : '') + '\n\n'
+    + '  Gematria: ' + p1.gematria.total + ' → ' + p1.gematria.reduced + (p1.hiddenMaster ? ' · Hidden Master: ' + p1.hiddenMaster : '') + '\n'
+    + richLine(p1) + '\n'
     + p2.firstName + ': Life Path ' + p2.lifePath + ' (' + p2.lpTitle + ') · ' + p2.sunSign.sign + ' Sun · ' + p2.tree.name + ' · ' + p2.tarotCard.card + ' · ' + p2.codexArchetype + '\n'
     + '  Axis Role: ' + axis2.title + ' — ' + axis2.pillar + '\n'
-    + '  Gematria: ' + p2.gematria.total + ' → ' + p2.gematria.reduced + (p2.hiddenMaster ? ' · Hidden Master: ' + p2.hiddenMaster : '') + '\n\n'
+    + '  Gematria: ' + p2.gematria.total + ' → ' + p2.gematria.reduced + (p2.hiddenMaster ? ' · Hidden Master: ' + p2.hiddenMaster : '') + '\n'
+    + richLine(p2) + '\n'
     + 'Combined Architecture: ' + axisConfig.name + ' ' + axisConfig.symbol + '\n'
     + 'Composite Life Path: ' + compositeLp + '\n'
     + 'Combined Gematria: ' + combinedGem + ' → ' + combinedReduced + '\n\n'
     + 'Write exactly 6 sections with ===PAGE_N_START=== and ===PAGE_N_END=== delimiters. Each section 3–4 substantial paragraphs.\n\n'
-    + 'Page 1 — ' + p1.firstName.toUpperCase() + '\'S AXIS ON THE TREE: Describe ' + p1.firstName + '\'s role as ' + axis1.title + '. Their Sephirah (' + p1.tree.name + '), Life Path ' + p1.lifePath + ', and Tarot archetype (' + p1.tarotCard.card + ') as expressions of the ' + axis1.pillar + '.\n'
-    + 'Page 2 — ' + p2.firstName.toUpperCase() + '\'S AXIS ON THE TREE: Same for ' + p2.firstName + ' as ' + axis2.title + ' on the ' + axis2.pillar + '.\n'
-    + 'Page 3 — THE COMBINED ARCHITECTURE (' + axisConfig.name + '): How their two axes meet. ' + axisConfig.description + ' What this means for how they build, love, and create together.\n'
+    + 'Page 1 — ' + p1.firstName.toUpperCase() + '\'S AXIS ON THE TREE: Describe ' + p1.firstName + '\'s role as ' + axis1.title + '. Their Sephirah (' + p1.tree.name + '), Life Path ' + p1.lifePath + ', and Tarot archetype (' + p1.tarotCard.card + ') as expressions of the ' + axis1.pillar + '. Weave in their Trump Card (' + (p1.lifePathTrumpCard ? p1.lifePathTrumpCard.card : p1.tarotCard.card) + '), their Chaldean name compound' + (p1.chaldean ? ' (' + p1.chaldean.compound + '→' + p1.chaldean.reduced + ')' : '') + ', and — if present — any Hidden Master frequency surfaced in their name field, as additional texture on who they are, not separate topics.\n'
+    + 'Page 2 — ' + p2.firstName.toUpperCase() + '\'S AXIS ON THE TREE: Same for ' + p2.firstName + ' as ' + axis2.title + ' on the ' + axis2.pillar + ', weaving in their Trump Card, Chaldean compound, and any Hidden Master frequencies the same way.\n'
+    + 'Page 3 — THE COMBINED ARCHITECTURE (' + axisConfig.name + '): How their two axes meet. ' + axisConfig.description + ' What this means for how they build, love, and create together. You may note how their two Trump Cards or Soul/Court Cards converse with each other structurally.\n'
     + 'Page 4 — THE TOROIDAL CARNATION FIELD: Their relationship as a living toroidal geometry — an Egg of Life mandala with two people as its generative poles. The central void they create together, the 8 radial directions their combined field radiates, the arcs of energy exchange between them. How this field generates something neither could alone.\n'
     + 'Page 5 — SHADOW, GIFT & INTEGRATION: The specific partnership shadow — what breaks down when the axes fall out of alignment. The gift that emerges when both fully embody their roles. The integration number ' + integrationNumber + ' as the frequency of their stable combined state.\n'
     + 'Page 6 — AIN SOPH AUR · PARTNERSHIP BLESSING: Composite Life Path ' + compositeLp + ' as their shared evolutionary mission. Combined gematria ' + combinedReduced + ' as the frequency of their union. Close with Celestia\'s full blessing invoking AIN SOPH AUR for their partnership.';
@@ -1467,8 +1510,10 @@ function getPartnershipFallback(p1, p2) {
   fb += p1.firstName + ', on the Kabbalistic Tree of Life, your numbers place you as ' + axis1.title + '. '
     + 'Your Life Path ' + p1.lifePath + ' resonates at the sphere of ' + p1.tree.name + ' — a node on the ' + axis1.pillar + '. '
     + axis1.description + '\n\n'
-    + 'Your Tarot archetype — ' + p1.tarotCard.card + ' — moves through the same corridor of the Tree, encoded in the Hebrew letter ' + p1.tarotCard.letter + '. '
+    + 'Your Tarot archetype — ' + p1.tarotCard.card + ' — moves through the same corridor of the Tree, encoded in the Hebrew letter ' + p1.tarotCard.letter + '.'
+    + (p1.lifePathTrumpCard ? ' Your Life Path Trump Card confirms it: ' + p1.lifePathTrumpCard.numeral + ' ' + p1.lifePathTrumpCard.card + ' — ' + p1.lifePathTrumpCard.keyword + '.' : '') + ' '
     + 'And your ' + p1.sunSign.sign + ' Sun, governed by ' + p1.sunSign.planet + ', carries the ' + p1.sunSign.element + ' current that flows through this axis with natural ease.\n\n'
+    + (p1.chaldean ? 'The name you are called by carries its own living vibration — a Chaldean compound of ' + p1.chaldean.compound + (p1.chaldean.archetype ? ', the archetype of "' + p1.chaldean.archetype + '"' : '') + ', reducing to ' + p1.chaldean.reduced + '.' + (p1.harmonic ? ' ' + p1.harmonic.detail : '') + (p1.nameHiddenMasters && p1.nameHiddenMasters.length ? ' A deeper audit of your name field also surfaces a Hidden Master frequency: ' + formatNameHiddenMasters(p1.nameHiddenMasters) + '.' : '') + '\n\n' : '')
     + 'You are not simply "compatible" with your partner. You are structurally designed to meet.\n';
   fb += '===PAGE_1_END===\n\n';
 
@@ -1476,8 +1521,10 @@ function getPartnershipFallback(p1, p2) {
   fb += p2.firstName + ', your Tree of Life position reveals you as ' + axis2.title + '. '
     + 'Life Path ' + p2.lifePath + ' places you at ' + p2.tree.name + ' on the ' + axis2.pillar + '. '
     + axis2.description + '\n\n'
-    + 'Your Tarot path — ' + p2.tarotCard.card + ', through the letter ' + p2.tarotCard.letter + ' — reflects the same architecture. '
+    + 'Your Tarot path — ' + p2.tarotCard.card + ', through the letter ' + p2.tarotCard.letter + ' — reflects the same architecture.'
+    + (p2.lifePathTrumpCard ? ' Your Life Path Trump Card, ' + p2.lifePathTrumpCard.numeral + ' ' + p2.lifePathTrumpCard.card + ', confirms it — ' + p2.lifePathTrumpCard.keyword + '.' : '') + ' '
     + 'Your ' + p2.sunSign.sign + ' Sun brings the ' + p2.sunSign.element + ' element into the structural field you inhabit.\n\n'
+    + (p2.chaldean ? 'Your living name resolves to a Chaldean compound of ' + p2.chaldean.compound + (p2.chaldean.archetype ? ', the archetype of "' + p2.chaldean.archetype + '"' : '') + ', reducing to ' + p2.chaldean.reduced + '.' + (p2.harmonic ? ' ' + p2.harmonic.detail : '') + (p2.nameHiddenMasters && p2.nameHiddenMasters.length ? ' Your name field also carries a Hidden Master frequency: ' + formatNameHiddenMasters(p2.nameHiddenMasters) + '.' : '') + '\n\n' : '')
     + 'Where ' + p1.firstName + ' carries meaning through the center, you give it a place to land. Where you build the crossbeams, they become the pillar. This is not coincidence — this is geometry.\n';
   fb += '===PAGE_2_END===\n\n';
 
@@ -1486,6 +1533,7 @@ function getPartnershipFallback(p1, p2) {
     + axisConfig.description + '\n\n'
     + p1.firstName + ' carries the ' + axis1.pillar + '. ' + p2.firstName + ' carries the ' + axis2.pillar + '. '
     + 'When these two meet, the Tree becomes whole — not as a diagram, but as a living architecture.\n\n'
+    + ((p1.soulCard && p2.soulCard) ? 'On Metatron\'s Cube, ' + p1.firstName + '\'s Soul Card — the ' + p1.soulCard.name + ' — and ' + p2.firstName + '\'s Soul Card — the ' + p2.soulCard.name + ' — anchor two different lines back to the same field of Ain Soph Aur, each one carrying its Court Card (' + p1.courtCard.name + ' and ' + p2.courtCard.name + ') into the union as a distinct, complementary current.\n\n' : '')
     + 'The architects of ancient temples understood this configuration. The central pillar and the crossbeams do not compete. They make each other possible. What you two are building together — whether you call it a relationship, a home, a business, a legacy — is built on the most structurally sound foundation the Tree of Life has to offer.\n';
   fb += '===PAGE_3_END===\n\n';
 
@@ -1522,9 +1570,10 @@ function generatePartnershipPDF(p1, p2, pages) {
   var GOLD=[201,168,76], PURPLE=[176,138,255], ROSE=[255,158,210];
   var TEAL=[80,220,200], WHITE=[232,224,255], MUTED=[120,100,170], DIM=[50,35,90];
 
+  var trump1 = p1.lifePathTrumpCard, trump2 = p2.lifePathTrumpCard;
   var PARTNER_PAGE_META = [
-    {sys:p1.firstName.toUpperCase()+'\'S AXIS',       layer:'THE ' + AXIS_ROLES[p1.axisRole].pillar.toUpperCase(), title:'The ' + AXIS_ROLES[p1.axisRole].title,              color:GOLD},
-    {sys:p2.firstName.toUpperCase()+'\'S AXIS',       layer:'THE ' + AXIS_ROLES[p2.axisRole].pillar.toUpperCase(), title:'The ' + AXIS_ROLES[p2.axisRole].title,              color:ROSE},
+    {sys:p1.firstName.toUpperCase()+'\'S AXIS',       layer:'THE ' + AXIS_ROLES[p1.axisRole].pillar.toUpperCase() + (trump1 ? '  ·  TRUMP CARD ' + trump1.numeral.toUpperCase() : '') + (p1.hiddenMaster ? '  ·  HIDDEN MASTER ' + p1.hiddenMaster : ''), title:'The ' + AXIS_ROLES[p1.axisRole].title,              color:GOLD},
+    {sys:p2.firstName.toUpperCase()+'\'S AXIS',       layer:'THE ' + AXIS_ROLES[p2.axisRole].pillar.toUpperCase() + (trump2 ? '  ·  TRUMP CARD ' + trump2.numeral.toUpperCase() : '') + (p2.hiddenMaster ? '  ·  HIDDEN MASTER ' + p2.hiddenMaster : ''), title:'The ' + AXIS_ROLES[p2.axisRole].title,              color:ROSE},
     {sys:'COMBINED ARCHITECTURE',                     layer:AXIS_CONFIGS[getAxisConfig(p1.axisRole,p2.axisRole)].name.toUpperCase(), title:'Two Souls, One Tree',             color:PURPLE},
     {sys:'TOROIDAL CARNATION FIELD',                  layer:'SACRED GEOMETRY  ·  RELATIONAL TORUS',  title:'The Living Field You Generate',                                   color:TEAL},
     {sys:'SHADOW, GIFT & INTEGRATION',                layer:'INTEGRATION NUMBER ' + reduceNum(p1.gematria.total+p2.gematria.total,false), title:'The Teaching of the Union', color:GOLD},
@@ -1623,6 +1672,8 @@ function generatePartnershipPDF(p1, p2, pages) {
   doc.text(AXIS_CONFIGS[getAxisConfig(p1.axisRole,p2.axisRole)].symbol+'  Composite Life Path '+reduceNum(p1.lifePath+p2.lifePath,true), W/2, H/2+7, {align:'center'});
   doc.setFontSize(5.2); doc.setTextColor(Math.round(DIM[0]*1.8),Math.round(DIM[1]*1.8),Math.round(DIM[2]*1.8));
   doc.text('TREE OF LIFE ARCHITECTURE  ·  TOROIDAL FIELD GEOMETRY  ·  SACRED GEMATRIA', W/2, H/2+13, {align:'center'});
+  var trumpCoverLine = (p1.lifePathTrumpCard && p2.lifePathTrumpCard) ? (p1.firstName+' '+p1.lifePathTrumpCard.numeral+' '+p1.lifePathTrumpCard.card+'  ·  '+p2.firstName+' '+p2.lifePathTrumpCard.numeral+' '+p2.lifePathTrumpCard.card) : '';
+  if (trumpCoverLine) { doc.setFontSize(4.8); doc.setTextColor(Math.round(MUTED[0]*0.85),Math.round(MUTED[1]*0.85),Math.round(MUTED[2]*0.85)); doc.text(trumpCoverLine, W/2, H/2+18, {align:'center'}); }
 
   eggOfLifeP(W/2,H/2+66,16,[22,10,52],0.12);
 
