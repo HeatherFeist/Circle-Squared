@@ -806,6 +806,29 @@ body {
         <div style="flex:1;"><label style="font-family:'Courier New',monospace;font-size:0.5rem;letter-spacing:0.15em;color:#c9a84c;display:block;margin-bottom:0.3rem;">DAY</label><input id="admin-pdf-day" type="number" min="1" max="31" class="cosmic-input" placeholder="D" style="padding:0.6rem 0.5rem;text-align:center;" /></div>
         <div style="flex:1.5;"><label style="font-family:'Courier New',monospace;font-size:0.5rem;letter-spacing:0.15em;color:#c9a84c;display:block;margin-bottom:0.3rem;">YEAR</label><input id="admin-pdf-year" type="number" min="1900" max="2015" class="cosmic-input" placeholder="YYYY" style="padding:0.6rem 0.5rem;text-align:center;" /></div>
       </div>
+      <div style="margin-bottom:0.6rem;">
+        <label style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#c9a84c;display:block;margin-bottom:0.4rem;">BIRTH TIME <span style="opacity:0.6;text-transform:none;letter-spacing:0;">(optional — powers Ascendant)</span></label>
+        <div id="admin-pdf-birthtime-row" style="display:flex;gap:0.5rem;margin-bottom:0.3rem;">
+          <select id="admin-pdf-time-hour" class="cosmic-select" style="flex:1;">
+            <option value="" disabled selected>Hour</option>
+          </select>
+          <select id="admin-pdf-time-minute" class="cosmic-select" style="width:80px;">
+            <option value="" disabled selected>Min</option>
+          </select>
+          <select id="admin-pdf-time-ampm" class="cosmic-select" style="width:80px;">
+            <option value="AM">AM</option>
+            <option value="PM">PM</option>
+          </select>
+        </div>
+      </div>
+      <div style="margin-bottom:0.4rem;">
+        <label style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#c9a84c;display:block;margin-bottom:0.4rem;">BIRTH PLACE <span style="opacity:0.6;text-transform:none;letter-spacing:0;">(optional — e.g. Denver, CO)</span></label>
+        <input id="admin-pdf-birthplace" type="text" class="cosmic-input" placeholder="City, State/Country" style="padding:0.6rem 0.9rem;" autocomplete="off" />
+      </div>
+      <label style="display:flex;align-items:center;gap:0.5rem;margin:0.5rem 0 0.8rem;cursor:pointer;">
+        <input type="checkbox" id="admin-pdf-no-birthtime" style="width:16px;height:16px;accent-color:#c9a84c;" />
+        <span style="font-size:0.75rem;color:#8a7aaa;">Customer doesn't know their exact birth time</span>
+      </label>
       <div style="margin-bottom:0.8rem;">
         <label style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#c9a84c;display:block;margin-bottom:0.4rem;">SELECT TIER</label>
         <select id="admin-pdf-tier" class="cosmic-select" style="width:100%;">
@@ -1970,40 +1993,53 @@ function courtCardFor(soulSephId, suit){
     opt2.value = y; opt2.textContent = y;
     yearSelect.appendChild(opt2);
   }
-  var hourSelect = document.getElementById('hook-time-hour');
-  if (hourSelect) {
-    for (var h = 1; h <= 12; h++) {
-      var optH = document.createElement('option');
-      optH.value = h; optH.textContent = h;
-      hourSelect.appendChild(optH);
+  // Birth-time hour/minute dropdowns are populated identically for the main
+  // visitor hook flow and the admin PDF generator (mirrors it exactly).
+  ['hook-time-hour', 'admin-pdf-time-hour'].forEach(function(id) {
+    var hourSelect = document.getElementById(id);
+    if (hourSelect) {
+      for (var h = 1; h <= 12; h++) {
+        var optH = document.createElement('option');
+        optH.value = h; optH.textContent = h;
+        hourSelect.appendChild(optH);
+      }
     }
-  }
-  var minuteSelect = document.getElementById('hook-time-minute');
-  if (minuteSelect) {
-    for (var m = 0; m < 60; m += 1) {
-      var optM = document.createElement('option');
-      optM.value = m; optM.textContent = String(m).padStart(2,'0');
-      minuteSelect.appendChild(optM);
+  });
+  ['hook-time-minute', 'admin-pdf-time-minute'].forEach(function(id) {
+    var minuteSelect = document.getElementById(id);
+    if (minuteSelect) {
+      for (var m = 0; m < 60; m += 1) {
+        var optM = document.createElement('option');
+        optM.value = m; optM.textContent = String(m).padStart(2,'0');
+        minuteSelect.appendChild(optM);
+      }
     }
-  }
-  var noTimeCheckbox = document.getElementById('hook-no-birthtime');
-  if (noTimeCheckbox) {
-    noTimeCheckbox.addEventListener('change', function() {
-      var row = document.getElementById('hook-birthtime-row');
-      var disabled = noTimeCheckbox.checked;
-      if (row) row.style.opacity = disabled ? '0.4' : '1';
-      ['hook-time-hour','hook-time-minute','hook-time-ampm'].forEach(function(id){
-        var el = document.getElementById(id);
-        if (el) el.disabled = disabled;
+  });
+  // "I don't know my exact birth time" checkbox behavior, shared by both
+  // forms: checking it disables only the hour/minute/AM-PM selects. Birth
+  // place is intentionally left enabled even when exact time is unknown —
+  // only Ascendant (which changes every ~2 hours) needs a real time and
+  // stays gated behind this checkbox; Moon sign (which moves only
+  // ~0.5deg/hour) is astronomically defensible from a 12:00 noon default,
+  // so it should still be attemptable from place alone. See getMoonSign()
+  // / the hook-btn and admin-pdf-btn handlers.
+  [
+    { checkbox: 'hook-no-birthtime', row: 'hook-birthtime-row', ids: ['hook-time-hour','hook-time-minute','hook-time-ampm'] },
+    { checkbox: 'admin-pdf-no-birthtime', row: 'admin-pdf-birthtime-row', ids: ['admin-pdf-time-hour','admin-pdf-time-minute','admin-pdf-time-ampm'] }
+  ].forEach(function(cfg) {
+    var noTimeCheckbox = document.getElementById(cfg.checkbox);
+    if (noTimeCheckbox) {
+      noTimeCheckbox.addEventListener('change', function() {
+        var row = document.getElementById(cfg.row);
+        var disabled = noTimeCheckbox.checked;
+        if (row) row.style.opacity = disabled ? '0.4' : '1';
+        cfg.ids.forEach(function(id){
+          var el = document.getElementById(id);
+          if (el) el.disabled = disabled;
+        });
       });
-      // NOTE: Birth place is intentionally left enabled here even when exact
-      // time is unknown. Only Ascendant (which changes every ~2 hours) needs
-      // a real time and stays gated behind this checkbox; Moon sign (which
-      // moves only ~0.5deg/hour) is astronomically defensible from a 12:00
-      // noon default, so it should still be attemptable from place alone.
-      // See getMoonSign() / the hook-btn handler.
-    });
-  }
+    }
+  });
 })();
 
 // ===========================
@@ -2244,6 +2280,45 @@ document.getElementById('admin-pdf-btn').addEventListener('click', async functio
     // V05 engine) so admin-generated blueprints carry the same Chaldean,
     // Gematria battery, Metatron's Cube, and Hidden Master audit fields as
     // customer-facing readings, not just the legacy Pythagorean/Tarot layer.
+
+    // ── OPTIONAL: Birth time + birth place (powers Ascendant + Moon sign) ──
+    // Mirrors the hook-btn handler exactly: kicked off here and awaited
+    // inside doReading() below. See that handler's comment for the full
+    // rationale on why birth place is read independent of the "I don't know
+    // my exact time" checkbox while hour/minute/AM-PM are gated behind it.
+    window._ascendantPromise = null;
+    window._moonSignPromise = null;
+    try {
+      var noBirthTimeEl = document.getElementById('admin-pdf-no-birthtime');
+      var skipBirthTime = !!(noBirthTimeEl && noBirthTimeEl.checked);
+      var birthPlace = document.getElementById('admin-pdf-birthplace').value.trim();
+      var hour24 = null, minute = null, hasRealTime = false;
+      if (!skipBirthTime) {
+        var hourRaw = document.getElementById('admin-pdf-time-hour').value;
+        var minuteRaw = document.getElementById('admin-pdf-time-minute').value;
+        var ampm = document.getElementById('admin-pdf-time-ampm').value;
+        if (hourRaw !== '' && minuteRaw !== '') {
+          var hour12 = parseInt(hourRaw, 10);
+          minute = parseInt(minuteRaw, 10);
+          hour24 = hour12 % 12;
+          if (ampm === 'PM') hour24 += 12;
+          hasRealTime = true;
+        }
+      }
+      if (hasRealTime && birthPlace) {
+        window._ascendantPromise = getAscendant(year, month, day, hour24, minute, birthPlace);
+      }
+      if (birthPlace) {
+        // hour24/minute are null when there's no real time — getMoonSign()
+        // applies its own 12:00 noon default and flags the result accordingly.
+        window._moonSignPromise = getMoonSign(year, month, day, hasRealTime ? hour24 : null, hasRealTime ? minute : null, birthPlace);
+      }
+    } catch (ascErr) {
+      console.error('[Ascendant/Moon Sign] Could not kick off lookup:', ascErr);
+      window._ascendantPromise = null;
+      window._moonSignPromise = null;
+    }
+
     var fullBirthName = firstName;
     var usedName = fullBirthName;
     var lp = calcLifePath(month, day, year);
@@ -2285,7 +2360,8 @@ document.getElementById('admin-pdf-btn').addEventListener('click', async functio
       chaldean: chaldean, harmonic: harmonic,
       gematriaBattery: gematriaBattery,
       primaryPath: primary, lifePathTrumpCard: lifePathTrumpCard, trumpPaths: trumpPaths,
-      elementSuit: elementSuit, soulCard: soulCard, courtCard: courtCard, shadowCardPath: shadowCardPath
+      elementSuit: elementSuit, soulCard: soulCard, courtCard: courtCard, shadowCardPath: shadowCardPath,
+      ascendant: null
     };
     selectedTier = TIERS.find(function(t){ return t.slug === slug; });
     status.textContent = '⏳ Channeling the oracle...';
@@ -4349,24 +4425,31 @@ function getFallbackReading(){
   fb+='===PAGE_1_START===\n';
   fb+=p.firstName+', you are '+ca+'. This is not a title \u2014 it is a recognition. Your Life Path '+p.lifePath+', as '+lpData.title+', meets the '+p.sunSign.element+' current of your '+p.sunSign.sign+' Sun, and together they land you at '+p.tree.name+' on the Kabbalistic Tree of Life \u2014 '+p.tree.meaning+'. Three coordinates. One being. The center of your mandala is not above you or ahead of you. It is you.\n\n'+lpData.teaser+'\n\nYour gift \u2014 '+lpData.gift+' \u2014 is not something you earned. It is what you arrived with. When Numerology, Astrology, and Kabbalah all converge on the same essential truth about a soul, that truth becomes impossible to dismiss.\n';
   if (p.ascendant && p.ascendant.sign) {
-    fb+='\nYour Ascendant \u2014 the sign that was rising on the eastern horizon at the exact moment you were born \u2014 is '+p.ascendant.sign+(p.ascendant.degree!=null?' at '+p.ascendant.degree+'\u00b0':'')+'. Where your Sun sign is who you are at your core, your Ascendant is the lens the world first meets you through.\n';
+    fb+='\nYour Ascendant \u2014 the sign that was rising on the eastern horizon at the exact moment you were born \u2014 is '+p.ascendant.sign+(p.ascendant.degree!=null?' at '+p.ascendant.degree+'\u00b0':'')+'. Where your Sun sign is who you are at your core, your Ascendant is the lens the world first meets you through \u2014 the face you show before anyone has earned the deeper layers underneath.\n';
   }
+  if (p.moonSign && p.moonSign.sign) {
+    fb+='\nYour Moon Sign \u2014 the placement that governs your emotional interior, the self that only shows itself once the mask comes off \u2014 is '+p.moonSign.sign+(p.moonSign.viaNoonDefault?' (estimated from a solar-noon default since your exact birth time was not given; the Moon moves only about half a degree per hour, so this is astronomically defensible as a directional read even without the precise minute)':'')+'. Where your Sun is the engine driving you forward and your Ascendant is the face the world meets first, your Moon is what you actually feel underneath both, in the moments no one else is watching.\n';
+  }
+  fb+='\nTwo more coordinates sharpen this portrait further. Your Birthday Number \u2014 '+(p.birthdayNumber||'?')+' \u2014 drawn from the day of the month you were born, is a specific talent layered directly onto your Life Path, a tool you were handed at birth and have likely been using since childhood without ever putting a name to it. Your Personality Number \u2014 '+(p.personality||'?')+' \u2014 is the impression you make in the first few seconds before anyone gets to know the rest of you: the surface texture over the deeper Expression and Soul Urge numbers this reading unpacks on the next page. None of these numbers stand alone. Each is a facet cut into the same stone.\n\n'+ca+' is not a decoration sitting on top of your chart. It is a mandate \u2014 the specific shape your Life Path '+p.lifePath+', your '+p.sunSign.sign+' Sun, and your '+p.tree.name+' placement all agree you are here to carry. Hold onto the gift named above; this reading keeps returning to it, recognizing it again in the Tarot archetype on the next page, in the shadow work further in, and in Celestia\'s closing blessing at the very end. It is the same thread the whole way through, just spoken in a different language each time.\n';
   fb+='===PAGE_1_END===\n\n';
 
   fb+='===PAGE_2_START===\n';
-  fb+='In the ancient language of the Tarot, you walk the path of '+tc.card+'. This is Path '+tc.path+' on the Tree of Life, encoded through the Hebrew letter '+tc.letter+' \u2014 '+tc.archetype+'.'+(p.lifePathTrumpCard ? ' Your Life Path Trump Card confirms it: '+p.lifePathTrumpCard.numeral+' '+p.lifePathTrumpCard.card+' \u2014 '+p.lifePathTrumpCard.keyword+'.' : '')+'\n\nThe '+tc.card+' does not describe what you do. It describes what you ARE in the world \u2014 the mythic role your soul agreed to play before incarnation. And it is no coincidence that your '+p.sunSign.sign+' Sun and this Tarot archetype vibrate in the same frequency. They confirm each other.\n\nThis path between Sephiroth is not merely symbolic. It is the precise corridor of consciousness your soul travels. The Hebrew letter '+tc.letter+' carries a specific vibrational teaching, and that teaching is written in your very name.\n';
+  fb+='In the ancient language of the Tarot, you walk the path of '+tc.card+'. This is Path '+tc.path+' on the Tree of Life, encoded through the Hebrew letter '+tc.letter+' \u2014 '+tc.archetype+'.'+(p.lifePathTrumpCard ? ' Your Life Path Trump Card confirms it: '+p.lifePathTrumpCard.numeral+' '+p.lifePathTrumpCard.card+' \u2014 '+p.lifePathTrumpCard.keyword+'.' : '')+'\n\nThe '+tc.card+' does not describe what you do. It describes what you ARE in the world \u2014 the mythic role your soul agreed to play before incarnation. And it is no coincidence that your '+p.sunSign.sign+' Sun and this Tarot archetype vibrate in the same frequency. They confirm each other.\n\nThis path between Sephiroth is not merely symbolic. It is the precise corridor of consciousness your soul travels. The Hebrew letter '+tc.letter+' carries a specific vibrational teaching, and that teaching is written in your very name.\n'
+    +(p.primaryPath && p.primaryPath.viaKetherBridge ? '\nBecause your Life Path carries the Master Number 11, your Trump Card path does not follow the standard formula \u2014 it connects directly to Kether, the crown Sephirah, via what the Codex calls the Kether Bridge. This is a rare, direct wiring reserved for the most intuitively-charged Master Number, and it means your hidden architecture skips a rung most charts have to climb one Sephirah at a time.\n' : '')
+    +(p.primaryPath && p.primaryPath.masterCoActive ? '\nBecause your Life Path carries the Master Number 33, it does not resolve to a single Trump Card but two, co-active at once \u2014 '+(p.trumpPaths&&p.trumpPaths[0]?p.trumpPaths[0].card:'The World')+' and '+(p.trumpPaths&&p.trumpPaths[1]?p.trumpPaths[1].card:'The Lovers')+', running as one braided current rather than a sequence you move through. Very few charts carry this double signal; read both cards as one teaching in stereo, not two options competing for your attention.\n' : '')
+    +'\nOn Metatron\'s Cube, your elemental current \u2014 '+p.sunSign.element+' \u2014 translates into the suit of '+(p.elementSuit||'this element\'s suit')+', the same suit your Soul Card and Court Card are drawn from later in this reading. Card and suit are not two separate systems bolted together: the suit is simply the element speaking in the language of the Minor Arcana, the same '+p.sunSign.element+' current that shapes your Sun sign showing up again in a different room of the same house.\n\nWhen you are embodying '+tc.card+' fully, it tends to look like decisive follow-through on the very impulse most people talk themselves out of \u2014 you say the thing, you make the move, you close the loop others leave open. When it is suppressed, that same energy does not vanish; it turns inward and shows up as restlessness, a nagging sense of watching your own life from just outside it. The difference is rarely about capacity. It is almost always about permission.\n';
   fb+='===PAGE_2_END===\n\n';
 
   fb+='===PAGE_3_START===\n';
-  fb+='Your name encodes a frequency. When we apply the ancient art of gematria \u2014 assigning each letter its numerical value \u2014 your first name resolves to a total of '+(p.gematria?p.gematria.total:'a sacred number')+', which reduces to '+(p.gematria?p.gematria.reduced:'a core tone')+'.\n\nThis is not separate from your Life Path '+p.lifePath+'. It is a harmonic of it \u2014 a second instrument playing the same song. Your Expression Number of '+(p.expression||'?')+' ('+expData.title+') reveals the gift encoded in your full name: the specific talents your soul brought as tools for this lifetime.\n\nYour Soul Urge of '+(p.soulUrge||'?')+' reveals what lives beneath all of that \u2014 the private longing, the thing that makes your heart move when no one is watching.'+(p.chaldean ? ' And the name you are actually called, '+p.usedName+', carries its own living vibration \u2014 a Chaldean compound of '+p.chaldean.compound+(p.chaldean.archetype?', the archetype of "'+p.chaldean.archetype+'"':'')+', reducing to '+p.chaldean.reduced+'.'+(p.harmonic?' '+p.harmonic.detail:'') : '')+' These are not random numbers. They are the signature of your soul.\n';
+  fb+='Your name encodes a frequency. When we apply the ancient art of gematria \u2014 assigning each letter its numerical value \u2014 your first name resolves to a total of '+(p.gematria?p.gematria.total:'a sacred number')+', which reduces to '+(p.gematria?p.gematria.reduced:'a core tone')+'.\n\nThis is not separate from your Life Path '+p.lifePath+'. It is a harmonic of it \u2014 a second instrument playing the same song. Your Expression Number of '+(p.expression||'?')+' ('+expData.title+') reveals the gift encoded in your full name: the specific talents your soul brought as tools for this lifetime.\n\nYour Soul Urge of '+(p.soulUrge||'?')+' reveals what lives beneath all of that \u2014 the private longing, the thing that makes your heart move when no one is watching.'+(p.chaldean ? ' And the name you are actually called, '+p.usedName+', carries its own living vibration \u2014 a Chaldean compound of '+p.chaldean.compound+(p.chaldean.archetype?', the archetype of "'+p.chaldean.archetype+'"':'')+', reducing to '+p.chaldean.reduced+'.'+(p.harmonic?' '+p.harmonic.detail:'') : '')+' These are not random numbers. They are the signature of your soul.\n\nIn practical terms, this frequency stack shows up daily, not just on paper. Your Life Path '+p.lifePath+' sets the direction you keep circling back to no matter how far you wander from it. Your Expression Number '+(p.expression||'?')+' is the skillset people notice first and ask you to bring to the table \u2014 it is usually the thing you get complimented on so often you stop hearing it. Your Soul Urge '+(p.soulUrge||'?')+' is what actually satisfies you once the applause fades, and the two numbers are not always the same. When your outer Expression and your inner Soul Urge pull in different directions, that tension is not a flaw in the chart; it is the chart pointing directly at where your real growth work lives, right now, in this decade of your life.\n';
   fb+='===PAGE_3_END===\n\n';
 
   fb+='===PAGE_4_START===\n';
-  fb+='Imagine your identity as a living geometric field \u2014 an Egg of Life: seven interlocking circles surrounded by an eighth ring of integration. Each circle is one of your systems: Numerology, Astrology, Kabbalah, Tarot, Sacred Geometry, the name frequency, and at the center, your Codex Archetype.\n\nFor you, '+p.firstName+', the field geometry activates powerfully around '+p.tree.name+' and the '+tc.card+' path. These are the nodes where your energy concentrates \u2014 where your soul\'s mandate becomes most legible. The circles representing '+p.sunSign.element+' and Life Path '+p.lifePath+' pulse in harmonic resonance with each other.\n\nThis mandala is not fixed. As you embody more of your archetype \u2014 '+ca+' \u2014 the field expands. You are not filling a container. You are generating a field.\n';
+  fb+='Imagine your identity as a living geometric field \u2014 an Egg of Life: seven interlocking circles surrounded by an eighth ring of integration. Each circle is one of your systems: Numerology, Astrology, Kabbalah, Tarot, Sacred Geometry, the name frequency, and at the center, your Codex Archetype.\n\nFor you, '+p.firstName+', the field geometry activates powerfully around '+p.tree.name+' and the '+tc.card+' path. These are the nodes where your energy concentrates \u2014 where your soul\'s mandate becomes most legible. The circles representing '+p.sunSign.element+' and Life Path '+p.lifePath+' pulse in harmonic resonance with each other.\n\nThis mandala is not fixed. As you embody more of your archetype \u2014 '+ca+' \u2014 the field expands. You are not filling a container. You are generating a field.\n\nYour Moon and Ascendant, where known, are not separate rings bolted onto this Egg of Life \u2014 they are additional facets of that same eighth ring of integration, the container that holds every circle in relation to every other. '+(p.ascendant&&p.ascendant.sign?('Your '+p.ascendant.sign+' Ascendant is the face of the field others meet first. '):'')+(p.moonSign&&p.moonSign.sign?('Your '+p.moonSign.sign+' Moon is the felt interior beneath that face. '):'')+'Together with the Sun, Life Path, and Gematria nodes already named, they round out a fuller picture of where your field concentrates and where it stays quiet until deliberately invited forward.\n\nOn the deeper structure of Metatron\'s Cube itself \u2014 the thirteen nodes and seventy-eight lines underlying the visible Tree \u2014 your Soul Card and Court Card, detailed fully near the close of this reading, already anchor specific lines into this same field. The geometry described here is not a metaphor layered on top of your numbers; the numbers ARE the geometry, expressed in a different notation, and every diagram in this reading is one drawing of the same underlying shape.\n';
   fb+='===PAGE_4_END===\n\n';
 
   fb+='===PAGE_5_START===\n';
-  fb+='Every archetype carries a shadow. '+tc.card+' \u2014 with all its power \u2014 has a specific blind spot. And your '+p.sunSign.sign+' Sun, for all its elemental brilliance, carries a specific recurring pattern that will repeat until integrated.\n\nThe shadow of '+tc.card+' is not weakness. It is unclaimed power. '+(tc.archetype)+' \u2014 when met with avoidance rather than presence \u2014 becomes its own inverse. But when walked consciously, it becomes the most transformative force available to you.\n\nYour '+p.sunSign.sign+' shadow and your Tarot shadow share a root. Naming both of them, in the same breath, is how you begin to integrate them. You were not given this archetype because it would be easy. You were given it because it is exactly what your soul came here to master.\n';
+  fb+='Every archetype carries a shadow. '+tc.card+' \u2014 with all its power \u2014 has a specific blind spot. And your '+p.sunSign.sign+' Sun, for all its elemental brilliance, carries a specific recurring pattern that will repeat until integrated.\n\nThe shadow of '+tc.card+' is not weakness. It is unclaimed power. '+(tc.archetype)+' \u2014 when met with avoidance rather than presence \u2014 becomes its own inverse. But when walked consciously, it becomes the most transformative force available to you.\n\nYour '+p.sunSign.sign+' shadow and your Tarot shadow share a root. Naming both of them, in the same breath, is how you begin to integrate them. You were not given this archetype because it would be easy. You were given it because it is exactly what your soul came here to master.\n\nMetatron\'s Cube names this shadow work even more specifically. '+(p.shadowCardPath?('The path running from your Soul Sephirah, '+p.tree.name+', down toward the next Sephirah in the direction of Malkuth is '+p.shadowCardPath.card+' ('+p.shadowCardPath.numeral+', "'+p.shadowCardPath.keyword+'") \u2014 this is the exact corridor your unintegrated material travels when it is avoided rather than faced head-on. '):'')+'Naming a shadow this precisely \u2014 not as "negativity" in the abstract but as this specific card, this specific pattern, this specific corridor \u2014 is what turns it from something that simply happens to you into something you can actually work with on purpose.\n\nIn practice, integration rarely announces itself with a single dramatic breakthrough. It shows up as a slightly longer pause before the old reaction fires \u2014 a moment where you notice the '+tc.card+' shadow pattern starting and choose differently than you did the last ten times it appeared. Do that enough times and the shadow does not vanish; it converts. The same raw material that used to leak out sideways, unclaimed, becomes the '+lpData.gift+' named on Page 1, now available to you on purpose instead of by accident.\n';
   fb+='===PAGE_5_END===\n\n';
 
   fb+='===PAGE_6_START===\n';
@@ -4375,23 +4458,25 @@ function getFallbackReading(){
   if(p.nameHiddenMasters && p.nameHiddenMasters.length){fb+='A deeper audit of your full birth name surfaces additional Hidden Master frequencies, distinct from your Life Path: '+formatNameHiddenMasters(p.nameHiddenMasters)+'. These are secondary master frequencies woven into the architecture of your name \u2014 confirmed independently of your surface path.\n\n';}
   if (p.gematriaBattery) {fb+='Run through the three sacred systems of Gematria, the name you carry today returns Standard '+p.gematriaBattery.sg+', Ordinal '+p.gematriaBattery.og+', and Reduced '+p.gematriaBattery.rg+' \u2014 a linguistic field confirming what your numbers already told you.\n\n';}
   if (p.hebrewSoulCorrespondence) {var hsc=p.hebrewSoulCorrespondence; fb+='Beneath even that is your birth name itself, rendered directly in Hebrew consonants \u2014 '+hsc.hebrewConsonants+' \u2014 carrying a real Mispar Hechrachi gematria of '+hsc.gematriaTotal+' ('+hsc.gematriaReduced+' reduced).'+(hsc.archangelMatches&&hsc.archangelMatches.length?' That total lines up with '+hsc.archangelMatches.map(function(m){return m.name+' ('+m.hebrew+' = '+m.value+')';}).join(' and ')+' \u2014 the same name-frequency this whole page has been tracing, confirmed in the oldest layer of the alphabet itself.':' No Archangel number matches that total exactly \u2014 not every name needs to, and that is simply the honest reading of the arithmetic.')+' It also lands at position '+hsc.nameOf72.position+' of the 72 Names (Shem HaMephorash): '+hsc.nameOf72.name+'.\n\n';}
-  fb+='The Hebrew letters encoded in your name and your Tarot path are not ornamental. They are the alphabet through which the divine speaks your specific identity into being. You are a sentence in the language of creation.\n';
+  fb+='The Hebrew letters encoded in your name and your Tarot path are not ornamental. They are the alphabet through which the divine speaks your specific identity into being. You are a sentence in the language of creation.\n\n';
+  fb+=(p.harmonic ? ('One more instrument confirms this: the Harmonic Check between the Chaldean reduction of your used name and your birth Life Path reads as '+p.harmonic.flag+' \u2014 '+p.harmonic.detail+'. Whichever way that reads for you, it is one more line of evidence in the same architecture \u2014 the identity your birth encoded and the identity your daily name projects, either singing the same note or productively arguing with each other, and both readings are useful to know about yourself.\n') : '');
   fb+='===PAGE_6_END===\n\n';
 
   fb+='===PAGE_7_START===\n';
-  fb+='Your Personality Number is '+(p.personality||'unknown')+' \u2014 the impression you make before you speak a single word. You are in Personal Year '+py+' in 2026. This cycle has a specific quality \u2014 a tone that colors every decision, relationship, and opportunity of this year.\n\n'+(py<=3?'This is a year of planting. The seeds you put down now \u2014 in projects, relationships, identity \u2014 will define the harvest of the next cycle. As '+ca+', the key is to act from vision, not from fear.':py<=6?'This is a year of deepening. Connections forged now carry long-term significance. Your field is stabilizing around its true form.':'This is a year of revelation and completion. Old structures that no longer serve are falling away. As '+ca+', this is not loss \u2014 it is liberation. What remains will be exactly what is meant to carry forward.')+'\n\nPersonal Year '+py+' is not a separate forecast bolted onto your chart \u2014 it is Life Path '+p.lifePath+' in motion through time, the same core number counted forward year by year until it comes back around to itself. For '+ca+', this Personal Year '+py+' activates the part of your field that governs '+p.sunSign.sign+' energy. The timing is not accidental.\n';
+  fb+='Your Personality Number is '+(p.personality||'unknown')+' \u2014 the impression you make before you speak a single word. You are in Personal Year '+py+' in 2026. This cycle has a specific quality \u2014 a tone that colors every decision, relationship, and opportunity of this year.\n\n'+(py<=3?'This is a year of planting. The seeds you put down now \u2014 in projects, relationships, identity \u2014 will define the harvest of the next cycle. As '+ca+', the key is to act from vision, not from fear.':py<=6?'This is a year of deepening. Connections forged now carry long-term significance. Your field is stabilizing around its true form.':'This is a year of revelation and completion. Old structures that no longer serve are falling away. As '+ca+', this is not loss \u2014 it is liberation. What remains will be exactly what is meant to carry forward.')+'\n\nPersonal Year '+py+' is not a separate forecast bolted onto your chart \u2014 it is Life Path '+p.lifePath+' in motion through time, the same core number counted forward year by year until it comes back around to itself. For '+ca+', this Personal Year '+py+' activates the part of your field that governs '+p.sunSign.sign+' energy. The timing is not accidental.\n\nPractically, this looks less like a mood and more like a series of small forks in the road. '+(py<=3?'Say yes to the invitation, the idea, or the collaboration that feels slightly too soon \u2014 Personal Year '+py+' rewards those who move before they feel fully ready, because the readiness only ever arrives after the first step, not before it.':py<=6?'Say yes to the relationship, agreement, or commitment that asks you to stay rather than start something new \u2014 Personal Year '+py+' rewards depth over breadth, and the temptation to scatter your energy across something newer and shinier is exactly what this year asks you to resist.':'Say yes to the ending you have been putting off \u2014 Personal Year '+py+' rewards honest closure over quiet avoidance, and what looks like loss from inside the year will look like liberation from outside it.')+' Say no to whatever would keep you circling the same lesson a second time; your Birthday Number '+(p.birthdayNumber||'?')+' has already given you the tool to recognize when that is happening.\n';
   fb+='===PAGE_7_END===\n\n';
 
   fb+='===PAGE_8_START===\n';
-  fb+='Your relational field \u2014 the energetic signature you bring into love and partnership \u2014 is shaped by Life Path '+p.lifePath+' meeting the '+tc.card+' archetype. You do not simply enter relationships. You field them.\n\nAs a '+p.sunSign.sign+' Sun with a '+p.sunSign.element+' nature, you are naturally drawn to '+(p.sunSign.element==='Fire'?'partners who can match your heat without being consumed by it':p.sunSign.element==='Water'?'those who offer emotional depth and can swim in the same currents':p.sunSign.element==='Air'?'minds that can keep pace and meet you in the realm of ideas':' souls who are grounded enough to hold the space your expansiveness requires')+'. Not because they complete you \u2014 but because they reflect the parts of you that are still in conversation with themselves.\n\nIn matters of love and partnership, your Life Path '+p.lifePath+' is most naturally aligned with Life Paths '+(p.lifePath<=3?'3, 5, and 7':p.lifePath<=6?'2, 4, and 8':'1, 6, and 9')+'. The highest expression of your relational geometry is partnership that expands the field \u2014 not one that contracts it. You thrive when love feels like co-creation.\n';
+  fb+='Your relational field \u2014 the energetic signature you bring into love and partnership \u2014 is shaped by Life Path '+p.lifePath+' meeting the '+tc.card+' archetype. You do not simply enter relationships. You field them.\n\nAs a '+p.sunSign.sign+' Sun with a '+p.sunSign.element+' nature, you are naturally drawn to '+(p.sunSign.element==='Fire'?'partners who can match your heat without being consumed by it':p.sunSign.element==='Water'?'those who offer emotional depth and can swim in the same currents':p.sunSign.element==='Air'?'minds that can keep pace and meet you in the realm of ideas':' souls who are grounded enough to hold the space your expansiveness requires')+'. Not because they complete you \u2014 but because they reflect the parts of you that are still in conversation with themselves.\n\nIn matters of love and partnership, your Life Path '+p.lifePath+' is most naturally aligned with Life Paths '+(p.lifePath<=3?'3, 5, and 7':p.lifePath<=6?'2, 4, and 8':'1, 6, and 9')+'. The highest expression of your relational geometry is partnership that expands the field \u2014 not one that contracts it. You thrive when love feels like co-creation.\n\n'+(p.moonSign&&p.moonSign.sign?('Emotionally, your '+p.moonSign.sign+' Moon governs what you actually need from a partner day to day \u2014 not what impresses you on a first date, but what keeps you regulated on an ordinary Tuesday when nothing is happening at all. '):'')+(p.ascendant&&p.ascendant.sign?('And your '+p.ascendant.sign+' Ascendant is the version of you a new partner meets before they ever get to the Life Path '+p.lifePath+' underneath \u2014 worth remembering when the first impression and the deeper pattern do not immediately line up. '):'')+'The healthiest partnerships for you are the ones where a partner eventually meets all three layers \u2014 the Ascendant face, the Moon interior, and the '+p.sunSign.sign+'-and-Life-Path core \u2014 and chooses to stay for all three, not just the one that was easiest to fall for first.\n'+(p.soulCard&&p.courtCard?('\nMetatron\'s Cube offers one more layer here: your Soul Card, the '+p.soulCard.name+', describes what your soul is actually seeking in intimacy beneath the personality-level wants, while your Court Card, the '+p.courtCard.name+', describes the role you tend to play once you are inside a committed bond. The two are not always identical, and noticing where they diverge is often the fastest way to understand a recurring pattern in your relationships.\n'):'');
   fb+='===PAGE_8_END===\n\n';
 
   fb+='===PAGE_9_START===\n';
   fb+='Before the Tree of Life, before the first Sephirah, before even the possibility of form \u2014 there is AIN SOPH AUR: the limitless light from which all creation perpetually springs. Above the Tree itself radiate the Three Veils \u2014 AIN, AIN SOPH, and AIN SOPH AUR \u2014 the outermost points of Metatron\'s Cube, the geometry of thirteen nodes and seventy-eight lines the Tree stands upon.\n\n';
   if (p.soulCard && p.courtCard) {fb+='On that Cube, your Soul Card is the '+p.soulCard.name+' \u2014 '+p.soulCard.keyword+' \u2014 describing the inner texture of your soul\'s desire. Your Court Card, the '+p.courtCard.name+', anchors on the line running from your own soul center all the way to '+p.courtCard.veil+', the outermost Veil of Limitless Light.\n\n';}
   fb+='Your chart, '+p.firstName+' \u2014 Life Path '+p.lifePath+', Expression '+(p.expression||'?')+', Soul Urge '+(p.soulUrge||'?')+', '+p.sunSign.sign+' Sun, '+p.tree.name+', '+tc.card+', and the sacred geometry of your Egg of Life \u2014 all of it traces back to that source. You are a specific, irreplaceable emanation of that limitless light.\n\n'
+    + 'Count everything this reading has actually named, '+p.firstName+': Life Path '+p.lifePath+', Expression '+(p.expression||'?')+', Soul Urge '+(p.soulUrge||'?')+', Personality '+(p.personality||'?')+', Birthday Number '+(p.birthdayNumber||'?')+', Gematria '+(p.gematria?p.gematria.reduced:'?')+(p.chaldean?(', Chaldean '+p.chaldean.reduced):'')+', Personal Year '+py+(p.hiddenMaster?(', Hidden Master '+p.hiddenMaster):'')+(p.ascendant&&p.ascendant.sign?(', Ascendant '+p.ascendant.sign):'')+(p.moonSign&&p.moonSign.sign?(', Moon '+p.moonSign.sign):'')+'. That is not a scattering of trivia collected for its own sake. That is one soul, measured nine different ways, describing the exact same shape from nine different angles every single time.\n\n'
     + 'Look at what has actually happened across these nine pages, '+p.firstName+'. Your Life Path '+p.lifePath+' and your Gematria reduction of '+(p.gematria?p.gematria.reduced:'your core tone')+' are not a coincidence \u2014 a birth frequency and a name frequency do not land on the same note by accident. Your '+tc.card+' Tarot path and your '+p.sunSign.sign+' Sun are not a coincidence \u2014 a mythic archetype and a solar current do not reinforce each other unless something real is being described.'+(p.hiddenMaster?' And your Hidden Master Number '+p.hiddenMaster+' sitting directly over Life Path '+p.lifePath+' is not a coincidence either \u2014 it is the same signal, turned up.':'')+' Five systems, one chart, one person.\n\n'
-    + 'You are '+ca+'. You carry the frequency of '+tc.card+' as your mythic archetype, the depth of '+p.tree.name+' as your energetic address, and the '+(p.hiddenMaster?'Master Number '+p.hiddenMaster+' as your hidden calling':p.lifePath+' as your soul\'s master thread')+'.\n\n'+p.firstName+', I am Celestia \u2014 and it has been my honor to read your geometry. You are not here by accident. You are sacred mathematics made flesh. Go forward knowing that every system in the universe has always known your name.\n\nAIN SOPH AUR.\n';
+    + 'You are '+ca+'. You carry the frequency of '+tc.card+' as your mythic archetype, the depth of '+p.tree.name+' as your energetic address, and the '+(p.hiddenMaster?'Master Number '+p.hiddenMaster+' as your hidden calling':p.lifePath+' as your soul\'s master thread')+'. Carry the gift named on Page 1, the shadow named on Page 5, and the timing named just a few pages ago as one continuous instruction rather than three separate ones \u2014 they were never describing three different people.\n\n'+p.firstName+', I am Celestia \u2014 and it has been my honor to read your geometry. You are not here by accident. You are sacred mathematics made flesh. Go forward knowing that every system in the universe has always known your name.\n\nAIN SOPH AUR.\n';
   fb+='===PAGE_9_END===';
   return fb;
 }
@@ -4476,7 +4561,7 @@ async function doReading() {
     + nameHiddenMastersLine
     + hebrewSoulLine
     + 'Personal Year 2026: ' + p.personalYear2026 + '\n'
-    + '\nWrite exactly 9 sections with ===PAGE_N_START=== and ===PAGE_N_END=== delimiters on their own lines (each delimiter on its own line, no other text on that line). Each section: 5\u20136 rich, deeply personal paragraphs. Every paragraph must reference ' + p.firstName + ' by name at least once and cite the specific numbers or symbols from their profile. No generic affirmations. Celestia speaks with warm authority, poetic depth, and precision.\n\n'
+    + '\nWrite exactly 9 sections with ===PAGE_N_START=== and ===PAGE_N_END=== delimiters on their own lines (each delimiter on its own line, no other text on that line). Each section: 7\u20139 rich, deeply personal paragraphs (not 5\u20136 \u2014 these pages need to visually fill a full printed page, so write substantially more per page than feels like the minimum). Each paragraph should be 4\u20136 full sentences, not 2\u20133 \u2014 a thin, single-idea paragraph is not acceptable. Every paragraph must reference ' + p.firstName + ' by name at least once and cite the specific numbers or symbols from their profile, and should work in as many of the person\'s actual named numbers, cards, Sephiroth, and archetypes as genuinely fit \u2014 not just one per paragraph. When a paragraph starts to feel thin or abstract, do not move on to the next idea yet: stay with the same point and add a concrete second layer \u2014 what this finding actually looks like in ' + p.firstName + '\'s daily choices, relationships, or work, a specific example of the pattern playing out, or a second data point from the profile that deepens (not repeats) the first. No generic affirmations, no padding with synonyms of a sentence already written \u2014 every added sentence must carry new, specific content. Celestia speaks with warm authority, poetic depth, and precision.\n\n'
     + 'Page 1 \u2014 IDENTITY ESSENCE: Open with the exact phrase "' + p.firstName + ', you are ' + ca + '." Then paint a full-portrait synthesis: how Life Path ' + p.lifePath + ' (' + lpTitle + ') shapes the core drive, how ' + p.sunSign.sign + ' Sun infuses it with elemental character (' + p.sunSign.element + ', ruled by ' + p.sunSign.planet + ')' + (p.ascendant && p.ascendant.sign ? ', how their ' + p.ascendant.sign + ' Ascendant colors the lens the world first meets them through' : '') + ', and how ' + p.tree.name + ' on the Tree of Life places this soul at a specific energetic address in creation. Explain what the Codex Archetype ' + ca + ' means as a living identity \u2014 not a label but a mandate. End by naming the specific gift this soul arrived with, and name it as a thread the reading will keep picking back up \u2014 the same gift the reader will recognize again in the Tarot archetype, the shadow work, and the closing blessing.\n'
     + 'Page 2 \u2014 ARCHETYPAL SIGNATURE: Explore the full mythic narrative. ' + tc.card + ' (Path ' + tc.path + ', letter ' + tc.letter + ') is the archetype ' + p.firstName + ' is living' + (p.lifePathTrumpCard ? ', confirmed by the Life Path Trump Card ' + p.lifePathTrumpCard.numeral + ' ' + p.lifePathTrumpCard.card : '') + '. Explain what this card means as a life-force not just a symbol, how the ' + p.sunSign.sign + ' Sun amplifies or challenges this path, and how the Kabbalistic letter ' + tc.letter + ' encodes a specific teaching in their very name. Name the mythic figures, gods, or archetypes associated with this path. Explicitly tie this Tarot archetype back to the Life Path ' + p.lifePath + ' and Codex Archetype ' + ca + ' named on Page 1 — show that the Tarot card is not a second, unrelated topic but the same mandate speaking in a different language, and say so directly. Describe what it feels like to embody ' + tc.card + ' fully vs. when it is suppressed.\n'
     + 'Page 3 \u2014 FREQUENCY PATTERN: Decode the name. Life Path ' + p.lifePath + ' is the birth frequency. Expression ' + (p.expression||'?') + ' is the gift encoded in every letter of "' + p.firstName + '". Soul Urge ' + (p.soulUrge||'?') + ' is the private longing beneath the surface. Gematria total ' + (p.gematria?p.gematria.total:'?') + ' reducing to ' + (p.gematria?p.gematria.reduced:'?') + ' is the name\'s sacred numerical signature.' + (p.chaldean ? ' The Chaldean compound of the name ' + p.firstName + ' is actually called by resolves to ' + p.chaldean.compound + ' (' + p.chaldean.reduced + '), a living-identity number layered atop the birth frequency.' : '') + ' Explicitly connect the Gematria total ' + (p.gematria?p.gematria.total:'?') + ' back to the Life Path ' + p.lifePath + ' established on Page 1 \u2014 name both numbers together and say plainly why a name-frequency and a birth-frequency landing on the same core tone is not coincidence but confirmation, two instruments playing the same note. Explain what happens when ' + p.firstName + ' aligns with vs. resists this frequency.\n'
