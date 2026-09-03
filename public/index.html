@@ -880,6 +880,23 @@ body {
         </div>
         <div id="partner-narration-status" style="font-size:0.75rem;color:#e8e0ff;line-height:1.6;"></div>
       </div>
+
+      <!-- Shared relational geometry diagram — Codex Logic V07 Part XVIII.
+           Both souls' real Sephirah/Trump-Card-path data on ONE shared
+           Flower→Fruit→Tree→Cube diagram (buildSharedGeometryDiagram()),
+           each in a distinct color. Additive alongside the existing
+           Toroidal Carnation Field / axis-role content in the PDF above —
+           nothing existing is removed. No compatibility score anywhere. -->
+      <div id="partner-geometry-section" style="display:none;width:100%;margin-top:1.5rem;">
+        <div style="text-align:center;margin-bottom:0.8rem;">
+          <div style="font-family:'Courier New',monospace;font-size:0.58rem;letter-spacing:0.35em;color:#c9a84c;margin-bottom:0.3rem;">✦ SHARED RELATIONAL GEOMETRY ✦</div>
+          <h3 style="font:700 1.05rem Georgia,serif;background:linear-gradient(135deg,#e8e0ff,#b08aff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:0;">One Tree, Two Landings</h3>
+        </div>
+        <div id="partner-geometry-svg-wrapper" class="cosmic-card" style="padding:1.2rem 0.5rem 0.5rem;">
+          <div id="partner-geometry-svg"></div>
+        </div>
+        <div id="partner-geometry-caption" style="margin-top:0.8rem;"></div>
+      </div>
     </div>
 
   </div>
@@ -1761,10 +1778,22 @@ function generatePartnershipPDF(p1, p2, pages) {
   doc.setFont('courier','normal'); doc.setFontSize(5.5); doc.setTextColor(Math.round(DIM[0]*1.8),Math.round(DIM[1]*1.8),Math.round(DIM[2]*1.8));
   doc.text(nowP.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}).toUpperCase(), W/2, H-8, {align:'center'});
 
-  // ===== CONTENT PAGES =====
+  // ===== SHARED RELATIONAL GEOMETRY PAGE (Codex Logic V07 Part XVIII) =====
+  // Inserted right after the cover, same pattern as the solo PDF's
+  // drawSacredGeometryPDFPage() insertion — one page added to the
+  // sequence, so PAGE_ROMS_P below (which numbers the 6 written content
+  // sections, unchanged) stays as-is, but totalPdf and every content
+  // page's footer number are bumped by 1 to match.
   var PAGE_ROMS_P=['I','II','III','IV','V','VI'];
-  var totalPdf=1+pages.length;
+  var totalPdf=2+pages.length;
 
+  doc.addPage();
+  drawSharedGeometryPDFPage(doc, p1, p2, W, H, {
+    BG:BG, BG2:BG2, GHOST:GHOST, GOLD:GOLD, PURPLE:PURPLE, ROSE:ROSE,
+    TEAL:TEAL, WHITE:WHITE, MUTED:MUTED, DIM:DIM
+  }, 2, totalPdf);
+
+  // ===== CONTENT PAGES =====
   pages.forEach(function(pageContent, idx) {
     doc.addPage();
     var meta=PARTNER_PAGE_META[idx]||{sys:'PARTNERSHIP',layer:'SECTION '+(idx+1),title:'Your Reading',color:ROSE};
@@ -1835,7 +1864,7 @@ function generatePartnershipPDF(p1, p2, pages) {
       doc.setFillColor(Math.round(col[0]*0.4),Math.round(col[1]*0.4),Math.round(col[2]*0.4)); doc.circle(W/2,maxY,1,'F');
     }
 
-    pdfFooter(idx+2, totalPdf);
+    pdfFooter(idx+3, totalPdf);
   });
 
   var fn1=p1.firstName.toLowerCase().replace(/[^a-z]/g,'');
@@ -2412,6 +2441,8 @@ document.getElementById('partner-generate-btn').addEventListener('click', async 
     status.textContent = '✅ Partnership reading ready for ' + fn1 + ' & ' + fn2 + ' (' + AXIS_CONFIGS[axisConf].symbol + ' ' + AXIS_CONFIGS[axisConf].name + ')';
     pdfBtn.style.display = 'block';
     document.getElementById('partner-listen-btn').style.display = 'block';
+    document.getElementById('partner-geometry-section').style.display = 'block';
+    buildSharedGeometryDiagram(p1, p2, 'partner-geometry-svg', 'partner-geometry-caption');
   } catch(e) {
     status.textContent = '⚠️ AI unavailable — using fallback reading.';
     var p1 = window._partnerP1, p2 = window._partnerP2;
@@ -2419,6 +2450,8 @@ document.getElementById('partner-generate-btn').addEventListener('click', async 
       window._partnerPages = parseReadingPages(getPartnershipFallback(p1, p2));
       pdfBtn.style.display = 'block';
       document.getElementById('partner-listen-btn').style.display = 'block';
+      document.getElementById('partner-geometry-section').style.display = 'block';
+      buildSharedGeometryDiagram(p1, p2, 'partner-geometry-svg', 'partner-geometry-caption');
     }
   }
 });
@@ -3866,6 +3899,23 @@ function buildSacredGeometryDiagram(p, containerId, captionId, options) {
   defs.innerHTML = '<filter id="' + containerId + '-glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
   svgEl.appendChild(defs);
 
+  // ---- STAGE 0a: Vesica Piscis — Ring0 + one Ring1 circle (canonically 0°),
+  // §17.1. Pure subset of the same lattice; same faint stroke weight as the
+  // Flower of Life base layer below (this is a simpler, earlier version of
+  // that same faint layer, not a new visual language). ----
+  var gVesica = sgGroup(svgEl, containerId + '-stage-vesica');
+  sgCircle(gVesica, lattice.ring0[0].x, lattice.ring0[0].y, R, { stroke: 'rgba(176,138,255,0.18)', width: '0.6' });
+  var vesicaRing1 = lattice.ring1.filter(function(pt) { return pt.angle === 0; })[0];
+  sgCircle(gVesica, vesicaRing1.x, vesicaRing1.y, R, { stroke: 'rgba(176,138,255,0.18)', width: '0.6' });
+
+  // ---- STAGE 0b: Seed of Life — Ring0 + all six Ring1 circles, §17.2. Also
+  // a pure subset of the lattice, same faint stroke as the Flower base. ----
+  var gSeed = sgGroup(svgEl, containerId + '-stage-seed');
+  sgCircle(gSeed, lattice.ring0[0].x, lattice.ring0[0].y, R, { stroke: 'rgba(176,138,255,0.18)', width: '0.6' });
+  lattice.ring1.forEach(function(pt) {
+    sgCircle(gSeed, pt.x, pt.y, R, { stroke: 'rgba(176,138,255,0.18)', width: '0.6' });
+  });
+
   // ---- STAGE 1: Flower of Life — all 19 circles, faint (§14.1, §16.4 step 1) ----
   var gFlower = sgGroup(svgEl, containerId + '-stage-flower');
   lattice.ring3.forEach(function(pt) {
@@ -3971,9 +4021,140 @@ function buildSacredGeometryDiagram(p, containerId, captionId, options) {
   // of this self-driving fixed-cadence loop.
   if (!options.manualReveal) {
     sgRevealStages(svgEl, containerId, [
+      containerId + '-stage-vesica', containerId + '-stage-seed',
       containerId + '-stage-flower', containerId + '-stage-fruit',
       containerId + '-stage-tree', containerId + '-stage-cube', containerId + '-stage-capstone'
     ]);
+  }
+}
+
+// ===========================
+// SHARED PARTNERSHIP GEOMETRY DIAGRAM — Codex Logic V07 Part XVIII
+// ===========================
+// Draws ONE shared Flower->Fruit->Tree->Cube diagram (§18.1) for both
+// partnership subjects, reusing sgBuildLattice/sgBuildFruitPoints/
+// sgBuildCubeLines exactly as buildSacredGeometryDiagram() does — the base
+// geometry is drawn once, shared, since it's identical for every reading.
+// Each subject's own real computed data (Sephirah, landed Trump Card
+// path(s)) is then highlighted in a distinct color: p1 in gold (#f0d070,
+// the same color buildSacredGeometryDiagram() already uses for a solo
+// capstone highlight) and p2 in rose (#ff9ed2, already established
+// elsewhere in this app's palette — e.g. the partnership PDF's own p2-axis
+// color at generatePartnershipPDF()) so the two read clearly apart against
+// the dark background without introducing a new color.
+//
+// Per §18.2, coincidence points (the literal same Sephirah id, or the
+// literal same Trump Card path number, landed by both subjects) are
+// reported in the caption as a plain stated fact — never a score or
+// percentage (§18.3). p1/p2: computePartnerProfile() output, used as-is,
+// nothing recomputed. containerId: element to receive the <svg>.
+// captionId: element to receive the Sephirah/Path/coincidence caption text.
+function buildSharedGeometryDiagram(p1, p2, containerId, captionId) {
+  var container = document.getElementById(containerId);
+  if (!container) return;
+
+  var COLOR_P1 = '#f0d070'; // gold — same hue as the solo capstone highlight
+  var COLOR_P2 = '#ff9ed2'; // rose — already established elsewhere in the app
+
+  var VW = 320, VH = 320, cx = 160, cy = 160;
+  var R = 22;
+  var lattice = sgBuildLattice(cx, cy, R);
+  var fruitPoints = sgBuildFruitPoints(lattice);
+  var cube = sgBuildCubeLines(fruitPoints);
+
+  var sephId1 = (p1.tree && p1.tree.sephId) || (p1.treePosition && p1.treePosition.sephId) || null;
+  var sephId2 = (p2.tree && p2.tree.sephId) || (p2.treePosition && p2.treePosition.sephId) || null;
+  var trumpNums1 = (p1.trumpPaths || []).filter(Boolean).map(function(tp) { return tp.num; });
+  var trumpNums2 = (p2.trumpPaths || []).filter(Boolean).map(function(tp) { return tp.num; });
+
+  var svgEl = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svgEl.setAttribute('viewBox', '0 0 ' + VW + ' ' + VH);
+  svgEl.setAttribute('width', '100%');
+  svgEl.setAttribute('style', 'max-width:600px;display:block;margin:0 auto;');
+  svgEl.setAttribute('id', containerId + '-inner');
+
+  var defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+  defs.innerHTML = '<filter id="' + containerId + '-glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
+  svgEl.appendChild(defs);
+
+  // ---- Shared base structure, drawn once (§18.1): Flower (faint) -> Fruit
+  // (stronger) -> Tree of Life's 22 named paths -> Metatron's Cube's
+  // remaining 56 lines. Same helpers, same weights as the solo diagram. ----
+  var gFlower = sgGroup(svgEl, containerId + '-stage-flower');
+  lattice.ring3.forEach(function(pt) { sgCircle(gFlower, pt.x, pt.y, R, { stroke: 'rgba(176,138,255,0.18)', width: '0.6' }); });
+  fruitPoints.forEach(function(pt) { sgCircle(gFlower, pt.x, pt.y, R, { stroke: 'rgba(176,138,255,0.18)', width: '0.6' }); });
+
+  var gFruit = sgGroup(svgEl, containerId + '-stage-fruit');
+  fruitPoints.forEach(function(pt) { sgCircle(gFruit, pt.x, pt.y, R, { stroke: 'rgba(201,168,76,0.55)', width: '1.3' }); });
+
+  var gTree = sgGroup(svgEl, containerId + '-stage-tree');
+  cube.treeLines.forEach(function(line) {
+    sgLine(gTree, line.a.x, line.a.y, line.b.x, line.b.y, { stroke: 'rgba(201,168,76,0.5)', width: '1.1' });
+  });
+
+  var gCube = sgGroup(svgEl, containerId + '-stage-cube');
+  cube.cubeLines.forEach(function(line) {
+    sgLine(gCube, line.a.x, line.a.y, line.b.x, line.b.y, { stroke: 'rgba(80,220,200,0.14)', width: '0.45' });
+  });
+
+  // ---- Per-subject highlights (§18.1): each subject's landed path(s) and
+  // Sephirah node, each in that subject's own color. Where both subjects
+  // land on the same path or Sephirah, both colors are drawn on the same
+  // line/node (p1's full-width stroke first, p2's thinner stroke on top)
+  // so the shared line/node is visibly carrying both colors at once —
+  // this is a display choice only, not a score of any kind (§18.3). ----
+  var gHighlight = sgGroup(svgEl, containerId + '-stage-capstone');
+  gHighlight.classList.add('sg-visible'); // static admin-tool diagram — no staged reveal here
+
+  cube.treeLines.forEach(function(line) {
+    var hit1 = trumpNums1.indexOf(line.path.num) !== -1;
+    var hit2 = trumpNums2.indexOf(line.path.num) !== -1;
+    if (!hit1 && !hit2) return;
+    if (hit1) sgLine(gHighlight, line.a.x, line.a.y, line.b.x, line.b.y, { stroke: COLOR_P1, width: '3' });
+    if (hit2) sgLine(gHighlight, line.a.x, line.a.y, line.b.x, line.b.y, { stroke: COLOR_P2, width: hit1 ? '1.3' : '3' });
+  });
+
+  [{ sephId: sephId1, color: COLOR_P1, r: 8 }, { sephId: sephId2, color: COLOR_P2, r: 5.5 }].forEach(function(who) {
+    if (!who.sephId) return;
+    var pt = fruitPoints.filter(function(fp) { return fp.sephId === who.sephId; })[0];
+    if (!pt) return;
+    sgCircle(gHighlight, pt.x, pt.y, who.r, { stroke: who.color, width: '1.6' });
+  });
+
+  container.innerHTML = '';
+  container.appendChild(svgEl);
+
+  // ---- Caption: each subject's real Sephirah/path data, plus §18.2's
+  // plain-fact coincidence readout — no score, no percentage, ever. ----
+  if (captionId) {
+    var capEl = document.getElementById(captionId);
+    if (!capEl) return;
+    var seph1 = SEPHIROTH.find(function(s) { return s.id === sephId1; });
+    var seph2 = SEPHIROTH.find(function(s) { return s.id === sephId2; });
+    var trumpNames1 = (p1.trumpPaths || []).filter(Boolean).map(function(tp) { return tp.numeral + ' ' + tp.card; }).join(' + ');
+    var trumpNames2 = (p2.trumpPaths || []).filter(Boolean).map(function(tp) { return tp.numeral + ' ' + tp.card; }).join(' + ');
+
+    var sharedNums = trumpNums1.filter(function(n) { return trumpNums2.indexOf(n) !== -1; });
+    var sharedSeph = (sephId1 && sephId1 === sephId2) ? seph1 : null;
+
+    var html = '<div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:0.5rem;">';
+    html += '<div style="font-size:0.78rem;color:' + COLOR_P1 + ';"><span style="color:#c9a84c;">&#9733; ' + p1.firstName + ':</span> ' + (seph1 ? seph1.name : '—') + (trumpNames1 ? ' &middot; ' + trumpNames1 : '') + '</div>';
+    html += '<div style="font-size:0.78rem;color:' + COLOR_P2 + ';"><span style="color:#ff9ed2;">&#9733; ' + p2.firstName + ':</span> ' + (seph2 ? seph2.name : '—') + (trumpNames2 ? ' &middot; ' + trumpNames2 : '') + '</div>';
+    html += '</div>';
+
+    if (sharedSeph || sharedNums.length) {
+      var facts = [];
+      if (sharedSeph) facts.push('Both of you land on ' + sharedSeph.name + ' — the literal same Sephirah.');
+      if (sharedNums.length) {
+        var sharedNames = cube.treeLines.filter(function(l) { return sharedNums.indexOf(l.path.num) !== -1; })
+          .map(function(l) { return l.path.numeral + ' ' + l.path.card; })
+          .filter(function(v, i, a) { return a.indexOf(v) === i; }).join(', ');
+        facts.push('Both of you land on the same path' + (sharedNums.length > 1 ? 's' : '') + ': ' + sharedNames + '.');
+      }
+      capEl.innerHTML = '<div style="font-size:0.78rem;color:#e8e0ff;">' + facts.join(' ') + '</div>' + html;
+    } else {
+      capEl.innerHTML = html + '<div style="font-size:0.75rem;color:#8a7aaa;font-style:italic;">No shared path this time — your two charts activate different lines of the same structure.</div>';
+    }
   }
 }
 
@@ -4110,6 +4291,19 @@ function drawSacredGeometryPDFPage(doc, p, W, H, C, pageNum, totalPages) {
   lattice.ring3.forEach(function(pt) { doc.circle(pt.x,pt.y,R,'S'); });
   fruitPoints.forEach(function(pt) { doc.circle(pt.x,pt.y,R,'S'); });
 
+  // ---- Construction lineage overlay (§17.1/17.2): a static page has no
+  // staged reveal, so the Vesica Piscis pair and Seed of Life group are
+  // called out with a brighter re-stroke on just those same circles
+  // (already drawn above as part of the Flower — no duplicate circles, no
+  // new geometry) plus a caption line below. This is the "in both places"
+  // touch requested for the PDF: identifiable without cluttering the page. ----
+  var lineageColor = blend(PURPLE, 0.5);
+  doc.setDrawColor(lineageColor[0],lineageColor[1],lineageColor[2]); doc.setLineWidth(0.24);
+  var vesicaRing1Pdf = lattice.ring1.filter(function(pt) { return pt.angle === 0; })[0];
+  doc.circle(lattice.ring0[0].x, lattice.ring0[0].y, R, 'S'); // Ring0 — shared by Vesica + Seed
+  doc.circle(vesicaRing1Pdf.x, vesicaRing1Pdf.y, R, 'S');     // Vesica's one Ring1 circle (0°)
+  lattice.ring1.forEach(function(pt) { doc.circle(pt.x, pt.y, R, 'S'); }); // Seed's remaining Ring1 circles
+
   // ---- STAGE 2: Fruit of Life — inner 13 circles, stronger stroke ----
   var fruitColor = blend(GOLD, 0.6);
   doc.setDrawColor(fruitColor[0],fruitColor[1],fruitColor[2]); doc.setLineWidth(0.32);
@@ -4211,11 +4405,184 @@ function drawSacredGeometryPDFPage(doc, p, W, H, C, pageNum, totalPages) {
     doc.setFont('courier','normal'); doc.setFontSize(6.5); doc.setTextColor(MUTED[0],MUTED[1],MUTED[2]);
     doc.text('SOUL CARD: ' + p.soulCard.name + '   ·   COURT CARD: ' + p.courtCard.name, W/2, capY, {align:'center'});
   }
+  // §17.1/17.2 construction-lineage note — points back at the brighter-
+  // stroked Vesica/Seed circles drawn above (same circles, no duplicates).
+  var lineageNoteColor = blend(WHITE, 0.4);
+  doc.setFont('courier','normal'); doc.setFontSize(5.2); doc.setTextColor(lineageNoteColor[0],lineageNoteColor[1],lineageNoteColor[2]);
+  doc.text('built from the Vesica Piscis and Seed of Life outward — the brighter inner circles above', W/2, H-20-2, {align:'center'});
 
   // ---- Footer (same convention as pdfFooter() elsewhere) ----
   doc.setFont('courier','normal'); doc.setFontSize(5.5);
   doc.setTextColor(Math.round(DIM[0]*1.5),Math.round(DIM[1]*1.5),Math.round(DIM[2]*1.5));
   doc.text('CIRCLES SQUARED  ·  CELESTIAL BLUEPRINT', 14, H-6);
+  doc.text('PAGE '+pageNum+' OF '+totalPages, W-14, H-6, {align:'right'});
+}
+
+// ===========================
+// PDF — SHARED RELATIONAL GEOMETRY PAGE (Codex Logic V07 Part XVIII)
+// One static full page for generatePartnershipPDF(), analogous to
+// drawSacredGeometryPDFPage() above but for two subjects on one shared
+// diagram (§18.1): same sgBuildLattice/sgBuildFruitPoints/sgBuildCubeLines
+// geometry, drawn once, with each subject's Sephirah node and landed
+// Trump Card path(s) highlighted in their own color (p1 gold, p2 rose —
+// matching this same PDF's existing p1/p2 axis-page colors in
+// PARTNER_PAGE_META above, so the convention is consistent within this one
+// document). Caption reports §18.2 coincidence points as a plain fact —
+// no score, no percentage (§18.3).
+// p1/p2: computePartnerProfile() output, reused as-is.
+function drawSharedGeometryPDFPage(doc, p1, p2, W, H, C, pageNum, totalPages) {
+  var BG=C.BG, BG2=C.BG2, GHOST=C.GHOST, GOLD=C.GOLD, PURPLE=C.PURPLE,
+      ROSE=C.ROSE, TEAL=C.TEAL, WHITE=C.WHITE, MUTED=C.MUTED, DIM=C.DIM;
+  var col = PURPLE; // page accent — distinct from the solo geometry page's teal
+
+  function blend(rgb, alpha) {
+    return [
+      Math.round(BG[0] + (rgb[0]-BG[0])*alpha),
+      Math.round(BG[1] + (rgb[1]-BG[1])*alpha),
+      Math.round(BG[2] + (rgb[2]-BG[2])*alpha)
+    ];
+  }
+
+  // ---- Page background + starfield ----
+  doc.setFillColor(BG[0],BG[1],BG[2]); doc.rect(0,0,W,H,'F');
+  doc.setFillColor(BG2[0],BG2[1],BG2[2]); doc.rect(0,0,W,58,'F');
+  (function stars(seed,n){
+    var x=seed;
+    for(var i=0;i<n;i++){
+      x=(x*1664525+1013904223)%4294967296; var sx=(x%1000)/1000*W;
+      x=(x*1664525+1013904223)%4294967296; var sy=(x%1000)/1000*H;
+      var r=(i%7===0)?0.65:(i%3===0)?0.45:0.28;
+      var bright=(i%5===0)?[230,220,255]:(i%3===0)?[200,188,240]:[160,148,210];
+      doc.setFillColor(bright[0],bright[1],bright[2]); doc.circle(sx,sy,r,'F');
+    }
+  })(444, 140);
+
+  doc.setDrawColor(GHOST[0],GHOST[1],GHOST[2]); doc.setLineWidth(0.18);
+  doc.circle(W+22,38,55,'S'); doc.circle(W+22,38,40,'S');
+
+  doc.setFillColor(GHOST[0],GHOST[1],GHOST[2]);
+  doc.roundedRect(6,6,W-12,H-20,3,3,'F');
+  doc.setDrawColor(Math.round(col[0]*0.3),Math.round(col[1]*0.3),Math.round(col[2]*0.3)); doc.setLineWidth(0.28);
+  doc.roundedRect(6,6,W-12,H-20,3,3,'S');
+  doc.setFillColor(col[0],col[1],col[2]);
+  doc.rect(6,6,W-12,2.2,'F');
+
+  doc.setFont('courier','bold'); doc.setFontSize(5);
+  doc.setTextColor(col[0],col[1],col[2]);
+  doc.text("SHARED RELATIONAL GEOMETRY  ·  ONE TREE, TWO LANDINGS", 14, 17);
+  doc.setFont('times','bold'); doc.setFontSize(20);
+  doc.setTextColor(252,250,255);
+  doc.text('YOUR SHARED GEOMETRY', 14, 28);
+  doc.setDrawColor(Math.round(col[0]*0.55),Math.round(col[1]*0.55),Math.round(col[2]*0.55)); doc.setLineWidth(0.22);
+  doc.line(14,33,W-14,33);
+  doc.setFillColor(col[0],col[1],col[2]);
+  doc.circle(W/2,33,1.2,'F'); doc.circle(W/2-9,33,0.5,'F'); doc.circle(W/2+9,33,0.5,'F');
+
+  // ---- Layout ----
+  var DIAGRAM_TOP = 40;
+  var CAPTION_H = 34;
+  var CAPTION_TOP = (H-20) - CAPTION_H;
+  var marginX = 14;
+  var availW = (W - marginX) - marginX;
+  var availH = CAPTION_TOP - DIAGRAM_TOP;
+  var side = Math.min(availW, availH) - 8;
+  var diagRadiusTarget = side / 2;
+  var ORIG_EXTENT = 117; // same lattice extent as the solo geometry page
+  var scale = diagRadiusTarget / ORIG_EXTENT;
+  var R = 22 * scale;
+  var cx = W/2, cy = DIAGRAM_TOP + availH/2;
+
+  var sephId1 = (p1.tree && p1.tree.sephId) || null;
+  var sephId2 = (p2.tree && p2.tree.sephId) || null;
+  var trumpPaths1 = (p1.trumpPaths || []).filter(Boolean);
+  var trumpPaths2 = (p2.trumpPaths || []).filter(Boolean);
+  var trumpNums1 = trumpPaths1.map(function(tp) { return tp.num; });
+  var trumpNums2 = trumpPaths2.map(function(tp) { return tp.num; });
+
+  var lattice = sgBuildLattice(cx, cy, R);
+  var fruitPoints = sgBuildFruitPoints(lattice);
+  var cube = sgBuildCubeLines(fruitPoints);
+
+  // ---- Shared base structure, drawn once (§18.1): Flower (faint) -> Fruit
+  // (stronger) -> Tree's 22 named paths -> Cube's remaining 56 lines ----
+  var flowerColor = blend(PURPLE, 0.22);
+  doc.setDrawColor(flowerColor[0],flowerColor[1],flowerColor[2]); doc.setLineWidth(0.12);
+  lattice.ring3.forEach(function(pt) { doc.circle(pt.x,pt.y,R,'S'); });
+  fruitPoints.forEach(function(pt) { doc.circle(pt.x,pt.y,R,'S'); });
+
+  var fruitColor = blend(GOLD, 0.6);
+  doc.setDrawColor(fruitColor[0],fruitColor[1],fruitColor[2]); doc.setLineWidth(0.32);
+  fruitPoints.forEach(function(pt) { doc.circle(pt.x,pt.y,R,'S'); });
+
+  var treeColor = blend(GOLD, 0.55);
+  doc.setDrawColor(treeColor[0],treeColor[1],treeColor[2]); doc.setLineWidth(0.28);
+  cube.treeLines.forEach(function(line) { doc.line(line.a.x,line.a.y,line.b.x,line.b.y); });
+
+  var cubeColor = blend(TEAL, 0.22);
+  doc.setDrawColor(cubeColor[0],cubeColor[1],cubeColor[2]); doc.setLineWidth(0.1);
+  cube.cubeLines.forEach(function(line) { doc.line(line.a.x,line.a.y,line.b.x,line.b.y); });
+
+  // ---- Per-subject highlights, each in their own color ----
+  cube.treeLines.forEach(function(line) {
+    var hit1 = trumpNums1.indexOf(line.path.num) !== -1;
+    var hit2 = trumpNums2.indexOf(line.path.num) !== -1;
+    if (!hit1 && !hit2) return;
+    if (hit1) { doc.setDrawColor(GOLD[0],GOLD[1],GOLD[2]); doc.setLineWidth(1.0); doc.line(line.a.x,line.a.y,line.b.x,line.b.y); }
+    if (hit2) { doc.setDrawColor(ROSE[0],ROSE[1],ROSE[2]); doc.setLineWidth(hit1?0.45:1.0); doc.line(line.a.x,line.a.y,line.b.x,line.b.y); }
+  });
+  [{ sephId: sephId1, color: GOLD, r: 8 }, { sephId: sephId2, color: ROSE, r: 5.5 }].forEach(function(who) {
+    if (!who.sephId) return;
+    var pt = fruitPoints.filter(function(fp) { return fp.sephId === who.sephId; })[0];
+    if (!pt) return;
+    var r = who.r * scale;
+    doc.setFillColor(BG[0],BG[1],BG[2]); doc.circle(pt.x,pt.y,r,'F');
+    doc.setDrawColor(who.color[0],who.color[1],who.color[2]); doc.setLineWidth(0.5);
+    doc.circle(pt.x,pt.y,r,'S');
+  });
+
+  // ---- Caption: per-subject readout + §18.2 coincidence, plain fact only ----
+  var seph1 = SEPHIROTH.find(function(s) { return s.id === sephId1; });
+  var seph2 = SEPHIROTH.find(function(s) { return s.id === sephId2; });
+  var trumpNames1 = trumpPaths1.map(function(tp) { return tp.numeral + ' ' + tp.card; }).join(' + ');
+  var trumpNames2 = trumpPaths2.map(function(tp) { return tp.numeral + ' ' + tp.card; }).join(' + ');
+  var sharedNums = trumpNums1.filter(function(n) { return trumpNums2.indexOf(n) !== -1; });
+  var sharedSeph = (sephId1 && sephId1 === sephId2) ? seph1 : null;
+
+  var capY = CAPTION_TOP + 6;
+  doc.setDrawColor(Math.round(col[0]*0.3),Math.round(col[1]*0.3),Math.round(col[2]*0.3)); doc.setLineWidth(0.15);
+  doc.line(marginX, CAPTION_TOP+2, W-marginX, CAPTION_TOP+2);
+
+  doc.setFont('courier','bold'); doc.setFontSize(7); doc.setTextColor(GOLD[0],GOLD[1],GOLD[2]);
+  doc.text('★ ' + p1.firstName.toUpperCase(), marginX+2, capY, {align:'left'});
+  doc.setFont('times','normal'); doc.setFontSize(8.5); doc.setTextColor(WHITE[0],WHITE[1],WHITE[2]);
+  doc.text((seph1?seph1.name:'') + (trumpNames1?'  ·  '+trumpNames1:''), marginX+2, capY+5, {align:'left'});
+
+  doc.setFont('courier','bold'); doc.setFontSize(7); doc.setTextColor(ROSE[0],ROSE[1],ROSE[2]);
+  doc.text(p2.firstName.toUpperCase() + ' ★', W-marginX-2, capY, {align:'right'});
+  doc.setFont('times','normal'); doc.setFontSize(8.5); doc.setTextColor(WHITE[0],WHITE[1],WHITE[2]);
+  doc.text((seph2?seph2.name:'') + (trumpNames2?'  ·  '+trumpNames2:''), W-marginX-2, capY+5, {align:'right'});
+
+  capY += 13;
+  doc.setFont('times', sharedSeph||sharedNums.length ? 'bold' : 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(sharedSeph||sharedNums.length ? PURPLE[0] : MUTED[0], sharedSeph||sharedNums.length ? PURPLE[1] : MUTED[1], sharedSeph||sharedNums.length ? PURPLE[2] : MUTED[2]);
+  var factLines = [];
+  if (sharedSeph) factLines.push('Both of you land on ' + sharedSeph.name + ' — the literal same Sephirah.');
+  if (sharedNums.length) {
+    var sharedNames = cube.treeLines.filter(function(l) { return sharedNums.indexOf(l.path.num) !== -1; })
+      .map(function(l) { return l.path.numeral + ' ' + l.path.card; })
+      .filter(function(v, i, a) { return a.indexOf(v) === i; }).join(', ');
+    factLines.push('Both of you land on the same path' + (sharedNums.length>1?'s':'') + ': ' + sharedNames + '.');
+  }
+  if (!factLines.length) factLines.push('No shared path this time — your two charts activate different lines of the same structure.');
+  doc.splitTextToSize(factLines.join(' '), W-2*marginX-8).forEach(function(line, i) {
+    doc.text(line, W/2, capY + i*4.6, {align:'center'});
+  });
+
+  // ---- Footer ----
+  doc.setFont('courier','normal'); doc.setFontSize(5.5);
+  doc.setTextColor(Math.round(DIM[0]*1.5),Math.round(DIM[1]*1.5),Math.round(DIM[2]*1.5));
+  doc.text('CIRCLES SQUARED  ·  PARTNERSHIP BLUEPRINT', 14, H-6);
   doc.text('PAGE '+pageNum+' OF '+totalPages, W-14, H-6, {align:'right'});
 }
 
@@ -6347,16 +6714,34 @@ function buildRevealScript() {
   // the Codex Logic V06 doc itself describes it (§14.4: "the Cube rides the
   // Tree, which rides the Fruit, which blooms from the Flower").
   return [
+    // 0a. vesica — genesis point: two circles, the seed of every layer to
+    // follow. Per V07 §17.1/17.4, prepended before the Flower of Life.
+    {
+      stage: 'vesica',
+      mutedPauseMs: 2800,
+      text: p.firstName + ', before any of it, there is this: two circles, each one centered on the other\'s edge. '
+        + 'The Vesica Piscis — the genesis point, two circles overlapping. Every shape you are about to see, '
+        + 'the whole Codex, grows out of this single relationship.'
+    },
+    // 0b. seed — six more circles born around the center, completing the
+    // first full symmetry. Per V07 §17.2/17.4, prepended before the Flower.
+    {
+      stage: 'seed',
+      mutedPauseMs: 3000,
+      text: 'Now watch that pair multiply around itself, six times over, until the center is surrounded. '
+        + 'This is the Seed of Life — the first complete symmetry, six circles born from the center. '
+        + 'Nothing new has been added; the same relationship you just saw has simply repeated until it closed.'
+    },
     // 1. flower — whole-system framing, no personal number yet. This is the
     // "base layer" the owner described: the Codex is made of ancient systems
     // layered as one structure, starting with the Flower of Life.
     {
       stage: 'flower',
       mutedPauseMs: 3200,
-      text: p.firstName + ', what you are about to see is the Codex itself — one living structure, '
+      text: 'Let that same seed keep growing, and what you are about to see is the Codex itself — one living structure, '
         + 'not five separate systems, but five ancient languages describing the same underlying geometry. '
         + 'They are built by layering on top of one another, each one growing out of the last. '
-        + 'The base layer is the Flower of Life: nineteen interlocking circles, the geometric root every other layer grows from.'
+        + 'The next layer is the Flower of Life: nineteen interlocking circles, the geometric root every other layer grows from.'
     },
     // 2. fruit — the inner 13 circles as the foundation the Tree and Cube
     // stand on. Kept as its own beat (not folded into segment 1) so the
