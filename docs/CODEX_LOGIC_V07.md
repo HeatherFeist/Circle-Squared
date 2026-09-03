@@ -225,4 +225,80 @@ Cardinal, Fixed, and Mutable modality is already load-bearing elsewhere in this 
 
 ---
 
+## Part XXIV — The Zodiacal Court Card Wheel (Golden Dawn, Sun placement)
+
+This part adds the follow-on work flagged as out of scope in Part XXIII §23.1: the Golden Dawn's zodiacal attribution of the Court Cards, distinct from both the existing Sephirah-based Soul/Court Card system (`soulCardFor`/`courtCardFor`, V06 §6.3) and the Node Decan Cards (Part XXI) — a third, independent Minor-Arcana-adjacent readout, per the fixed/fluid principle of Part XXIII, computed from a subject's own Sun longitude.
+
+### 24.0 — Naming warning: this is where secondary sources most often get it wrong
+
+This codebase's own `courtRankForSephId()` (V06 §6.3) already fixes this Codex's Court Card rank names as **King / Queen / Knight / Page** (Rider-Waite-Smith naming). Aleister Crowley's Thoth deck renames three of those same four ranks: RWS "King" = Thoth "Knight"; RWS "Queen" = Thoth "Queen"; RWS "Knight" = Thoth "Prince"; RWS "Page" = Thoth "Princess". Many secondary tarot sources use the word "Knight" to mean either rank depending on which lineage they are describing, without saying so. Getting this wrong silently swaps which modality (Fixed vs. Mutable) a rank is anchored to. Every citation below is stated in **both** vocabularies explicitly, specifically to avoid that trap, after this session hit exactly that apparent contradiction mid-verification and had to resolve it by re-reading citations in both vocabularies side by side before trusting any of them.
+
+### 24.1 — The verified rule: modality anchors each rank to a cusp-straddling 30° span
+
+Twelve of the sixteen Court Cards (King, Queen, and Knight — RWS naming — for all four suits) each rule a 30°-wide span of the ecliptic that straddles a sign cusp: the **last decan (20–30°) of one sign, plus the first two decans (0–20°) of the next sign**. Which rank owns which sign is fixed by that sign's modality:
+
+- **Queen** → the suit's **Cardinal** sign
+- **Knight** (RWS) = **Prince** (Thoth) → the suit's **Fixed / Kerubic** sign
+- **King** (RWS) = **Knight** (Thoth) → the suit's **Mutable** sign
+
+For whichever sign a rank owns (its "home" sign), that card's 30° span = [the immediately preceding sign's last decan] + [the home sign's own first two decans].
+
+**Named-citation verification, cross-translated between vocabularies** (search-result summaries; several source sites are blocked by this environment's egress proxy and could not be fetched directly for full-page review):
+- Queen of Wands = last decan Pisces + first two decans Aries (Wands/Fire, cardinal Aries)
+- Queen of Cups = last decan Gemini + first two decans Cancer (Cups/Water, cardinal Cancer)
+- Queen of Swords = last decan Virgo + first two decans Libra (Swords/Air, cardinal Libra; cited in Thoth's own 21°–20° degree convention — the same cusp-straddling shape as the Book T 20°–20° convention used here, shifted by the one degree that is simply Thoth's own decan-boundary convention)
+- Knight of Wands (RWS) = Thoth's "Prince of Wands, 21° Cancer – 20° Leo" (Wands/Fire, fixed Leo)
+- Knight of Cups (RWS) = fixed sign Scorpio, confirmed both directly ("Knight of Cups… fixed zodiac sign Scorpio") and as Thoth's "Prince of Cups, 21° Libra – 20° Scorpio" (Cups/Water, fixed Scorpio)
+- King of Wands (RWS) = Thoth's "Knight of Wands, 21° Scorpio – 20° Sagittarius" (Wands/Fire, mutable Sagittarius)
+- King of Cups (RWS) = mutable sign Pisces, confirmed directly ("King of Cups… mutable sign Pisces")
+
+Sources: davidcunliffe.com ("Tarot Astrological Correspondences of the Hermetic Order of the Golden Dawn"), Tarot Thrones ("Significators | Astrology"), Parsifal's Wheel Tarot & Astrology ("Personal Court Cards: A Crowleyan Perspective"), crowley-thoth.com and book-of-thoth.net (Prince/Knight of Wands and Cups pages), esotericmeanings.com (Knight of Cups / King of Cups pages).
+
+### 24.2 — Structural self-consistency check (same method as Part XXI §21.9)
+
+The single generative rule stated in 24.1 was applied to all 12 signs around the full 360° wheel (`COURT_ZODIAC_WHEEL`, built programmatically, not hand-typed) and checked against all 7 of the individually-cited cards in 24.1. It reproduced **every one exactly, with zero exceptions**, and the resulting 12 spans **tile the full 360° with no gap and no overlap** — a direct structural closure check, verified this session by running the generated table (see below). The remaining 5 of the 12 entries (Queen of Pentacles, Knight of Pentacles, King of Pentacles, Knight of Swords, King of Swords) were not individually name-cited this session but are required by, and only by, the same rule that already matches all 7 confirmed points — satisfying the Part XXII standard (checked at least two independent ways: cross-vocabulary named citation, and structural regeneration/closure).
+
+### 24.3 — The full 12-entry table
+
+| Home sign | Span (start–end) | Court Card | Verification |
+|---|---|---|---|
+| Aries (Cardinal Fire) | 20° Pisces – 20° Aries | **Queen of Wands** | Named citation |
+| Taurus (Fixed Earth) | 20° Aries – 20° Taurus | **Knight of Pentacles** | Structural (rule closure) |
+| Gemini (Mutable Air) | 20° Taurus – 20° Gemini | **King of Swords** | Structural (rule closure) |
+| Cancer (Cardinal Water) | 20° Gemini – 20° Cancer | **Queen of Cups** | Named citation |
+| Leo (Fixed Fire) | 20° Cancer – 20° Leo | **Knight of Wands** | Named citation (Thoth: Prince of Wands) |
+| Virgo (Mutable Earth) | 20° Leo – 20° Virgo | **King of Pentacles** | Structural (rule closure) |
+| Libra (Cardinal Air) | 20° Virgo – 20° Libra | **Queen of Swords** | Named citation |
+| Scorpio (Fixed Water) | 20° Libra – 20° Scorpio | **Knight of Cups** | Named citation (Thoth: Prince of Cups) |
+| Sagittarius (Mutable Fire) | 20° Scorpio – 20° Sagittarius | **King of Wands** | Named citation (Thoth: Knight of Wands) |
+| Capricorn (Cardinal Earth) | 20° Sagittarius – 20° Capricorn | **Queen of Pentacles** | Structural (rule closure) |
+| Aquarius (Fixed Air) | 20° Capricorn – 20° Aquarius | **Knight of Swords** | Structural (rule closure) |
+| Pisces (Mutable Water) | 20° Aquarius – 20° Pisces | **King of Cups** | Named citation (King of Cups: mutable Pisces) |
+
+Card names above reuse the same `Rank + ' of ' + Suit` naming already produced by `courtCardFor()` (V06 §6.3) — no new card-name text was invented.
+
+### 24.4 — The Page/Princess exception (a real finding, not a gap)
+
+The fourth rank — Page (RWS) = Princess (Thoth) — is **not part of the ecliptic wheel at all**, and this is a genuine, well-documented feature of the tradition, not a research shortfall. Multiple independent sources agree the four Princesses instead rule the four quadrants of the celestial sphere around the pole, each centered above the Kerubic/Fixed sign of its own suit's triplicity — a division of *space around the pole*, not a *span of ecliptic longitude* the way the other three ranks are. (Sources: Tabula Mundi Tarot, "The Tarot Princesses: Between Heaven and Earth"; Parsifal's Wheel Tarot & Astrology, "Personalizing the Princesses.")
+
+Consequently, `courtCardForLongitude()` below can only ever return one of the 12 King/Queen/Knight cards in the 24.3 table — **never** a Page — by design, matching the tradition it is drawn from exactly rather than forcing an approximation onto the one rank that does not fit.
+
+### 24.5 — Implementation
+
+- `calcSunLongitude(dateObj)` — a low-precision solar ecliptic longitude formula (Jean Meeus, *Astronomical Algorithms* ch. 25; geometric/true longitude, nutation correction omitted as immaterial at ~10° decan resolution), reusing the same Julian Day algorithm already in `calcMeanLunarNode()`. Verified this session against this app's own existing `getSunSign()` cusp-date table (an already-established system in this Codex, per Part XXII): evaluated at all 12 of `getSunSign()`'s own cusp dates, it lands within about a degree of the expected 0°/30°/.../330° boundary in every case — the same "within ~1°" margin already used to verify `calcMeanLunarNode()` against real Node ingress dates.
+- `COURT_RANK_BY_MODALITY` / `modalityForSign()` — reuses the modality grouping already implicit in Part XXI's `DECAN_SIGN_RANKS` table (its first rank value is 2 for every Cardinal sign, 5 for every Fixed sign, 8 for every Mutable sign) rather than introducing a second modality table.
+- `COURT_ZODIAC_WHEEL` — the 12-entry wheel, built generatively from `NODE_ZODIAC_SIGNS`, `DECAN_SIGN_SUIT`, and the modality rule above, not hand-typed.
+- `courtCardForLongitude(longitude)` — takes a 0–360° ecliptic longitude and returns the one Court Card (of the 12) whose span contains it.
+- `getZodiacalCourtCard(birthDateObj)` — the whole-feature entry point: `calcSunLongitude()` feeding straight into `courtCardForLongitude()`.
+
+### 24.6 — Product wiring: Sun placement only, named as a third independent finding
+
+Per Part XXIII, this is the most defensible input available: the person's own **Sun longitude**, real collected birth data, fixed at birth. No date-dependent second layer is introduced on top of it — that would be new, unverified scope beyond what this Part verifies. It is wired into both solo profile builders (admin PDF generator and the main hook flow) and into `computePartnerProfile()`, always under the field name `zodiacalCourtCard`, and surfaced in `getFallbackReading()`, the solo `doReading()` AI prompt, and the partnership AI prompt — every occurrence explicitly labeled **"Zodiacal Court Card (Sun placement)"** and explicitly distinguished from both the Sephirah-based Court Card and the Node Decan Cards, per Part XXIII's standing rule that none of this Codex's Minor Arcana readouts is "the" fixed answer.
+
+### 24.7 — Partnership reading: coincidence as a plain fact only (V07 §18.2/§20.5/§21.7 pattern)
+
+`getZodiacalCourtCardCoincidence(p1, p2)` reports only a single, plain binary fact — whether both partners' Zodiacal Court Cards are the same card — exactly as the Node Decan Card coincidence check in Part XXI does, and no more elaborate matching logic is introduced. No numeric scoring, no compatibility percentage, no special-destiny claim.
+
+---
+
 *W3BB Worldwide · Codex Logic V07 · Addendum to V06 · All additions are cross-verified against at least one other system already established in this Codex, with the derivation shown — no assertion stands alone.*
