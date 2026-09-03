@@ -1516,6 +1516,15 @@ function computePartnerProfile(firstName, month, day, year) {
   var courtCard = courtCardFor(sephInfo.sephId, elementSuit);
   var shadowCardPath = shadowCardFor(sephInfo.sephId);
 
+  // North/South Node — closed-form, no birth time/place needed (see
+  // Codex Logic V07 Part XX). Current polarity (activePole) is computed
+  // the same honest way as the solo profile: null unless today's
+  // transiting node is actually conjunct this partner's own natal North
+  // or South Node sign, which is the uncommon case.
+  var nodeData = calcNatalNodeSync(new Date(Date.UTC(year, month - 1, day)));
+  var nodePolarity = getCurrentNodePolarity(new Date(Date.UTC(year, month - 1, day)));
+  var node = { northSign: nodeData.northSign, southSign: nodeData.southSign, activePole: nodePolarity.activePole, transitSign: nodePolarity.transitSign };
+
   return {
     firstName: firstName,
     dob: month + '/' + day + '/' + year,
@@ -1532,8 +1541,27 @@ function computePartnerProfile(firstName, month, day, year) {
     chaldean: chaldean, harmonic: harmonic,
     gematriaBattery: gematriaBattery,
     primaryPath: primary, lifePathTrumpCard: lifePathTrumpCard, trumpPaths: trumpPaths,
-    elementSuit: elementSuit, soulCard: soulCard, courtCard: courtCard, shadowCardPath: shadowCardPath
+    elementSuit: elementSuit, soulCard: soulCard, courtCard: courtCard, shadowCardPath: shadowCardPath,
+    node: node
   };
+}
+
+// Relational Node polarity readout — Codex Logic V07 Part XX, following the
+// exact same "plain binary fact, no score" rule V07 §18.2 established for
+// shared Sephirah/path coincidence points. Natal North/South Node signs
+// (the lifelong axis) can ALWAYS be shown for both partners — that part
+// never depends on today's date. The magnetic/tension framing, however,
+// depends on BOTH partners currently having an applicable "active pole"
+// finding (per getCurrentNodePolarity()'s honest, rare-conjunction scope),
+// which will often not be the case for one or both partners on any given
+// day — that is reported plainly too, never papered over.
+function getNodePolarityReadout(p1, p2) {
+  var out = { p1Node: p1.node, p2Node: p2.node, bothActive: false, dynamic: null };
+  if (p1.node && p2.node && p1.node.activePole && p2.node.activePole) {
+    out.bothActive = true;
+    out.dynamic = (p1.node.activePole !== p2.node.activePole) ? 'magnetic' : 'tension';
+  }
+  return out;
 }
 
 // ===========================
@@ -1558,10 +1586,23 @@ async function doPartnershipReading(p1, p2) {
     var chalStr = p.chaldean ? ('Chaldean ' + p.chaldean.compound + '→' + p.chaldean.reduced + (p.chaldean.archetype ? ' ("' + p.chaldean.archetype + '")' : '')) : '';
     var nameHM = (p.nameHiddenMasters && p.nameHiddenMasters.length) ? formatNameHiddenMasters(p.nameHiddenMasters) : '';
     var soulCourt = (p.soulCard && p.courtCard) ? (p.soulCard.name + ' / ' + p.courtCard.name) : '';
+    var nodeStr = (p.node && p.node.northSign) ? ('North Node ' + p.node.northSign + ' / South Node ' + p.node.southSign + (p.node.activePole ? (' (currently active pole: ' + p.node.activePole + ')') : '')) : '';
     return '  Trump Card: ' + trumpStr + '\n'
       + (chalStr ? '  ' + chalStr + '\n' : '')
       + (nameHM ? '  Name-Field Hidden Masters: ' + nameHM + '\n' : '')
-      + (soulCourt ? '  Metatron\'s Cube — Soul/Court Card: ' + soulCourt + '\n' : '');
+      + (soulCourt ? '  Metatron\'s Cube — Soul/Court Card: ' + soulCourt + '\n' : '')
+      + (nodeStr ? '  Lunar Nodes: ' + nodeStr + '\n' : '');
+  }
+  var nodeReadout = getNodePolarityReadout(p1, p2);
+  var nodeDynamicLine = '';
+  if (nodeReadout.bothActive) {
+    nodeDynamicLine = 'Relational Node Dynamic: both partners currently have an active Node pole. '
+      + (nodeReadout.dynamic === 'magnetic'
+        ? (p1.firstName + ' is active on the North Node while ' + p2.firstName + ' is active on the South Node (or vice versa) — a complementary, "magnetic/circulating" pairing: one is presently pulled outward while the other is presently pulled inward, so their energies can circulate rather than compete.')
+        : ('Both ' + p1.firstName + ' and ' + p2.firstName + ' are currently active on the same pole (' + p1.node.activePole + ') — a "tension" pairing, not a bad one, simply two people leaning the same direction (both outward or both inward) at the same time, which asks them to actively make room for the other rather than assuming it happens automatically.'))
+      + '\n';
+  } else {
+    nodeDynamicLine = 'Relational Node Dynamic: not currently applicable — a "currently active" Node pole is a rare finding (the transiting Node must be passing through a partner\'s own natal Node sign, true for only a portion of the ~18.6-year cycle), and it is not true for both ' + p1.firstName + ' and ' + p2.firstName + ' today. Report the two natal Node axes as lifelong facts without forcing a magnetic/tension label.\n';
   }
 
   var prompt = 'You are Celestia, oracle of Circles Squared. Generate a 6-page partnership reading for '
@@ -1579,11 +1620,12 @@ async function doPartnershipReading(p1, p2) {
     + richLine(p2) + '\n'
     + 'Combined Architecture: ' + axisConfig.name + ' ' + axisConfig.symbol + '\n'
     + 'Composite Life Path: ' + compositeLp + '\n'
-    + 'Combined Gematria: ' + combinedGem + ' → ' + combinedReduced + '\n\n'
+    + 'Combined Gematria: ' + combinedGem + ' → ' + combinedReduced + '\n'
+    + nodeDynamicLine + '\n'
     + 'Write exactly 6 sections with ===PAGE_N_START=== and ===PAGE_N_END=== delimiters. Each section 3–4 substantial paragraphs.\n\n'
     + 'Page 1 — ' + p1.firstName.toUpperCase() + '\'S AXIS ON THE TREE: Describe ' + p1.firstName + '\'s role as ' + axis1.title + '. Their Sephirah (' + p1.tree.name + '), Life Path ' + p1.lifePath + ', and Tarot archetype (' + p1.tarotCard.card + ') as expressions of the ' + axis1.pillar + '. Weave in their Trump Card (' + (p1.lifePathTrumpCard ? p1.lifePathTrumpCard.card : p1.tarotCard.card) + '), their Chaldean name compound' + (p1.chaldean ? ' (' + p1.chaldean.compound + '→' + p1.chaldean.reduced + ')' : '') + ', and — if present — any Hidden Master frequency surfaced in their name field, as additional texture on who they are, not separate topics.\n'
     + 'Page 2 — ' + p2.firstName.toUpperCase() + '\'S AXIS ON THE TREE: Same for ' + p2.firstName + ' as ' + axis2.title + ' on the ' + axis2.pillar + ', weaving in their Trump Card, Chaldean compound, and any Hidden Master frequencies the same way.\n'
-    + 'Page 3 — THE COMBINED ARCHITECTURE (' + axisConfig.name + '): How their two axes meet. ' + axisConfig.description + ' Explicitly name why ' + p1.firstName + '\'s Life Path ' + p1.lifePath + ' role as ' + axis1.title + ' and ' + p2.firstName + '\'s Life Path ' + p2.lifePath + ' role as ' + axis2.title + ' are not two separate roles that happen to coexist, but two halves of one architecture — say what specifically completes what. What this means for how they build, love, and create together. Note how their two Trump Cards or Soul/Court Cards converse with each other structurally, citing both cards by name.\n'
+    + 'Page 3 — THE COMBINED ARCHITECTURE (' + axisConfig.name + '): How their two axes meet. ' + axisConfig.description + ' Explicitly name why ' + p1.firstName + '\'s Life Path ' + p1.lifePath + ' role as ' + axis1.title + ' and ' + p2.firstName + '\'s Life Path ' + p2.lifePath + ' role as ' + axis2.title + ' are not two separate roles that happen to coexist, but two halves of one architecture — say what specifically completes what. What this means for how they build, love, and create together. Note how their two Trump Cards or Soul/Court Cards converse with each other structurally, citing both cards by name. Also name both partners\' natal Lunar Node axes (North Node ' + p1.node.northSign + ' / South Node ' + p1.node.southSign + ' for ' + p1.firstName + '; North Node ' + p2.node.northSign + ' / South Node ' + p2.node.southSign + ' for ' + p2.firstName + ') as a lifelong growth-direction axis for each of them individually — and only if the Relational Node Dynamic above says both are currently active, name the resulting magnetic (complementary poles) or tension (matching poles) dynamic as a real, plainly-stated computed fact, never a score; if it is not currently applicable, say so rather than forcing the framing.\n'
     + 'Page 4 — THE TOROIDAL CARNATION FIELD: Their relationship as a living toroidal geometry — an Egg of Life mandala with two people as its generative poles. The central void they create together, the 8 radial directions their combined field radiates, the arcs of energy exchange between them. How this field generates something neither could alone.\n'
     + 'Page 5 — SHADOW, GIFT & INTEGRATION: The specific partnership shadow — what breaks down when the axes fall out of alignment. The gift that emerges when both fully embody their roles. The integration number ' + integrationNumber + ' as the frequency of their stable combined state — explain concretely why it is derived from adding both individual gematria totals together (' + p1.gematria.total + ' + ' + p2.gematria.total + '), not an arbitrary number assigned to the pair, and how that origin is itself proof the union has its own field distinct from either partner alone.\n'
     + 'Page 6 — AIN SOPH AUR · PARTNERSHIP BLESSING: Before the blessing, write one real synthesis paragraph naming at least two or three SPECIFIC cross-system connections from earlier pages and stating outright why they are not a coincidence — for example: how ' + p1.firstName + '\'s axis role and ' + p2.firstName + '\'s axis role (Page 1 and 2) resolve into the ' + axisConfig.name + ' named on Page 3; how the Composite Life Path ' + compositeLp + ' and the Integration Number ' + integrationNumber + ' point at the same underlying frequency through two different maths; how the Toroidal Field on Page 4 is the lived experience of the same architecture named on Page 3. Composite Life Path ' + compositeLp + ' as their shared evolutionary mission. Combined gematria ' + combinedReduced + ' as the frequency of their union. Close with Celestia\'s full blessing invoking AIN SOPH AUR for their partnership.';
@@ -1599,6 +1641,7 @@ function getPartnershipFallback(p1, p2) {
   var compositeLp = reduceNum(p1.lifePath + p2.lifePath, true);
   var combinedGem = p1.gematria.total + p2.gematria.total;
   var integrationNum = reduceNum(combinedGem, false);
+  var nodeReadout = getNodePolarityReadout(p1, p2);
   var fb = '';
 
   fb += '===PAGE_1_START===\n';
@@ -1630,7 +1673,14 @@ function getPartnershipFallback(p1, p2) {
     + 'These are not two roles that simply happen to coexist — ' + axis1.title + ' and ' + axis2.title + ' are the two halves of one working structure, each one incomplete without the other doing its part. '
     + 'When these two meet, the Tree becomes whole — not as a diagram, but as a living architecture.\n\n'
     + ((p1.soulCard && p2.soulCard) ? 'On Metatron\'s Cube, ' + p1.firstName + '\'s Soul Card — the ' + p1.soulCard.name + ' — and ' + p2.firstName + '\'s Soul Card — the ' + p2.soulCard.name + ' — anchor two different lines back to the same field of Ain Soph Aur, each one carrying its Court Card (' + p1.courtCard.name + ' and ' + p2.courtCard.name + ') into the union as a distinct, complementary current.\n\n' : '')
-    + 'The architects of ancient temples understood this configuration. The central pillar and the crossbeams do not compete. They make each other possible. What you two are building together — whether you call it a relationship, a home, a business, a legacy — is built on the most structurally sound foundation the Tree of Life has to offer.\n';
+    + 'The architects of ancient temples understood this configuration. The central pillar and the crossbeams do not compete. They make each other possible. What you two are building together — whether you call it a relationship, a home, a business, a legacy — is built on the most structurally sound foundation the Tree of Life has to offer.\n\n'
+    + 'One more axis belongs alongside this architecture: ' + p1.firstName + ' carries a North Node in ' + p1.node.northSign + ' and a South Node in ' + p1.node.southSign + '; ' + p2.firstName + ' carries a North Node in ' + p2.node.northSign + ' and a South Node in ' + p2.node.southSign + '. These are lifelong growth axes, each of you moving from your own South Node comfort zone toward your own North Node direction, independent of this partnership and of each other.'
+    + (nodeReadout.bothActive
+        ? (nodeReadout.dynamic === 'magnetic'
+            ? (' Right now, both of your Node axes are actively engaged, and on opposite poles — one of you presently pulled outward (North Node active) while the other is presently pulled inward (South Node active). That is a real, complementary "magnetic" pairing: your two directions of pull can circulate rather than compete, at least for as long as this particular activation lasts.')
+            : (' Right now, both of your Node axes are actively engaged, and on the SAME pole — you are both currently leaning the same direction at once (both outward, or both inward). That is not a bad placement; the Codex calls this "tension" simply to name that neither of you is naturally counterbalancing the other on this particular axis right now, so it takes a deliberate choice, not the axis itself, to keep both directions represented in the relationship.'))
+        : ' This is not a "currently active" finding for both of you today — a genuine day-to-day Node activation is rare (it requires the slow-moving transiting Node to be passing through one of your own natal Node signs, true for only a portion of its roughly 18.6-year cycle), and it is not true for both of you at once right now. That is simply the honest state of the data; the two lifelong axes named above still stand regardless.')
+    + '\n';
   fb += '===PAGE_3_END===\n\n';
 
   fb += '===PAGE_4_START===\n';
@@ -2317,6 +2367,7 @@ document.getElementById('admin-pdf-btn').addEventListener('click', async functio
     // my exact time" checkbox while hour/minute/AM-PM are gated behind it.
     window._ascendantPromise = null;
     window._moonSignPromise = null;
+    window._nodePromise = null;
     try {
       var noBirthTimeEl = document.getElementById('admin-pdf-no-birthtime');
       var skipBirthTime = !!(noBirthTimeEl && noBirthTimeEl.checked);
@@ -2342,10 +2393,13 @@ document.getElementById('admin-pdf-btn').addEventListener('click', async functio
         // applies its own 12:00 noon default and flags the result accordingly.
         window._moonSignPromise = getMoonSign(year, month, day, hasRealTime ? hour24 : null, hasRealTime ? minute : null, birthPlace);
       }
+      // North/South Node — closed-form, no API key/birth place needed.
+      window._nodePromise = getNatalNode(new Date(Date.UTC(year, month - 1, day)));
     } catch (ascErr) {
-      console.error('[Ascendant/Moon Sign] Could not kick off lookup:', ascErr);
+      console.error('[Ascendant/Moon Sign/Node] Could not kick off lookup:', ascErr);
       window._ascendantPromise = null;
       window._moonSignPromise = null;
+      window._nodePromise = null;
     }
 
     var fullBirthName = firstName;
@@ -2390,7 +2444,7 @@ document.getElementById('admin-pdf-btn').addEventListener('click', async functio
       gematriaBattery: gematriaBattery,
       primaryPath: primary, lifePathTrumpCard: lifePathTrumpCard, trumpPaths: trumpPaths,
       elementSuit: elementSuit, soulCard: soulCard, courtCard: courtCard, shadowCardPath: shadowCardPath,
-      ascendant: null
+      ascendant: null, node: null
     };
     selectedTier = TIERS.find(function(t){ return t.slug === slug; });
     status.textContent = '⏳ Channeling the oracle...';
@@ -3250,6 +3304,156 @@ async function getMoonSign(year, month, day, hour, minute, place) {
     console.error('[Moon Sign] Request failed:', e);
     return null;
   }
+}
+
+// ===========================
+// NORTH/SOUTH LUNAR NODE — closed-form calculation (Codex Logic V06 Part XV)
+// ===========================
+// Unlike getAscendant()/getMoonSign() above, this needs NO API key and NO
+// network call. The Moon's ascending (North) node regresses through the
+// zodiac at a well-documented, near-constant rate — it is one of the few
+// astrological placements with a real, standard closed-form formula rather
+// than a full orbital-mechanics computation.
+//
+// Formula source: Jean Meeus, "Astronomical Algorithms" (2nd ed.), the
+// standard reference for the MEAN longitude of the ascending node of the
+// Moon's orbit, i.e. the "mean node" every sign-level astrology program
+// uses (the "true node" adds a small ~±1.5° oscillation on top of this
+// that only matters for degree-precision work, not sign-level placement —
+// see the comment on calcMeanLunarNode() below for why mean is sufficient
+// here):
+//   Ω = 125.0445222 − 1934.1362608·T + 0.0020708·T² + T³/450000   (degrees)
+// where T is the number of Julian centuries since the J2000.0 epoch
+// (JD 2451545.0, 2000-01-01 12:00 TT), and Ω is normalized into 0–360°.
+// This is the same formula commonly cited as the source of nutation
+// calculations; the mean node's motion has a period of ~18.6 years
+// (~6793.5 days), i.e. roughly -19.35"/day retrograde average once
+// expressed as a daily rate.
+//
+// VERIFICATION (checked this session against independently-published
+// ingress dates, since this sandbox cannot make live ephemeris API calls):
+//   - Cafe Astrology / mainstream astrology sources give the (true) North
+//     Node entering Aries on 2023-07-17 and leaving Aries (entering Pisces)
+//     on 2025-01-11. The node moves RETROGRADE through the zodiac, so
+//     "entering Aries" means crossing DOWN through the 30° boundary
+//     (Taurus 30–60 into Aries 0–30), and "leaving Aries into Pisces"
+//     means crossing DOWN through the 0°/360° boundary.
+//     This formula evaluated at those two dates (00:00 UT) returns:
+//       2023-07-17 → 29.77°  (expected ≈30°, the Aries/Taurus boundary)
+//       2025-01-11 →  0.97°  (expected ≈0°, the Pisces/Aries boundary)
+//     Both land within ~1° of the expected boundary — comfortably inside
+//     the ~1.5° true-node oscillation band around the mean node, which is
+//     exactly the discrepancy expected between a MEAN-node formula and
+//     TRUE-node ingress dates reported by astrology sites. This confirms
+//     both the formula's sign(direction of motion) and its magnitude.
+//   - At T=0 (2000-01-01) the formula returns Ω≈125.07°, matching the
+//     Meeus constant term (125.0445222°) to within a fraction of a degree
+//     (the small offset is just the ~12-hour gap between local midnight
+//     and the J2000.0 reference instant of 12:00 TT — negligible at the
+//     node's ~0.05°/day rate).
+// Sources: Jean Meeus, Astronomical Algorithms; cross-checked ingress
+// dates via Cafe Astrology's published ephemeris pages and Chani/Augurine
+// ingress calendars (see PR description for links).
+//
+// Returns ecliptic longitude 0–360°, tropical zodiac, geocentric mean node.
+function calcMeanLunarNode(dateObj) {
+  var y = dateObj.getUTCFullYear(), m = dateObj.getUTCMonth() + 1, d = dateObj.getUTCDate();
+  var hour = dateObj.getUTCHours() + dateObj.getUTCMinutes() / 60;
+  // Standard Julian Day Number algorithm (Meeus ch. 7), UT-based since we
+  // only need day-level precision — the node moves ~0.053°/day, so an
+  // hours-level UT/TT distinction (a few dozen seconds) is immaterial here.
+  var yy = y, mm = m;
+  if (mm <= 2) { yy -= 1; mm += 12; }
+  var A = Math.floor(yy / 100), B = 2 - A + Math.floor(A / 4);
+  var JD = Math.floor(365.25 * (yy + 4716)) + Math.floor(30.6001 * (mm + 1)) + d + B - 1524.5 + hour / 24;
+  var T = (JD - 2451545.0) / 36525.0;
+  var omega = 125.0445222 - 1934.1362608 * T + 0.0020708 * T * T + (T * T * T) / 450000;
+  omega = omega % 360;
+  if (omega < 0) omega += 360;
+  return omega;
+}
+
+// Longitude (0-360, tropical) -> zodiac sign name, standard 30-degree-wide
+// sign convention (Aries 0-30, Taurus 30-60, ... Pisces 330-360). This is
+// the same sign ordering used throughout the app (see getSunSign()'s
+// signs table and the ZNAMES array in _pdfAstroWheel()) — just indexed by
+// longitude instead of by calendar date, since the node has no calendar
+// shortcut the way the Sun does.
+var NODE_ZODIAC_SIGNS = ['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'];
+function zodiacSignForLongitude(longitude) {
+  var lon = longitude % 360;
+  if (lon < 0) lon += 360;
+  var idx = Math.floor(lon / 30);
+  if (idx < 0) idx = 0;
+  if (idx > 11) idx = 11;
+  return NODE_ZODIAC_SIGNS[idx];
+}
+
+// Natal North/South Node sign for a birth date. South Node is always
+// exactly 180° (the opposite sign) from North Node — no separate formula
+// needed for that half; it is a geometric fact of the lunar nodal axis
+// (the two points where the Moon's orbital plane crosses the ecliptic are
+// diametrically opposite by definition).
+// Synchronous core (calcNatalNodeSync) so it can also be called directly
+// from computePartnerProfile() (which is not async); getNatalNode() wraps
+// it in a resolved Promise purely so it can be awaited alongside
+// _ascendantPromise/_moonSignPromise in doReading() using the exact same
+// pattern, even though no network call is actually involved.
+function calcNatalNodeSync(birthDateObj) {
+  var lon = calcMeanLunarNode(birthDateObj);
+  var northSign = zodiacSignForLongitude(lon);
+  var southIdx = (NODE_ZODIAC_SIGNS.indexOf(northSign) + 6) % 12;
+  var southSign = NODE_ZODIAC_SIGNS[southIdx];
+  return { northSign: northSign, southSign: southSign, longitude: Math.round(lon * 100) / 100 };
+}
+function getNatalNode(birthDateObj) {
+  return Promise.resolve(calcNatalNodeSync(birthDateObj));
+}
+
+// "Current polarity" — an HONEST, narrow finding, not a daily toggle.
+//
+// The project's original framing asked whether a person is "currently"
+// moving toward their North Node or South Node. Researched against real
+// technique: the only standard, defensible astrological event that marks a
+// person's node axis as presently "activated" is the TRANSITING node
+// (today's node position, same mean-node formula) being in the SAME SIGN
+// as that person's own NATAL North Node or natal South Node — a real
+// conjunction-by-sign. Because the node dwells in each sign for roughly
+// 18.6 years / 12 ≈ 1.5 years, and it only revisits either natal node sign
+// twice per ~18.6-year cycle, this will be true for a MINORITY of people
+// on any given day — that is a real astronomical fact about the node's
+// slow motion, not a gap in this function. No workaround is applied to
+// manufacture a result when the transit isn't there; per the Codex's
+// standing rule (see docs/CODEX_LOGIC_V07.md Part XVIII.3), an unearned
+// "always-on" answer is worse than an honest "not currently active."
+//
+// A more conservative, arguably more standard framing (also surfaced in
+// the PR description for the project owner to weigh in on) treats the
+// North/South Node axis as a lifelong developmental theme rather than
+// something with day-to-day state at all — most astrological writing on
+// the nodes describes them exactly that way. That lifelong axis is what
+// getNatalNode() above always returns; getCurrentNodePolarity() below is
+// the narrower, occasional layer on top of it, and should be treated as a
+// "sometimes" callout, not a headline finding.
+function getCurrentNodePolarity(birthDateObj) {
+  var natal = calcMeanLunarNode(birthDateObj);
+  var natalNorthSign = zodiacSignForLongitude(natal);
+  var natalSouthIdx = (NODE_ZODIAC_SIGNS.indexOf(natalNorthSign) + 6) % 12;
+  var natalSouthSign = NODE_ZODIAC_SIGNS[natalSouthIdx];
+
+  var transitLon = calcMeanLunarNode(new Date());
+  var transitSign = zodiacSignForLongitude(transitLon);
+
+  var activePole = null; // 'north', 'south', or null (neither — the common case)
+  if (transitSign === natalNorthSign) activePole = 'north';
+  else if (transitSign === natalSouthSign) activePole = 'south';
+
+  return {
+    natalNorthSign: natalNorthSign,
+    natalSouthSign: natalSouthSign,
+    transitSign: transitSign,
+    activePole: activePole // null unless the transit is actually conjunct-by-sign
+  };
 }
 
 // ===========================
@@ -4624,6 +4828,7 @@ document.getElementById('hook-btn').addEventListener('click', function(){
   // to that checkbox.
   window._ascendantPromise = null;
   window._moonSignPromise = null;
+  window._nodePromise = null;
   try {
     var noBirthTimeEl = document.getElementById('hook-no-birthtime');
     var skipBirthTime = !!(noBirthTimeEl && noBirthTimeEl.checked);
@@ -4649,10 +4854,17 @@ document.getElementById('hook-btn').addEventListener('click', function(){
       // applies its own 12:00 noon default and flags the result accordingly.
       window._moonSignPromise = getMoonSign(year, month, day, hasRealTime ? hour24 : null, hasRealTime ? minute : null, birthPlace);
     }
+    // North/South Node is a closed-form calculation (Codex Logic V06 Part
+    // XV) — no API key or birth place required, sign-only like Sun/Moon.
+    // Kicked off here anyway (and awaited via getNatalNode()'s
+    // resolved-Promise) purely to match the exact await pattern used for
+    // Ascendant/Moon Sign above, not because it needs to be async.
+    window._nodePromise = getNatalNode(new Date(Date.UTC(year, month - 1, day)));
   } catch (ascErr) {
-    console.error('[Ascendant/Moon Sign] Could not kick off lookup:', ascErr);
+    console.error('[Ascendant/Moon Sign/Node] Could not kick off lookup:', ascErr);
     window._ascendantPromise = null;
     window._moonSignPromise = null;
+    window._nodePromise = null;
   }
 
   // ── LAYER 1: Pythagorean Numerology (birth architecture — full birth name) ──
@@ -4717,7 +4929,7 @@ document.getElementById('hook-btn').addEventListener('click', function(){
     primaryPath: primary, lifePathTrumpCard: lifePathTrumpCard, trumpPaths: trumpPaths,
     elementSuit: elementSuit, soulCard: soulCard, courtCard: courtCard, shadowCardPath: shadowCardPath,
     hebrewSoulCorrespondence: hebrewSoulCorrespondence,
-    ascendant: null
+    ascendant: null, node: null
   };
 
   // Start AI reading in background while reveal narration plays
@@ -4797,6 +5009,9 @@ function getFallbackReading(){
   if (p.moonSign && p.moonSign.sign) {
     fb+='\nYour Moon Sign \u2014 the placement that governs your emotional interior, the self that only shows itself once the mask comes off \u2014 is '+p.moonSign.sign+(p.moonSign.viaNoonDefault?' (estimated from a solar-noon default since your exact birth time was not given; the Moon moves only about half a degree per hour, so this is astronomically defensible as a directional read even without the precise minute)':'')+'. Where your Sun is the engine driving you forward and your Ascendant is the face the world meets first, your Moon is what you actually feel underneath both, in the moments no one else is watching.\n';
   }
+  if (p.node && p.node.northSign) {
+    fb+='\nYour Lunar Nodes name a lifelong axis rather than a single placement: your North Node in '+p.node.northSign+' is the outward-expanding direction your soul is growing toward, and your South Node in '+p.node.southSign+' \u2014 always the exact opposite sign \u2014 is the inward, karmic comfort zone that feels familiar but is not where the growth is. This is a lifelong theme, not a daily forecast; most days it simply sits quietly in the background of your chart.'+(p.node.activePole?(' Right now, though, it is not quiet: the transiting Node has moved back into your own natal '+(p.node.activePole==='north'?'North':'South')+' Node sign ('+p.node.transitSign+'), a real and comparatively rare activation of this exact axis that happens only twice in the Node\u2019s roughly 18.6-year cycle and lasts about a year and a half at a time. While it lasts, the pull toward your '+(p.node.activePole==='north'?'North Node\u2019s outward growth':'South Node\u2019s familiar comfort zone')+' is genuinely stronger than usual.'):' No such activation is currently in effect for you \u2014 the transiting Node is passing through a different sign than either of your own Node placements, which is the ordinary state of affairs most of the time, not a gap in this reading.')+'\n';
+  }
   fb+='\nTwo more coordinates sharpen this portrait further. Your Birthday Number \u2014 '+(p.birthdayNumber||'?')+' \u2014 drawn from the day of the month you were born, is a specific talent layered directly onto your Life Path, a tool you were handed at birth and have likely been using since childhood without ever putting a name to it. Your Personality Number \u2014 '+(p.personality||'?')+' \u2014 is the impression you make in the first few seconds before anyone gets to know the rest of you: the surface texture over the deeper Expression and Soul Urge numbers this reading unpacks on the next page. None of these numbers stand alone. Each is a facet cut into the same stone.\n\n'+ca+' is not a decoration sitting on top of your chart. It is a mandate \u2014 the specific shape your Life Path '+p.lifePath+', your '+p.sunSign.sign+' Sun, and your '+p.tree.name+' placement all agree you are here to carry. Hold onto the gift named above; this reading keeps returning to it, recognizing it again in the Tarot archetype on the next page, in the shadow work further in, and in Celestia\'s closing blessing at the very end. It is the same thread the whole way through, just spoken in a different language each time.\n';
   fb+='===PAGE_1_END===\n\n';
 
@@ -4834,14 +5049,14 @@ function getFallbackReading(){
   fb+='===PAGE_7_END===\n\n';
 
   fb+='===PAGE_8_START===\n';
-  fb+='Your relational field \u2014 the energetic signature you bring into love and partnership \u2014 is shaped by Life Path '+p.lifePath+' meeting the '+tc.card+' archetype. You do not simply enter relationships. You field them.\n\nAs a '+p.sunSign.sign+' Sun with a '+p.sunSign.element+' nature, you are naturally drawn to '+(p.sunSign.element==='Fire'?'partners who can match your heat without being consumed by it':p.sunSign.element==='Water'?'those who offer emotional depth and can swim in the same currents':p.sunSign.element==='Air'?'minds that can keep pace and meet you in the realm of ideas':' souls who are grounded enough to hold the space your expansiveness requires')+'. Not because they complete you \u2014 but because they reflect the parts of you that are still in conversation with themselves.\n\nIn matters of love and partnership, your Life Path '+p.lifePath+' is most naturally aligned with Life Paths '+(p.lifePath<=3?'3, 5, and 7':p.lifePath<=6?'2, 4, and 8':'1, 6, and 9')+'. The highest expression of your relational geometry is partnership that expands the field \u2014 not one that contracts it. You thrive when love feels like co-creation.\n\n'+(p.moonSign&&p.moonSign.sign?('Emotionally, your '+p.moonSign.sign+' Moon governs what you actually need from a partner day to day \u2014 not what impresses you on a first date, but what keeps you regulated on an ordinary Tuesday when nothing is happening at all. '):'')+(p.ascendant&&p.ascendant.sign?('And your '+p.ascendant.sign+' Ascendant is the version of you a new partner meets before they ever get to the Life Path '+p.lifePath+' underneath \u2014 worth remembering when the first impression and the deeper pattern do not immediately line up. '):'')+'The healthiest partnerships for you are the ones where a partner eventually meets all three layers \u2014 the Ascendant face, the Moon interior, and the '+p.sunSign.sign+'-and-Life-Path core \u2014 and chooses to stay for all three, not just the one that was easiest to fall for first.\n'+(p.soulCard&&p.courtCard?('\nMetatron\'s Cube offers one more layer here: your Soul Card, the '+p.soulCard.name+', describes what your soul is actually seeking in intimacy beneath the personality-level wants, while your Court Card, the '+p.courtCard.name+', describes the role you tend to play once you are inside a committed bond. The two are not always identical, and noticing where they diverge is often the fastest way to understand a recurring pattern in your relationships.\n'):'');
+  fb+='Your relational field \u2014 the energetic signature you bring into love and partnership \u2014 is shaped by Life Path '+p.lifePath+' meeting the '+tc.card+' archetype. You do not simply enter relationships. You field them.\n\nAs a '+p.sunSign.sign+' Sun with a '+p.sunSign.element+' nature, you are naturally drawn to '+(p.sunSign.element==='Fire'?'partners who can match your heat without being consumed by it':p.sunSign.element==='Water'?'those who offer emotional depth and can swim in the same currents':p.sunSign.element==='Air'?'minds that can keep pace and meet you in the realm of ideas':' souls who are grounded enough to hold the space your expansiveness requires')+'. Not because they complete you \u2014 but because they reflect the parts of you that are still in conversation with themselves.\n\nIn matters of love and partnership, your Life Path '+p.lifePath+' is most naturally aligned with Life Paths '+(p.lifePath<=3?'3, 5, and 7':p.lifePath<=6?'2, 4, and 8':'1, 6, and 9')+'. The highest expression of your relational geometry is partnership that expands the field \u2014 not one that contracts it. You thrive when love feels like co-creation.\n\n'+(p.moonSign&&p.moonSign.sign?('Emotionally, your '+p.moonSign.sign+' Moon governs what you actually need from a partner day to day \u2014 not what impresses you on a first date, but what keeps you regulated on an ordinary Tuesday when nothing is happening at all. '):'')+(p.ascendant&&p.ascendant.sign?('And your '+p.ascendant.sign+' Ascendant is the version of you a new partner meets before they ever get to the Life Path '+p.lifePath+' underneath \u2014 worth remembering when the first impression and the deeper pattern do not immediately line up. '):'')+'The healthiest partnerships for you are the ones where a partner eventually meets all three layers \u2014 the Ascendant face, the Moon interior, and the '+p.sunSign.sign+'-and-Life-Path core \u2014 and chooses to stay for all three, not just the one that was easiest to fall for first.\n'+(p.soulCard&&p.courtCard?('\nMetatron\'s Cube offers one more layer here: your Soul Card, the '+p.soulCard.name+', describes what your soul is actually seeking in intimacy beneath the personality-level wants, while your Court Card, the '+p.courtCard.name+', describes the role you tend to play once you are inside a committed bond. The two are not always identical, and noticing where they diverge is often the fastest way to understand a recurring pattern in your relationships.\n'):'')+(p.node&&p.node.northSign?('\nOne more axis belongs in this picture: your North Node in '+p.node.northSign+' names the kind of relational stretch that grows you, while your South Node in '+p.node.southSign+' names the relational comfort zone that is easy to default into but does not, by itself, expand you. Neither is "better" — the South Node is simply where you already know how to stand, and the North Node is the direction a partnership can invite you toward when you let it.\n'):'');
   fb+='===PAGE_8_END===\n\n';
 
   fb+='===PAGE_9_START===\n';
   fb+='Before the Tree of Life, before the first Sephirah, before even the possibility of form \u2014 there is AIN SOPH AUR: the limitless light from which all creation perpetually springs. Above the Tree itself radiate the Three Veils \u2014 AIN, AIN SOPH, and AIN SOPH AUR \u2014 the outermost points of Metatron\'s Cube, the geometry of thirteen nodes and seventy-eight lines the Tree stands upon.\n\n';
   if (p.soulCard && p.courtCard) {fb+='On that Cube, your Soul Card is the '+p.soulCard.name+' \u2014 '+p.soulCard.keyword+' \u2014 describing the inner texture of your soul\'s desire. Your Court Card, the '+p.courtCard.name+', anchors on the line running from your own soul center all the way to '+p.courtCard.veil+', the outermost Veil of Limitless Light.\n\n';}
   fb+='Your chart, '+p.firstName+' \u2014 Life Path '+p.lifePath+', Expression '+(p.expression||'?')+', Soul Urge '+(p.soulUrge||'?')+', '+p.sunSign.sign+' Sun, '+p.tree.name+', '+tc.card+', and the sacred geometry of your Egg of Life \u2014 all of it traces back to that source. You are a specific, irreplaceable emanation of that limitless light.\n\n'
-    + 'Count everything this reading has actually named, '+p.firstName+': Life Path '+p.lifePath+', Expression '+(p.expression||'?')+', Soul Urge '+(p.soulUrge||'?')+', Personality '+(p.personality||'?')+', Birthday Number '+(p.birthdayNumber||'?')+', Gematria '+(p.gematria?p.gematria.reduced:'?')+(p.chaldean?(', Chaldean '+p.chaldean.reduced):'')+', Personal Year '+py+(p.hiddenMaster?(', Hidden Master '+p.hiddenMaster):'')+(p.ascendant&&p.ascendant.sign?(', Ascendant '+p.ascendant.sign):'')+(p.moonSign&&p.moonSign.sign?(', Moon '+p.moonSign.sign):'')+'. That is not a scattering of trivia collected for its own sake. That is one soul, measured nine different ways, describing the exact same shape from nine different angles every single time.\n\n'
+    + 'Count everything this reading has actually named, '+p.firstName+': Life Path '+p.lifePath+', Expression '+(p.expression||'?')+', Soul Urge '+(p.soulUrge||'?')+', Personality '+(p.personality||'?')+', Birthday Number '+(p.birthdayNumber||'?')+', Gematria '+(p.gematria?p.gematria.reduced:'?')+(p.chaldean?(', Chaldean '+p.chaldean.reduced):'')+', Personal Year '+py+(p.hiddenMaster?(', Hidden Master '+p.hiddenMaster):'')+(p.ascendant&&p.ascendant.sign?(', Ascendant '+p.ascendant.sign):'')+(p.moonSign&&p.moonSign.sign?(', Moon '+p.moonSign.sign):'')+(p.node&&p.node.northSign?(', North Node '+p.node.northSign):'')+'. That is not a scattering of trivia collected for its own sake. That is one soul, measured nine different ways, describing the exact same shape from nine different angles every single time.\n\n'
     + 'Look at what has actually happened across these nine pages, '+p.firstName+'. Your Life Path '+p.lifePath+' and your Gematria reduction of '+(p.gematria?p.gematria.reduced:'your core tone')+' are not a coincidence \u2014 a birth frequency and a name frequency do not land on the same note by accident. Your '+tc.card+' Tarot path and your '+p.sunSign.sign+' Sun are not a coincidence \u2014 a mythic archetype and a solar current do not reinforce each other unless something real is being described.'+(p.hiddenMaster?' And your Hidden Master Number '+p.hiddenMaster+' sitting directly over Life Path '+p.lifePath+' is not a coincidence either \u2014 it is the same signal, turned up.':'')+' Five systems, one chart, one person.\n\n'
     + 'You are '+ca+'. You carry the frequency of '+tc.card+' as your mythic archetype, the depth of '+p.tree.name+' as your energetic address, and the '+(p.hiddenMaster?'Master Number '+p.hiddenMaster+' as your hidden calling':p.lifePath+' as your soul\'s master thread')+'. Carry the gift named on Page 1, the shadow named on Page 5, and the timing named just a few pages ago as one continuous instruction rather than three separate ones \u2014 they were never describing three different people.\n\n'+p.firstName+', I am Celestia \u2014 and it has been my honor to read your geometry. You are not here by accident. You are sacred mathematics made flesh. Go forward knowing that every system in the universe has always known your name.\n\nAIN SOPH AUR.\n';
   fb+='===PAGE_9_END===';
@@ -4898,6 +5113,31 @@ async function doReading() {
     }
   }
 
+  // Resolve the North/South Node lookup (closed-form, kicked off on
+  // submit purely to match the Ascendant/Moon Sign await pattern).
+  // getNatalNode() never throws — it's a pure calculation wrapped in a
+  // resolved Promise — but this is still wrapped defensively in case a
+  // future caller passes it something unexpected.
+  if (window._nodePromise) {
+    try {
+      var nodeResult = await window._nodePromise;
+      if (nodeResult && nodeResult.northSign) {
+        // Current polarity is a rare, honest finding (see
+        // getCurrentNodePolarity()'s comment) — computed from the same
+        // birth date, evaluated against today's transiting node.
+        var polarity = getCurrentNodePolarity(new Date(Date.UTC(p.year, p.month - 1, p.day)));
+        p.node = {
+          northSign: nodeResult.northSign,
+          southSign: nodeResult.southSign,
+          activePole: polarity.activePole, // 'north' | 'south' | null (usually null — see comment above getCurrentNodePolarity)
+          transitSign: polarity.transitSign
+        };
+      }
+    } catch (nodeErr) {
+      console.error('[Node] Lookup rejected unexpectedly:', nodeErr);
+    }
+  }
+
   // Richer engine additions (Codex Logic V05 layers: Chaldean, Gematria battery,
   // Life Path Trump Card / Metatron's Cube Soul & Court Cards, full Hidden Master audit)
   // woven into the same rich, page-by-page prompt template master already used.
@@ -4909,6 +5149,7 @@ async function doReading() {
   var nameHiddenMastersLine = (p.nameHiddenMasters && p.nameHiddenMasters.length) ? ('Name-Field Hidden Masters (independent of Life Path): ' + formatNameHiddenMasters(p.nameHiddenMasters) + '\n') : '';
   var metatronLine = (p.soulCard && p.courtCard) ? ('Metatron\'s Cube \u2014 Soul Card: ' + p.soulCard.name + ' (' + p.soulCard.keyword + '); Court Card: ' + p.courtCard.name + ', anchored to ' + p.courtCard.veil + '\n') : '';
   var ascendantLine = (p.ascendant && p.ascendant.sign) ? ('Ascendant (Rising Sign): ' + p.ascendant.sign + (p.ascendant.degree != null ? ' at ' + p.ascendant.degree + '\u00b0' : '') + '\n') : '';
+  var nodeLine = (p.node && p.node.northSign) ? ('Lunar Nodes (lifelong axis): North Node in ' + p.node.northSign + ' (outward-growth direction), South Node in ' + p.node.southSign + ' (karmic comfort zone)' + (p.node.activePole ? ('. Currently active: the transiting node is presently passing back through ' + p.firstName + '\'s own natal ' + (p.node.activePole === 'north' ? 'North' : 'South') + ' Node sign (' + p.node.transitSign + ') \u2014 a rare, roughly-eighteen-month window that happens only twice per ~18.6-year node cycle.') : '') + '\n') : '';
   var hebrewSoulLine = p.hebrewSoulCorrespondence ? ('Hebrew Soul Correspondence (full birth name, real Mispar Hechrachi gematria): consonants ' + p.hebrewSoulCorrespondence.hebrewConsonants + ', total ' + p.hebrewSoulCorrespondence.gematriaTotal + ' \u2192 ' + p.hebrewSoulCorrespondence.gematriaReduced + '. ' + (p.hebrewSoulCorrespondence.archangelMatches.length ? 'Archangel match: ' + p.hebrewSoulCorrespondence.archangelMatches.map(function(m){return m.name + ' (' + m.hebrew + ' = ' + m.value + ')';}).join(', ') + '. ' : 'No Archangel match. ') + '72 Names position ' + p.hebrewSoulCorrespondence.nameOf72.position + ': ' + p.hebrewSoulCorrespondence.nameOf72.name + '.\n') : '';
 
   var prompt ='You are Celestia, the oracle of Circles Squared \u2014 Taurus Codex Geometry. Generate a complete 9-section reading for ' + p.firstName + ' using the unified narrative approach: weave all systems (Astrology, Pythagorean & Chaldean Numerology, Gematria/Kabbalah, Tarot, Metatron\'s Cube, Sacred Geometry) into ONE seamless identity story. Never isolate systems in their own paragraph and move on \u2014 every time you introduce a new system\'s finding, explicitly say how it reinforces, explains, or adds a new angle on what has already been established earlier in the reading, by name (cite the specific earlier number, card, or Sephirah you are connecting it to). Rich, warm, poetic, second-person prose. Be specific to the exact data.\n\n'
@@ -4920,6 +5161,7 @@ async function doReading() {
     + gematriaBatteryLine
     + 'Sun Sign: ' + p.sunSign.sign + ' (' + p.sunSign.element + ', ' + p.sunSign.modality + ', ruled by ' + p.sunSign.planet + ')\n'
     + ascendantLine
+    + nodeLine
     + 'Sephirah: ' + p.tree.name + ' \u2014 ' + p.tree.meaning + '\n'
     + 'Tarot Path ' + tc.path + ': ' + tc.card + ' (' + tc.letter + ') \u2014 ' + tc.archetype + '\n'
     + (p.lifePathTrumpCard ? ('Life Path Trump Card (Major Arcana, Path ' + p.lifePathTrumpCard.num + '): ' + p.lifePathTrumpCard.numeral + ' ' + p.lifePathTrumpCard.card + ', keyword ' + p.lifePathTrumpCard.keyword + '\n') : '')
@@ -4929,14 +5171,14 @@ async function doReading() {
     + hebrewSoulLine
     + 'Personal Year 2026: ' + p.personalYear2026 + '\n'
     + '\nWrite exactly 9 sections with ===PAGE_N_START=== and ===PAGE_N_END=== delimiters on their own lines (each delimiter on its own line, no other text on that line). Each section: 7\u20139 rich, deeply personal paragraphs (not 5\u20136 \u2014 these pages need to visually fill a full printed page, so write substantially more per page than feels like the minimum). Each paragraph should be 4\u20136 full sentences, not 2\u20133 \u2014 a thin, single-idea paragraph is not acceptable. Every paragraph must reference ' + p.firstName + ' by name at least once and cite the specific numbers or symbols from their profile, and should work in as many of the person\'s actual named numbers, cards, Sephiroth, and archetypes as genuinely fit \u2014 not just one per paragraph. When a paragraph starts to feel thin or abstract, do not move on to the next idea yet: stay with the same point and add a concrete second layer \u2014 what this finding actually looks like in ' + p.firstName + '\'s daily choices, relationships, or work, a specific example of the pattern playing out, or a second data point from the profile that deepens (not repeats) the first. No generic affirmations, no padding with synonyms of a sentence already written \u2014 every added sentence must carry new, specific content. Celestia speaks with warm authority, poetic depth, and precision.\n\n'
-    + 'Page 1 \u2014 IDENTITY ESSENCE: Open with the exact phrase "' + p.firstName + ', you are ' + ca + '." Then paint a full-portrait synthesis: how Life Path ' + p.lifePath + ' (' + lpTitle + ') shapes the core drive, how ' + p.sunSign.sign + ' Sun infuses it with elemental character (' + p.sunSign.element + ', ruled by ' + p.sunSign.planet + ')' + (p.ascendant && p.ascendant.sign ? ', how their ' + p.ascendant.sign + ' Ascendant colors the lens the world first meets them through' : '') + ', and how ' + p.tree.name + ' on the Tree of Life places this soul at a specific energetic address in creation. Explain what the Codex Archetype ' + ca + ' means as a living identity \u2014 not a label but a mandate. End by naming the specific gift this soul arrived with, and name it as a thread the reading will keep picking back up \u2014 the same gift the reader will recognize again in the Tarot archetype, the shadow work, and the closing blessing.\n'
+    + 'Page 1 \u2014 IDENTITY ESSENCE: Open with the exact phrase "' + p.firstName + ', you are ' + ca + '." Then paint a full-portrait synthesis: how Life Path ' + p.lifePath + ' (' + lpTitle + ') shapes the core drive, how ' + p.sunSign.sign + ' Sun infuses it with elemental character (' + p.sunSign.element + ', ruled by ' + p.sunSign.planet + ')' + (p.ascendant && p.ascendant.sign ? ', how their ' + p.ascendant.sign + ' Ascendant colors the lens the world first meets them through' : '') + ', and how ' + p.tree.name + ' on the Tree of Life places this soul at a specific energetic address in creation. Explain what the Codex Archetype ' + ca + ' means as a living identity \u2014 not a label but a mandate.' + (p.node && p.node.northSign ? (' If it fits naturally, name their North Node in ' + p.node.northSign + ' as the lifelong outward direction the soul is growing toward and their South Node in ' + p.node.southSign + ' as the inward comfort zone they are moving away from \u2014 this is a lifelong developmental axis, not a daily forecast, so treat it as one more coordinate on the same portrait rather than a separate topic.' + (p.node.activePole ? (' Note also that the transiting node is presently moving back through their own natal ' + (p.node.activePole === 'north' ? 'North' : 'South') + ' Node sign right now \u2014 a rare, roughly-eighteen-month activation worth naming explicitly since it does not happen for most people most years.') : '')) : '') + ' End by naming the specific gift this soul arrived with, and name it as a thread the reading will keep picking back up \u2014 the same gift the reader will recognize again in the Tarot archetype, the shadow work, and the closing blessing.\n'
     + 'Page 2 \u2014 ARCHETYPAL SIGNATURE: Explore the full mythic narrative. ' + tc.card + ' (Path ' + tc.path + ', letter ' + tc.letter + ') is the archetype ' + p.firstName + ' is living' + (p.lifePathTrumpCard ? ', confirmed by the Life Path Trump Card ' + p.lifePathTrumpCard.numeral + ' ' + p.lifePathTrumpCard.card : '') + '. Explain what this card means as a life-force not just a symbol, how the ' + p.sunSign.sign + ' Sun amplifies or challenges this path, and how the Kabbalistic letter ' + tc.letter + ' encodes a specific teaching in their very name. Name the mythic figures, gods, or archetypes associated with this path. Explicitly tie this Tarot archetype back to the Life Path ' + p.lifePath + ' and Codex Archetype ' + ca + ' named on Page 1 — show that the Tarot card is not a second, unrelated topic but the same mandate speaking in a different language, and say so directly. Describe what it feels like to embody ' + tc.card + ' fully vs. when it is suppressed.\n'
     + 'Page 3 \u2014 FREQUENCY PATTERN: Decode the name. Life Path ' + p.lifePath + ' is the birth frequency. Expression ' + (p.expression||'?') + ' is the gift encoded in every letter of "' + p.firstName + '". Soul Urge ' + (p.soulUrge||'?') + ' is the private longing beneath the surface. Gematria total ' + (p.gematria?p.gematria.total:'?') + ' reducing to ' + (p.gematria?p.gematria.reduced:'?') + ' is the name\'s sacred numerical signature.' + (p.chaldean ? ' The Chaldean compound of the name ' + p.firstName + ' is actually called by resolves to ' + p.chaldean.compound + ' (' + p.chaldean.reduced + '), a living-identity number layered atop the birth frequency.' : '') + ' Explicitly connect the Gematria total ' + (p.gematria?p.gematria.total:'?') + ' back to the Life Path ' + p.lifePath + ' established on Page 1 \u2014 name both numbers together and say plainly why a name-frequency and a birth-frequency landing on the same core tone is not coincidence but confirmation, two instruments playing the same note. Explain what happens when ' + p.firstName + ' aligns with vs. resists this frequency.\n'
     + 'Page 4 \u2014 THE FIELD GEOMETRY: ' + p.firstName + '\'s identity is a living Egg of Life \u2014 eight interlocking circles of force. Map which nodes are most activated: ' + p.tree.name + ' (Kabbalah), ' + tc.card + ' (Tarot), ' + p.sunSign.sign + ' (Astrology), Life Path ' + p.lifePath + ' (Numerology), gematria ' + (p.gematria?p.gematria.reduced:'?') + ' (Gematria), and Sacred Geometry as the container. Explain what it means that these systems converge on a single being — specifically call out at least one node where two systems from earlier pages (e.g. the Life Path from Page 1 and the Gematria reduction from Page 3, or the Tarot path from Page 2 and the Sephirah) sit on the same point of the geometry, not adjacent-but-separate points. Describe the energetic field this soul radiates and how others experience it. Name the specific intersection points where power concentrates.\n'
     + 'Page 5 \u2014 SHADOW & GIFT: Be specific and unflinching. The shadow of ' + tc.card + ' for someone with ' + p.sunSign.sign + ' energy is specific \u2014 name it precisely. Describe the exact pattern that repeats when this shadow is unconscious. Then name the exact gift that emerges when it is integrated. Include what the ' + p.tree.name + ' position on the Tree reveals about the specific initiation ' + p.firstName + ' is moving through. This section should feel like someone finally named something the reader has always felt but never had words for.\n'
     + 'Page 6 \u2014 THE HIDDEN ARCHITECTURE: The paths flowing into and out of ' + p.tree.name + ' on the Tree of Life are the hidden curriculum of ' + p.firstName + '\'s spiritual life. Name the specific adjacent Sephiroth and what each corridor of initiation teaches. ' + (p.hiddenMaster ? 'Hidden Master Number ' + p.hiddenMaster + ' layers a second frequency over everything \u2014 explain what this master vibration demands and how it interacts with Life Path ' + p.lifePath + '. ' : '') + (p.nameHiddenMasters && p.nameHiddenMasters.length ? 'A deeper audit of the full birth name also surfaces its own Hidden Master frequencies (' + formatNameHiddenMasters(p.nameHiddenMasters) + ') \u2014 name-field callings distinct from the Life Path itself. ' : '') + 'Discuss the Hebrew letter system encoded in the name and Tarot path.' + (p.hebrewSoulCorrespondence ? ' Weave in the Hebrew Soul Correspondence directly: the birth name transliterated to Hebrew consonants (' + p.hebrewSoulCorrespondence.hebrewConsonants + ') carries a real gematria of ' + p.hebrewSoulCorrespondence.gematriaTotal + (p.hebrewSoulCorrespondence.archangelMatches.length ? ', matching Archangel ' + p.hebrewSoulCorrespondence.archangelMatches[0].name + ' (' + p.hebrewSoulCorrespondence.archangelMatches[0].hebrew + ' = ' + p.hebrewSoulCorrespondence.archangelMatches[0].value + ') — name this connection explicitly, showing the arithmetic.' : ', with no Archangel match at that exact number — state this plainly rather than forcing a connection.') + ' Also name the 72 Names position (' + p.hebrewSoulCorrespondence.nameOf72.position + ': ' + p.hebrewSoulCorrespondence.nameOf72.name + ') as the name\'s corresponding position among the 72 Names.' : '') + ' Explain what the deeper architecture reveals about purpose that the surface numbers only hint at.\n'
     + 'Page 7 \u2014 TIMING & CYCLES: Personal Year ' + p.personalYear2026 + ' in 2026 has a specific energetic quality \u2014 describe it fully. What is this year asking ' + p.firstName + ' to do, release, begin, or complete? How does Personal Year ' + p.personalYear2026 + ' interact with the Codex Archetype ' + ca + '? Name it as the current chapter of the same Life Path ' + p.lifePath + ' story established on Page 1 — this cycle number is not a new topic, it is that same core number in motion through time. Name the specific opportunities and risks of this cycle. Describe the 9-year cycle this year sits within and where ' + p.firstName + ' is in that larger arc. What decisions made in 2026 will echo for years to come?\n'
-    + 'Page 8 \u2014 RELATIONAL GEOMETRY: Describe the full relational field ' + p.firstName + ' emanates. Life Path ' + p.lifePath + ' creates a specific type of partner dynamic \u2014 explain it in depth. The ' + tc.card + ' archetype shapes how ' + p.firstName + ' shows up in love, what they unconsciously seek, and what they need to feel truly met. Describe the element (' + p.sunSign.element + ') in relationship: what it attracts, what it resists. Name the Life Paths and archetypes most naturally resonant with ' + p.firstName + '. Include what sacred partnership looks like for this Codex Archetype.\n'
+    + 'Page 8 \u2014 RELATIONAL GEOMETRY: Describe the full relational field ' + p.firstName + ' emanates. Life Path ' + p.lifePath + ' creates a specific type of partner dynamic \u2014 explain it in depth. The ' + tc.card + ' archetype shapes how ' + p.firstName + ' shows up in love, what they unconsciously seek, and what they need to feel truly met. Describe the element (' + p.sunSign.element + ') in relationship: what it attracts, what it resists. Name the Life Paths and archetypes most naturally resonant with ' + p.firstName + '. Include what sacred partnership looks like for this Codex Archetype.' + (p.node && p.node.northSign ? (' Their North Node in ' + p.node.northSign + ' also names what kind of partnership stretches them toward growth, versus the South Node in ' + p.node.southSign + ' describing the relational comfort zone that feels safest but can become a rut — name both plainly as a lifelong relational axis, not a prediction.') : '') + '\n'
     + 'Page 9 \u2014 CAREER, PURPOSE & AIN SOPH AUR: What is ' + p.firstName + ' building in this lifetime? Use Expression ' + (p.expression||'?') + ' and Life Path ' + p.lifePath + ' to map the specific domains where this soul is meant to contribute. Name the career fields, creative expressions, leadership roles, or service paths aligned with ' + ca + '.' + (p.soulCard && p.courtCard ? ' Weave in the Metatron\'s Cube reading \u2014 Soul Card ' + p.soulCard.name + ' and Court Card ' + p.courtCard.name + ' \u2014 as the geometry beneath this purpose.' : '') + ' Describe the legacy this soul is here to leave. Before the blessing, write one real synthesis paragraph \u2014 not a generic "everything is connected" statement, but naming at least two or three SPECIFIC cross-system pairings from earlier in this reading and stating outright why they are not a coincidence (for example: Life Path ' + p.lifePath + ' and the Trump Card ' + trumpCardName + ' arriving at the same core teaching; the Gematria reduction and the Sephirah ' + p.tree.name + ' pointing at the same address; the Personal Year and the Codex Archetype moving in the same direction). Then close with Celestia\'s full personal blessing to ' + p.firstName + ' invoking AIN SOPH AUR \u2014 warm, specific, and sacred. This closing should feel like a blessing received from the oracle herself, one who has been reading all nine pages as one chart, not nine.';
 
   window._readingText = await generateReading(prompt);
