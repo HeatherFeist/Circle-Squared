@@ -1525,6 +1525,11 @@ function computePartnerProfile(firstName, month, day, year) {
   var nodePolarity = getCurrentNodePolarity(new Date(Date.UTC(year, month - 1, day)));
   var node = { northSign: nodeData.northSign, southSign: nodeData.southSign, activePole: nodePolarity.activePole, transitSign: nodePolarity.transitSign };
 
+  // Node Decan Cards (Codex Logic V07 Part XXI) — same birth date, no
+  // separate birth time/place needed (decanCardForLongitude is a pure
+  // function of the same natal Node longitude already computed above).
+  var nodeDecanCards = getNodeDecanCards(new Date(Date.UTC(year, month - 1, day)));
+
   return {
     firstName: firstName,
     dob: month + '/' + day + '/' + year,
@@ -1542,7 +1547,7 @@ function computePartnerProfile(firstName, month, day, year) {
     gematriaBattery: gematriaBattery,
     primaryPath: primary, lifePathTrumpCard: lifePathTrumpCard, trumpPaths: trumpPaths,
     elementSuit: elementSuit, soulCard: soulCard, courtCard: courtCard, shadowCardPath: shadowCardPath,
-    node: node
+    node: node, nodeDecanCards: nodeDecanCards
   };
 }
 
@@ -1561,6 +1566,25 @@ function getNodePolarityReadout(p1, p2) {
     out.bothActive = true;
     out.dynamic = (p1.node.activePole !== p2.node.activePole) ? 'magnetic' : 'tension';
   }
+  return out;
+}
+
+// Node Decan Card coincidences — Codex Logic V07 Part XXI, same standing
+// rule as Part XVIII.2: a shared card is reported as a plain binary fact
+// ("both of you land on the same card") ONLY, never scored or interpreted
+// as some special destiny — it is exactly as meaningful, and exactly as
+// reported, as any other shared-Sephirah/shared-path coincidence elsewhere
+// in this Codex.
+function getNodeDecanCoincidences(p1, p2) {
+  var out = { sameNorthCard: false, sameSouthCard: false, crossMatch: false };
+  if (!p1.nodeDecanCards || !p2.nodeDecanCards) return out;
+  var n1 = p1.nodeDecanCards.northNodeCard.card, s1 = p1.nodeDecanCards.southNodeCard.card;
+  var n2 = p2.nodeDecanCards.northNodeCard.card, s2 = p2.nodeDecanCards.southNodeCard.card;
+  out.sameNorthCard = (n1 === n2);
+  out.sameSouthCard = (s1 === s2);
+  // "Cross match" = one partner's North Node card equals the other's South
+  // Node card (either direction) — a plain fact, reported the same way.
+  out.crossMatch = (n1 === s2) || (n2 === s1);
   return out;
 }
 
@@ -1587,13 +1611,24 @@ async function doPartnershipReading(p1, p2) {
     var nameHM = (p.nameHiddenMasters && p.nameHiddenMasters.length) ? formatNameHiddenMasters(p.nameHiddenMasters) : '';
     var soulCourt = (p.soulCard && p.courtCard) ? (p.soulCard.name + ' / ' + p.courtCard.name) : '';
     var nodeStr = (p.node && p.node.northSign) ? ('North Node ' + p.node.northSign + ' / South Node ' + p.node.southSign + (p.node.activePole ? (' (currently active pole: ' + p.node.activePole + ')') : '')) : '';
+    var decanStr = (p.nodeDecanCards) ? ('North Node card: ' + p.nodeDecanCards.northNodeCard.card + ' (' + p.nodeDecanCards.northNodeCard.decanRuler + ' in ' + p.nodeDecanCards.northNodeCard.decanRulerSign + ') / South Node card: ' + p.nodeDecanCards.southNodeCard.card + ' (' + p.nodeDecanCards.southNodeCard.decanRuler + ' in ' + p.nodeDecanCards.southNodeCard.decanRulerSign + ')') : '';
     return '  Trump Card: ' + trumpStr + '\n'
       + (chalStr ? '  ' + chalStr + '\n' : '')
       + (nameHM ? '  Name-Field Hidden Masters: ' + nameHM + '\n' : '')
       + (soulCourt ? '  Metatron\'s Cube — Soul/Court Card: ' + soulCourt + '\n' : '')
-      + (nodeStr ? '  Lunar Nodes: ' + nodeStr + '\n' : '');
+      + (nodeStr ? '  Lunar Nodes: ' + nodeStr + '\n' : '')
+      + (decanStr ? '  Node Decan Cards: ' + decanStr + '\n' : '');
   }
   var nodeReadout = getNodePolarityReadout(p1, p2);
+  var nodeDecanCoincidences = getNodeDecanCoincidences(p1, p2);
+  var nodeDecanCoincidenceLine = '';
+  if (nodeDecanCoincidences.sameNorthCard || nodeDecanCoincidences.sameSouthCard || nodeDecanCoincidences.crossMatch) {
+    var facts = [];
+    if (nodeDecanCoincidences.sameNorthCard) facts.push('both of you land on the same North Node card (' + p1.nodeDecanCards.northNodeCard.card + ')');
+    if (nodeDecanCoincidences.sameSouthCard) facts.push('both of you land on the same South Node card (' + p1.nodeDecanCards.southNodeCard.card + ')');
+    if (nodeDecanCoincidences.crossMatch) facts.push('one of your North Node cards equals the other\'s South Node card');
+    nodeDecanCoincidenceLine = 'Node Decan Card Coincidence (state as plain fact only, never a score or special-destiny claim): ' + facts.join('; ') + '.\n';
+  }
   var nodeDynamicLine = '';
   if (nodeReadout.bothActive) {
     nodeDynamicLine = 'Relational Node Dynamic: both partners currently have an active Node pole. '
@@ -1622,10 +1657,11 @@ async function doPartnershipReading(p1, p2) {
     + 'Composite Life Path: ' + compositeLp + '\n'
     + 'Combined Gematria: ' + combinedGem + ' → ' + combinedReduced + '\n'
     + nodeDynamicLine + '\n'
+    + nodeDecanCoincidenceLine + '\n'
     + 'Write exactly 6 sections with ===PAGE_N_START=== and ===PAGE_N_END=== delimiters. Each section 3–4 substantial paragraphs.\n\n'
     + 'Page 1 — ' + p1.firstName.toUpperCase() + '\'S AXIS ON THE TREE: Describe ' + p1.firstName + '\'s role as ' + axis1.title + '. Their Sephirah (' + p1.tree.name + '), Life Path ' + p1.lifePath + ', and Tarot archetype (' + p1.tarotCard.card + ') as expressions of the ' + axis1.pillar + '. Weave in their Trump Card (' + (p1.lifePathTrumpCard ? p1.lifePathTrumpCard.card : p1.tarotCard.card) + '), their Chaldean name compound' + (p1.chaldean ? ' (' + p1.chaldean.compound + '→' + p1.chaldean.reduced + ')' : '') + ', and — if present — any Hidden Master frequency surfaced in their name field, as additional texture on who they are, not separate topics.\n'
     + 'Page 2 — ' + p2.firstName.toUpperCase() + '\'S AXIS ON THE TREE: Same for ' + p2.firstName + ' as ' + axis2.title + ' on the ' + axis2.pillar + ', weaving in their Trump Card, Chaldean compound, and any Hidden Master frequencies the same way.\n'
-    + 'Page 3 — THE COMBINED ARCHITECTURE (' + axisConfig.name + '): How their two axes meet. ' + axisConfig.description + ' Explicitly name why ' + p1.firstName + '\'s Life Path ' + p1.lifePath + ' role as ' + axis1.title + ' and ' + p2.firstName + '\'s Life Path ' + p2.lifePath + ' role as ' + axis2.title + ' are not two separate roles that happen to coexist, but two halves of one architecture — say what specifically completes what. What this means for how they build, love, and create together. Note how their two Trump Cards or Soul/Court Cards converse with each other structurally, citing both cards by name. Also name both partners\' natal Lunar Node axes (North Node ' + p1.node.northSign + ' / South Node ' + p1.node.southSign + ' for ' + p1.firstName + '; North Node ' + p2.node.northSign + ' / South Node ' + p2.node.southSign + ' for ' + p2.firstName + ') as a lifelong growth-direction axis for each of them individually — and only if the Relational Node Dynamic above says both are currently active, name the resulting magnetic (complementary poles) or tension (matching poles) dynamic as a real, plainly-stated computed fact, never a score; if it is not currently applicable, say so rather than forcing the framing.\n'
+    + 'Page 3 — THE COMBINED ARCHITECTURE (' + axisConfig.name + '): How their two axes meet. ' + axisConfig.description + ' Explicitly name why ' + p1.firstName + '\'s Life Path ' + p1.lifePath + ' role as ' + axis1.title + ' and ' + p2.firstName + '\'s Life Path ' + p2.lifePath + ' role as ' + axis2.title + ' are not two separate roles that happen to coexist, but two halves of one architecture — say what specifically completes what. What this means for how they build, love, and create together. Note how their two Trump Cards or Soul/Court Cards converse with each other structurally, citing both cards by name. Also name both partners\' natal Lunar Node axes (North Node ' + p1.node.northSign + ' / South Node ' + p1.node.southSign + ' for ' + p1.firstName + '; North Node ' + p2.node.northSign + ' / South Node ' + p2.node.southSign + ' for ' + p2.firstName + ') as a lifelong growth-direction axis for each of them individually — and only if the Relational Node Dynamic above says both are currently active, name the resulting magnetic (complementary poles) or tension (matching poles) dynamic as a real, plainly-stated computed fact, never a score; if it is not currently applicable, say so rather than forcing the framing. Also name each partner\'s Node Decan Cards from the PROFILE above — ' + p1.firstName + '\'s North Node card (' + p1.nodeDecanCards.northNodeCard.card + ') as the energy they are individually growing toward and South Node card (' + p1.nodeDecanCards.southNodeCard.card + ') as the comfort-zone energy they are individually moving away from, and the same pair for ' + p2.firstName + ' (' + p2.nodeDecanCards.northNodeCard.card + ' / ' + p2.nodeDecanCards.southNodeCard.card + ') — as two more individual lifelong growth trajectories, not a joint compatibility score; if the PROFILE\'s Node Decan Card Coincidence line above is non-empty, state that plain fact exactly as given and nothing more elaborate.\n'
     + 'Page 4 — THE TOROIDAL CARNATION FIELD: Their relationship as a living toroidal geometry — an Egg of Life mandala with two people as its generative poles. The central void they create together, the 8 radial directions their combined field radiates, the arcs of energy exchange between them. How this field generates something neither could alone.\n'
     + 'Page 5 — SHADOW, GIFT & INTEGRATION: The specific partnership shadow — what breaks down when the axes fall out of alignment. The gift that emerges when both fully embody their roles. The integration number ' + integrationNumber + ' as the frequency of their stable combined state — explain concretely why it is derived from adding both individual gematria totals together (' + p1.gematria.total + ' + ' + p2.gematria.total + '), not an arbitrary number assigned to the pair, and how that origin is itself proof the union has its own field distinct from either partner alone.\n'
     + 'Page 6 — AIN SOPH AUR · PARTNERSHIP BLESSING: Before the blessing, write one real synthesis paragraph naming at least two or three SPECIFIC cross-system connections from earlier pages and stating outright why they are not a coincidence — for example: how ' + p1.firstName + '\'s axis role and ' + p2.firstName + '\'s axis role (Page 1 and 2) resolve into the ' + axisConfig.name + ' named on Page 3; how the Composite Life Path ' + compositeLp + ' and the Integration Number ' + integrationNumber + ' point at the same underlying frequency through two different maths; how the Toroidal Field on Page 4 is the lived experience of the same architecture named on Page 3. Composite Life Path ' + compositeLp + ' as their shared evolutionary mission. Combined gematria ' + combinedReduced + ' as the frequency of their union. Close with Celestia\'s full blessing invoking AIN SOPH AUR for their partnership.';
@@ -1680,6 +1716,21 @@ function getPartnershipFallback(p1, p2) {
             ? (' Right now, both of your Node axes are actively engaged, and on opposite poles — one of you presently pulled outward (North Node active) while the other is presently pulled inward (South Node active). That is a real, complementary "magnetic" pairing: your two directions of pull can circulate rather than compete, at least for as long as this particular activation lasts.')
             : (' Right now, both of your Node axes are actively engaged, and on the SAME pole — you are both currently leaning the same direction at once (both outward, or both inward). That is not a bad placement; the Codex calls this "tension" simply to name that neither of you is naturally counterbalancing the other on this particular axis right now, so it takes a deliberate choice, not the axis itself, to keep both directions represented in the relationship.'))
         : ' This is not a "currently active" finding for both of you today — a genuine day-to-day Node activation is rare (it requires the slow-moving transiting Node to be passing through one of your own natal Node signs, true for only a portion of its roughly 18.6-year cycle), and it is not true for both of you at once right now. That is simply the honest state of the data; the two lifelong axes named above still stand regardless.')
+    + '\n\n'
+    + ((p1.nodeDecanCards && p2.nodeDecanCards)
+        ? ('That same Node axis resolves further down to one specific Minor Arcana card apiece, via the Golden Dawn decan attributions (Codex Logic V07 Part XXI): '
+            + p1.firstName + '\'s North Node falls in the decan of the ' + p1.nodeDecanCards.northNodeCard.card + ' (' + p1.nodeDecanCards.northNodeCard.decanRuler + ' in ' + p1.nodeDecanCards.northNodeCard.decanRulerSign + ') — the energy ' + p1.firstName + ' is individually growing toward — while their South Node falls in the decan of the ' + p1.nodeDecanCards.southNodeCard.card + ' (' + p1.nodeDecanCards.southNodeCard.decanRuler + ' in ' + p1.nodeDecanCards.southNodeCard.decanRulerSign + '), the comfort-zone energy they are individually moving away from. '
+            + p2.firstName + '\'s North Node falls in the decan of the ' + p2.nodeDecanCards.northNodeCard.card + ' (' + p2.nodeDecanCards.northNodeCard.decanRuler + ' in ' + p2.nodeDecanCards.northNodeCard.decanRulerSign + '), and their South Node in the decan of the ' + p2.nodeDecanCards.southNodeCard.card + ' (' + p2.nodeDecanCards.southNodeCard.decanRuler + ' in ' + p2.nodeDecanCards.southNodeCard.decanRulerSign + '). '
+            + 'These are two individual growth trajectories, not a joint compatibility score — the placement itself is fixed for each of you; only your relationship to it is a matter of choice.'
+            + (function(){
+                var c = getNodeDecanCoincidences(p1, p2);
+                var facts = [];
+                if (c.sameNorthCard) facts.push('both of you land on the same North Node card, the ' + p1.nodeDecanCards.northNodeCard.card);
+                if (c.sameSouthCard) facts.push('both of you land on the same South Node card, the ' + p1.nodeDecanCards.southNodeCard.card);
+                if (c.crossMatch) facts.push('one of your North Node cards is exactly the other\'s South Node card');
+                return facts.length ? (' As a plain, direct fact — not a special destiny, simply what the math turned up — ' + facts.join(', and ') + '.') : '';
+              })())
+        : '')
     + '\n';
   fb += '===PAGE_3_END===\n\n';
 
@@ -2444,7 +2495,7 @@ document.getElementById('admin-pdf-btn').addEventListener('click', async functio
       gematriaBattery: gematriaBattery,
       primaryPath: primary, lifePathTrumpCard: lifePathTrumpCard, trumpPaths: trumpPaths,
       elementSuit: elementSuit, soulCard: soulCard, courtCard: courtCard, shadowCardPath: shadowCardPath,
-      ascendant: null, node: null
+      ascendant: null, node: null, nodeDecanCards: null
     };
     selectedTier = TIERS.find(function(t){ return t.slug === slug; });
     status.textContent = '⏳ Channeling the oracle...';
@@ -3453,6 +3504,141 @@ function getCurrentNodePolarity(birthDateObj) {
     natalSouthSign: natalSouthSign,
     transitSign: transitSign,
     activePole: activePole // null unless the transit is actually conjunct-by-sign
+  };
+}
+
+// ===========================
+// W3BB CODEX V07 PART XXI — NODE DECAN CARDS
+// North/South Lunar Node -> zodiac decan -> specific Minor Arcana pip card
+// (Golden Dawn "decanate" attribution), giving each person one card for the
+// energy they are growing toward (North Node) and one for the comfort-zone
+// energy they are moving away from (South Node). This is a SEPARATE system
+// from the existing Sephirah-based Soul/Court Card system above (soulCardFor/
+// courtCardFor) — decan-based, not Tree-of-Life-based — and is not merged
+// into it.
+//
+// VERIFICATION (done this session, Golden Dawn / Rider-Waite-Smith lineage
+// specifically, per Codex Logic V06 §14's standing Golden Dawn attribution —
+// deliberately NOT Crowley/Thoth, which uses a different decan rule):
+//
+// 1) Planetary ruler per decan: the 36 decans (12 signs x 3 decans of 10
+//    degrees) are assigned planets in one continuous Chaldean-order cycle
+//    (Saturn, Jupiter, Mars, Sun, Venus, Mercury, Moon, repeating every 7
+//    decans) starting at Aries' first decan = Mars. Confirmed via multiple
+//    independent sources: Parsifal the Scribe, "The Tarot and the Chaldean
+//    Decanates" (Medium) states the cycle "starts at Aries 0 degrees with
+//    Mars... then walks the cycle across all 36 decans without breaking";
+//    Joy Vernon, "Two of Wands: Mars in Aries" and Tarot-ically Speaking's
+//    "Decan Walk" both independently confirm 2 of Wands = Mars in Aries
+//    (Aries' own first decan). The resulting continuous-cycle sequence was
+//    cross-checked decan-by-decan against every well-documented Golden Dawn
+//    card/planet/sign correspondence this session could verify (e.g. 5 of
+//    Cups = Mars in Scorpio's first decan, cited in the task brief itself
+//    and confirmed independently; 8 of Wands = Mercury in Sagittarius; 2 of
+//    Swords = Moon in Libra; 8 of Pentacles = Sun in Virgo) — every one
+//    matched the continuous-cycle formula below with zero exceptions.
+//
+// 2) Sign -> card-rank assignment within each suit's triplicity: confirmed
+//    via search results summarizing Golden Dawn Book T (Mathers/Felkin,
+//    "Book T — The Tarot", 1888) and corroborated by The Pagan Grimoire's
+//    zodiac/tarot correspondence article: within each suit's three signs
+//    (its elemental triplicity), the CARDINAL sign gets ranks 2-3-4, the
+//    FIXED sign gets ranks 5-6-7, and the MUTABLE sign gets ranks 8-9-10 —
+//    e.g. Fire/Wands: Aries(cardinal)=2,3,4; Leo(fixed)=5,6,7;
+//    Sagittarius(mutable)=8,9,10. This is NOT simple zodiac order (Aries,
+//    Leo, Sagittarius happen to already be in zodiac order for Fire, but
+//    Air/Swords is Libra(2-4), Aquarius(5-7), Gemini(8-10) — cardinal/
+//    fixed/mutable order, not the signs' calendar order) — verified
+//    specifically against known Swords correspondences (2 of Swords = Moon
+//    in Libra; 8 of Swords = Jupiter in Gemini) to rule out the more naive
+//    "zodiac order" guess before hardcoding this table.
+//    Sources checked (search-result summaries; several source sites are
+//    blocked by this environment's egress proxy and could not be fetched
+//    directly, so citations below are to the search results describing
+//    their content): Mary K. Greer's Tarot Blog ("The Golden Dawn Minor
+//    Arcana"), Joy Vernon Astrology/Tarot ("Two of Wands: Mars in Aries"),
+//    Tarot-ically Speaking ("Decan Walk"), davidcunliffe.com ("Tarot
+//    Astrological Correspondences of the Hermetic Order of the Golden
+//    Dawn"), Parsifal the Scribe ("The Tarot and the Chaldean Decanates"),
+//    and The Pagan Grimoire ("Tarot Cards by Zodiac Sign"). No disagreement
+//    was found between sources on either the planetary cycle or the
+//    cardinal/fixed/mutable rank rule; both were independently re-derived
+//    from named individual card correspondences and matched exactly.
+//
+// Resulting full 36-entry table (sign, decan 1/2/3, planet, card):
+//   Aries:   1 Mars->2 Wands      2 Sun->3 Wands       3 Venus->4 Wands
+//   Taurus:  1 Mercury->5 Pent.   2 Moon->6 Pent.       3 Saturn->7 Pent.
+//   Gemini:  1 Jupiter->8 Swords  2 Mars->9 Swords      3 Sun->10 Swords
+//   Cancer:  1 Venus->2 Cups      2 Mercury->3 Cups     3 Moon->4 Cups
+//   Leo:     1 Saturn->5 Wands    2 Jupiter->6 Wands    3 Mars->7 Wands
+//   Virgo:   1 Sun->8 Pent.       2 Venus->9 Pent.      3 Mercury->10 Pent.
+//   Libra:   1 Moon->2 Swords     2 Saturn->3 Swords    3 Jupiter->4 Swords
+//   Scorpio: 1 Mars->5 Cups       2 Sun->6 Cups         3 Venus->7 Cups
+//   Sagitt.: 1 Mercury->8 Wands   2 Moon->9 Wands       3 Saturn->10 Wands
+//   Capric.: 1 Jupiter->2 Pent.   2 Mars->3 Pent.       3 Sun->4 Pent.
+//   Aquarius:1 Venus->5 Swords    2 Mercury->6 Swords   3 Moon->7 Swords
+//   Pisces:  1 Saturn->8 Cups     2 Jupiter->9 Cups     3 Mars->10 Cups
+// ===========================
+
+// Continuous Chaldean-order planet cycle, indexed so that decan-index 0
+// (Aries, 1st decan) lands on Mars: (2 + decanIndex) % 7 into this array.
+var DECAN_CHALDEAN_CYCLE = ['Saturn','Jupiter','Mars','Sun','Venus','Mercury','Moon'];
+
+// Each sign's suit, by elemental triplicity (Fire=Wands, Earth=Pentacles,
+// Air=Swords, Water=Cups) — same element/suit pairing as ELEMENT_TO_SOLID.
+var DECAN_SIGN_SUIT = {
+  Aries:'Wands', Leo:'Wands', Sagittarius:'Wands',
+  Taurus:'Pentacles', Virgo:'Pentacles', Capricorn:'Pentacles',
+  Gemini:'Swords', Libra:'Swords', Aquarius:'Swords',
+  Cancer:'Cups', Scorpio:'Cups', Pisces:'Cups'
+};
+// Each sign's modality/quality -> which 3 ranks its 3 decans carry within
+// its suit (Cardinal=2,3,4; Fixed=5,6,7; Mutable=8,9,10 — Golden Dawn Book T).
+var DECAN_SIGN_RANKS = {
+  Aries:[2,3,4], Cancer:[2,3,4], Libra:[2,3,4], Capricorn:[2,3,4],       // Cardinal
+  Taurus:[5,6,7], Leo:[5,6,7], Scorpio:[5,6,7], Aquarius:[5,6,7],        // Fixed
+  Gemini:[8,9,10], Virgo:[8,9,10], Sagittarius:[8,9,10], Pisces:[8,9,10] // Mutable
+};
+
+// Longitude (0-360, tropical) -> the specific Golden Dawn decan card for
+// that point. Reuses zodiacSignForLongitude() (PR #25) for the sign, and
+// pipCardName()/pipKeyword() (Section 6.3, above) for the card name/keyword
+// so the 36 pip-card names/keywords are not re-typed a second time.
+function decanCardForLongitude(longitude) {
+  var lon = longitude % 360;
+  if (lon < 0) lon += 360;
+  var sign = zodiacSignForLongitude(lon);
+  var posInSign = lon % 30;
+  var decanIdx = Math.floor(posInSign / 10); // 0, 1, or 2
+  if (decanIdx > 2) decanIdx = 2; // guard against 30.000 floating-point edge
+  var signIdx = NODE_ZODIAC_SIGNS.indexOf(sign);
+  var globalDecanIdx = signIdx * 3 + decanIdx; // 0-35, Aries 1st decan = 0
+  var decanRuler = DECAN_CHALDEAN_CYCLE[(2 + globalDecanIdx) % 7];
+  var suit = DECAN_SIGN_SUIT[sign];
+  var rank = DECAN_SIGN_RANKS[sign][decanIdx];
+  return {
+    card: pipCardName(rank, suit),
+    suit: suit,
+    rank: rank,
+    keyword: pipKeyword(rank, suit),
+    decanRuler: decanRuler,
+    decanRulerSign: sign,
+    decanNumber: decanIdx + 1, // 1st/2nd/3rd decan of the sign
+    longitude: Math.round(lon * 100) / 100
+  };
+}
+
+// North/South Node decan cards for a birth date: North = the card at the
+// natal North Node's own longitude (energy grown toward); South = the card
+// at the exactly-opposite point of the ecliptic (180 degrees away — the
+// same geometric fact used by calcNatalNodeSync above), i.e. the
+// comfort-zone energy being moved away from.
+function getNodeDecanCards(birthDateObj) {
+  var northLon = calcMeanLunarNode(birthDateObj);
+  var southLon = (northLon + 180) % 360;
+  return {
+    northNodeCard: decanCardForLongitude(northLon),
+    southNodeCard: decanCardForLongitude(southLon)
   };
 }
 
@@ -4929,7 +5115,7 @@ document.getElementById('hook-btn').addEventListener('click', function(){
     primaryPath: primary, lifePathTrumpCard: lifePathTrumpCard, trumpPaths: trumpPaths,
     elementSuit: elementSuit, soulCard: soulCard, courtCard: courtCard, shadowCardPath: shadowCardPath,
     hebrewSoulCorrespondence: hebrewSoulCorrespondence,
-    ascendant: null, node: null
+    ascendant: null, node: null, nodeDecanCards: null
   };
 
   // Start AI reading in background while reveal narration plays
@@ -5011,6 +5197,10 @@ function getFallbackReading(){
   }
   if (p.node && p.node.northSign) {
     fb+='\nYour Lunar Nodes name a lifelong axis rather than a single placement: your North Node in '+p.node.northSign+' is the outward-expanding direction your soul is growing toward, and your South Node in '+p.node.southSign+' \u2014 always the exact opposite sign \u2014 is the inward, karmic comfort zone that feels familiar but is not where the growth is. This is a lifelong theme, not a daily forecast; most days it simply sits quietly in the background of your chart.'+(p.node.activePole?(' Right now, though, it is not quiet: the transiting Node has moved back into your own natal '+(p.node.activePole==='north'?'North':'South')+' Node sign ('+p.node.transitSign+'), a real and comparatively rare activation of this exact axis that happens only twice in the Node\u2019s roughly 18.6-year cycle and lasts about a year and a half at a time. While it lasts, the pull toward your '+(p.node.activePole==='north'?'North Node\u2019s outward growth':'South Node\u2019s familiar comfort zone')+' is genuinely stronger than usual.'):' No such activation is currently in effect for you \u2014 the transiting Node is passing through a different sign than either of your own Node placements, which is the ordinary state of affairs most of the time, not a gap in this reading.')+'\n';
+    if (p.nodeDecanCards) {
+      var decanOrdinal = ['1st','2nd','3rd'];
+      fb+='\nThat same Node axis resolves one layer further down, through the Golden Dawn\u2019s decan attributions, to one specific Minor Arcana card apiece. Your North Node falls in the '+decanOrdinal[p.nodeDecanCards.northNodeCard.decanNumber-1]+' decan of '+p.nodeDecanCards.northNodeCard.decanRulerSign+' \u2014 the '+p.nodeDecanCards.northNodeCard.card+', ruled by '+p.nodeDecanCards.northNodeCard.decanRuler+' \u2014 naming '+p.nodeDecanCards.northNodeCard.keyword+' as the specific texture of what you are growing toward. Your South Node falls in the '+decanOrdinal[p.nodeDecanCards.southNodeCard.decanNumber-1]+' decan of '+p.nodeDecanCards.southNodeCard.decanRulerSign+' \u2014 the '+p.nodeDecanCards.southNodeCard.card+', ruled by '+p.nodeDecanCards.southNodeCard.decanRuler+' \u2014 naming '+p.nodeDecanCards.southNodeCard.keyword+' as the specific texture of the shadow, comfort-zone energy you are moving away from. Neither card is a verdict: the '+p.nodeDecanCards.southNodeCard.card+' is not something wrong with you, it is simply the gravity that is easiest to fall back into, and the '+p.nodeDecanCards.northNodeCard.card+' is not a finish line, it is the direction the growth keeps pointing. The placement itself does not move \u2014 it was fixed the moment you were born \u2014 only your relationship to it, moment by moment, is yours to choose.\n';
+    }
   }
   fb+='\nTwo more coordinates sharpen this portrait further. Your Birthday Number \u2014 '+(p.birthdayNumber||'?')+' \u2014 drawn from the day of the month you were born, is a specific talent layered directly onto your Life Path, a tool you were handed at birth and have likely been using since childhood without ever putting a name to it. Your Personality Number \u2014 '+(p.personality||'?')+' \u2014 is the impression you make in the first few seconds before anyone gets to know the rest of you: the surface texture over the deeper Expression and Soul Urge numbers this reading unpacks on the next page. None of these numbers stand alone. Each is a facet cut into the same stone.\n\n'+ca+' is not a decoration sitting on top of your chart. It is a mandate \u2014 the specific shape your Life Path '+p.lifePath+', your '+p.sunSign.sign+' Sun, and your '+p.tree.name+' placement all agree you are here to carry. Hold onto the gift named above; this reading keeps returning to it, recognizing it again in the Tarot archetype on the next page, in the shadow work further in, and in Celestia\'s closing blessing at the very end. It is the same thread the whole way through, just spoken in a different language each time.\n';
   fb+='===PAGE_1_END===\n\n';
@@ -5132,6 +5322,9 @@ async function doReading() {
           activePole: polarity.activePole, // 'north' | 'south' | null (usually null — see comment above getCurrentNodePolarity)
           transitSign: polarity.transitSign
         };
+        // Node Decan Cards (Codex Logic V07 Part XXI) — pure calculation off
+        // the same birth date, no extra lookup/promise needed.
+        p.nodeDecanCards = getNodeDecanCards(new Date(Date.UTC(p.year, p.month - 1, p.day)));
       }
     } catch (nodeErr) {
       console.error('[Node] Lookup rejected unexpectedly:', nodeErr);
@@ -5150,6 +5343,7 @@ async function doReading() {
   var metatronLine = (p.soulCard && p.courtCard) ? ('Metatron\'s Cube \u2014 Soul Card: ' + p.soulCard.name + ' (' + p.soulCard.keyword + '); Court Card: ' + p.courtCard.name + ', anchored to ' + p.courtCard.veil + '\n') : '';
   var ascendantLine = (p.ascendant && p.ascendant.sign) ? ('Ascendant (Rising Sign): ' + p.ascendant.sign + (p.ascendant.degree != null ? ' at ' + p.ascendant.degree + '\u00b0' : '') + '\n') : '';
   var nodeLine = (p.node && p.node.northSign) ? ('Lunar Nodes (lifelong axis): North Node in ' + p.node.northSign + ' (outward-growth direction), South Node in ' + p.node.southSign + ' (karmic comfort zone)' + (p.node.activePole ? ('. Currently active: the transiting node is presently passing back through ' + p.firstName + '\'s own natal ' + (p.node.activePole === 'north' ? 'North' : 'South') + ' Node sign (' + p.node.transitSign + ') \u2014 a rare, roughly-eighteen-month window that happens only twice per ~18.6-year node cycle.') : '') + '\n') : '';
+  var nodeDecanCardsLine = (p.nodeDecanCards) ? ('Node Decan Cards (Golden Dawn decan attribution, Codex Logic V07 Part XXI): North Node falls in the decan of the ' + p.nodeDecanCards.northNodeCard.card + ' (' + p.nodeDecanCards.northNodeCard.decanRuler + ' in ' + p.nodeDecanCards.northNodeCard.decanRulerSign + ', keyword "' + p.nodeDecanCards.northNodeCard.keyword + '") \u2014 the growth-toward energy; South Node falls in the decan of the ' + p.nodeDecanCards.southNodeCard.card + ' (' + p.nodeDecanCards.southNodeCard.decanRuler + ' in ' + p.nodeDecanCards.southNodeCard.decanRulerSign + ', keyword "' + p.nodeDecanCards.southNodeCard.keyword + '") \u2014 the shadow/comfort-zone energy.\n') : '';
   var hebrewSoulLine = p.hebrewSoulCorrespondence ? ('Hebrew Soul Correspondence (full birth name, real Mispar Hechrachi gematria): consonants ' + p.hebrewSoulCorrespondence.hebrewConsonants + ', total ' + p.hebrewSoulCorrespondence.gematriaTotal + ' \u2192 ' + p.hebrewSoulCorrespondence.gematriaReduced + '. ' + (p.hebrewSoulCorrespondence.archangelMatches.length ? 'Archangel match: ' + p.hebrewSoulCorrespondence.archangelMatches.map(function(m){return m.name + ' (' + m.hebrew + ' = ' + m.value + ')';}).join(', ') + '. ' : 'No Archangel match. ') + '72 Names position ' + p.hebrewSoulCorrespondence.nameOf72.position + ': ' + p.hebrewSoulCorrespondence.nameOf72.name + '.\n') : '';
 
   var prompt ='You are Celestia, the oracle of Circles Squared \u2014 Taurus Codex Geometry. Generate a complete 9-section reading for ' + p.firstName + ' using the unified narrative approach: weave all systems (Astrology, Pythagorean & Chaldean Numerology, Gematria/Kabbalah, Tarot, Metatron\'s Cube, Sacred Geometry) into ONE seamless identity story. Never isolate systems in their own paragraph and move on \u2014 every time you introduce a new system\'s finding, explicitly say how it reinforces, explains, or adds a new angle on what has already been established earlier in the reading, by name (cite the specific earlier number, card, or Sephirah you are connecting it to). Rich, warm, poetic, second-person prose. Be specific to the exact data.\n\n'
@@ -5162,6 +5356,7 @@ async function doReading() {
     + 'Sun Sign: ' + p.sunSign.sign + ' (' + p.sunSign.element + ', ' + p.sunSign.modality + ', ruled by ' + p.sunSign.planet + ')\n'
     + ascendantLine
     + nodeLine
+    + nodeDecanCardsLine
     + 'Sephirah: ' + p.tree.name + ' \u2014 ' + p.tree.meaning + '\n'
     + 'Tarot Path ' + tc.path + ': ' + tc.card + ' (' + tc.letter + ') \u2014 ' + tc.archetype + '\n'
     + (p.lifePathTrumpCard ? ('Life Path Trump Card (Major Arcana, Path ' + p.lifePathTrumpCard.num + '): ' + p.lifePathTrumpCard.numeral + ' ' + p.lifePathTrumpCard.card + ', keyword ' + p.lifePathTrumpCard.keyword + '\n') : '')
@@ -5171,7 +5366,7 @@ async function doReading() {
     + hebrewSoulLine
     + 'Personal Year 2026: ' + p.personalYear2026 + '\n'
     + '\nWrite exactly 9 sections with ===PAGE_N_START=== and ===PAGE_N_END=== delimiters on their own lines (each delimiter on its own line, no other text on that line). Each section: 7\u20139 rich, deeply personal paragraphs (not 5\u20136 \u2014 these pages need to visually fill a full printed page, so write substantially more per page than feels like the minimum). Each paragraph should be 4\u20136 full sentences, not 2\u20133 \u2014 a thin, single-idea paragraph is not acceptable. Every paragraph must reference ' + p.firstName + ' by name at least once and cite the specific numbers or symbols from their profile, and should work in as many of the person\'s actual named numbers, cards, Sephiroth, and archetypes as genuinely fit \u2014 not just one per paragraph. When a paragraph starts to feel thin or abstract, do not move on to the next idea yet: stay with the same point and add a concrete second layer \u2014 what this finding actually looks like in ' + p.firstName + '\'s daily choices, relationships, or work, a specific example of the pattern playing out, or a second data point from the profile that deepens (not repeats) the first. No generic affirmations, no padding with synonyms of a sentence already written \u2014 every added sentence must carry new, specific content. Celestia speaks with warm authority, poetic depth, and precision.\n\n'
-    + 'Page 1 \u2014 IDENTITY ESSENCE: Open with the exact phrase "' + p.firstName + ', you are ' + ca + '." Then paint a full-portrait synthesis: how Life Path ' + p.lifePath + ' (' + lpTitle + ') shapes the core drive, how ' + p.sunSign.sign + ' Sun infuses it with elemental character (' + p.sunSign.element + ', ruled by ' + p.sunSign.planet + ')' + (p.ascendant && p.ascendant.sign ? ', how their ' + p.ascendant.sign + ' Ascendant colors the lens the world first meets them through' : '') + ', and how ' + p.tree.name + ' on the Tree of Life places this soul at a specific energetic address in creation. Explain what the Codex Archetype ' + ca + ' means as a living identity \u2014 not a label but a mandate.' + (p.node && p.node.northSign ? (' If it fits naturally, name their North Node in ' + p.node.northSign + ' as the lifelong outward direction the soul is growing toward and their South Node in ' + p.node.southSign + ' as the inward comfort zone they are moving away from \u2014 this is a lifelong developmental axis, not a daily forecast, so treat it as one more coordinate on the same portrait rather than a separate topic.' + (p.node.activePole ? (' Note also that the transiting node is presently moving back through their own natal ' + (p.node.activePole === 'north' ? 'North' : 'South') + ' Node sign right now \u2014 a rare, roughly-eighteen-month activation worth naming explicitly since it does not happen for most people most years.') : '')) : '') + ' End by naming the specific gift this soul arrived with, and name it as a thread the reading will keep picking back up \u2014 the same gift the reader will recognize again in the Tarot archetype, the shadow work, and the closing blessing.\n'
+    + 'Page 1 \u2014 IDENTITY ESSENCE: Open with the exact phrase "' + p.firstName + ', you are ' + ca + '." Then paint a full-portrait synthesis: how Life Path ' + p.lifePath + ' (' + lpTitle + ') shapes the core drive, how ' + p.sunSign.sign + ' Sun infuses it with elemental character (' + p.sunSign.element + ', ruled by ' + p.sunSign.planet + ')' + (p.ascendant && p.ascendant.sign ? ', how their ' + p.ascendant.sign + ' Ascendant colors the lens the world first meets them through' : '') + ', and how ' + p.tree.name + ' on the Tree of Life places this soul at a specific energetic address in creation. Explain what the Codex Archetype ' + ca + ' means as a living identity \u2014 not a label but a mandate.' + (p.node && p.node.northSign ? (' If it fits naturally, name their North Node in ' + p.node.northSign + ' as the lifelong outward direction the soul is growing toward and their South Node in ' + p.node.southSign + ' as the inward comfort zone they are moving away from \u2014 this is a lifelong developmental axis, not a daily forecast, so treat it as one more coordinate on the same portrait rather than a separate topic.' + (p.node.activePole ? (' Note also that the transiting node is presently moving back through their own natal ' + (p.node.activePole === 'north' ? 'North' : 'South') + ' Node sign right now \u2014 a rare, roughly-eighteen-month activation worth naming explicitly since it does not happen for most people most years.') : '')) : '') + (p.nodeDecanCards ? (' That same Node axis resolves further, via the Golden Dawn decan attributions, to one specific Minor Arcana card apiece: the ' + p.nodeDecanCards.northNodeCard.card + ' (' + p.nodeDecanCards.northNodeCard.decanRuler + ' in ' + p.nodeDecanCards.northNodeCard.decanRulerSign + ') for the North Node \u2014 name this explicitly as the energy ' + p.firstName + ' is growing TOWARD \u2014 and the ' + p.nodeDecanCards.southNodeCard.card + ' (' + p.nodeDecanCards.southNodeCard.decanRuler + ' in ' + p.nodeDecanCards.southNodeCard.decanRulerSign + ') for the South Node \u2014 name this as the shadow/comfort-zone energy ' + p.firstName + ' is moving AWAY from. Frame this as a growth trajectory, not a moral judgment: the South Node card is not "bad," it is simply the familiar gravity the North Node card is inviting ' + p.firstName + ' beyond. Make clear the placement itself is fixed \u2014 it does not change based on ' + p.firstName + '\'s choices \u2014 only how ' + p.firstName + ' works with it, leans into the North Node card or leans back on the South Node card in any given moment, is a matter of choice.') : '') + ' End by naming the specific gift this soul arrived with, and name it as a thread the reading will keep picking back up \u2014 the same gift the reader will recognize again in the Tarot archetype, the shadow work, and the closing blessing.\n'
     + 'Page 2 \u2014 ARCHETYPAL SIGNATURE: Explore the full mythic narrative. ' + tc.card + ' (Path ' + tc.path + ', letter ' + tc.letter + ') is the archetype ' + p.firstName + ' is living' + (p.lifePathTrumpCard ? ', confirmed by the Life Path Trump Card ' + p.lifePathTrumpCard.numeral + ' ' + p.lifePathTrumpCard.card : '') + '. Explain what this card means as a life-force not just a symbol, how the ' + p.sunSign.sign + ' Sun amplifies or challenges this path, and how the Kabbalistic letter ' + tc.letter + ' encodes a specific teaching in their very name. Name the mythic figures, gods, or archetypes associated with this path. Explicitly tie this Tarot archetype back to the Life Path ' + p.lifePath + ' and Codex Archetype ' + ca + ' named on Page 1 — show that the Tarot card is not a second, unrelated topic but the same mandate speaking in a different language, and say so directly. Describe what it feels like to embody ' + tc.card + ' fully vs. when it is suppressed.\n'
     + 'Page 3 \u2014 FREQUENCY PATTERN: Decode the name. Life Path ' + p.lifePath + ' is the birth frequency. Expression ' + (p.expression||'?') + ' is the gift encoded in every letter of "' + p.firstName + '". Soul Urge ' + (p.soulUrge||'?') + ' is the private longing beneath the surface. Gematria total ' + (p.gematria?p.gematria.total:'?') + ' reducing to ' + (p.gematria?p.gematria.reduced:'?') + ' is the name\'s sacred numerical signature.' + (p.chaldean ? ' The Chaldean compound of the name ' + p.firstName + ' is actually called by resolves to ' + p.chaldean.compound + ' (' + p.chaldean.reduced + '), a living-identity number layered atop the birth frequency.' : '') + ' Explicitly connect the Gematria total ' + (p.gematria?p.gematria.total:'?') + ' back to the Life Path ' + p.lifePath + ' established on Page 1 \u2014 name both numbers together and say plainly why a name-frequency and a birth-frequency landing on the same core tone is not coincidence but confirmation, two instruments playing the same note. Explain what happens when ' + p.firstName + ' aligns with vs. resists this frequency.\n'
     + 'Page 4 \u2014 THE FIELD GEOMETRY: ' + p.firstName + '\'s identity is a living Egg of Life \u2014 eight interlocking circles of force. Map which nodes are most activated: ' + p.tree.name + ' (Kabbalah), ' + tc.card + ' (Tarot), ' + p.sunSign.sign + ' (Astrology), Life Path ' + p.lifePath + ' (Numerology), gematria ' + (p.gematria?p.gematria.reduced:'?') + ' (Gematria), and Sacred Geometry as the container. Explain what it means that these systems converge on a single being — specifically call out at least one node where two systems from earlier pages (e.g. the Life Path from Page 1 and the Gematria reduction from Page 3, or the Tarot path from Page 2 and the Sephirah) sit on the same point of the geometry, not adjacent-but-separate points. Describe the energetic field this soul radiates and how others experience it. Name the specific intersection points where power concentrates.\n'
