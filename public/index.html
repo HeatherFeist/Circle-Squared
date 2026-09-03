@@ -2492,6 +2492,11 @@ document.getElementById('admin-pdf-btn').addEventListener('click', async functio
     var _today = new Date();
     var personalMonth = calcPersonalMonth(month, day, _today.getFullYear(), _today.getMonth()+1);
     var personalDay = calcPersonalDay(month, day, _today.getFullYear(), _today.getMonth()+1, _today.getDate());
+    // Personal Day Wildcard Major + Minor Arcana pool (Codex Logic V07 Part
+    // XXV) — a live, narrative-only "invitation, not assignment" layer for
+    // today specifically, distinct from the birth-locked Life Path Trump
+    // Card above.
+    var personalDayWildcard = getPersonalDayWildcard(personalDay);
     var lpData = LP_DATA[lp] || LP_DATA[digitSum(lp)] || LP_DATA[6];
     var nameHiddenMasters = hiddenMasterAudit(fullBirthName);
     var chaldean = calcChaldeanName(usedName);
@@ -2523,6 +2528,7 @@ document.getElementById('admin-pdf-btn').addEventListener('click', async functio
       expression: expression, soulUrge: soulUrge,
       personality: personality, birthdayNumber: birthdayNumber, gematria: gematria,
       personalYear2026: personalYear2026, personalMonth: personalMonth, personalDay: personalDay,
+      personalDayWildcard: personalDayWildcard,
       tarotCard: tarotCard, codexArchetype: codexArchetype,
       chaldean: chaldean, harmonic: harmonic,
       gematriaBattery: gematriaBattery,
@@ -3902,6 +3908,188 @@ function calcSunLongitude(dateObj) {
 function getZodiacalCourtCard(birthDateObj) {
   var sunLon = calcSunLongitude(birthDateObj);
   return courtCardForLongitude(sunLon);
+}
+
+// ===========================
+// W3BB CODEX V07 PART XXV — PERSONAL DAY WILDCARD MAJOR + MINOR ARCANA POOL
+// Personal Day (Part XXIV's numerology sibling, added alongside it in this
+// branch) narrows all the way down to today. Unlike the birth-locked Life
+// Path Trump Card (Section 5.5, primaryPathForLP) -- which is fixed the
+// moment someone is born and never moves -- a Personal Day repeats every
+// few weeks and is not tied to a single fixed archetype the way a Life
+// Path is. So this system does NOT hand back one Trump Card. It pools
+// EVERY Major Arcana whose Tree-of-Life path number genuinely resonates
+// with today's Personal Day digit, and for each candidate Major, a further
+// pool of Minor Arcana pip cards it "wildcards" toward through its own
+// Golden Dawn planetary/zodiacal ruler. The reading must present this as
+// an invitation, not an assignment: a live field of possibility available
+// today, never a verdict the way the Trump Card is.
+//
+// STEP 1 -- digit -> candidate Major(s). Reuses PATH_TABLE (already real,
+// already verified data -- not a new hand-typed table) and the codebase's
+// digit-reduction convention. For an ordinary Personal Day (1-9), pool
+// every path whose OWN path number (11-32) fully reduces to that digit --
+// verified against the real PATH_TABLE data below (e.g. digit 9 pools
+// Path 18/The Chariot and Path 27/The Tower, since 1+8=9 and 2+7=9).
+// Master Personal Days (11, 22) are handled separately and are NOT run
+// through the same reduction: PATH_TABLE happens to carry a path numbered
+// exactly 11 (The Fool) and exactly 22 (Justice), so a Master Personal Day
+// matches that one path directly, by exact number. This is a deliberate,
+// documented choice, not an oversight -- fully reducing 11 and 22 the same
+// way the 1-9 digits are reduced above would silently break the "no
+// ambiguity" guarantee a Master Number is supposed to carry: Path 29 (The
+// Moon) also fully reduces to 2+9=11, so a naive single reduction rule
+// would put The Moon in the same bucket as the Master-11 exact match.
+// Exact-number lookup for 11/22 avoids that collision entirely.
+function fullDigitReduce(n) {
+  n = Math.abs(Math.round(n));
+  while (n > 9) {
+    n = String(n).split('').reduce(function(a, b) { return a + parseInt(b, 10); }, 0);
+  }
+  return n;
+}
+var PERSONAL_DAY_MAJOR_POOL = (function() {
+  var byDigit = {};
+  PATH_TABLE.forEach(function(p) {
+    var d = fullDigitReduce(p.num);
+    if (!byDigit[d]) byDigit[d] = [];
+    byDigit[d].push({ card: p.card, path: p.num, numeral: p.numeral, keyword: p.keyword });
+  });
+  var fool = pathByNumber(11), justice = pathByNumber(22);
+  byDigit[11] = [{ card: fool.card, path: fool.num, numeral: fool.numeral, keyword: fool.keyword }];
+  byDigit[22] = [{ card: justice.card, path: justice.num, numeral: justice.numeral, keyword: justice.keyword }];
+  return byDigit;
+})();
+function getPersonalDayMajorCandidates(personalDayDigit) {
+  return PERSONAL_DAY_MAJOR_POOL[personalDayDigit] || [];
+}
+
+// STEP 2 -- Golden Dawn Hebrew-letter-type attribution for each Major
+// Arcana (which of the 3 Mother/7 Double/12 Simple letters it carries),
+// cross-checked this session against multiple independent sources
+// (WebSearch: Mary K. Greer's Tarot Blog, davidcunliffe.com's "Tarot
+// Astrological Correspondences of the Hermetic Order of the Golden Dawn",
+// Tarot Elements' "Hebrew for Tarot Readers" series, Gates of Light Tarot,
+// and Joy Vernon Astrology/Tarot) -- the standard Rider-Waite-Smith/Golden
+// Dawn lineage this codebase already commits to (Part XXI), not
+// Crowley/Thoth's reordering of The Emperor/The Star. The 12 'sign'-type
+// entries below match the CARD_TO_SIGN table defined later in this file
+// (the Personal Tone feature) card-for-card -- the same 12 zodiac-
+// attributed Majors, independently re-typed here since CARD_TO_SIGN is
+// not yet defined at this point in the file.
+var MAJOR_ASTRO_ATTRIBUTION = {
+  'The Fool':           { type: 'element', value: 'Air' },
+  'The Magician':       { type: 'planet',  value: 'Mercury' },
+  'The High Priestess': { type: 'planet',  value: 'Moon' },
+  'The Empress':        { type: 'planet',  value: 'Venus' },
+  'The Emperor':        { type: 'sign',    value: 'Aries' },
+  'The Hierophant':     { type: 'sign',    value: 'Taurus' },
+  'The Lovers':         { type: 'sign',    value: 'Gemini' },
+  'The Chariot':        { type: 'sign',    value: 'Cancer' },
+  'Strength':           { type: 'sign',    value: 'Leo' },
+  'The Hermit':         { type: 'sign',    value: 'Virgo' },
+  'Wheel of Fortune':   { type: 'planet',  value: 'Jupiter' },
+  'Justice':            { type: 'sign',    value: 'Libra' },
+  'The Hanged Man':     { type: 'element', value: 'Water' },
+  'Death':              { type: 'sign',    value: 'Scorpio' },
+  'Temperance':         { type: 'sign',    value: 'Sagittarius' },
+  'The Devil':          { type: 'sign',    value: 'Capricorn' },
+  'The Tower':          { type: 'planet',  value: 'Mars' },
+  'The Star':           { type: 'sign',    value: 'Aquarius' },
+  'The Moon':           { type: 'sign',    value: 'Pisces' },
+  'The Sun':            { type: 'planet',  value: 'Sun' },
+  'Judgement':          { type: 'element', value: 'Fire' },
+  'The World':          { type: 'planet',  value: 'Saturn' }
+};
+
+// STEP 3 -- pip-card pool for one candidate Major, sized honestly by which
+// of the 3 letter-types rules it rather than forced to a uniform count:
+//  - Element-ruled Major (3 of the 22: Fool/Air, Hanged Man/Water,
+//    Judgement/Fire): the element rules the ENTIRE suit, not one decan --
+//    so its pool is deliberately the largest, all 9 pip ranks (2-10) of
+//    that suit. This is reported plainly as a 9-card pool, not smoothed
+//    down to match the smaller planet/sign pools.
+//  - Planet-ruled Major (7 of the 22): every decan across the real
+//    36-decan wheel already verified in Part XXI that is ruled by that
+//    planet. Since 36 does not divide evenly by 7 planets, Mars alone
+//    gets 6 decans; the other 6 planets get 5 each (verified below).
+//  - Sign-ruled Major (12 of the 22): exactly the 3 pip cards of that
+//    sign's own 3 decans, no more and no fewer.
+// Walks the SAME real decan table Part XXI already verified
+// (DECAN_CHALDEAN_CYCLE / DECAN_SIGN_SUIT / DECAN_SIGN_RANKS) rather than
+// hand-typing a second planet/sign -> card table that could drift out of
+// sync with it.
+function getPipPoolForMajor(cardName) {
+  var attrib = MAJOR_ASTRO_ATTRIBUTION[cardName];
+  if (!attrib) return [];
+  if (attrib.type === 'element') {
+    var elSuit = (ELEMENT_TO_SOLID[attrib.value] || {}).suit;
+    if (!elSuit) return [];
+    var elPool = [];
+    for (var rank = 2; rank <= 10; rank++) {
+      elPool.push({ card: pipCardName(rank, elSuit), suit: elSuit, rank: rank, keyword: pipKeyword(rank, elSuit) });
+    }
+    return elPool;
+  }
+  var pool = [];
+  NODE_ZODIAC_SIGNS.forEach(function(sign, signIdx) {
+    var suit = DECAN_SIGN_SUIT[sign];
+    var ranks = DECAN_SIGN_RANKS[sign];
+    for (var decanIdx = 0; decanIdx < 3; decanIdx++) {
+      var globalDecanIdx = signIdx * 3 + decanIdx;
+      var ruler = DECAN_CHALDEAN_CYCLE[(2 + globalDecanIdx) % 7];
+      var isMatch = (attrib.type === 'planet' && ruler === attrib.value) ||
+                    (attrib.type === 'sign' && sign === attrib.value);
+      if (isMatch) {
+        var rank2 = ranks[decanIdx];
+        pool.push({ card: pipCardName(rank2, suit), suit: suit, rank: rank2, keyword: pipKeyword(rank2, suit), decanRuler: ruler, decanRulerSign: sign });
+      }
+    }
+  });
+  return pool;
+}
+
+// Full Part XXV assembly for one person's Personal Day digit: the pooled
+// candidate Major(s) plus each one's own pip-card pool, attribution type
+// included so reading copy can name honestly why the pool is the size it
+// is (a 9-card suit vs. a 5-6-card planetary spread vs. a 3-card decan
+// triad).
+function getPersonalDayWildcard(personalDayDigit) {
+  var majors = getPersonalDayMajorCandidates(personalDayDigit);
+  return {
+    digit: personalDayDigit,
+    majors: majors.map(function(m) {
+      return {
+        card: m.card, path: m.path, numeral: m.numeral, keyword: m.keyword,
+        attribution: MAJOR_ASTRO_ATTRIBUTION[m.card] || null,
+        pipPool: getPipPoolForMajor(m.card)
+      };
+    })
+  };
+}
+
+// Narrative-only formatting helper for the Part XXV pool above, shared by
+// getFallbackReading() and doReading()'s AI prompt so the exact same
+// honest, size-varies-by-type framing is never re-typed two different
+// ways. Deliberately invitational language throughout ("wildcard toward",
+// "worth noticing"), never assignment language ("is", "will be") -- a
+// Personal Day pool is a live possibility field for today, not a verdict.
+function formatPersonalDayWildcard(pdw) {
+  if (!pdw || !pdw.majors || !pdw.majors.length) return '';
+  var majorNames = pdw.majors.map(function(m){ return m.card; });
+  var majorPhrase = majorNames.length === 1 ? majorNames[0]
+    : (majorNames.slice(0, -1).join(', ') + ' and ' + majorNames[majorNames.length - 1]);
+  var parts = pdw.majors.map(function(m) {
+    var pool = m.pipPool || [];
+    var sizeNote = (m.attribution && m.attribution.type === 'element')
+      ? ('the entire ' + (pool[0] ? pool[0].suit : '') + ' suit, ' + pool.length + ' pip cards, since ' + m.card + ' is ruled by the element ' + m.attribution.value + ' rather than one planet or sign')
+      : (m.attribution && m.attribution.type === 'planet')
+      ? (pool.length + ' pip cards spread across the zodiac wherever ' + m.attribution.value + ' rules a decan, since ' + m.card + ' is ruled by the planet ' + m.attribution.value)
+      : (m.attribution ? (pool.length + ' pip cards, the three decans of ' + m.attribution.value + ' itself, since ' + m.card + ' is ruled by the sign ' + m.attribution.value) : (pool.length + ' pip cards'));
+    var poolNames = pool.map(function(c){ return c.card; }).join(', ');
+    return m.card + ' wildcards toward ' + sizeNote + ': ' + poolNames + '.';
+  });
+  return { majorPhrase: majorPhrase, poolSentences: parts.join(' ') };
 }
 
 // ===========================
@@ -5327,6 +5515,11 @@ document.getElementById('hook-btn').addEventListener('click', function(){
   var _today = new Date();
   var personalMonth = calcPersonalMonth(month, day, _today.getFullYear(), _today.getMonth()+1);
   var personalDay = calcPersonalDay(month, day, _today.getFullYear(), _today.getMonth()+1, _today.getDate());
+  // Personal Day Wildcard Major + Minor Arcana pool (Codex Logic V07 Part
+  // XXV) — a live, narrative-only "invitation, not assignment" layer for
+  // today specifically, distinct from the birth-locked Life Path Trump
+  // Card above.
+  var personalDayWildcard = getPersonalDayWildcard(personalDay);
   var lpData = LP_DATA[lp] || LP_DATA[digitSum(lp)] || LP_DATA[6];
   // Section 3.2/3.4 Hidden Master audit — always run on the FULL birth name
   // (the birth-blueprint identity), independent of the used-name layer.
@@ -5377,6 +5570,7 @@ document.getElementById('hook-btn').addEventListener('click', function(){
     expression: expression, soulUrge: soulUrge,
     personality: personality, birthdayNumber: birthdayNumber, gematria: gematria,
     personalYear2026: personalYear2026, personalMonth: personalMonth, personalDay: personalDay,
+    personalDayWildcard: personalDayWildcard,
     tarotCard: tarotCard,
     codexArchetype: codexArchetype,
     chaldean: chaldean, harmonic: harmonic,
@@ -5456,6 +5650,7 @@ function getFallbackReading(){
   var _todayFb=new Date();
   var pm=(p.personalMonth!=null?p.personalMonth:calcPersonalMonth(p.month,p.day,_todayFb.getFullYear(),_todayFb.getMonth()+1));
   var pd=(p.personalDay!=null?p.personalDay:calcPersonalDay(p.month,p.day,_todayFb.getFullYear(),_todayFb.getMonth()+1,_todayFb.getDate()));
+  var pdw=p.personalDayWildcard||getPersonalDayWildcard(pd);
   var tc=p.tarotCard||TAROT_PATHS[1];
   var ca=p.codexArchetype||'The Integrator';
   var fb='';
@@ -5509,6 +5704,10 @@ function getFallbackReading(){
 
   fb+='===PAGE_7_START===\n';
   fb+='Your Personality Number is '+(p.personality||'unknown')+' \u2014 the impression you make before you speak a single word. You are in Personal Year '+py+' in 2026. This cycle has a specific quality \u2014 a tone that colors every decision, relationship, and opportunity of this year.\n\n'+(py<=3?'This is a year of planting. The seeds you put down now \u2014 in projects, relationships, identity \u2014 will define the harvest of the next cycle. As '+ca+', the key is to act from vision, not from fear.':py<=6?'This is a year of deepening. Connections forged now carry long-term significance. Your field is stabilizing around its true form.':'This is a year of revelation and completion. Old structures that no longer serve are falling away. As '+ca+', this is not loss \u2014 it is liberation. What remains will be exactly what is meant to carry forward.')+'\n\nPersonal Year '+py+' is not a separate forecast bolted onto your chart \u2014 it is Life Path '+p.lifePath+' in motion through time, the same core number counted forward year by year until it comes back around to itself. For '+ca+', this Personal Year '+py+' activates the part of your field that governs '+p.sunSign.sign+' energy. The timing is not accidental.\n\nPractically, this looks less like a mood and more like a series of small forks in the road. '+(py<=3?'Say yes to the invitation, the idea, or the collaboration that feels slightly too soon \u2014 Personal Year '+py+' rewards those who move before they feel fully ready, because the readiness only ever arrives after the first step, not before it.':py<=6?'Say yes to the relationship, agreement, or commitment that asks you to stay rather than start something new \u2014 Personal Year '+py+' rewards depth over breadth, and the temptation to scatter your energy across something newer and shinier is exactly what this year asks you to resist.':'Say yes to the ending you have been putting off \u2014 Personal Year '+py+' rewards honest closure over quiet avoidance, and what looks like loss from inside the year will look like liberation from outside it.')+' Say no to whatever would keep you circling the same lesson a second time; your Birthday Number '+(p.birthdayNumber||'?')+' has already given you the tool to recognize when that is happening.\n\nThis Personal Year narrows further the closer you look. Right now you are moving through Personal Month '+pm+' — the same yearly theme, focused down onto the chapter you are actually living this month — and today itself falls in Personal Day '+pd+', the smallest and most immediate ring of this same cycle. None of these three numbers is a separate forecast; Personal Day '+pd+' is Personal Month '+pm+' in motion, and Personal Month '+pm+' is Personal Year '+py+' in motion, the same way Personal Year is Life Path '+p.lifePath+' in motion through time. When you want to know what today is actually asking of you, Personal Day '+pd+' is the most precise instrument this reading has to offer.\n';
+  if (pdw && pdw.majors && pdw.majors.length) {
+    var pdwFmt = formatPersonalDayWildcard(pdw);
+    fb += '\nPersonal Day '+pd+' opens one more door, and it is worth naming as an invitation rather than a verdict: the Tree of Life carries '+(pdw.majors.length>1?'more than one path':'exactly one path')+' whose own path number resonates with the digit '+pd+' itself, so today wildcards toward '+pdwFmt.majorPhrase+' — '+(pdw.majors.length>1?'not as a forced choice between them, but as a field of live possibility you can lean into either direction of today':'as the live possibility available to lean into today')+'. '+pdwFmt.poolSentences+' None of this replaces the '+tc.card+' path named earlier in this reading, and none of it is fixed the way your birth chart is fixed — it simply names what today, specifically, is offering you room to explore, gone again once Personal Day '+pd+' rolls forward into tomorrow\'s number.\n';
+  }
   fb+='===PAGE_7_END===\n\n';
 
   fb+='===PAGE_8_START===\n';
@@ -5616,6 +5815,8 @@ async function doReading() {
   var nameHiddenMastersLine = (p.nameHiddenMasters && p.nameHiddenMasters.length) ? ('Name-Field Hidden Masters (independent of Life Path): ' + formatNameHiddenMasters(p.nameHiddenMasters) + '\n') : '';
   var metatronLine = (p.soulCard && p.courtCard) ? ('Metatron\'s Cube \u2014 Soul Card: ' + p.soulCard.name + ' (' + p.soulCard.keyword + '); Court Card: ' + p.courtCard.name + ', anchored to ' + p.courtCard.veil + '\n') : '';
   var zodiacalCourtCardLine = (p.zodiacalCourtCard) ? ('Zodiacal Court Card (Sun placement, Codex Logic V07 Part XXIV \u2014 a SEPARATE, independent finding from the Metatron\'s Cube Court Card above, reached from the Sun\'s own zodiacal degree, not the Sephirah): ' + p.zodiacalCourtCard.name + ' (Sun at ' + p.zodiacalCourtCard.longitude + '\u00b0, home sign ' + p.zodiacalCourtCard.homeSign + ')\n') : '';
+  var pdwFmtPrompt = (p.personalDayWildcard && p.personalDayWildcard.majors && p.personalDayWildcard.majors.length) ? formatPersonalDayWildcard(p.personalDayWildcard) : null;
+  var personalDayWildcardLine = pdwFmtPrompt ? ('Personal Day Wildcard (Codex Logic V07 Part XXV \u2014 narrative-only, an INVITATION not an assignment, distinct from the birth-locked Life Path Trump Card above): today\'s Personal Day ' + p.personalDay + ' pools toward ' + pdwFmtPrompt.majorPhrase + '. ' + pdwFmtPrompt.poolSentences + '\n') : '';
   var ascendantLine = (p.ascendant && p.ascendant.sign) ? ('Ascendant (Rising Sign): ' + p.ascendant.sign + (p.ascendant.degree != null ? ' at ' + p.ascendant.degree + '\u00b0' : '') + '\n') : '';
   var nodeLine = (p.node && p.node.northSign) ? ('Lunar Nodes (lifelong axis): North Node in ' + p.node.northSign + ' (outward-growth direction), South Node in ' + p.node.southSign + ' (karmic comfort zone)' + (p.node.activePole ? ('. Currently active: the transiting node is presently passing back through ' + p.firstName + '\'s own natal ' + (p.node.activePole === 'north' ? 'North' : 'South') + ' Node sign (' + p.node.transitSign + ') \u2014 a rare, roughly-eighteen-month window that happens only twice per ~18.6-year node cycle.') : '') + '\n') : '';
   var nodeDecanCardsLine = (p.nodeDecanCards) ? ('Node Decan Cards (Golden Dawn decan attribution, Codex Logic V07 Part XXI): North Node falls in the decan of the ' + p.nodeDecanCards.northNodeCard.card + ' (' + p.nodeDecanCards.northNodeCard.decanRuler + ' in ' + p.nodeDecanCards.northNodeCard.decanRulerSign + ', keyword "' + p.nodeDecanCards.northNodeCard.keyword + '") \u2014 the growth-toward energy; South Node falls in the decan of the ' + p.nodeDecanCards.southNodeCard.card + ' (' + p.nodeDecanCards.southNodeCard.decanRuler + ' in ' + p.nodeDecanCards.southNodeCard.decanRulerSign + ', keyword "' + p.nodeDecanCards.southNodeCard.keyword + '") \u2014 the shadow/comfort-zone energy.\n') : '';
@@ -5641,6 +5842,7 @@ async function doReading() {
     + nameHiddenMastersLine
     + hebrewSoulLine
     + 'Personal Year 2026: ' + p.personalYear2026 + (p.personalMonth != null ? ('  Personal Month (current): ' + p.personalMonth) : '') + (p.personalDay != null ? ('  Personal Day (today): ' + p.personalDay) : '') + '\n'
+    + personalDayWildcardLine
     + '\nWrite exactly 9 sections with ===PAGE_N_START=== and ===PAGE_N_END=== delimiters on their own lines (each delimiter on its own line, no other text on that line). Each section: 7\u20139 rich, deeply personal paragraphs (not 5\u20136 \u2014 these pages need to visually fill a full printed page, so write substantially more per page than feels like the minimum). Each paragraph should be 4\u20136 full sentences, not 2\u20133 \u2014 a thin, single-idea paragraph is not acceptable. Every paragraph must reference ' + p.firstName + ' by name at least once and cite the specific numbers or symbols from their profile, and should work in as many of the person\'s actual named numbers, cards, Sephiroth, and archetypes as genuinely fit \u2014 not just one per paragraph. When a paragraph starts to feel thin or abstract, do not move on to the next idea yet: stay with the same point and add a concrete second layer \u2014 what this finding actually looks like in ' + p.firstName + '\'s daily choices, relationships, or work, a specific example of the pattern playing out, or a second data point from the profile that deepens (not repeats) the first. No generic affirmations, no padding with synonyms of a sentence already written \u2014 every added sentence must carry new, specific content. Celestia speaks with warm authority, poetic depth, and precision.\n\n'
     + 'Page 1 \u2014 IDENTITY ESSENCE: Open with the exact phrase "' + p.firstName + ', you are ' + ca + '." Then paint a full-portrait synthesis: how Life Path ' + p.lifePath + ' (' + lpTitle + ') shapes the core drive, how ' + p.sunSign.sign + ' Sun infuses it with elemental character (' + p.sunSign.element + ', ruled by ' + p.sunSign.planet + ')' + (p.ascendant && p.ascendant.sign ? ', how their ' + p.ascendant.sign + ' Ascendant colors the lens the world first meets them through' : '') + ', and how ' + p.tree.name + ' on the Tree of Life places this soul at a specific energetic address in creation. Explain what the Codex Archetype ' + ca + ' means as a living identity \u2014 not a label but a mandate.' + (p.node && p.node.northSign ? (' If it fits naturally, name their North Node in ' + p.node.northSign + ' as the lifelong outward direction the soul is growing toward and their South Node in ' + p.node.southSign + ' as the inward comfort zone they are moving away from \u2014 this is a lifelong developmental axis, not a daily forecast, so treat it as one more coordinate on the same portrait rather than a separate topic.' + (p.node.activePole ? (' Note also that the transiting node is presently moving back through their own natal ' + (p.node.activePole === 'north' ? 'North' : 'South') + ' Node sign right now \u2014 a rare, roughly-eighteen-month activation worth naming explicitly since it does not happen for most people most years.') : '')) : '') + (p.nodeDecanCards ? (' That same Node axis resolves further, via the Golden Dawn decan attributions, to one specific Minor Arcana card apiece: the ' + p.nodeDecanCards.northNodeCard.card + ' (' + p.nodeDecanCards.northNodeCard.decanRuler + ' in ' + p.nodeDecanCards.northNodeCard.decanRulerSign + ') for the North Node \u2014 name this explicitly as the energy ' + p.firstName + ' is growing TOWARD \u2014 and the ' + p.nodeDecanCards.southNodeCard.card + ' (' + p.nodeDecanCards.southNodeCard.decanRuler + ' in ' + p.nodeDecanCards.southNodeCard.decanRulerSign + ') for the South Node \u2014 name this as the shadow/comfort-zone energy ' + p.firstName + ' is moving AWAY from. Frame this as a growth trajectory, not a moral judgment: the South Node card is not "bad," it is simply the familiar gravity the North Node card is inviting ' + p.firstName + ' beyond. Make clear the placement itself is fixed \u2014 it does not change based on ' + p.firstName + '\'s choices \u2014 only how ' + p.firstName + ' works with it, leans into the North Node card or leans back on the South Node card in any given moment, is a matter of choice.') : '') + ' End by naming the specific gift this soul arrived with, and name it as a thread the reading will keep picking back up \u2014 the same gift the reader will recognize again in the Tarot archetype, the shadow work, and the closing blessing.\n'
     + 'Page 2 \u2014 ARCHETYPAL SIGNATURE: Explore the full mythic narrative. ' + tc.card + ' (Path ' + tc.path + ', letter ' + tc.letter + ') is the archetype ' + p.firstName + ' is living' + (p.lifePathTrumpCard ? ', confirmed by the Life Path Trump Card ' + p.lifePathTrumpCard.numeral + ' ' + p.lifePathTrumpCard.card : '') + '. Explain what this card means as a life-force not just a symbol, how the ' + p.sunSign.sign + ' Sun amplifies or challenges this path, and how the Kabbalistic letter ' + tc.letter + ' encodes a specific teaching in their very name. Name the mythic figures, gods, or archetypes associated with this path. Explicitly tie this Tarot archetype back to the Life Path ' + p.lifePath + ' and Codex Archetype ' + ca + ' named on Page 1 — show that the Tarot card is not a second, unrelated topic but the same mandate speaking in a different language, and say so directly. Describe what it feels like to embody ' + tc.card + ' fully vs. when it is suppressed.\n'
@@ -5648,7 +5850,7 @@ async function doReading() {
     + 'Page 4 \u2014 THE FIELD GEOMETRY: ' + p.firstName + '\'s identity is a living Egg of Life \u2014 eight interlocking circles of force. Map which nodes are most activated: ' + p.tree.name + ' (Kabbalah), ' + tc.card + ' (Tarot), ' + p.sunSign.sign + ' (Astrology), Life Path ' + p.lifePath + ' (Numerology), gematria ' + (p.gematria?p.gematria.reduced:'?') + ' (Gematria), and Sacred Geometry as the container. Explain what it means that these systems converge on a single being — specifically call out at least one node where two systems from earlier pages (e.g. the Life Path from Page 1 and the Gematria reduction from Page 3, or the Tarot path from Page 2 and the Sephirah) sit on the same point of the geometry, not adjacent-but-separate points. Describe the energetic field this soul radiates and how others experience it. Name the specific intersection points where power concentrates.\n'
     + 'Page 5 \u2014 SHADOW & GIFT: Be specific and unflinching. The shadow of ' + tc.card + ' for someone with ' + p.sunSign.sign + ' energy is specific \u2014 name it precisely. Describe the exact pattern that repeats when this shadow is unconscious. Then name the exact gift that emerges when it is integrated. Include what the ' + p.tree.name + ' position on the Tree reveals about the specific initiation ' + p.firstName + ' is moving through. This section should feel like someone finally named something the reader has always felt but never had words for.\n'
     + 'Page 6 \u2014 THE HIDDEN ARCHITECTURE: The paths flowing into and out of ' + p.tree.name + ' on the Tree of Life are the hidden curriculum of ' + p.firstName + '\'s spiritual life. Name the specific adjacent Sephiroth and what each corridor of initiation teaches. ' + (p.hiddenMaster ? 'Hidden Master Number ' + p.hiddenMaster + ' layers a second frequency over everything \u2014 explain what this master vibration demands and how it interacts with Life Path ' + p.lifePath + '. ' : '') + (p.nameHiddenMasters && p.nameHiddenMasters.length ? 'A deeper audit of the full birth name also surfaces its own Hidden Master frequencies (' + formatNameHiddenMasters(p.nameHiddenMasters) + ') \u2014 name-field callings distinct from the Life Path itself. ' : '') + 'Discuss the Hebrew letter system encoded in the name and Tarot path.' + (p.hebrewSoulCorrespondence ? ' Weave in the Hebrew Soul Correspondence directly: the birth name transliterated to Hebrew consonants (' + p.hebrewSoulCorrespondence.hebrewConsonants + ') carries a real gematria of ' + p.hebrewSoulCorrespondence.gematriaTotal + (p.hebrewSoulCorrespondence.archangelMatches.length ? ', matching Archangel ' + p.hebrewSoulCorrespondence.archangelMatches[0].name + ' (' + p.hebrewSoulCorrespondence.archangelMatches[0].hebrew + ' = ' + p.hebrewSoulCorrespondence.archangelMatches[0].value + ') — name this connection explicitly, showing the arithmetic.' : ', with no Archangel match at that exact number — state this plainly rather than forcing a connection.') + ' Also name the 72 Names position (' + p.hebrewSoulCorrespondence.nameOf72.position + ': ' + p.hebrewSoulCorrespondence.nameOf72.name + ') as the name\'s corresponding position among the 72 Names.' : '') + ' Explain what the deeper architecture reveals about purpose that the surface numbers only hint at.\n'
-    + 'Page 7 \u2014 TIMING & CYCLES: Personal Year ' + p.personalYear2026 + ' in 2026 has a specific energetic quality \u2014 describe it fully. What is this year asking ' + p.firstName + ' to do, release, begin, or complete? How does Personal Year ' + p.personalYear2026 + ' interact with the Codex Archetype ' + ca + '? Name it as the current chapter of the same Life Path ' + p.lifePath + ' story established on Page 1 — this cycle number is not a new topic, it is that same core number in motion through time.' + (p.personalMonth != null && p.personalDay != null ? (' Then narrow the lens twice more: explain how Personal Month ' + p.personalMonth + ' focuses this year\'s theme onto the present month, and how Personal Day ' + p.personalDay + ' focuses it once more onto today specifically — make explicit that Personal Day, Personal Month, and Personal Year are the same cycle at three nested scales, not three separate topics.') : '') + ' Name the specific opportunities and risks of this cycle. Describe the 9-year cycle this year sits within and where ' + p.firstName + ' is in that larger arc. What decisions made in 2026 will echo for years to come?\n'
+    + 'Page 7 \u2014 TIMING & CYCLES: Personal Year ' + p.personalYear2026 + ' in 2026 has a specific energetic quality \u2014 describe it fully. What is this year asking ' + p.firstName + ' to do, release, begin, or complete? How does Personal Year ' + p.personalYear2026 + ' interact with the Codex Archetype ' + ca + '? Name it as the current chapter of the same Life Path ' + p.lifePath + ' story established on Page 1 — this cycle number is not a new topic, it is that same core number in motion through time.' + (p.personalMonth != null && p.personalDay != null ? (' Then narrow the lens twice more: explain how Personal Month ' + p.personalMonth + ' focuses this year\'s theme onto the present month, and how Personal Day ' + p.personalDay + ' focuses it once more onto today specifically — make explicit that Personal Day, Personal Month, and Personal Year are the same cycle at three nested scales, not three separate topics.') : '') + (pdwFmtPrompt ? (' Close this page by naming the Personal Day Wildcard explicitly: today\'s Personal Day ' + p.personalDay + ' pools toward ' + pdwFmtPrompt.majorPhrase + ', each opening its own pool of Minor Arcana pip cards (' + pdwFmtPrompt.poolSentences + '). Frame this with genuinely invitational language — "worth noticing," "a door that is open today," "one possibility among the pool" — never assignment language like "you are" or "this is your card." Make explicit that this is a live, temporary field of possibility for today only, gone once tomorrow\'s Personal Day rolls the number over, and is a completely separate, later-arriving finding from the fixed, birth-locked ' + tc.card + ' Trump Card named earlier — never conflate the two or imply the wildcard replaces or outranks it.') : '') + ' Name the specific opportunities and risks of this cycle. Describe the 9-year cycle this year sits within and where ' + p.firstName + ' is in that larger arc. What decisions made in 2026 will echo for years to come?\n'
     + 'Page 8 \u2014 RELATIONAL GEOMETRY: Describe the full relational field ' + p.firstName + ' emanates. Life Path ' + p.lifePath + ' creates a specific type of partner dynamic \u2014 explain it in depth. The ' + tc.card + ' archetype shapes how ' + p.firstName + ' shows up in love, what they unconsciously seek, and what they need to feel truly met. Describe the element (' + p.sunSign.element + ') in relationship: what it attracts, what it resists. Name the Life Paths and archetypes most naturally resonant with ' + p.firstName + '. Include what sacred partnership looks like for this Codex Archetype.' + (p.node && p.node.northSign ? (' Their North Node in ' + p.node.northSign + ' also names what kind of partnership stretches them toward growth, versus the South Node in ' + p.node.southSign + ' describing the relational comfort zone that feels safest but can become a rut — name both plainly as a lifelong relational axis, not a prediction.') : '') + '\n'
     + 'Page 9 \u2014 CAREER, PURPOSE & AIN SOPH AUR: What is ' + p.firstName + ' building in this lifetime? Use Expression ' + (p.expression||'?') + ' and Life Path ' + p.lifePath + ' to map the specific domains where this soul is meant to contribute. Name the career fields, creative expressions, leadership roles, or service paths aligned with ' + ca + '.' + (p.soulCard && p.courtCard ? ' Weave in the Metatron\'s Cube reading \u2014 Soul Card ' + p.soulCard.name + ' and Court Card ' + p.courtCard.name + ' \u2014 as the geometry beneath this purpose.' : '') + (p.zodiacalCourtCard ? ' Separately, also name the Zodiacal Court Card (Sun placement) \u2014 the ' + p.zodiacalCourtCard.name + ' \u2014 explicitly as a second, independent Court Card finding reached from ' + p.firstName + '\'s own Sun degree rather than the Sephirah, never implying it replaces or outranks the Metatron\'s Cube Court Card named just above.' : '') + ' Describe the legacy this soul is here to leave. Before the blessing, write one real synthesis paragraph \u2014 not a generic "everything is connected" statement, but naming at least two or three SPECIFIC cross-system pairings from earlier in this reading and stating outright why they are not a coincidence (for example: Life Path ' + p.lifePath + ' and the Trump Card ' + trumpCardName + ' arriving at the same core teaching; the Gematria reduction and the Sephirah ' + p.tree.name + ' pointing at the same address; the Personal Year and the Codex Archetype moving in the same direction). Then close with Celestia\'s full personal blessing to ' + p.firstName + ' invoking AIN SOPH AUR \u2014 warm, specific, and sacred. This closing should feel like a blessing received from the oracle herself, one who has been reading all nine pages as one chart, not nine.';
 
