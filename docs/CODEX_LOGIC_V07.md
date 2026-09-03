@@ -203,4 +203,26 @@ This is, in fact, what every addition in this Codex has already done when it hel
 
 ---
 
+## Part XXIII — The Fixed/Fluid Principle: Why the 22 Majors Are Settled and the 56 Minors Are Not
+
+This Codex spent considerable effort (documented candidly in earlier working sessions, not reproduced here) attempting to place all 56 Minor Arcana cards onto fixed, permanent lines of Metatron's Cube — one universal table, the same for every subject, forever. That attempt was correctly abandoned, and not merely because it turned out to be mathematically impossible (Metatron's Cube is a complete graph with no usable distance metric, and a per-suit local partition produced collisions and shortfalls). It was the wrong thing to attempt in the first place, for a reason worth stating plainly:
+
+**The 22 Major Arcana cards are fixed in this Codex because the thing they trace is fixed.** The Golden Dawn's attribution of the 22 Trumps to the 22 paths of the Tree of Life, one card per path, one path per pair of Hebrew letters, is settled, single-lineage, cited tradition (V06 §14). A subject's Life Path number resolves to exactly one Trump Card (or, for Master Numbers 11/33, a defined dual/bridged resolution) — and that resolution does not change, because the birth data it is computed from does not change.
+
+**The 56 Minor Arcana cards are deliberately NOT fixed in this Codex, and that is a feature, not a limitation.** This matches how the Minor Arcana have been read across the tradition generally: the Majors are widely treated as the fated, archetypal, "big weather" layer of a reading, while the Minors have always been the situational, everyday-choice, currently-in-motion layer — the part of a tarot reading that is expected to look different if you draw again next week, because it is describing present circumstances and available choices, not a fixed destiny. Keeping the Minors fluid in this Codex is therefore not a compromise made to route around an implementation problem — it is the more accurate representation of what the Minor Arcana have always meant.
+
+Concretely, this Codex now expresses that fluidity honestly, through multiple independent and genuinely different Minor Arcana readouts for the same person, each computed from a different real input, deliberately not merged into one fixed table:
+
+- **Soul Card / Court Card** (V06 §14, `soulCardFor`/`courtCardFor`) — computed from a subject's Sephirah placement and elemental suit. Fixed at birth (the Sephirah placement doesn't change), but this was always meant to describe an enduring soul-level orientation, not a day-to-day state — closer in spirit to how a Sun sign is fixed while still describing something alive.
+- **Node Decan Cards** (Part XXI) — the North/South Node's exact zodiacal degree, fixed at birth by the same Node calculation, but explicitly framed (§21.6) as a *growth trajectory the person actively works with*, not a static label — the card is fixed, but which of its two poles a person is presently leaning into is the changeable, chosen part.
+- **Current node polarity** (Part XX §20.4) — the one genuinely date-dependent Minor Arcana-adjacent finding already in this Codex: whether today's transiting Node is actually conjunct a subject's own natal Node, changing (rarely) as the sky actually moves.
+
+None of these four is presented as "the" fixed Minor Arcana answer, because none of them should be. Each is real, computed, and honestly scoped to what it actually measures. A future addition that wants to introduce a *deliberately* dynamic Minor Arcana readout — one that changes with the calendar, the question asked, or a fresh draw — is welcome and consistent with this principle, provided it passes the Part XXII standard (checks out against a real, cross-verified system) rather than being invented outright.
+
+### 23.1 — Applying this to Court Cards specifically: modality as the next verified layer
+
+Cardinal, Fixed, and Mutable modality is already load-bearing elsewhere in this Codex (Part XXI §21.3's Cardinal→2-4/Fixed→5-7/Mutable→8-10 pip-rank rule). Golden Dawn tradition also assigns the four Court Card ranks (King/Knight, Queen, Prince/Knight, Princess/Page, depending on deck) to zodiacal ranges via a real, documented system — but that system is more intricate than a simple per-sign modality lookup: the Golden Dawn Court Card wheel assigns each Court card to a 30°-wide span that **straddles a sign cusp** (the last decan of one sign plus the first two decans of the next), not to a whole sign or a whole modality group at once. Because this is a real but more detailed correspondence than the pip-decan rule, it requires its own dedicated verification pass — cross-checked at least two independent ways, per Part XXII — before being hardcoded, rather than approximated from a simpler modality guess. That verification and implementation is tracked as separate, follow-on work (not included in this Part), specifically so the Part XXII standard is actually applied to it rather than skipped for expediency.
+
+---
+
 *W3BB Worldwide · Codex Logic V07 · Addendum to V06 · All additions are cross-verified against at least one other system already established in this Codex, with the derivation shown — no assertion stands alone.*
