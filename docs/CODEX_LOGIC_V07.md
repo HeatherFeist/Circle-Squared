@@ -384,4 +384,28 @@ Part XXV's entire Step 1 depends on `calcPersonalDay()` existing. That function 
 
 ---
 
+## Part XXVI — Presentation Principle: Mechanics Stay Internal, Meaning Surfaces to the Reader
+
+Every Part above this one exists to make sure a calculation is *real* — traceable to a verified table, cross-checked against an independent source, honest about its own edge cases. None of that changes here. What this Part addresses is a separate question: once a finding is verified, how much of the verification apparatus should the person receiving a reading actually be told?
+
+### 26.1 — The rule
+
+Reader-facing output — `getFallbackReading()`'s returned text, `getPartnershipFallback()`'s returned text, and the prompt instructions in `doReading()`/`doPartnershipReading()` that tell the AI model how to write each page — states the **meaning** of a finding (what it feels like, what it invites, what it means for the person's life) as the priority, and names **which tradition it draws from** in a light, non-technical way (e.g. "in the language of the decans," "through the Golden Dawn's astrological correspondences," "your Sun's placement in the sky also points to..."). It does not narrate the **derivation** — the specific degrees, cusps, planetary rulerships, decan numbers, nested-reduction mechanics, or pool-assembly logic that produced the finding. A reader is told *here is your North Node card and what it means*, not *your North Node falls in the 2nd decan of Scorpio, ruled by the Moon*.
+
+### 26.2 — What this does not relax
+
+This is a front-of-house rule only. It changes zero words in:
+
+- Any calculation function, lookup table, or the data structures they return.
+- Code comments, which continue to document derivation exactly as precisely as Part XXII requires.
+- This document. Every verification table, cross-check, and worked example in Parts I–XXV stands exactly as written, at exactly the same level of rigor, for exactly the same audience — the team maintaining this Codex, not the person receiving a reading.
+
+The calculation must still be real, checkable, and traceable to a verified source. It simply is not recited to the reader as part of their reading. Verifying a finding and narrating its verification to the end user are two different acts, and only the first one is required.
+
+### 26.3 — Practical guidance for future reader-facing copy
+
+When writing or editing anything that reaches `getFallbackReading()`, `getPartnershipFallback()`, or a page instruction inside `doReading()`/`doPartnershipReading()`'s prompt construction, ask: *does this sentence describe what the finding means, or how it was produced?* Sentences describing meaning stay and are the priority. Sentences describing production — degree ranges, cusp-straddling, "resolves further down through," "counted forward year by year," "assembled from six decans because Mars rules six of the thirty-six" — get cut or reduced to at most one light acknowledgment that a system underlies the finding, named but not explained. The specific computed facts (the actual card name, sign, number) always stay; it is the *explanation of how those facts were derived* that moves to code comments and this document, where it belongs.
+
+---
+
 *W3BB Worldwide · Codex Logic V07 · Addendum to V06 · All additions are cross-verified against at least one other system already established in this Codex, with the derivation shown — no assertion stands alone.*
