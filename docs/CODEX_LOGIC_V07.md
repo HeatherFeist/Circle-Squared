@@ -299,6 +299,113 @@ Per Part XXIII, this is the most defensible input available: the person's own **
 
 `getZodiacalCourtCardCoincidence(p1, p2)` reports only a single, plain binary fact — whether both partners' Zodiacal Court Cards are the same card — exactly as the Node Decan Card coincidence check in Part XXI does, and no more elaborate matching logic is introduced. No numeric scoring, no compatibility percentage, no special-destiny claim.
 
+## Part XXV — Personal Day Wildcard: Major Arcana Pool → Planetary/Zodiacal Pip Pool
+
+This Part adds the Personal Day/Personal Month numerology layer (cherry-picked into this branch from [PR #24, "Add Personal Month and Personal Day numerology"](https://github.com/HeatherFeist/Circle-Squared/pull/24) — see the note at the end of this Part on why that dependency is called out explicitly) and, on top of it, a genuinely new finding: for **today's Personal Day specifically**, which Major Arcana card(s) resonate, and which pool of Minor Arcana pip cards each one wildcards toward through its own Golden Dawn planetary or zodiacal ruler.
+
+### 25.1 — Why this is not a second Life Path Trump Card
+
+Section 5.5 (`primaryPathForLP`) already gives every Life Path a single, fixed Trump Card, locked at birth and never moving. A Personal Day is the opposite kind of number: it cycles every few weeks and repeats throughout a lifetime with no birth-chart permanence at all. Handing it a single fixed card the same way would misrepresent what a Personal Day is. Instead, Part XXV pools **every** Major Arcana whose own Tree-of-Life path number resonates with today's digit, and frames the result explicitly as an **invitation, not an assignment** — a live field of possibility for today, never a verdict. This follows the Part XXIII fixed/fluid principle precisely: the 22 Majors and the underlying path-number table are fixed and real; what changes daily is only which of the fixed candidates today's number happens to point toward.
+
+### 25.2 — Step 1: digit → candidate Major(s), verified against the real `PATH_TABLE`
+
+No new path-numbering table was created. `PATH_TABLE` (Section 5, already in force since V06) assigns each of the 22 Majors a path number 11–32. For an ordinary Personal Day digit (1–9), Part XXV pools every path whose own path number **fully reduces** (ordinary digit-sum, no Master Number stop) to that digit. Applying this rule to the real table data produces:
+
+| Personal Day | Candidate Major(s) | Path numbers (reduction shown) |
+|---|---|---|
+| 1 | Strength, The Star | 19 (1+9=10→1), 28 (2+8=10→1) |
+| 2 | The Fool, The Hermit, The Moon | 11 (1+1=2), 20 (2+0=2), 29 (2+9=11→1+1=2) |
+| 3 | The Magician, Wheel of Fortune, The Sun | 12, 21, 30 |
+| 4 | The High Priestess, Justice, Judgement | 13, 22 (2+2=4), 31 (3+1=4) |
+| 5 | The Empress, The Hanged Man, The World | 14, 23, 32 |
+| 6 | The Emperor, Death | 15, 24 |
+| 7 | The Hierophant, Temperance | 16, 25 |
+| 8 | The Lovers, The Devil | 17, 26 |
+| 9 | **The Chariot, The Tower** | 18 (1+8=9), 27 (2+7=9) |
+
+Verified standalone this session: `9 → [The Chariot, The Tower]` exactly, matching the sanity check run before any of this was wired into the app.
+
+**Master Personal Days (11, 22) are deliberately NOT run through the same full-reduction rule** — and this is the one place this Part had to correct its own first instinct. Reusing the codebase's own Master-Number-preserving `digitSum()` (the function every other Master Number check in this Codex already uses) looked like the obvious reuse, but it silently breaks the "no ambiguity" guarantee a Master Number is supposed to carry: `digitSum(29)` returns `11` (2+9=11, and `digitSum` stops reducing at 11), which would put The Moon (path 29) in the *same* Master-11 bucket as the intended exact match. Instead, Master Personal Days look up their path by **exact path number**: PATH_TABLE happens to carry a path numbered exactly 11 (The Fool) and a path numbered exactly 22 (Justice), so:
+
+- **Personal Day 11 → The Fool, exactly one path, no ambiguity.**
+- **Personal Day 22 → Justice, exactly one path, no ambiguity.**
+
+Both verified standalone before committing.
+
+### 25.3 — Step 2: Golden Dawn Hebrew-letter-type attribution per Major
+
+Each of the 22 Majors carries one of the Golden Dawn's three Hebrew letter types, cross-checked this session via WebSearch against multiple independent sources (Mary K. Greer's Tarot Blog; davidcunliffe.com's "Tarot Astrological Correspondences of the Hermetic Order of the Golden Dawn"; Tarot Elements' "Hebrew for Tarot Readers" series; Gates of Light Tarot's "Major Arcana Midrash" on Mem/Hanged Man; Joy Vernon Astrology/Tarot) — the standard Rider-Waite-Smith/Golden Dawn lineage this Codex already commits to (Part XXI §21.1), not Crowley/Thoth's reordering of The Emperor and The Star:
+
+| Type | Count | Majors | Astrological ruler |
+|---|---|---|---|
+| Mother letters | 3 | The Fool, The Hanged Man, Judgement | **Element**: Air, Water, Fire |
+| Double letters | 7 | The Magician, The High Priestess, The Empress, Wheel of Fortune, The Tower, The Sun, The World | **Planet**: Mercury, Moon, Venus, Jupiter, Mars, Sun, Saturn |
+| Simple letters | 12 | Emperor, Hierophant, Lovers, Chariot, Strength, Hermit, Justice, Death, Temperance, Devil, Star, Moon | **Zodiac sign**: Aries → Pisces, in order |
+
+The 12 Simple-letter attributions match this codebase's own `CARD_TO_SIGN` table (used for the unrelated Personal Tone/musical-note feature) card-for-card — an independent structural confirmation that these are the same 12 well-established Golden Dawn attributions, not a second, drifting table.
+
+### 25.4 — Step 3: pip-card pool per candidate Major, sized honestly by letter type
+
+Rather than hand-typing a second planet/sign → card table, `getPipPoolForMajor()` walks the **same real 36-decan table already verified in Part XXI** (`DECAN_CHALDEAN_CYCLE`, `DECAN_SIGN_SUIT`, `DECAN_SIGN_RANKS`). The three letter types produce genuinely different pool sizes, and this Part reports that honestly rather than smoothing it over to a uniform count:
+
+- **Element-ruled Major (3 of the 22)** — an element rules an entire suit, not one decan, so its pool is the **entire suit, all 9 pip ranks (2–10)**. This is deliberately the largest pool and is named as such in reading copy, not disguised as equal-sized to the other two categories.
+- **Planet-ruled Major (7 of the 22)** — every decan across the 36-decan wheel ruled by that planet. Since 36 does not divide evenly by 7, **Mars alone gets 6 decans; the other 6 planets get 5 each** — verified standalone this session by counting every planet's occurrences across all 36 decans (Mars: 6; Saturn, Jupiter, Sun, Venus, Mercury, Moon: 5 each).
+- **Sign-ruled Major (12 of the 22)** — exactly the 3 pip cards belonging to that one sign's own 3 decans.
+
+**Standalone verification — The Tower (Mars) pip pool, cross-checked against Part XXI's own documented 36-entry table:**
+
+| Sign / decan | Card |
+|---|---|
+| Aries, 1st | Two of Wands |
+| Gemini, 2nd | Nine of Swords |
+| Leo, 3rd | Seven of Wands |
+| Scorpio, 1st | Five of Cups |
+| Capricorn, 2nd | Three of Pentacles |
+| Pisces, 3rd | Ten of Cups |
+
+All six match Part XXI §21.3's own cited table exactly (`Aries: 1 Mars->2 Wands`, `Scorpio: 1 Mars->5 Cups`, etc.) — the pool was generated from the same table, not re-derived by hand, so this is a structural consistency check rather than a second independent source.
+
+### 25.5 — Full worked example: Personal Day 9
+
+Personal Day 9 pools two Majors — The Chariot (Cheth, sign-ruled by Cancer, a 3-card pool: Two/Three/Four of Cups) and The Tower (Peh, planet-ruled by Mars, the 6-card pool above). The reading names both candidates and both pools, framed as: *"today wildcards toward The Chariot and The Tower... neither is a forced choice between them, but a field of live possibility."*
+
+### 25.6 — Product wiring: narrative-only, solo readings only
+
+`getPersonalDayWildcard(personalDayDigit)` is computed alongside `calcPersonalDay()` in both solo profile builders (admin PDF generator and the main hook flow) under the field name `personalDayWildcard`, and a shared formatting helper (`formatPersonalDayWildcard()`) renders it consistently in two places:
+
+- **`getFallbackReading()`**, Page 7 — an added paragraph naming the candidate Major(s) and their pip pools in explicitly invitational language ("worth naming as an invitation rather than a verdict," "a field of live possibility"), never assignment language.
+- **`doReading()`'s AI prompt** (solo only) — a new `Personal Day Wildcard` profile line, plus an added instruction on the Page 7 spec directing Celestia to close that page by naming the wildcard explicitly, with invitational phrasing required ("worth noticing," "a door that is open today") and assignment phrasing ("you are," "this is your card") explicitly forbidden, and an explicit instruction never to conflate this with, or imply it outranks, the fixed Life Path Trump Card.
+
+**No changes were made to `computePartnerProfile()` or the partnership AI prompt.** Partnership profiles do not currently carry a per-partner Personal Day at all (Personal Month/Day was scoped to solo readings only when it was added — see the dependency note below), so there is nothing for Part XXV to wire into on the partnership side without first extending that separate, out-of-scope piece of work. No new interactive UI was added; this is narrative reading content only, matching how every other Part of V07 has been delivered.
+
+### 25.7 — Dependency note: this Part relies on Personal Month/Day, cherry-picked from PR #24
+
+Part XXV's entire Step 1 depends on `calcPersonalDay()` existing. That function was not yet present on this branch's own ancestry (`claude/court-card-zodiac-wheel` → the Part XX–XXIV decan/court-card work) — it was built on a sibling branch, [PR #24](https://github.com/HeatherFeist/Circle-Squared/pull/24) ("Add Personal Month and Personal Day numerology"), off a different base. Commit `c3e29d4` from that PR was cherry-picked onto this branch to unblock Part XXV; the one resulting merge conflict (Page 7 of the AI prompt, touched by both this branch's Part XXIV zodiacal-court-card line and PR #24's Personal Month/Day narration) was resolved by hand, keeping both branches' additions rather than dropping either side. **This is a stacked-PR sequencing matter for a human to resolve when merging**, not a content conflict: if PR #24 lands in the base chain before this PR, its commit will already be present and this PR's diff should show no changes to the Personal Month/Day code itself, only the new Part XXV additions on top of it; if this PR merges first, PR #24's diff against the then-current base will already be satisfied and should show no changes either. Either way, the same `c3e29d4` content should not need to land twice.
+
+---
+
+## Part XXVI — Presentation Principle: Mechanics Stay Internal, Meaning Surfaces to the Reader
+
+Every Part above this one exists to make sure a calculation is *real* — traceable to a verified table, cross-checked against an independent source, honest about its own edge cases. None of that changes here. What this Part addresses is a separate question: once a finding is verified, how much of the verification apparatus should the person receiving a reading actually be told?
+
+### 26.1 — The rule
+
+Reader-facing output — `getFallbackReading()`'s returned text, `getPartnershipFallback()`'s returned text, and the prompt instructions in `doReading()`/`doPartnershipReading()` that tell the AI model how to write each page — states the **meaning** of a finding (what it feels like, what it invites, what it means for the person's life) as the priority, and names **which tradition it draws from** in a light, non-technical way (e.g. "in the language of the decans," "through the Golden Dawn's astrological correspondences," "your Sun's placement in the sky also points to..."). It does not narrate the **derivation** — the specific degrees, cusps, planetary rulerships, decan numbers, nested-reduction mechanics, or pool-assembly logic that produced the finding. A reader is told *here is your North Node card and what it means*, not *your North Node falls in the 2nd decan of Scorpio, ruled by the Moon*.
+
+### 26.2 — What this does not relax
+
+This is a front-of-house rule only. It changes zero words in:
+
+- Any calculation function, lookup table, or the data structures they return.
+- Code comments, which continue to document derivation exactly as precisely as Part XXII requires.
+- This document. Every verification table, cross-check, and worked example in Parts I–XXV stands exactly as written, at exactly the same level of rigor, for exactly the same audience — the team maintaining this Codex, not the person receiving a reading.
+
+The calculation must still be real, checkable, and traceable to a verified source. It simply is not recited to the reader as part of their reading. Verifying a finding and narrating its verification to the end user are two different acts, and only the first one is required.
+
+### 26.3 — Practical guidance for future reader-facing copy
+
+When writing or editing anything that reaches `getFallbackReading()`, `getPartnershipFallback()`, or a page instruction inside `doReading()`/`doPartnershipReading()`'s prompt construction, ask: *does this sentence describe what the finding means, or how it was produced?* Sentences describing meaning stay and are the priority. Sentences describing production — degree ranges, cusp-straddling, "resolves further down through," "counted forward year by year," "assembled from six decans because Mars rules six of the thirty-six" — get cut or reduced to at most one light acknowledgment that a system underlies the finding, named but not explained. The specific computed facts (the actual card name, sign, number) always stay; it is the *explanation of how those facts were derived* that moves to code comments and this document, where it belongs.
+
 ---
 
 *W3BB Worldwide · Codex Logic V07 · Addendum to V06 · All additions are cross-verified against at least one other system already established in this Codex, with the derivation shown — no assertion stands alone.*
