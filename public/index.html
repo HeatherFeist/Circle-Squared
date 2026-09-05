@@ -425,7 +425,7 @@ body {
       <p class="mb-4" style="color:var(--text-muted); font-size:0.72rem; opacity:0.75;">Your Ascendant (Rising Sign) needs an exact time and place. Your Moon sign only needs a place — we can still estimate it from a noon default if you check this box. Skip either and your reading proceeds normally without them.</p>
 
       <button data-id="34" id="hook-btn" class="cta-btn w-full mt-5" style="font-size:1.05rem;">✦ Reveal My Blueprint</button>
-      <p data-id="35" class="text-center mt-3" style="color:var(--text-muted); font-size:0.72rem; opacity:0.7;">🔒 Your information is never stored or shared.</p>
+      <p data-id="35" class="text-center mt-3" style="color:var(--text-muted); font-size:0.72rem; opacity:0.7;">🔒 Your information is never sent anywhere or shared — it's remembered only in this browser so you don't have to retype it. <a href="#" data-cs-clear-saved="hook" style="color:var(--text-muted);text-decoration:underline;opacity:0.85;">Clear saved info</a></p>
     </div>
   </div>
 </div>
@@ -839,6 +839,7 @@ body {
       </div>
       <button id="admin-pdf-btn" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.6rem 1.4rem;background:linear-gradient(135deg,#c9a84c,#f0d070);color:#0a0015;font-weight:700;font-size:0.85rem;border:none;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;">✦ Generate &amp; Download PDF</button>
       <div id="admin-pdf-status" style="font-size:0.75rem;color:#5a4a7a;min-height:1.2em;margin-top:0.5rem;"></div>
+      <p style="font-size:0.68rem;color:#5a4a7a;margin-top:0.4rem;">This form remembers what you typed (this browser only) so you don't have to retype it next time. <a href="#" data-cs-clear-saved="admin-solo" style="color:#5a4a7a;text-decoration:underline;">Clear saved info</a></p>
     </div>
 
     <!-- ===== PARTNERSHIP PDF GENERATOR ===== -->
@@ -917,6 +918,7 @@ body {
 
       <button id="partner-generate-btn" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.6rem 1.4rem;background:linear-gradient(135deg,#ff9ed2,#ff6ab4);color:#0a0015;font-weight:700;font-size:0.82rem;border:none;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;width:100%;justify-content:center;">💞 Generate Partnership Reading</button>
       <div id="partner-status" style="font-size:0.75rem;color:#ff9ed2;min-height:1.5em;margin-top:0.5rem;text-align:center;"></div>
+      <p style="font-size:0.68rem;color:#8a7aaa;text-align:center;margin-top:-0.4rem;margin-bottom:0.5rem;">This form remembers what you typed (this browser only). <a href="#" data-cs-clear-saved="admin-partner" style="color:#8a7aaa;text-decoration:underline;">Clear saved info</a></p>
       <button id="partner-pdf-btn" style="display:none;margin-top:0.5rem;padding:0.6rem 1.4rem;background:linear-gradient(135deg,#c9a84c,#f0d070);color:#0a0015;font-weight:700;font-size:0.82rem;border:none;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;width:100%;">📄 Download Partnership PDF</button>
       <button id="partner-listen-btn" style="display:none;margin-top:0.5rem;padding:0.6rem 1.4rem;background:linear-gradient(135deg,rgba(255,158,210,0.15),rgba(176,138,255,0.15));border:1px solid rgba(255,158,210,0.35);color:#ff9ed2;font-weight:700;font-size:0.82rem;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;width:100%;">&#x1F50A; Listen to Partnership Reading</button>
       <div id="partner-narration-progress" style="display:none;margin-top:0.7rem;padding:0.8rem 1rem;background:rgba(8,4,35,0.85);border:1px solid rgba(255,158,210,0.22);border-radius:10px;text-align:center;">
@@ -2455,6 +2457,131 @@ function courtCardFor(soulSephId, suit){
     }
   });
 })();
+
+// ===========================
+// FORM INPUT PERSISTENCE (birth-data / name / email autofill)
+// ===========================
+// The reading-intake forms are highly custom JS-driven widgets, not plain
+// native <form>s with name/autocomplete attributes the browser can reliably
+// remember — so ordinary browser autofill doesn't kick in here. This gives
+// the project owner the same "it remembers what I typed" experience, but
+// implemented ourselves via localStorage, entirely client-side.
+//
+// One shared helper, since the public solo hook form, the admin solo PDF
+// form, and the two halves of the admin partnership form are all the same
+// shape underneath (plain text inputs, plain selects, and — on every one of
+// them — an "I don't know my exact birth time" checkbox that gates a
+// birth-time row): each form gets its own single JSON blob in localStorage
+// (never scattered per-field keys), each field is saved on realistic user
+// interaction (input/change — never merely on load, which would just
+// re-save nothing), and saved values are restored once at page load, only
+// for field ids that actually have a stored value — so a field nobody ever
+// saved is left at its normal default, and (since this only ever runs once,
+// synchronously, before the user can have typed anything) a field the user
+// is mid-interaction with is never at risk of being clobbered.
+//
+// Mirrors the try{...}catch(e){} defensive style already used for
+// localStorage elsewhere in this file (see logPurchase below) so a browser
+// that blocks localStorage (private browsing, etc.) just runs the form
+// normally with no persistence, never a broken page.
+function csSetupFormPersistence(storageKey, fieldIds, checkboxIds) {
+  checkboxIds = checkboxIds || [];
+  var saved = {};
+  try { saved = JSON.parse(localStorage.getItem(storageKey) || '{}') || {}; } catch(e) { saved = {}; }
+
+  function save() {
+    try {
+      var data = {};
+      fieldIds.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) data[id] = el.value;
+      });
+      checkboxIds.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) data[id] = el.checked;
+      });
+      localStorage.setItem(storageKey, JSON.stringify(data));
+    } catch(e) {}
+  }
+
+  function restore() {
+    try {
+      fieldIds.forEach(function(id) {
+        if (!(id in saved)) return;
+        var el = document.getElementById(id);
+        if (el) el.value = saved[id];
+      });
+      checkboxIds.forEach(function(id) {
+        if (!(id in saved)) return;
+        var el = document.getElementById(id);
+        if (el) {
+          el.checked = !!saved[id];
+          // Re-fire the same 'change' handling the checkbox already wires
+          // up manually (disabling/dimming the birth-time row), so a
+          // restored "I don't know my time" checkbox gates the time
+          // selects exactly as if the user had just clicked it.
+          el.dispatchEvent(new Event('change'));
+        }
+      });
+    } catch(e) {}
+  }
+
+  function clearSaved() {
+    try { localStorage.removeItem(storageKey); } catch(e) {}
+    saved = {};
+    fieldIds.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    checkboxIds.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) { el.checked = false; el.dispatchEvent(new Event('change')); }
+    });
+  }
+
+  try {
+    fieldIds.concat(checkboxIds).forEach(function(id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      var evt = (el.tagName === 'SELECT' || el.type === 'checkbox') ? 'change' : 'input';
+      el.addEventListener(evt, save);
+    });
+  } catch(e) {}
+
+  restore();
+  return { save: save, restore: restore, clear: clearSaved };
+}
+
+// Public-facing solo reading intake ("hook") form, plus the email-gate's
+// email field (typed manually further along the same flow, same reading).
+var csHookFormPersistence = csSetupFormPersistence('cs_saved_form_input', [
+  'hook-fullname', 'hook-usedname', 'hook-month', 'hook-day', 'hook-year',
+  'hook-time-hour', 'hook-time-minute', 'hook-time-ampm', 'hook-birthplace', 'gate-email'
+], ['hook-no-birthtime']);
+
+// Admin panel — "Generate Any Reading PDF" solo customer form.
+var csAdminSoloFormPersistence = csSetupFormPersistence('cs_saved_admin_solo_form', [
+  'admin-pdf-name', 'admin-pdf-month', 'admin-pdf-day', 'admin-pdf-year',
+  'admin-pdf-time-hour', 'admin-pdf-time-minute', 'admin-pdf-time-ampm', 'admin-pdf-birthplace'
+], ['admin-pdf-no-birthtime']);
+
+// Admin panel — Partnership PDF generator, both souls' fields in one blob.
+var csAdminPartnerFormPersistence = csSetupFormPersistence('cs_saved_admin_partner_form', [
+  'p1-name', 'p1-month', 'p1-day', 'p1-year', 'p1-time-hour', 'p1-time-minute', 'p1-time-ampm', 'p1-birthplace',
+  'p2-name', 'p2-month', 'p2-day', 'p2-year', 'p2-time-hour', 'p2-time-minute', 'p2-time-ampm', 'p2-birthplace'
+], ['p1-no-birthtime', 'p2-no-birthtime']);
+
+// Small "Clear saved info" links (see markup near each form) all delegate
+// through one click listener rather than three near-identical ones.
+document.addEventListener('click', function(e) {
+  var target = e.target.closest ? e.target.closest('[data-cs-clear-saved]') : null;
+  if (!target) return;
+  e.preventDefault();
+  var which = target.getAttribute('data-cs-clear-saved');
+  if (which === 'hook') csHookFormPersistence.clear();
+  else if (which === 'admin-solo') csAdminSoloFormPersistence.clear();
+  else if (which === 'admin-partner') csAdminPartnerFormPersistence.clear();
+});
 
 // ===========================
 // OWNER EMAIL & PURCHASE LOGGING
@@ -7141,16 +7268,20 @@ function _openPDF(doc, filename) {
 
 // ===========================
 // PERSONAL TONE — Web Audio playback engine
-// Sustained ambient pad (chord) + a slow melody sequence + a numerology-
-// driven rhythm + a generated short reverb, all synthesized client-side
-// via the Web Audio API. No external audio files, no external API/backend.
-// Loops indefinitely until Stop is pressed; Stop actually cancels every
-// scheduled oscillator/gain ramp, not just the UI state.
+// Sustained choir-like pad (chord) + a harp-like plucked melody sequence +
+// a numerology-driven rhythm + a generated short reverb, all synthesized
+// client-side via the Web Audio API. No external audio files, no external
+// API/backend, no library — every timbre below (detuned-oscillator +
+// formant-filter choir voices, Karplus-Strong plucked strings) is built
+// from raw AudioContext nodes. Loops indefinitely until Stop is pressed;
+// Stop actually cancels/disconnects every node in play — oscillators,
+// vibrato LFOs, formant filters and the pluck's ScriptProcessorNode alike —
+// not just the UI state.
 // ===========================
 var PersonalTone = (function() {
   var ctx = null;
   var masterGain = null, dryGain = null, reverbGain = null, convolver = null;
-  var activeNodes = [];   // every live {osc,gain} pair, for a hard stop
+  var activeNodes = [];   // every live voice ({gain, oscillators?, processors?, disconnectables}), for a hard stop
   var playToken = 0;      // bumped on stop/replay so old scheduleLoop() recursion halts
   var playing = false;
 
@@ -7197,55 +7328,179 @@ var PersonalTone = (function() {
     gainNode.connect(convolver);
   }
 
-  // A soft, sustained pad tone (sine wave) with a slow linear attack —
-  // never a hard gain step, so it never clicks/pops.
+  // A choir-like sustained pad: 3 oscillators per note, each a few cents
+  // apart in tune (the same physical fact that makes several real singers
+  // holding a unison sound like "a choir" rather than one flat tone),
+  // each with its own slow subtle vibrato LFO (real sustained voices are
+  // never perfectly steady in pitch — without it a held tone reads as
+  // mechanical), summed and passed through two bandpass filters tuned to
+  // rough first/second formants of an "ah" vowel (~750Hz / ~1150Hz,
+  // standard values for that vowel in vocal-acoustics references) so the
+  // result reads as voice-like rather than a generic synth pad. Same slow
+  // linear attack as before — never a hard gain step, so it never
+  // clicks/pops.
   function startSustainedTone(freq, atSecOffset, level) {
-    var osc = ctx.createOscillator();
-    osc.type = 'sine';
-    osc.frequency.value = freq;
-    var gain = ctx.createGain();
     var startAt = ctx.currentTime + atSecOffset;
+    var detuneCents = [-6, 0, 6]; // "several real voices", never perfectly in tune with each other
+    var oscillators = [];
+    var lfos = [];
+
+    // Sums the unison layers before the formant filters shape the vowel.
+    var mix = ctx.createGain();
+    mix.gain.value = 1 / detuneCents.length;
+
+    detuneCents.forEach(function(cents) {
+      var osc = ctx.createOscillator();
+      osc.type = 'sawtooth'; // harmonically rich source for the formant filters to carve a vowel out of
+      osc.frequency.value = freq;
+      osc.detune.value = cents;
+
+      var lfo = ctx.createOscillator();
+      lfo.type = 'sine';
+      lfo.frequency.value = 5.4 + Math.random() * 0.8; // ~5-6Hz vibrato, slightly different per layer
+      var lfoDepth = ctx.createGain();
+      lfoDepth.gain.value = 4; // +/- a few cents of pitch wobble — subtle, not a wide vibrato
+      lfo.connect(lfoDepth);
+      lfoDepth.connect(osc.detune);
+      lfo.start(startAt);
+
+      osc.connect(mix);
+      osc.start(startAt);
+      oscillators.push(osc);
+      lfos.push(lfo);
+    });
+
+    // Two parallel bandpass "formants" — moderate Q so this stays a warm
+    // vowel color rather than a honky, screamingly resonant filter sweep.
+    var formant1 = ctx.createBiquadFilter();
+    formant1.type = 'bandpass';
+    formant1.frequency.value = 750; // F1 for an "ah" vowel
+    formant1.Q.value = 4;
+    var formant2 = ctx.createBiquadFilter();
+    formant2.type = 'bandpass';
+    formant2.frequency.value = 1150; // F2 for an "ah" vowel
+    formant2.Q.value = 3;
+    mix.connect(formant1);
+    mix.connect(formant2);
+
+    var gain = ctx.createGain();
     gain.gain.setValueAtTime(0, startAt);
     gain.gain.linearRampToValueAtTime(level, startAt + 3.5);
-    osc.connect(gain);
+    formant1.connect(gain);
+    formant2.connect(gain);
     connectVoice(gain);
-    osc.start(startAt);
-    var voice = { osc: osc, gain: gain };
+
+    // `gain` stays the single node the chord-pulse loop below ramps
+    // directly (same contract as before); everything else is tracked here
+    // purely so stop()/clearActiveNodes() can silence and disconnect the
+    // whole choir voice, not just its final gain stage.
+    var voice = {
+      gain: gain,
+      oscillators: oscillators.concat(lfos),
+      disconnectables: oscillators.concat(lfos, [mix, formant1, formant2, gain])
+    };
     activeNodes.push(voice);
     return voice;
   }
 
-  // A short, soft melody note (triangle wave — gentler than square/sawtooth)
-  // with its own attack/release envelope, scheduled at a future offset.
+  // A harp-like plucked string via Karplus-Strong synthesis: fill a short
+  // ring buffer exactly one pitch-period long with noise (the "pluck"),
+  // then repeatedly output the oldest sample while replacing it with the
+  // decayed average of itself and its neighbor — the classic Karplus-Strong
+  // feedback loop, which produces the bright-attack / smoothly-darkening
+  // decay of a real plucked string for free, with no separate filter
+  // envelope needed. This runs on a ScriptProcessorNode rather than an
+  // AudioWorklet: this feature is a single inline <script> with no build
+  // step or ES-module loading, so there is no separate file to hand
+  // audioWorklet.addModule() (a Blob-URL worklet is possible but adds a
+  // second async-loading path and a real risk of first-note silence while
+  // it resolves); ScriptProcessorNode is deprecated but still universally
+  // supported and lets the per-sample feedback loop live inline like
+  // everything else here. See PR notes for the tradeoffs.
   function scheduleMelodyNote(freq, atSecOffset, durationSec, level) {
-    var osc = ctx.createOscillator();
-    osc.type = 'triangle';
-    osc.frequency.value = freq;
-    var gain = ctx.createGain();
     var startAt = ctx.currentTime + atSecOffset;
-    var attack = Math.min(0.6, durationSec * 0.3);
-    var release = Math.min(0.9, durationSec * 0.4);
+    var period = Math.max(2, Math.round(ctx.sampleRate / freq));
+    var ring = new Float32Array(period);
+    for (var i = 0; i < period; i++) ring[i] = Math.random() * 2 - 1; // the pluck: a noise burst at the string's pitch period
+    var ringIdx = 0;
+
+    // A real harp note rings out well past its beat slot, so let the decay
+    // run long instead of hard-cutting at durationSec. How many feedback
+    // passes fit in that time depends on the period (higher notes have a
+    // shorter period, so need a lower per-pass decay factor to die out in
+    // the same wall-clock time as a low note).
+    var ringSeconds = Math.max(1.2, durationSec * 1.8);
+    var totalSamples = Math.round(ctx.sampleRate * ringSeconds);
+    var passes = Math.max(1, totalSamples / period);
+    var decay = Math.min(0.9995, Math.max(0.9, Math.pow(0.0008, 1 / passes)));
+    var samplesLeft = totalSamples;
+
+    var processor = ctx.createScriptProcessor(1024, 1, 1);
+    processor.onaudioprocess = function(e) {
+      var out = e.outputBuffer.getChannelData(0);
+      for (var n = 0; n < out.length; n++) {
+        if (samplesLeft <= 0) { out[n] = 0; continue; }
+        var current = ring[ringIdx];
+        var next = ring[(ringIdx + 1) % period];
+        ring[ringIdx] = decay * 0.5 * (current + next); // Karplus-Strong: 2-tap average + decay feedback
+        out[n] = current;
+        ringIdx = (ringIdx + 1) % period;
+        samplesLeft--;
+      }
+    };
+
+    var gain = ctx.createGain();
+    var attack = Math.min(0.008, durationSec * 0.1); // a few ms — just enough to avoid a click at pluck onset
     gain.gain.setValueAtTime(0, startAt);
     gain.gain.linearRampToValueAtTime(level, startAt + attack);
-    gain.gain.setValueAtTime(level, startAt + Math.max(attack, durationSec - release));
-    gain.gain.linearRampToValueAtTime(0.0001, startAt + durationSec);
-    osc.connect(gain);
+    // A safety fade at the very end of the ring window, well after the
+    // string's own Karplus-Strong decay has already died away — insurance
+    // against a click on disconnect, not a second envelope fighting the
+    // string's natural decay.
+    gain.gain.setValueAtTime(level, startAt + Math.max(attack, ringSeconds - 0.05));
+    gain.gain.linearRampToValueAtTime(0.0001, startAt + ringSeconds);
+
+    processor.connect(gain);
     connectVoice(gain);
-    osc.start(startAt);
-    osc.stop(startAt + durationSec + 0.05);
-    activeNodes.push({ osc: osc, gain: gain });
+
+    var voice = { gain: gain, processors: [processor], disconnectables: [processor, gain] };
+    activeNodes.push(voice);
+
+    // ScriptProcessorNode has no "stop()" of its own; disconnect it once
+    // the string has rung out so it isn't left running (and referenced in
+    // activeNodes) for the rest of an indefinitely-looping playback
+    // session. A later hard stop() just does this same cleanup early via
+    // clearActiveNodes() below, so this timeout finding the voice already
+    // gone is expected and harmless.
+    setTimeout(function() {
+      try { processor.onaudioprocess = null; } catch (e) { /* already torn down */ }
+      try { processor.disconnect(); } catch (e) { /* already torn down */ }
+      try { gain.disconnect(); } catch (e) { /* already torn down */ }
+      var idx = activeNodes.indexOf(voice);
+      if (idx !== -1) activeNodes.splice(idx, 1);
+    }, Math.max(50, (atSecOffset + ringSeconds) * 1000));
   }
 
+  // Hard-stops and disconnects every live node from every voice shape
+  // above — the choir pad's oscillator/LFO stack and formant filters, and
+  // the harp pluck's ScriptProcessorNode — not just each voice's final
+  // gain stage.
   function clearActiveNodes() {
     var now = ctx ? ctx.currentTime : 0;
     activeNodes.forEach(function(n) {
       try {
         n.gain.gain.cancelScheduledValues(now);
         n.gain.gain.setValueAtTime(0.0001, now);
-        n.osc.stop(now + 0.05);
-        n.osc.disconnect();
-        n.gain.disconnect();
       } catch (e) { /* already stopped — fine */ }
+      (n.oscillators || []).forEach(function(o) {
+        try { o.stop(now + 0.05); } catch (e) { /* already stopped — fine */ }
+      });
+      (n.processors || []).forEach(function(p) {
+        try { p.onaudioprocess = null; } catch (e) { /* already torn down */ }
+      });
+      (n.disconnectables || []).forEach(function(node) {
+        try { node.disconnect(); } catch (e) { /* already disconnected — fine */ }
+      });
     });
     activeNodes = [];
   }
