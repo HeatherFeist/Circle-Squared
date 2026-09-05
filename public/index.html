@@ -707,9 +707,9 @@ body {
 
     <!-- ===== AZURE AI SPEECH VOICE SETTINGS ===== -->
     <div data-id="266" style="margin-top:2rem;border-top:1px solid rgba(176,138,255,0.15);padding-top:1.5rem;">
-      <div data-id="267" style="font-family:'Courier New',monospace;font-size:0.62rem;letter-spacing:0.4em;color:#c9a84c;margin-bottom:0.3rem;">🎙️ VOICE SETTINGS (AZURE AI SPEECH)</div>
-      <div data-id="268" style="font:700 1.1rem Georgia,serif;color:#e8e0ff;margin-bottom:0.6rem;">Voice Settings (Azure AI Speech)</div>
-      <p data-id="269" style="font-size:0.8rem;color:#8a7aaa;line-height:1.6;margin-bottom:1rem;">Enter your Azure Cognitive Services Speech key and region below. Both are required. Stored only in your browser's local storage — never in any file or server.</p>
+      <div data-id="267" style="font-family:'Courier New',monospace;font-size:0.62rem;letter-spacing:0.4em;color:#c9a84c;margin-bottom:0.3rem;">🎙️ VOICE SETTINGS (OPTIONAL: AZURE AI SPEECH UPGRADE)</div>
+      <div data-id="268" style="font:700 1.1rem Georgia,serif;color:#e8e0ff;margin-bottom:0.6rem;">Voice Settings — Optional Azure AI Speech Upgrade</div>
+      <p data-id="269" style="font-size:0.8rem;color:#8a7aaa;line-height:1.6;margin-bottom:1rem;">By default the reading is narrated for free using the voice already built into your browser (preferring an "Aria" voice when one is available). Entering an Azure Cognitive Services Speech key and region below is entirely optional — it upgrades narration to a paid Azure neural voice instead. Both fields are required only if you want to use this upgrade. Stored only in your browser's local storage — never in any file or server.</p>
 
       <div data-id="270" style="margin-bottom:0.8rem;">
         <label data-id="271" style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#c9a84c;display:block;margin-bottom:0.4rem;">API KEY</label>
@@ -751,7 +751,7 @@ body {
       <!-- Free Intro Voice — separate voice for the free reveal-screen narration, same Azure account/key/region -->
       <div data-id="284" style="margin-top:1.4rem;padding-top:1.2rem;border-top:1px dashed rgba(176,138,255,0.15);">
         <div data-id="285" style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#c9a84c;display:block;margin-bottom:0.4rem;">FREE INTRO VOICE</div>
-        <p data-id="286" style="font-size:0.78rem;color:#8a7aaa;line-height:1.6;margin-bottom:0.6rem;">Optional — a distinct voice that narrates the free blueprint reveal (before the paywall). Uses the same API key and region above. Leave unset to fall back to the paid narration voice.</p>
+        <p data-id="286" style="font-size:0.78rem;color:#8a7aaa;line-height:1.6;margin-bottom:0.6rem;">Optional — only applies if you've saved an Azure key and region above. Picks a distinct Azure voice that narrates the free blueprint reveal (before the paywall). Leave unset to fall back to the main Azure narration voice above (or to the free browser voice if no Azure key is saved at all).</p>
         <select data-id="287" id="azure-intro-voice-select" class="cosmic-select" style="width:100%;margin-bottom:0.6rem;">
           <option value="">— None (use fallback voice) —</option>
           <optgroup label="— FEMALE VOICES —">
@@ -989,6 +989,44 @@ function preprocessForSpeech(text) {
     [/\b33\b/g, 'thirty-three'],
   ];
   replacements.forEach(function(pair){ text = text.replace(pair[0], pair[1]); });
+
+  // ── ALL-CAPS SPELL-OUT FIX ──────────────────────────────────
+  // Most speech engines (Azure and, especially, native browser TTS) read a
+  // fully-uppercase token as an acronym and spell it out letter-by-letter
+  // instead of pronouncing it as a word — e.g. a stray "AIN SOPH AUR" that
+  // slipped past the specific phonetic replacements above, a Tarot trump's
+  // Roman-numeral designation like "XXI" or "VI", or a Sephirah label like
+  // "HOD". This is audio-only preprocessing: it never touches the visually
+  // displayed reading text or the PDF, where ALL-CAPS styling on things like
+  // "AIN SOPH AUR" is intentional emphasis and must stay exactly as-is.
+  //
+  // Runs LAST, after the specific replacements above, and skips any
+  // all-caps run that is hyphen-joined to the rest of a word (e.g. the
+  // "KEH" in "KEH-ther", the "FEE" in "Seh-FEE-rah") — those are deliberate
+  // phonetic-spelling fragments created by the replacements above and must
+  // be left alone so the engine still pronounces the intended syllable
+  // stress instead of the plain word.
+  //
+  // Sanity check (see also the standalone regex test run before this PR
+  // was committed):
+  //   "AIN SOPH AUR"        -> "Ain Soph Aur"   (already handled above, so
+  //                                              this pass never even sees
+  //                                              raw "AIN SOPH AUR")
+  //   "XXI The World"       -> "Xxi The World"  (stops letter-by-letter
+  //                                              spelling of "XXI"; Roman
+  //                                              numerals have no clean
+  //                                              spoken form either way)
+  //   "Seh-FEE-rah"         -> unchanged        (hyphen-joined phonetic
+  //                                              fragment, left intact)
+  //   "A New Chapter."      -> unchanged        (normal sentence-initial
+  //                                              capital, only 1 letter —
+  //                                              regex requires 2+)
+  //   "I am proud of you."  -> unchanged        (lone capital "I", 1 letter)
+  text = text.replace(/(-?)\b([A-Z]{2,})\b(-?)/g, function(m, pre, word, post) {
+    if (pre === '-' || post === '-') return m; // part of a hyphenated phonetic spelling — leave as-is
+    return word.charAt(0) + word.slice(1).toLowerCase();
+  });
+
   return text;
 }
 
@@ -1135,7 +1173,13 @@ async function appSdkSpeak(text) {
   }
 }
 
-// Browser TTS fallback (Microsoft Edge neural voices)
+// Browser TTS — this is now the DEFAULT free voice path (per project owner
+// request: "just connect the free Microsoft voice that is in the browser...
+// keep the australian Aria or whatever voice my browser is using now").
+// Azure AI Speech (above) remains available as an optional paid upgrade for
+// anyone who saves an API key in the admin panel; AppSDK's own voice is kept
+// only as a further fallback (see _fallbackSpeakLong) for environments where
+// speechSynthesis itself isn't available at all.
 function browserSpeak(text, onEnd) {
   if (!window.speechSynthesis) { if (onEnd) onEnd(); return; }
   window.speechSynthesis.cancel();
@@ -1144,36 +1188,70 @@ function browserSpeak(text, onEnd) {
   utter.pitch = 0.75;
   utter.volume = 1.0;
 
-  function pickVoice() {
-    var voices = window.speechSynthesis.getVoices();
-    var prefs = [
-      'Microsoft Aria Online (Natural)',
-      'Microsoft Jenny Online (Natural)',
-      'Microsoft Michelle Online (Natural)',
-      'Microsoft Zira Online (Natural)',
-      'Microsoft Susan Online (Natural)',
-      'Google UK English Female',
-      'Samantha', 'Victoria', 'Karen'
-    ];
-    for (var i = 0; i < prefs.length; i++) {
-      var v = voices.find(function(vo) { return vo.name.indexOf(prefs[i]) !== -1; });
-      if (v) return v;
-    }
-    return voices.find(function(vo) { return vo.lang && vo.lang.startsWith('en'); }) || null;
+  var finished = false;
+  function finish() {
+    if (finished) return;
+    finished = true;
+    clearTimeout(safetyTimer);
+    if (onEnd) onEnd();
   }
 
-  function go() {
-    var v = pickVoice();
+  // Prefer any voice with "Aria" in its name (case-insensitive substring) —
+  // this covers both the common US English "Microsoft Aria Online (Natural)"
+  // neural voice and any Australian-flavored "Aria"-named voice a given
+  // browser/OS ships. If no Aria voice is found anywhere in the list, leave
+  // utter.voice unset entirely — that makes the browser speak with its own
+  // currently-configured default voice ("whatever voice my browser is using
+  // now") instead of forcing any particular voice or lang. Setting
+  // utter.voice to a found voice already carries that voice's own .lang, so
+  // we never hardcode a lang here.
+  function pickAriaVoice(voices) {
+    for (var i = 0; i < voices.length; i++) {
+      if (voices[i].name && voices[i].name.toLowerCase().indexOf('aria') !== -1) return voices[i];
+    }
+    return null;
+  }
+
+  function speakWithVoices(voices) {
+    var v = pickAriaVoice(voices);
     if (v) utter.voice = v;
+    // else: utter.voice stays unset -> browser's own current default voice/lang is used
     window.speechSynthesis.speak(utter);
   }
 
-  utter.onend = function() { if (onEnd) onEnd(); };
-  utter.onerror = function() { if (onEnd) onEnd(); };
+  utter.onend = finish;
+  utter.onerror = finish;
+
+  // Safety net: since browser TTS is now the primary/default path (not just
+  // a last resort), it needs the same "never let this hang forever" posture
+  // as the _withTimeout guards above — some browsers can silently drop
+  // onend/onerror on a speechSynthesis utterance. Bound it generously
+  // relative to text length so genuinely long narration is never cut short.
+  var safetyTimer = setTimeout(finish, Math.max(8000, text.length * 120));
 
   var voices = window.speechSynthesis.getVoices();
-  if (voices.length) { go(); }
-  else { window.speechSynthesis.onvoiceschanged = go; }
+  if (voices && voices.length) {
+    speakWithVoices(voices);
+  } else {
+    // getVoices() quirk: the voice list can be empty on first call in some
+    // browsers (it loads asynchronously) — wait for the 'voiceschanged'
+    // event, but don't wait forever. If it never fires, proceed anyway
+    // after a short timeout with whatever getVoices() returns by then
+    // (possibly still none, which just means the browser's own default
+    // voice gets used — never a hang).
+    var settled = false;
+    var voicesTimeout = setTimeout(function() {
+      if (settled) return;
+      settled = true;
+      speakWithVoices(window.speechSynthesis.getVoices());
+    }, 1000);
+    window.speechSynthesis.onvoiceschanged = function() {
+      if (settled) return;
+      settled = true;
+      clearTimeout(voicesTimeout);
+      speakWithVoices(window.speechSynthesis.getVoices());
+    };
+  }
 }
 
 // Shared Azure chunking helper — splits text into pieces under 1800 chars
@@ -1225,11 +1303,12 @@ async function speakLongText(fullText, onFinish) {
     var azSuccess = await _trySpeakAzureChunks(fullText, apiKey, region, voiceId);
     if (!_speakCancelled && azSuccess && onFinish) onFinish();
     else if (!_speakCancelled && !azSuccess) {
-      // Azure failed — fall through to AppSDK / browser
+      // Azure failed — fall through to the default browser voice
       await _fallbackSpeakLong(fullText, onFinish);
     }
   } else {
-    // No Azure key/region configured — try AppSDK, then browser
+    // No Azure key/region configured (the common case) — use the free
+    // browser voice by default, preferring an "Aria" voice if present
     await _fallbackSpeakLong(fullText, onFinish);
   }
 }
@@ -1263,11 +1342,21 @@ async function speakIntroText(fullText, onFinish) {
   }
 }
 
-// Fallback chain: AppSDK.ai.speak → Browser TTS
+// Default free-voice chain: Browser speechSynthesis (default) → AppSDK.ai.speak
+// (further fallback for environments without speechSynthesis at all). Browser
+// TTS is promoted to the primary path here per the project owner's request to
+// default to the free voice already built into the browser rather than
+// depending on any paid/hosted voice; Azure (above, in speakLongText) remains
+// the opt-in paid upgrade when an API key is configured.
 async function _fallbackSpeakLong(fullText, onFinish) {
   if (_speakCancelled || isMuted) { if (onFinish) onFinish(); return; }
 
-  // Try AppSDK.ai.speak with chunking
+  if (window.speechSynthesis) {
+    browserSpeak(fullText, onFinish);
+    return;
+  }
+
+  // No native speechSynthesis support at all — fall back to AppSDK.ai.speak with chunking
   if (window.AppSDK && window.AppSDK.ai && window.AppSDK.ai.speak) {
     var sentences = fullText.match(/[^.!?]+[.!?]+/g) || [fullText];
     var chunks = [];
@@ -1322,14 +1411,16 @@ async function speakText(text) {
     }
   }
 
-  // Fallback: AppSDK
-  if (window.AppSDK && window.AppSDK.ai && window.AppSDK.ai.speak) {
-    var ok = await appSdkSpeak(text);
-    if (ok) return;
+  // No Azure key configured (or it failed) — default to the free browser voice
+  if (window.speechSynthesis) {
+    browserSpeak(text, null);
+    return;
   }
 
-  // Final fallback: browser
-  browserSpeak(text, null);
+  // No native speechSynthesis at all — fall back to AppSDK
+  if (window.AppSDK && window.AppSDK.ai && window.AppSDK.ai.speak) {
+    await appSdkSpeak(text);
+  }
 }
 
 function stopSpeech() {
@@ -2427,7 +2518,7 @@ document.getElementById('azure-save-btn').addEventListener('click', function() {
   localStorage.setItem('azure_voice_id', voice);
   if (introVoice) localStorage.setItem('azure_intro_voice_id', introVoice);
   else localStorage.removeItem('azure_intro_voice_id');
-  status.textContent = '✅ Key saved successfully! Voice will use Azure AI Speech on next reading.';
+  status.textContent = '✅ Key saved successfully! Voice will use the Azure AI Speech upgrade on next reading (instead of the free browser voice).';
   status.style.color = '#c9a84c';
 });
 
@@ -2697,7 +2788,6 @@ document.getElementById('admin-pdf-btn').addEventListener('click', async functio
       expression: expression, soulUrge: soulUrge,
       personality: personality, birthdayNumber: birthdayNumber, gematria: gematria,
       personalYear2026: personalYear2026, personalMonth: personalMonth, personalDay: personalDay,
-      personalDayWildcard: personalDayWildcard,
       tarotCard: tarotCard, codexArchetype: codexArchetype,
       chaldean: chaldean, harmonic: harmonic,
       gematriaBattery: gematriaBattery,
@@ -5880,6 +5970,7 @@ function getFallbackReading(){
     var pdwFmt = formatPersonalDayWildcard(pdw);
     fb += '\nPersonal Day '+pd+' opens one more door, and it is worth naming as an invitation rather than a verdict: today wildcards toward '+pdwFmt.majorPhrase+' — '+(pdw.majors.length>1?'not as a forced choice between them, but as a field of live possibility you can lean into either direction of today':'as the live possibility available to lean into today')+'. '+pdwFmt.poolSentences+' None of this replaces the '+tc.card+' path named earlier in this reading, and none of it is fixed the way your birth chart is fixed — it simply names what today, specifically, is offering you room to explore, gone again once Personal Day '+pd+' rolls forward into tomorrow\'s number.\n';
   }
+  fb+='Your Personality Number is '+(p.personality||'unknown')+' \u2014 the impression you make before you speak a single word. You are in Personal Year '+py+' in 2026. This cycle has a specific quality \u2014 a tone that colors every decision, relationship, and opportunity of this year.\n\n'+(py<=3?'This is a year of planting. The seeds you put down now \u2014 in projects, relationships, identity \u2014 will define the harvest of the next cycle. As '+ca+', the key is to act from vision, not from fear.':py<=6?'This is a year of deepening. Connections forged now carry long-term significance. Your field is stabilizing around its true form.':'This is a year of revelation and completion. Old structures that no longer serve are falling away. As '+ca+', this is not loss \u2014 it is liberation. What remains will be exactly what is meant to carry forward.')+'\n\nPersonal Year '+py+' is not a separate forecast bolted onto your chart \u2014 it is Life Path '+p.lifePath+' in motion through time, the same core number counted forward year by year until it comes back around to itself. For '+ca+', this Personal Year '+py+' activates the part of your field that governs '+p.sunSign.sign+' energy. The timing is not accidental.\n\nPractically, this looks less like a mood and more like a series of small forks in the road. '+(py<=3?'Say yes to the invitation, the idea, or the collaboration that feels slightly too soon \u2014 Personal Year '+py+' rewards those who move before they feel fully ready, because the readiness only ever arrives after the first step, not before it.':py<=6?'Say yes to the relationship, agreement, or commitment that asks you to stay rather than start something new \u2014 Personal Year '+py+' rewards depth over breadth, and the temptation to scatter your energy across something newer and shinier is exactly what this year asks you to resist.':'Say yes to the ending you have been putting off \u2014 Personal Year '+py+' rewards honest closure over quiet avoidance, and what looks like loss from inside the year will look like liberation from outside it.')+' Say no to whatever would keep you circling the same lesson a second time; your Birthday Number '+(p.birthdayNumber||'?')+' has already given you the tool to recognize when that is happening.\n\nThis Personal Year narrows further the closer you look. Right now you are moving through Personal Month '+pm+' — the same yearly theme, focused down onto the chapter you are actually living this month — and today itself falls in Personal Day '+pd+', the smallest and most immediate ring of this same cycle. None of these three numbers is a separate forecast; Personal Day '+pd+' is Personal Month '+pm+' in motion, and Personal Month '+pm+' is Personal Year '+py+' in motion, the same way Personal Year is Life Path '+p.lifePath+' in motion through time. When you want to know what today is actually asking of you, Personal Day '+pd+' is the most precise instrument this reading has to offer.\n';
   fb+='===PAGE_7_END===\n\n';
 
   fb+='===PAGE_8_START===\n';
@@ -6023,6 +6114,9 @@ async function doReading() {
     + 'Page 5 \u2014 SHADOW & GIFT: Be specific and unflinching. The shadow of ' + tc.card + ' for someone with ' + p.sunSign.sign + ' energy is specific \u2014 name it precisely. Describe the exact pattern that repeats when this shadow is unconscious. Then name the exact gift that emerges when it is integrated. Include what the ' + p.tree.name + ' position on the Tree reveals about the specific initiation ' + p.firstName + ' is moving through. This section should feel like someone finally named something the reader has always felt but never had words for.\n'
     + 'Page 6 \u2014 THE HIDDEN ARCHITECTURE: The paths flowing into and out of ' + p.tree.name + ' on the Tree of Life are the hidden curriculum of ' + p.firstName + '\'s spiritual life. Name the specific adjacent Sephiroth and what each corridor of initiation teaches. ' + (p.hiddenMaster ? 'Hidden Master Number ' + p.hiddenMaster + ' layers a second frequency over everything \u2014 explain what this master vibration demands and how it interacts with Life Path ' + p.lifePath + '. ' : '') + (p.nameHiddenMasters && p.nameHiddenMasters.length ? 'A deeper audit of the full birth name also surfaces its own Hidden Master frequencies (' + formatNameHiddenMasters(p.nameHiddenMasters) + ') \u2014 name-field callings distinct from the Life Path itself. ' : '') + 'Discuss the Hebrew letter system encoded in the name and Tarot path.' + (p.hebrewSoulCorrespondence ? ' Weave in the Hebrew Soul Correspondence directly: the birth name transliterated to Hebrew consonants (' + p.hebrewSoulCorrespondence.hebrewConsonants + ') carries a real gematria of ' + p.hebrewSoulCorrespondence.gematriaTotal + (p.hebrewSoulCorrespondence.archangelMatches.length ? ', matching Archangel ' + p.hebrewSoulCorrespondence.archangelMatches[0].name + ' (' + p.hebrewSoulCorrespondence.archangelMatches[0].hebrew + ' = ' + p.hebrewSoulCorrespondence.archangelMatches[0].value + ') — name this connection explicitly, showing the arithmetic.' : ', with no Archangel match at that exact number — state this plainly rather than forcing a connection.') + ' Also name the 72 Names position (' + p.hebrewSoulCorrespondence.nameOf72.position + ': ' + p.hebrewSoulCorrespondence.nameOf72.name + ') as the name\'s corresponding position among the 72 Names.' : '') + ' Explain what the deeper architecture reveals about purpose that the surface numbers only hint at.\n'
     + 'Page 7 \u2014 TIMING & CYCLES: Personal Year ' + p.personalYear2026 + ' in 2026 has a specific energetic quality \u2014 describe it fully. What is this year asking ' + p.firstName + ' to do, release, begin, or complete? How does Personal Year ' + p.personalYear2026 + ' interact with the Codex Archetype ' + ca + '? Name it as the current chapter of the same Life Path ' + p.lifePath + ' story established on Page 1 — this cycle is that same core thread in motion through time — at most one light sentence acknowledging these numbers nest within each other, not an explanation of the mechanism.' + (p.personalMonth != null && p.personalDay != null ? (' Then narrow the lens twice more: describe what Personal Month ' + p.personalMonth + ' feels like and invites this month, and what Personal Day ' + p.personalDay + ' feels like and invites today specifically — focus on the lived feeling and the invitation, not on how the numbers are derived from one another.') : '') + (pdwFmtPrompt ? (' Close this page by naming the Personal Day Wildcard: today wildcards toward ' + pdwFmtPrompt.majorPhrase + ', with a small pool of companion cards nearby (' + pdwFmtPrompt.poolSentences + '). Frame this with genuinely invitational language — "worth noticing," "a door that is open today," "one possibility among the pool" — never assignment language like "you are" or "this is your card," and never explain how the pool of cards was assembled. Make explicit that this is a live, temporary possibility for today only, gone once tomorrow arrives, and is separate from the fixed, birth-locked ' + tc.card + ' Trump Card named earlier — never conflate the two or imply the wildcard replaces or outranks it.') : '') + ' Name the specific opportunities and risks of this cycle. Describe the 9-year cycle this year sits within and where ' + p.firstName + ' is in that larger arc. What decisions made in 2026 will echo for years to come?\n'
+    + 'Page 7 \u2014 TIMING & CYCLES: Personal Year ' + p.personalYear2026 + ' in 2026 has a specific energetic quality \u2014 describe it fully. What is this year asking ' + p.firstName + ' to do, release, begin, or complete? How does Personal Year ' + p.personalYear2026 + ' interact with the Codex Archetype ' + ca + '? Name it as the current chapter of the same Life Path ' + p.lifePath + ' story established on Page 1 — this cycle number is not a new topic, it is that same core number in motion through time.' + (p.personalMonth != null && p.personalDay != null ? (' Then narrow the lens twice more: explain how Personal Month ' + p.personalMonth + ' focuses this year\'s theme onto the present month, and how Personal Day ' + p.personalDay + ' focuses it once more onto today specifically — make explicit that Personal Day, Personal Month, and Personal Year are the same cycle at three nested scales, not three separate topics.') : '') + ' Name the specific opportunities and risks of this cycle. Describe the 9-year cycle this year sits within and where ' + p.firstName + ' is in that larger arc. What decisions made in 2026 will echo for years to come?\n'
+    + 'Page 8 \u2014 RELATIONAL GEOMETRY: Describe the full relational field ' + p.firstName + ' emanates. Life Path ' + p.lifePath + ' creates a specific type of partner dynamic \u2014 explain it in depth. The ' + tc.card + ' archetype shapes how ' + p.firstName + ' shows up in love, what they unconsciously seek, and what they need to feel truly met. Describe the element (' + p.sunSign.element + ') in relationship: what it attracts, what it resists. Name the Life Paths and archetypes most naturally resonant with ' + p.firstName + '. Include what sacred partnership looks like for this Codex Archetype.\n'
+    + 'Page 7 \u2014 TIMING & CYCLES: Personal Year ' + p.personalYear2026 + ' in 2026 has a specific energetic quality \u2014 describe it fully. What is this year asking ' + p.firstName + ' to do, release, begin, or complete? How does Personal Year ' + p.personalYear2026 + ' interact with the Codex Archetype ' + ca + '? Name it as the current chapter of the same Life Path ' + p.lifePath + ' story established on Page 1 — this cycle number is not a new topic, it is that same core number in motion through time. Name the specific opportunities and risks of this cycle. Describe the 9-year cycle this year sits within and where ' + p.firstName + ' is in that larger arc. What decisions made in 2026 will echo for years to come?\n'
     + 'Page 8 \u2014 RELATIONAL GEOMETRY: Describe the full relational field ' + p.firstName + ' emanates. Life Path ' + p.lifePath + ' creates a specific type of partner dynamic \u2014 explain it in depth. The ' + tc.card + ' archetype shapes how ' + p.firstName + ' shows up in love, what they unconsciously seek, and what they need to feel truly met. Describe the element (' + p.sunSign.element + ') in relationship: what it attracts, what it resists. Name the Life Paths and archetypes most naturally resonant with ' + p.firstName + '. Include what sacred partnership looks like for this Codex Archetype.' + (p.node && p.node.northSign ? (' Their North Node in ' + p.node.northSign + ' also names what kind of partnership stretches them toward growth, versus the South Node in ' + p.node.southSign + ' describing the relational comfort zone that feels safest but can become a rut — name both plainly as a lifelong relational axis, not a prediction.') : '') + '\n'
     + 'Page 9 \u2014 CAREER, PURPOSE & AIN SOPH AUR: What is ' + p.firstName + ' building in this lifetime? Use Expression ' + (p.expression||'?') + ' and Life Path ' + p.lifePath + ' to map the specific domains where this soul is meant to contribute. Name the career fields, creative expressions, leadership roles, or service paths aligned with ' + ca + '.' + (p.soulCard && p.courtCard ? ' Weave in the Metatron\'s Cube reading \u2014 Soul Card ' + p.soulCard.name + ' and Court Card ' + p.courtCard.name + ' \u2014 as the geometry beneath this purpose.' : '') + (p.zodiacalCourtCard ? ' Separately, also name the Zodiacal Court Card (Sun placement) \u2014 the ' + p.zodiacalCourtCard.name + ' \u2014 as a second, independent Court Card finding reached through ' + p.firstName + '\'s own Sun placement in the sky rather than the Sephirah, never implying it replaces or outranks the Metatron\'s Cube Court Card named just above.' : '') + ' Describe the legacy this soul is here to leave. Before the blessing, write one real synthesis paragraph \u2014 not a generic "everything is connected" statement, but naming at least two or three SPECIFIC cross-system pairings from earlier in this reading and stating outright why they are not a coincidence (for example: Life Path ' + p.lifePath + ' and the Trump Card ' + trumpCardName + ' arriving at the same core teaching; the Gematria reduction and the Sephirah ' + p.tree.name + ' pointing at the same address; the Personal Year and the Codex Archetype moving in the same direction). Then close with Celestia\'s full personal blessing to ' + p.firstName + ' invoking AIN SOPH AUR \u2014 warm, specific, and sacred. This closing should feel like a blessing received from the oracle herself, one who has been reading all nine pages as one chart, not nine.';
 
