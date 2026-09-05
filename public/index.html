@@ -857,6 +857,29 @@ body {
         <div style="flex:1;"><label style="font-family:'Courier New',monospace;font-size:0.5rem;letter-spacing:0.15em;color:#c9a84c;display:block;margin-bottom:0.3rem;">DAY</label><input id="p1-day" type="number" min="1" max="31" class="cosmic-input" placeholder="D" style="padding:0.6rem 0.5rem;text-align:center;" /></div>
         <div style="flex:1.5;"><label style="font-family:'Courier New',monospace;font-size:0.5rem;letter-spacing:0.15em;color:#c9a84c;display:block;margin-bottom:0.3rem;">YEAR</label><input id="p1-year" type="number" min="1900" max="2015" class="cosmic-input" placeholder="YYYY" style="padding:0.6rem 0.5rem;text-align:center;" /></div>
       </div>
+      <div style="margin-bottom:0.6rem;">
+        <label style="font-family:'Courier New',monospace;font-size:0.55rem;letter-spacing:0.2em;color:#c9a84c;display:block;margin-bottom:0.3rem;">BIRTH TIME <span style="opacity:0.6;text-transform:none;letter-spacing:0;">(optional — powers Ascendant)</span></label>
+        <div id="p1-birthtime-row" style="display:flex;gap:0.5rem;margin-bottom:0.3rem;">
+          <select id="p1-time-hour" class="cosmic-select" style="flex:1;">
+            <option value="" disabled selected>Hour</option>
+          </select>
+          <select id="p1-time-minute" class="cosmic-select" style="width:80px;">
+            <option value="" disabled selected>Min</option>
+          </select>
+          <select id="p1-time-ampm" class="cosmic-select" style="width:80px;">
+            <option value="AM">AM</option>
+            <option value="PM">PM</option>
+          </select>
+        </div>
+      </div>
+      <div style="margin-bottom:0.4rem;">
+        <label style="font-family:'Courier New',monospace;font-size:0.55rem;letter-spacing:0.2em;color:#c9a84c;display:block;margin-bottom:0.3rem;">BIRTH PLACE <span style="opacity:0.6;text-transform:none;letter-spacing:0;">(optional — e.g. Denver, CO)</span></label>
+        <input id="p1-birthplace" type="text" class="cosmic-input" placeholder="City, State/Country" style="padding:0.6rem 0.9rem;" autocomplete="off" />
+      </div>
+      <label style="display:flex;align-items:center;gap:0.5rem;margin:0.5rem 0 1rem;cursor:pointer;">
+        <input type="checkbox" id="p1-no-birthtime" style="width:16px;height:16px;accent-color:#c9a84c;" />
+        <span style="font-size:0.75rem;color:#8a7aaa;">Doesn't know their exact birth time</span>
+      </label>
 
       <div style="font-family:'Courier New',monospace;font-size:0.58rem;letter-spacing:0.3em;color:#ff9ed2;margin-bottom:0.5rem;padding:0.3rem 0.5rem;border-left:2px solid #ff9ed2;">PERSON 2</div>
       <div style="margin-bottom:0.6rem;">
@@ -868,6 +891,29 @@ body {
         <div style="flex:1;"><label style="font-family:'Courier New',monospace;font-size:0.5rem;letter-spacing:0.15em;color:#ff9ed2;display:block;margin-bottom:0.3rem;">DAY</label><input id="p2-day" type="number" min="1" max="31" class="cosmic-input" placeholder="D" style="padding:0.6rem 0.5rem;text-align:center;" /></div>
         <div style="flex:1.5;"><label style="font-family:'Courier New',monospace;font-size:0.5rem;letter-spacing:0.15em;color:#ff9ed2;display:block;margin-bottom:0.3rem;">YEAR</label><input id="p2-year" type="number" min="1900" max="2015" class="cosmic-input" placeholder="YYYY" style="padding:0.6rem 0.5rem;text-align:center;" /></div>
       </div>
+      <div style="margin-bottom:0.6rem;">
+        <label style="font-family:'Courier New',monospace;font-size:0.55rem;letter-spacing:0.2em;color:#ff9ed2;display:block;margin-bottom:0.3rem;">BIRTH TIME <span style="opacity:0.6;text-transform:none;letter-spacing:0;">(optional — powers Ascendant)</span></label>
+        <div id="p2-birthtime-row" style="display:flex;gap:0.5rem;margin-bottom:0.3rem;">
+          <select id="p2-time-hour" class="cosmic-select" style="flex:1;">
+            <option value="" disabled selected>Hour</option>
+          </select>
+          <select id="p2-time-minute" class="cosmic-select" style="width:80px;">
+            <option value="" disabled selected>Min</option>
+          </select>
+          <select id="p2-time-ampm" class="cosmic-select" style="width:80px;">
+            <option value="AM">AM</option>
+            <option value="PM">PM</option>
+          </select>
+        </div>
+      </div>
+      <div style="margin-bottom:0.4rem;">
+        <label style="font-family:'Courier New',monospace;font-size:0.55rem;letter-spacing:0.2em;color:#ff9ed2;display:block;margin-bottom:0.3rem;">BIRTH PLACE <span style="opacity:0.6;text-transform:none;letter-spacing:0;">(optional — e.g. Denver, CO)</span></label>
+        <input id="p2-birthplace" type="text" class="cosmic-input" placeholder="City, State/Country" style="padding:0.6rem 0.9rem;" autocomplete="off" />
+      </div>
+      <label style="display:flex;align-items:center;gap:0.5rem;margin:0.5rem 0 1.2rem;cursor:pointer;">
+        <input type="checkbox" id="p2-no-birthtime" style="width:16px;height:16px;accent-color:#ff9ed2;" />
+        <span style="font-size:0.75rem;color:#8a7aaa;">Doesn't know their exact birth time</span>
+      </label>
 
       <button id="partner-generate-btn" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.6rem 1.4rem;background:linear-gradient(135deg,#ff9ed2,#ff6ab4);color:#0a0015;font-weight:700;font-size:0.82rem;border:none;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;width:100%;justify-content:center;">💞 Generate Partnership Reading</button>
       <div id="partner-status" style="font-size:0.75rem;color:#ff9ed2;min-height:1.5em;margin-top:0.5rem;text-align:center;"></div>
@@ -1557,6 +1603,72 @@ function computePartnerProfile(firstName, month, day, year) {
   };
 }
 
+// ── OPTIONAL per-partner: Birth time + birth place (powers Ascendant +
+// Moon sign) for the admin PARTNERSHIP form ── Mirrors the admin-pdf-btn /
+// hook-btn handlers exactly (see their comments for the full rationale on
+// why birth place is read independent of the "I don't know my exact time"
+// checkbox while hour/minute/AM-PM are gated behind it), just parameterized
+// by an element-id prefix ('p1' or 'p2') so each partner gets their own,
+// fully independent pair of promises — never shared between the two.
+function kickOffPartnerAscendantMoonLookups(prefix, year, month, day) {
+  var out = { ascendantPromise: null, moonSignPromise: null };
+  try {
+    var noBirthTimeEl = document.getElementById(prefix + '-no-birthtime');
+    var skipBirthTime = !!(noBirthTimeEl && noBirthTimeEl.checked);
+    var birthPlaceEl = document.getElementById(prefix + '-birthplace');
+    var birthPlace = birthPlaceEl ? birthPlaceEl.value.trim() : '';
+    var hour24 = null, minute = null, hasRealTime = false;
+    if (!skipBirthTime) {
+      var hourRaw = document.getElementById(prefix + '-time-hour').value;
+      var minuteRaw = document.getElementById(prefix + '-time-minute').value;
+      var ampm = document.getElementById(prefix + '-time-ampm').value;
+      if (hourRaw !== '' && minuteRaw !== '') {
+        var hour12 = parseInt(hourRaw, 10);
+        minute = parseInt(minuteRaw, 10);
+        hour24 = hour12 % 12;
+        if (ampm === 'PM') hour24 += 12;
+        hasRealTime = true;
+      }
+    }
+    if (hasRealTime && birthPlace) {
+      out.ascendantPromise = getAscendant(year, month, day, hour24, minute, birthPlace);
+    }
+    if (birthPlace) {
+      // hour24/minute are null when there's no real time — getMoonSign()
+      // applies its own 12:00 noon default and flags the result accordingly.
+      out.moonSignPromise = getMoonSign(year, month, day, hasRealTime ? hour24 : null, hasRealTime ? minute : null, birthPlace);
+    }
+  } catch (ascErr) {
+    console.error('[Partner Ascendant/Moon Sign] Could not kick off lookup for ' + prefix + ':', ascErr);
+    out.ascendantPromise = null;
+    out.moonSignPromise = null;
+  }
+  return out;
+}
+
+// Resolves one partner's kicked-off promises (from the function above) and
+// lands the results on that partner's own profile object, the exact same
+// way doReading() lands them on the solo profile: skipped/failed lookups
+// simply leave p.ascendant/p.moonSign unset — no error, no placeholder.
+async function resolvePartnerAscendantMoonLookups(p, promises) {
+  if (promises.ascendantPromise) {
+    try {
+      var ascResult = await promises.ascendantPromise;
+      if (ascResult && ascResult.sign) p.ascendant = ascResult;
+    } catch (ascErr) {
+      console.error('[Partner Ascendant] Lookup rejected unexpectedly:', ascErr);
+    }
+  }
+  if (promises.moonSignPromise) {
+    try {
+      var moonResult = await promises.moonSignPromise;
+      if (moonResult && moonResult.sign) p.moonSign = moonResult;
+    } catch (moonErr) {
+      console.error('[Partner Moon Sign] Lookup rejected unexpectedly:', moonErr);
+    }
+  }
+}
+
 // Relational Node polarity readout — Codex Logic V07 Part XX, following the
 // exact same "plain binary fact, no score" rule V07 §18.2 established for
 // shared Sephirah/path coincidence points. Natal North/South Node signs
@@ -1630,13 +1742,20 @@ async function doPartnershipReading(p1, p2) {
     var nodeStr = (p.node && p.node.northSign) ? ('North Node ' + p.node.northSign + ' / South Node ' + p.node.southSign + (p.node.activePole ? (' (currently active pole: ' + p.node.activePole + ')') : '')) : '';
     var decanStr = (p.nodeDecanCards) ? ('North Node card: ' + p.nodeDecanCards.northNodeCard.card + ' / South Node card: ' + p.nodeDecanCards.southNodeCard.card) : '';
     var zodiacalCourtStr = p.zodiacalCourtCard ? (p.zodiacalCourtCard.name + ' (Sun in ' + p.sunSign.sign + ')') : '';
+    // Ascendant/Moon Sign — optional, per-partner (see
+    // kickOffPartnerAscendantMoonLookups()/resolvePartnerAscendantMoonLookups()
+    // above), same fields the solo profile carries when birth time/place is given.
+    var ascStr = (p.ascendant && p.ascendant.sign) ? ('Ascendant (Rising Sign): ' + p.ascendant.sign + (p.ascendant.degree != null ? ' at ' + p.ascendant.degree + '°' : '')) : '';
+    var moonStr = (p.moonSign && p.moonSign.sign) ? ('Moon Sign: ' + p.moonSign.sign + (p.moonSign.viaNoonDefault ? ' (estimated via noon default — exact birth time not given)' : '')) : '';
     return '  Trump Card: ' + trumpStr + '\n'
       + (chalStr ? '  ' + chalStr + '\n' : '')
       + (nameHM ? '  Name-Field Hidden Masters: ' + nameHM + '\n' : '')
       + (soulCourt ? '  Metatron\'s Cube — Soul/Court Card: ' + soulCourt + '\n' : '')
       + (nodeStr ? '  Lunar Nodes: ' + nodeStr + '\n' : '')
       + (decanStr ? '  Node Decan Cards: ' + decanStr + '\n' : '')
-      + (zodiacalCourtStr ? '  Zodiacal Court Card (Sun placement, separate finding from the Sephirah-based Court Card above): ' + zodiacalCourtStr + '\n' : '');
+      + (zodiacalCourtStr ? '  Zodiacal Court Card (Sun placement, separate finding from the Sephirah-based Court Card above): ' + zodiacalCourtStr + '\n' : '')
+      + (ascStr ? '  ' + ascStr + '\n' : '')
+      + (moonStr ? '  ' + moonStr + '\n' : '');
   }
   var nodeReadout = getNodePolarityReadout(p1, p2);
   var nodeDecanCoincidences = getNodeDecanCoincidences(p1, p2);
@@ -1683,8 +1802,8 @@ async function doPartnershipReading(p1, p2) {
     + nodeDecanCoincidenceLine + '\n'
     + zodiacalCourtCardLine + '\n'
     + 'Write exactly 6 sections with ===PAGE_N_START=== and ===PAGE_N_END=== delimiters. Each section 3–4 substantial paragraphs.\n\n'
-    + 'Page 1 — ' + p1.firstName.toUpperCase() + '\'S AXIS ON THE TREE: Describe ' + p1.firstName + '\'s role as ' + axis1.title + '. Their Sephirah (' + p1.tree.name + '), Life Path ' + p1.lifePath + ', and Tarot archetype (' + p1.tarotCard.card + ') as expressions of the ' + axis1.pillar + '. Weave in their Trump Card (' + (p1.lifePathTrumpCard ? p1.lifePathTrumpCard.card : p1.tarotCard.card) + '), their Chaldean name compound' + (p1.chaldean ? ' (' + p1.chaldean.compound + '→' + p1.chaldean.reduced + ')' : '') + ', and — if present — any Hidden Master frequency surfaced in their name field, as additional texture on who they are, not separate topics.\n'
-    + 'Page 2 — ' + p2.firstName.toUpperCase() + '\'S AXIS ON THE TREE: Same for ' + p2.firstName + ' as ' + axis2.title + ' on the ' + axis2.pillar + ', weaving in their Trump Card, Chaldean compound, and any Hidden Master frequencies the same way.\n'
+    + 'Page 1 — ' + p1.firstName.toUpperCase() + '\'S AXIS ON THE TREE: Describe ' + p1.firstName + '\'s role as ' + axis1.title + '. Their Sephirah (' + p1.tree.name + '), Life Path ' + p1.lifePath + ', and Tarot archetype (' + p1.tarotCard.card + ') as expressions of the ' + axis1.pillar + '. Weave in their Trump Card (' + (p1.lifePathTrumpCard ? p1.lifePathTrumpCard.card : p1.tarotCard.card) + '), their Chaldean name compound' + (p1.chaldean ? ' (' + p1.chaldean.compound + '→' + p1.chaldean.reduced + ')' : '') + ', and — if present — any Hidden Master frequency surfaced in their name field, as additional texture on who they are, not separate topics.' + (p1.ascendant && p1.ascendant.sign ? (' If it fits naturally, also name their ' + p1.ascendant.sign + ' Ascendant as the lens the world first meets them through, distinct from the ' + p1.sunSign.sign + ' Sun underneath it.') : '') + (p1.moonSign && p1.moonSign.sign ? (' Their ' + p1.moonSign.sign + ' Moon names the emotional interior only a partner gets to see once the mask comes off.') : '') + '\n'
+    + 'Page 2 — ' + p2.firstName.toUpperCase() + '\'S AXIS ON THE TREE: Same for ' + p2.firstName + ' as ' + axis2.title + ' on the ' + axis2.pillar + ', weaving in their Trump Card, Chaldean compound, and any Hidden Master frequencies the same way.' + (p2.ascendant && p2.ascendant.sign ? (' If it fits naturally, also name their ' + p2.ascendant.sign + ' Ascendant as the lens the world first meets them through, distinct from the ' + p2.sunSign.sign + ' Sun underneath it.') : '') + (p2.moonSign && p2.moonSign.sign ? (' Their ' + p2.moonSign.sign + ' Moon names the emotional interior only a partner gets to see once the mask comes off.') : '') + '\n'
     + 'Page 3 — THE COMBINED ARCHITECTURE (' + axisConfig.name + '): How their two axes meet. ' + axisConfig.description + ' Explicitly name why ' + p1.firstName + '\'s Life Path ' + p1.lifePath + ' role as ' + axis1.title + ' and ' + p2.firstName + '\'s Life Path ' + p2.lifePath + ' role as ' + axis2.title + ' are not two separate roles that happen to coexist, but two halves of one architecture — say what specifically completes what. What this means for how they build, love, and create together. Note how their two Trump Cards or Soul/Court Cards converse with each other structurally, citing both cards by name. Also name both partners\' natal Lunar Node axes (North Node ' + p1.node.northSign + ' / South Node ' + p1.node.southSign + ' for ' + p1.firstName + '; North Node ' + p2.node.northSign + ' / South Node ' + p2.node.southSign + ' for ' + p2.firstName + ') as a lifelong growth-direction axis for each of them individually — and only if the Relational Node Dynamic above says both are currently active, name the resulting magnetic (complementary poles) or tension (matching poles) dynamic as a real, plainly-stated computed fact, never a score; if it is not currently applicable, say so rather than forcing the framing. Also name each partner\'s Node Decan Cards from the PROFILE above — ' + p1.firstName + '\'s North Node card (' + p1.nodeDecanCards.northNodeCard.card + ') as the energy they are individually growing toward and South Node card (' + p1.nodeDecanCards.southNodeCard.card + ') as the comfort-zone energy they are individually moving away from, and the same pair for ' + p2.firstName + ' (' + p2.nodeDecanCards.northNodeCard.card + ' / ' + p2.nodeDecanCards.southNodeCard.card + ') — as two more individual lifelong growth trajectories, not a joint compatibility score; if the PROFILE\'s Node Decan Card Coincidence line above is non-empty, state that plain fact exactly as given and nothing more elaborate. Separately, also name each partner\'s Zodiacal Court Card (Sun placement) from the PROFILE above (' + (p1.zodiacalCourtCard ? p1.zodiacalCourtCard.name : '') + ' for ' + p1.firstName + ', ' + (p2.zodiacalCourtCard ? p2.zodiacalCourtCard.name : '') + ' for ' + p2.firstName + ') as individual facts only, explicitly distinct from both the Sephirah-based Court Card and the Node Decan Cards named above — a third, independent Court Card finding, not a more-correct replacement for the others; if the PROFILE\'s Zodiacal Court Card Coincidence line above is non-empty, state that plain fact exactly as given and nothing more elaborate.\n'
     + 'Page 4 — THE TOROIDAL CARNATION FIELD: Their relationship as a living toroidal geometry — an Egg of Life mandala with two people as its generative poles. The central void they create together, the 8 radial directions their combined field radiates, the arcs of energy exchange between them. How this field generates something neither could alone.\n'
     + 'Page 5 — SHADOW, GIFT & INTEGRATION: The specific partnership shadow — what breaks down when the axes fall out of alignment. The gift that emerges when both fully embody their roles. The integration number ' + integrationNumber + ' as the frequency of their stable combined state — explain concretely why it is derived from adding both individual gematria totals together (' + p1.gematria.total + ' + ' + p2.gematria.total + '), not an arbitrary number assigned to the pair, and how that origin is itself proof the union has its own field distinct from either partner alone.\n'
@@ -1712,6 +1831,8 @@ function getPartnershipFallback(p1, p2) {
     + (p1.lifePathTrumpCard ? ' Your Life Path Trump Card confirms it: ' + p1.lifePathTrumpCard.numeral + ' ' + p1.lifePathTrumpCard.card + ' — ' + p1.lifePathTrumpCard.keyword + '.' : '') + ' '
     + 'And your ' + p1.sunSign.sign + ' Sun, governed by ' + p1.sunSign.planet + ', carries the ' + p1.sunSign.element + ' current that flows through this axis with natural ease.\n\n'
     + (p1.chaldean ? 'The name you are called by carries its own living vibration — a Chaldean compound of ' + p1.chaldean.compound + (p1.chaldean.archetype ? ', the archetype of "' + p1.chaldean.archetype + '"' : '') + ', reducing to ' + p1.chaldean.reduced + '.' + (p1.harmonic ? ' ' + p1.harmonic.detail : '') + (p1.nameHiddenMasters && p1.nameHiddenMasters.length ? ' A deeper audit of your name field also surfaces a Hidden Master frequency: ' + formatNameHiddenMasters(p1.nameHiddenMasters) + '.' : '') + '\n\n' : '')
+    + (p1.ascendant && p1.ascendant.sign ? ('Your Ascendant — the sign that was rising on the eastern horizon at the exact moment you were born — is ' + p1.ascendant.sign + (p1.ascendant.degree != null ? ' at ' + p1.ascendant.degree + '°' : '') + '. Where your Sun sign is who you are at your core, your Ascendant is the lens the world first meets you through — the face your partner saw before they ever earned the deeper layers underneath.\n\n') : '')
+    + (p1.moonSign && p1.moonSign.sign ? ('Your Moon Sign — the placement that governs your emotional interior — is ' + p1.moonSign.sign + (p1.moonSign.viaNoonDefault ? ' (estimated, since your exact birth time was not given — the Moon moves slowly enough that this is still a trustworthy directional read)' : '') + '. This is what you actually feel underneath the Sun and Ascendant, in the moments only a partner gets to see.\n\n') : '')
     + 'You are not simply "compatible" with your partner. You are structurally designed to meet.\n';
   fb += '===PAGE_1_END===\n\n';
 
@@ -1723,6 +1844,8 @@ function getPartnershipFallback(p1, p2) {
     + (p2.lifePathTrumpCard ? ' Your Life Path Trump Card, ' + p2.lifePathTrumpCard.numeral + ' ' + p2.lifePathTrumpCard.card + ', confirms it — ' + p2.lifePathTrumpCard.keyword + '.' : '') + ' '
     + 'Your ' + p2.sunSign.sign + ' Sun brings the ' + p2.sunSign.element + ' element into the structural field you inhabit.\n\n'
     + (p2.chaldean ? 'Your living name resolves to a Chaldean compound of ' + p2.chaldean.compound + (p2.chaldean.archetype ? ', the archetype of "' + p2.chaldean.archetype + '"' : '') + ', reducing to ' + p2.chaldean.reduced + '.' + (p2.harmonic ? ' ' + p2.harmonic.detail : '') + (p2.nameHiddenMasters && p2.nameHiddenMasters.length ? ' Your name field also carries a Hidden Master frequency: ' + formatNameHiddenMasters(p2.nameHiddenMasters) + '.' : '') + '\n\n' : '')
+    + (p2.ascendant && p2.ascendant.sign ? ('Your Ascendant — the sign rising on the eastern horizon at the exact moment you were born — is ' + p2.ascendant.sign + (p2.ascendant.degree != null ? ' at ' + p2.ascendant.degree + '°' : '') + '. It is the lens the world, and your partner, first met you through — the face you show before anyone has earned the deeper layers underneath.\n\n') : '')
+    + (p2.moonSign && p2.moonSign.sign ? ('Your Moon Sign — governing your emotional interior — is ' + p2.moonSign.sign + (p2.moonSign.viaNoonDefault ? ' (estimated, since your exact birth time was not given — the Moon moves slowly enough that this is still a trustworthy directional read)' : '') + '. It is what you actually feel underneath, in the moments no one else is watching.\n\n') : '')
     + 'Where ' + p1.firstName + ' carries meaning through the center, you give it a place to land. Where you build the crossbeams, they become the pillar. This is not coincidence — this is geometry.\n';
   fb += '===PAGE_2_END===\n\n';
 
@@ -2149,7 +2272,7 @@ function courtCardFor(soulSephId, suit){
   }
   // Birth-time hour/minute dropdowns are populated identically for the main
   // visitor hook flow and the admin PDF generator (mirrors it exactly).
-  ['hook-time-hour', 'admin-pdf-time-hour'].forEach(function(id) {
+  ['hook-time-hour', 'admin-pdf-time-hour', 'p1-time-hour', 'p2-time-hour'].forEach(function(id) {
     var hourSelect = document.getElementById(id);
     if (hourSelect) {
       for (var h = 1; h <= 12; h++) {
@@ -2159,7 +2282,7 @@ function courtCardFor(soulSephId, suit){
       }
     }
   });
-  ['hook-time-minute', 'admin-pdf-time-minute'].forEach(function(id) {
+  ['hook-time-minute', 'admin-pdf-time-minute', 'p1-time-minute', 'p2-time-minute'].forEach(function(id) {
     var minuteSelect = document.getElementById(id);
     if (minuteSelect) {
       for (var m = 0; m < 60; m += 1) {
@@ -2179,7 +2302,9 @@ function courtCardFor(soulSephId, suit){
   // / the hook-btn and admin-pdf-btn handlers.
   [
     { checkbox: 'hook-no-birthtime', row: 'hook-birthtime-row', ids: ['hook-time-hour','hook-time-minute','hook-time-ampm'] },
-    { checkbox: 'admin-pdf-no-birthtime', row: 'admin-pdf-birthtime-row', ids: ['admin-pdf-time-hour','admin-pdf-time-minute','admin-pdf-time-ampm'] }
+    { checkbox: 'admin-pdf-no-birthtime', row: 'admin-pdf-birthtime-row', ids: ['admin-pdf-time-hour','admin-pdf-time-minute','admin-pdf-time-ampm'] },
+    { checkbox: 'p1-no-birthtime', row: 'p1-birthtime-row', ids: ['p1-time-hour','p1-time-minute','p1-time-ampm'] },
+    { checkbox: 'p2-no-birthtime', row: 'p2-birthtime-row', ids: ['p2-time-hour','p2-time-minute','p2-time-ampm'] }
   ].forEach(function(cfg) {
     var noTimeCheckbox = document.getElementById(cfg.checkbox);
     if (noTimeCheckbox) {
@@ -2572,9 +2697,18 @@ document.getElementById('partner-generate-btn').addEventListener('click', async 
   }
   pdfBtn.style.display = 'none';
   status.textContent = '✦ Computing Tree of Life architecture...';
+  // ── OPTIONAL: Birth time + birth place (powers Ascendant + Moon sign) ──
+  // Kicked off here, per partner, before the (possibly slow) reading call
+  // below — mirrors the solo admin/hook flows exactly, just doubled into
+  // two fully independent pairs of promises (see
+  // kickOffPartnerAscendantMoonLookups()'s comment).
+  var p1Lookups = kickOffPartnerAscendantMoonLookups('p1', y1, m1, d1);
+  var p2Lookups = kickOffPartnerAscendantMoonLookups('p2', y2, m2, d2);
   try {
     var p1 = computePartnerProfile(fn1, m1, d1, y1);
     var p2 = computePartnerProfile(fn2, m2, d2, y2);
+    await resolvePartnerAscendantMoonLookups(p1, p1Lookups);
+    await resolvePartnerAscendantMoonLookups(p2, p2Lookups);
     window._partnerP1 = p1; window._partnerP2 = p2;
     var axisConf = getAxisConfig(p1.axisRole, p2.axisRole);
     status.textContent = '✦ ' + AXIS_CONFIGS[axisConf].name + ' detected — generating reading...';
