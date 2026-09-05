@@ -412,4 +412,14 @@ When writing or editing anything that reaches `getFallbackReading()`, `getPartne
 
 ---
 
+## Part XXVII — Archetype Quiz Confirmation: Same Standing Rule, New Pairing
+
+The marketing "Archetype Quiz" funnel (a fun, personality-preference quiz, explicitly not a computed system — see its own code comments in `public/index.html`) stores its guessed Archetype in `localStorage` when a person completes it. If that same person later generates a real, computed solo reading in the same browser, `getFallbackReading()` and `doReading()`'s AI prompt both compare the stored quiz guess to the real, computed `codexArchetype` for exact string equality.
+
+This is not new calculation logic — it is the exact same standing rule established in Part XVIII §18.2 and reaffirmed throughout this Codex (Parts XX §20.5, XXI §21.7, XXIV §24.7): a real, computed match between two independently-produced findings is reported as a **plain, binary fact only** ("your quiz guess and your real chart landed on the same Archetype"), never converted into a score, percentage, or compatibility rating. The only difference here is the pairing — quiz guess vs. computed Archetype, rather than two people's charts.
+
+Per this Codex's honesty standard, only the **match** case is surfaced. A non-match is not treated as a negative finding or narrated at all — the quiz is explicitly a for-fun, non-calculated guess, and inventing a narrative around why it didn't match would be unfounded psychologizing, not a verified fact. This applies to solo readings only; the quiz produces a single person's guess, so it has no counterpart in partnership readings.
+
+---
+
 *W3BB Worldwide · Codex Logic V07 · Addendum to V06 · All additions are cross-verified against at least one other system already established in this Codex, with the derivation shown — no assertion stands alone.*

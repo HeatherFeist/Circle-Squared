@@ -478,11 +478,11 @@ body {
 <div id="screen-quiz-intro" class="screen">
   <div style="max-width:520px;width:100%;padding:2rem 1.5rem;margin:0 auto;display:flex;flex-direction:column;align-items:center;min-height:100vh;justify-content:center;text-align:center;">
     <p class="label-mono mb-3" style="color:var(--accent-gold);">✦ THE ARCHETYPE QUIZ ✦</p>
-    <h1 class="gradient-title font-serif text-3xl md:text-4xl font-bold mb-5" style="line-height:1.2;">Which Codex Archetype Matches How You Move Through the World?</h1>
-    <p style="color:var(--text-muted); font-size:0.95rem; line-height:1.75; margin-bottom:1.5rem;">8 quick questions about how you think, feel, and choose. No birth data required.</p>
+    <h1 class="gradient-title font-serif text-3xl md:text-4xl font-bold mb-5" style="line-height:1.2;">Does Your Gut Match Your Chart?</h1>
+    <p style="color:var(--text-muted); font-size:0.95rem; line-height:1.75; margin-bottom:1.5rem;">8 quick questions about how you think, feel, and choose. No birth data required — this quiz guesses your Codex Archetype from your personality alone.</p>
     <div class="cosmic-card w-full mb-6" style="text-align:left;border-color:rgba(176,138,255,0.3);">
       <p style="color:#e8e0ff;font-size:0.85rem;line-height:1.7;margin:0;">
-        <strong style="color:var(--accent-gold);">Quick heads up:</strong> this is a fun, 5-minute personality-preference quiz — not a computed numerology or astrology reading. Your answers nudge you toward one of our real Codex Archetypes, but it's a guess based on how you think and feel, not on your actual birth chart.
+        <strong style="color:var(--accent-gold);">Quick heads up:</strong> this is a fun, 5-minute personality-preference quiz — not a computed numerology or astrology reading. Your answers nudge you toward one of our real Codex Archetypes, but it's a guess based on how you think and feel, not on your actual birth chart. Think of it as a fifth, just-for-fun voice alongside Numerology, Astrology, Kabbalah, and Tarot — the only one of the five that isn't actually calculated. The real point isn't the guess itself; it's what happens when you test it against the real thing. Take your full reading afterward — calculated from your actual birth chart — and find out whether your instincts and the stars are pointing at the same archetype.
       </p>
     </div>
     <button id="quiz-start-btn" class="cta-btn w-full" style="font-size:1.05rem;max-width:340px;">✦ Start the Quiz ✦</button>
@@ -538,12 +538,12 @@ body {
     <p id="quiz-reveal-blurb" style="color:#e8e0ff;font-size:1rem;line-height:1.7;text-align:center;max-width:480px;margin-bottom:1.5rem;"></p>
     <div class="cosmic-card w-full mb-8" style="max-width:520px;border-color:rgba(176,138,255,0.3);">
       <p style="color:#9b8ec4;font-size:0.85rem;line-height:1.7;margin:0;text-align:center;">
-        This is your quick-guess Archetype based on how you think and feel — your <strong style="color:var(--accent-gold);">TRUE archetype</strong>, calculated from your actual birth chart across nine real systems, is waiting in your full reading below.
+        Based on your answers, this is your gut-level Archetype — a guess drawn purely from your personality and preferences, not your birth chart. Now the real question: <strong style="color:var(--accent-gold);">does the universe agree?</strong> Your full reading is calculated from your actual birth chart across real Numerology, Astrology, Kabbalah, and Tarot — get it below and find out whether your instincts and the stars are pointing at the same thing.
       </p>
     </div>
     <div class="divider w-full">✦ ─────── ✦</div>
-    <h3 class="font-serif text-xl md:text-2xl mb-2 text-center gradient-title mt-2">Get Your Real Codex Blueprint</h3>
-    <p class="text-center mb-6" style="color:var(--text-muted); font-size:0.9rem; font-style:italic;">Computed from your actual birth date and name — Numerology, Astrology, Kabbalah, Tarot, and Sacred Geometry, unified.</p>
+    <h3 class="font-serif text-xl md:text-2xl mb-2 text-center gradient-title mt-2">See If Your Quiz Answers Were Right</h3>
+    <p class="text-center mb-6" style="color:var(--text-muted); font-size:0.9rem; font-style:italic;">Get your full reading — computed from your actual birth date and name across Numerology, Astrology, Kabbalah, Tarot, and Sacred Geometry — and find out.</p>
     <div id="quizTierCards" class="flex flex-col gap-4 w-full mb-4" style="max-width:520px;"></div>
     <button id="quiz-reveal-restart-btn" class="skip-btn mt-4">↩ Take the Quiz Again</button>
   </div>
@@ -6184,10 +6184,21 @@ function getFallbackReading(){
   var pdw=p.personalDayWildcard||getPersonalDayWildcard(pd);
   var tc=p.tarotCard||TAROT_PATHS[1];
   var ca=p.codexArchetype||'The Integrator';
+  // QUIZ ARCHETYPE CONFIRMATION -- see storeQuizArchetypeGuess()/
+  // getStoredQuizArchetypeGuess() in the ARCHETYPE QUIZ FUNNEL section. If
+  // this person took the fun personality-preference quiz at some earlier
+  // point in this same browser, compare its guessed Archetype to the real,
+  // computed one above -- a plain, honest match/no-match fact, exactly like
+  // every other coincidence-style finding in this Codex (Part XVIII \u00a718.2
+  // and its reaffirmations). Only the match case is surfaced (a genuine
+  // delight moment); a no-match is simply a fun quiz that didn't land on
+  // the same label, not a "finding" worth narrating.
+  var quizGuess = getStoredQuizArchetypeGuess();
+  var quizArchetypeMatched = !!(quizGuess && quizGuess === ca);
   var fb='';
 
   fb+='===PAGE_1_START===\n';
-  fb+=p.firstName+', you are '+ca+'. This is not a title \u2014 it is a recognition. Your Life Path '+p.lifePath+', as '+lpData.title+', meets the '+p.sunSign.element+' current of your '+p.sunSign.sign+' Sun, and together they land you at '+p.tree.name+' on the Kabbalistic Tree of Life \u2014 '+p.tree.meaning+'. Three coordinates. One being. The center of your mandala is not above you or ahead of you. It is you.\n\n'+lpData.teaser+'\n\nYour gift \u2014 '+lpData.gift+' \u2014 is not something you earned. It is what you arrived with. When Numerology, Astrology, and Kabbalah all converge on the same essential truth about a soul, that truth becomes impossible to dismiss.\n';
+  fb+=p.firstName+', you are '+ca+'. This is not a title \u2014 it is a recognition. Your Life Path '+p.lifePath+', as '+lpData.title+', meets the '+p.sunSign.element+' current of your '+p.sunSign.sign+' Sun, and together they land you at '+p.tree.name+' on the Kabbalistic Tree of Life \u2014 '+p.tree.meaning+'. Three coordinates. One being. The center of your mandala is not above you or ahead of you. It is you.\n\n'+(quizArchetypeMatched ? ('Before this reading even began, your own Archetype Quiz guessed '+ca+' \u2014 and here it is again, confirmed by your actual birth chart. Your instincts were right.\n\n') : '')+lpData.teaser+'\n\nYour gift \u2014 '+lpData.gift+' \u2014 is not something you earned. It is what you arrived with. When Numerology, Astrology, and Kabbalah all converge on the same essential truth about a soul, that truth becomes impossible to dismiss.\n';
   if (p.ascendant && p.ascendant.sign) {
     fb+='\nYour Ascendant \u2014 the sign that was rising on the eastern horizon at the exact moment you were born \u2014 is '+p.ascendant.sign+(p.ascendant.degree!=null?' at '+p.ascendant.degree+'\u00b0':'')+'. Where your Sun sign is who you are at your core, your Ascendant is the lens the world first meets you through \u2014 the face you show before anyone has earned the deeper layers underneath.\n';
   }
@@ -6284,6 +6295,12 @@ async function doReading() {
   var lpTitle = (LP_DATA[p.lifePath]||LP_DATA[reduceNum(p.lifePath,false)]||LP_DATA[6]).title;
   var tc = p.tarotCard || TAROT_PATHS[1];
   var ca = p.codexArchetype || 'The Integrator';
+  // QUIZ ARCHETYPE CONFIRMATION -- same honest match/no-match fact as
+  // getFallbackReading() above (see getStoredQuizArchetypeGuess()). Only
+  // surfaced to the AI prompt when it actually matched; a no-match is left
+  // out rather than narrated.
+  var quizGuess = getStoredQuizArchetypeGuess();
+  var quizArchetypeMatched = !!(quizGuess && quizGuess === ca);
 
   // Resolve the optional Ascendant lookup (kicked off on submit) before building
   // the prompt. getAscendant() never throws and resolves null on any skip/failure.
@@ -6352,10 +6369,16 @@ async function doReading() {
   var nodeLine = (p.node && p.node.northSign) ? ('Lunar Nodes (lifelong axis): North Node in ' + p.node.northSign + ' (outward-growth direction), South Node in ' + p.node.southSign + ' (karmic comfort zone)' + (p.node.activePole ? ('. Currently active: ' + p.firstName + ' is presently moving through a real activation of the ' + (p.node.activePole === 'north' ? 'North' : 'South') + ' Node \u2014 a season worth naming, not an everyday state.') : '') + '\n') : '';
   var nodeDecanCardsLine = (p.nodeDecanCards) ? ('Node Decan Cards (in the language of the decans): North Node card is the ' + p.nodeDecanCards.northNodeCard.card + ' (keyword "' + p.nodeDecanCards.northNodeCard.keyword + '") \u2014 the growth-toward energy; South Node card is the ' + p.nodeDecanCards.southNodeCard.card + ' (keyword "' + p.nodeDecanCards.southNodeCard.keyword + '") \u2014 the shadow/comfort-zone energy.\n') : '';
   var hebrewSoulLine = p.hebrewSoulCorrespondence ? ('Hebrew Soul Correspondence (full birth name, real Mispar Hechrachi gematria): consonants ' + p.hebrewSoulCorrespondence.hebrewConsonants + ', total ' + p.hebrewSoulCorrespondence.gematriaTotal + ' \u2192 ' + p.hebrewSoulCorrespondence.gematriaReduced + '. ' + (p.hebrewSoulCorrespondence.archangelMatches.length ? 'Archangel match: ' + p.hebrewSoulCorrespondence.archangelMatches.map(function(m){return m.name + ' (' + m.hebrew + ' = ' + m.value + ')';}).join(', ') + '. ' : 'No Archangel match. ') + '72 Names position ' + p.hebrewSoulCorrespondence.nameOf72.position + ': ' + p.hebrewSoulCorrespondence.nameOf72.name + '.\n') : '';
+  // QUIZ ARCHETYPE CONFIRMATION -- only added to the prompt when this
+  // person's earlier fun personality-preference quiz (same browser)
+  // happened to guess the same Archetype the real chart just computed. A
+  // plain, honest match fact, not a score -- see quizArchetypeMatched above.
+  var quizArchetypeLine = quizArchetypeMatched ? ('Archetype Quiz Confirmation: before this reading was generated, ' + p.firstName + ' took the fun, personality-based Archetype Quiz (no birth data used) in this same browser and it guessed ' + ca + ' \u2014 the exact same Archetype this real, computed chart just landed on independently.\n') : '';
 
   var prompt ='You are Celestia, the oracle of Circles Squared \u2014 Taurus Codex Geometry. Generate a complete 9-section reading for ' + p.firstName + ' using the unified narrative approach: weave all systems (Astrology, Pythagorean & Chaldean Numerology, Gematria/Kabbalah, Tarot, Metatron\'s Cube, Sacred Geometry) into ONE seamless identity story. Never isolate systems in their own paragraph and move on \u2014 every time you introduce a new system\'s finding, explicitly say how it reinforces, explains, or adds a new angle on what has already been established earlier in the reading, by name (cite the specific earlier number, card, or Sephirah you are connecting it to). Rich, warm, poetic, second-person prose. Be specific to the exact data.\n\n'
     + 'PROFILE:\n'
     + 'Codex Archetype: ' + ca + '\n'
+    + quizArchetypeLine
     + 'Life Path: ' + p.lifePath + ' (' + lpTitle + ')\n'
     + 'Expression: ' + (p.expression||'?') + '  Soul Urge: ' + (p.soulUrge||'?') + '  Personality: ' + (p.personality||'?') + '  Birthday Number: ' + (p.birthdayNumber||'?') + '  Gematria Total: ' + (p.gematria?p.gematria.total:'?') + ' \u2192 ' + (p.gematria?p.gematria.reduced:'?') + '\n'
     + chaldeanLine
@@ -6375,7 +6398,7 @@ async function doReading() {
     + 'Personal Year 2026: ' + p.personalYear2026 + (p.personalMonth != null ? ('  Personal Month (current): ' + p.personalMonth) : '') + (p.personalDay != null ? ('  Personal Day (today): ' + p.personalDay) : '') + '\n'
     + personalDayWildcardLine
     + '\nWrite exactly 9 sections with ===PAGE_N_START=== and ===PAGE_N_END=== delimiters on their own lines (each delimiter on its own line, no other text on that line). Each section: 7\u20139 rich, deeply personal paragraphs (not 5\u20136 \u2014 these pages need to visually fill a full printed page, so write substantially more per page than feels like the minimum). Each paragraph should be 4\u20136 full sentences, not 2\u20133 \u2014 a thin, single-idea paragraph is not acceptable. Every paragraph must reference ' + p.firstName + ' by name at least once and cite the specific numbers or symbols from their profile, and should work in as many of the person\'s actual named numbers, cards, Sephiroth, and archetypes as genuinely fit \u2014 not just one per paragraph. When a paragraph starts to feel thin or abstract, do not move on to the next idea yet: stay with the same point and add a concrete second layer \u2014 what this finding actually looks like in ' + p.firstName + '\'s daily choices, relationships, or work, a specific example of the pattern playing out, or a second data point from the profile that deepens (not repeats) the first. No generic affirmations, no padding with synonyms of a sentence already written \u2014 every added sentence must carry new, specific content. Celestia speaks with warm authority, poetic depth, and precision.\n\n'
-    + 'Page 1 \u2014 IDENTITY ESSENCE: Open with the exact phrase "' + p.firstName + ', you are ' + ca + '." Then paint a full-portrait synthesis: how Life Path ' + p.lifePath + ' (' + lpTitle + ') shapes the core drive, how ' + p.sunSign.sign + ' Sun infuses it with elemental character (' + p.sunSign.element + ', ruled by ' + p.sunSign.planet + ')' + (p.ascendant && p.ascendant.sign ? ', how their ' + p.ascendant.sign + ' Ascendant colors the lens the world first meets them through' : '') + ', and how ' + p.tree.name + ' on the Tree of Life places this soul at a specific energetic address in creation. Explain what the Codex Archetype ' + ca + ' means as a living identity \u2014 not a label but a mandate.' + (p.node && p.node.northSign ? (' If it fits naturally, name their North Node in ' + p.node.northSign + ' as the lifelong outward direction the soul is growing toward and their South Node in ' + p.node.southSign + ' as the inward comfort zone they are moving away from \u2014 this is a lifelong developmental axis, not a daily forecast, so treat it as one more coordinate on the same portrait rather than a separate topic.' + (p.node.activePole ? (' Note also that ' + p.firstName + ' is moving through a real, present-tense activation of their ' + (p.node.activePole === 'north' ? 'North' : 'South') + ' Node right now \u2014 a season worth naming explicitly, since it is not the everyday state of this axis.') : '')) : '') + (p.nodeDecanCards ? (' In the language of the decans, that same Node axis also names one Minor Arcana card apiece: the ' + p.nodeDecanCards.northNodeCard.card + ' for the North Node \u2014 name this as the energy ' + p.firstName + ' is growing TOWARD \u2014 and the ' + p.nodeDecanCards.southNodeCard.card + ' for the South Node \u2014 name this as the shadow/comfort-zone energy ' + p.firstName + ' is moving AWAY from. Frame this as a growth trajectory, not a moral judgment: the South Node card is not "bad," it is simply the familiar gravity the North Node card is inviting ' + p.firstName + ' beyond. Make clear the placement itself is fixed \u2014 only how ' + p.firstName + ' works with it, moment by moment, is a matter of choice. Do not explain decans, degrees, or planetary rulerships to the reader \u2014 simply name the cards and their meaning.') : '') + ' End by naming the specific gift this soul arrived with, and name it as a thread the reading will keep picking back up \u2014 the same gift the reader will recognize again in the Tarot archetype, the shadow work, and the closing blessing.\n'
+    + 'Page 1 \u2014 IDENTITY ESSENCE: Open with the exact phrase "' + p.firstName + ', you are ' + ca + '." Then paint a full-portrait synthesis: how Life Path ' + p.lifePath + ' (' + lpTitle + ') shapes the core drive, how ' + p.sunSign.sign + ' Sun infuses it with elemental character (' + p.sunSign.element + ', ruled by ' + p.sunSign.planet + ')' + (p.ascendant && p.ascendant.sign ? ', how their ' + p.ascendant.sign + ' Ascendant colors the lens the world first meets them through' : '') + ', and how ' + p.tree.name + ' on the Tree of Life places this soul at a specific energetic address in creation. Explain what the Codex Archetype ' + ca + ' means as a living identity \u2014 not a label but a mandate.' + (p.node && p.node.northSign ? (' If it fits naturally, name their North Node in ' + p.node.northSign + ' as the lifelong outward direction the soul is growing toward and their South Node in ' + p.node.southSign + ' as the inward comfort zone they are moving away from \u2014 this is a lifelong developmental axis, not a daily forecast, so treat it as one more coordinate on the same portrait rather than a separate topic.' + (p.node.activePole ? (' Note also that ' + p.firstName + ' is moving through a real, present-tense activation of their ' + (p.node.activePole === 'north' ? 'North' : 'South') + ' Node right now \u2014 a season worth naming explicitly, since it is not the everyday state of this axis.') : '')) : '') + (p.nodeDecanCards ? (' In the language of the decans, that same Node axis also names one Minor Arcana card apiece: the ' + p.nodeDecanCards.northNodeCard.card + ' for the North Node \u2014 name this as the energy ' + p.firstName + ' is growing TOWARD \u2014 and the ' + p.nodeDecanCards.southNodeCard.card + ' for the South Node \u2014 name this as the shadow/comfort-zone energy ' + p.firstName + ' is moving AWAY from. Frame this as a growth trajectory, not a moral judgment: the South Node card is not "bad," it is simply the familiar gravity the North Node card is inviting ' + p.firstName + ' beyond. Make clear the placement itself is fixed \u2014 only how ' + p.firstName + ' works with it, moment by moment, is a matter of choice. Do not explain decans, degrees, or planetary rulerships to the reader \u2014 simply name the cards and their meaning.') : '') + (quizArchetypeMatched ? (' Also work in, naturally and once, that before this reading was even generated, ' + p.firstName + ' took the fun, personality-based Archetype Quiz in this same browser and it guessed ' + ca + ' \u2014 the same Archetype this real chart just landed on independently; frame this as one more instance of convergence across systems, the way this reading already treats the Life Path/Sun Sign/Sephirah agreement, and be clear the quiz itself is not a calculated system, just an honest personality-based guess that happened to land in the same place as the real math.') : '') + ' End by naming the specific gift this soul arrived with, and name it as a thread the reading will keep picking back up \u2014 the same gift the reader will recognize again in the Tarot archetype, the shadow work, and the closing blessing.\n'
     + 'Page 2 \u2014 ARCHETYPAL SIGNATURE: Explore the full mythic narrative. ' + tc.card + ' (Path ' + tc.path + ', letter ' + tc.letter + ') is the archetype ' + p.firstName + ' is living' + (p.lifePathTrumpCard ? ', confirmed by the Life Path Trump Card ' + p.lifePathTrumpCard.numeral + ' ' + p.lifePathTrumpCard.card : '') + '. Explain what this card means as a life-force not just a symbol, how the ' + p.sunSign.sign + ' Sun amplifies or challenges this path, and how the Kabbalistic letter ' + tc.letter + ' encodes a specific teaching in their very name. Name the mythic figures, gods, or archetypes associated with this path. Explicitly tie this Tarot archetype back to the Life Path ' + p.lifePath + ' and Codex Archetype ' + ca + ' named on Page 1 — show that the Tarot card is not a second, unrelated topic but the same mandate speaking in a different language, and say so directly. Describe what it feels like to embody ' + tc.card + ' fully vs. when it is suppressed.\n'
     + 'Page 3 \u2014 FREQUENCY PATTERN: Decode the name. Life Path ' + p.lifePath + ' is the birth frequency. Expression ' + (p.expression||'?') + ' is the gift encoded in every letter of "' + p.firstName + '". Soul Urge ' + (p.soulUrge||'?') + ' is the private longing beneath the surface. Gematria total ' + (p.gematria?p.gematria.total:'?') + ' reducing to ' + (p.gematria?p.gematria.reduced:'?') + ' is the name\'s sacred numerical signature.' + (p.chaldean ? ' The Chaldean compound of the name ' + p.firstName + ' is actually called by resolves to ' + p.chaldean.compound + ' (' + p.chaldean.reduced + '), a living-identity number layered atop the birth frequency.' : '') + ' Explicitly connect the Gematria total ' + (p.gematria?p.gematria.total:'?') + ' back to the Life Path ' + p.lifePath + ' established on Page 1 \u2014 name both numbers together and say plainly why a name-frequency and a birth-frequency landing on the same core tone is not coincidence but confirmation, two instruments playing the same note. Explain what happens when ' + p.firstName + ' aligns with vs. resists this frequency.\n'
     + 'Page 4 \u2014 THE FIELD GEOMETRY: ' + p.firstName + '\'s identity is a living Egg of Life \u2014 eight interlocking circles of force. Map which nodes are most activated: ' + p.tree.name + ' (Kabbalah), ' + tc.card + ' (Tarot), ' + p.sunSign.sign + ' (Astrology), Life Path ' + p.lifePath + ' (Numerology), gematria ' + (p.gematria?p.gematria.reduced:'?') + ' (Gematria), and Sacred Geometry as the container. Explain what it means that these systems converge on a single being — specifically call out at least one node where two systems from earlier pages (e.g. the Life Path from Page 1 and the Gematria reduction from Page 3, or the Tarot path from Page 2 and the Sephirah) sit on the same point of the geometry, not adjacent-but-separate points. Describe the energetic field this soul radiates and how others experience it. Name the specific intersection points where power concentrates.\n'
@@ -8647,8 +8670,43 @@ function selectQuizOption(archetype) {
   } else {
     document.getElementById('quiz-progress-fill').style.width = '100%';
     quizState.result = computeQuizArchetype();
+    storeQuizArchetypeGuess(quizState.result);
     showScreen('quiz-lead');
   }
+}
+
+// Stashes the quiz's guessed Archetype in localStorage (NOT sessionStorage --
+// this needs to survive well past a single Square-checkout round trip,
+// potentially days or weeks, until the person eventually buys a real
+// reading in this same browser). Read back later by doReading()/
+// getFallbackReading() to report an honest match/no-match fact against the
+// real, computed Codex Archetype -- see the "QUIZ ARCHETYPE CONFIRMATION"
+// section near computeQuizArchetype's real-reading counterpart. Wrapped in
+// try/catch per this codebase's existing defensive localStorage pattern
+// (see logPurchase()).
+var CS_QUIZ_GUESS_KEY = 'cs_quiz_archetype_guess';
+function storeQuizArchetypeGuess(archetype) {
+  try {
+    localStorage.setItem(CS_QUIZ_GUESS_KEY, JSON.stringify({
+      archetype: archetype,
+      storedAt: new Date().toISOString()
+    }));
+  } catch (e) { console.warn('Quiz archetype guess could not be stored:', e); }
+}
+
+// Reads back a previously-stored quiz guess, if any exists in this browser.
+// Returns the archetype string, or null if none was ever stored (the common
+// case -- most people generating a real reading never took the quiz first).
+// Deliberately left in localStorage after being read (not cleared) so a
+// re-view of the same reading, or a PDF regeneration, still shows the same
+// honest fact -- see doReading()/getFallbackReading() call sites.
+function getStoredQuizArchetypeGuess() {
+  try {
+    var raw = localStorage.getItem(CS_QUIZ_GUESS_KEY);
+    if (!raw) return null;
+    var parsed = JSON.parse(raw);
+    return (parsed && parsed.archetype) || null;
+  } catch (e) { return null; }
 }
 
 // Simple, transparent scoring: each answer adds one point to its mapped
