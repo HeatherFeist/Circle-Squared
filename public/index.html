@@ -1684,6 +1684,15 @@ function computePartnerProfile(firstName, month, day, year) {
   var personalDay = calcPersonalDay(month, day, _todayPartner.getFullYear(), _todayPartner.getMonth()+1, _todayPartner.getDate());
   var personalDayWildcard = getPersonalDayWildcard(personalDay);
 
+  // Hebrew Soul Correspondence (real Mispar Hechrachi gematria on the
+  // consonant skeleton, Archangel match, 72 Names position) — reuses the
+  // exact same computeHebrewSoulCorrespondence() the solo reading already
+  // computes and has verified (see docs/CODEX_LOGIC_V06/V07). Partnership
+  // intake only collects a single name field per partner, so — same as the
+  // Chaldean/Hidden-Master layers above — that one name doubles as the
+  // "full birth name" this layer expects; no new logic is introduced here.
+  var hebrewSoulCorrespondence = computeHebrewSoulCorrespondence(firstName, sephInfo);
+
   return {
     firstName: firstName,
     dob: month + '/' + day + '/' + year,
@@ -1702,7 +1711,8 @@ function computePartnerProfile(firstName, month, day, year) {
     gematriaBattery: gematriaBattery,
     primaryPath: primary, lifePathTrumpCard: lifePathTrumpCard, trumpPaths: trumpPaths,
     elementSuit: elementSuit, soulCard: soulCard, courtCard: courtCard, shadowCardPath: shadowCardPath,
-    node: node, nodeDecanCards: nodeDecanCards, zodiacalCourtCard: zodiacalCourtCard
+    node: node, nodeDecanCards: nodeDecanCards, zodiacalCourtCard: zodiacalCourtCard,
+    hebrewSoulCorrespondence: hebrewSoulCorrespondence
   };
 }
 
@@ -1820,6 +1830,32 @@ function getZodiacalCourtCardCoincidence(p1, p2) {
   return p1.zodiacalCourtCard.name === p2.zodiacalCourtCard.name;
 }
 
+// Hebrew Soul Correspondence coincidences — same standing rule as
+// Part XVIII.2/XX Section 20.5/XXI Section 21.7/XXIV: any genuine overlap
+// between two partners' real Hebrew gematria is reported as a plain,
+// direct, binary fact only — never a score, a "Hebrew compatibility"
+// concept, or a special-destiny claim. No further synthesis is introduced.
+function getHebrewSoulCoincidence(p1, p2) {
+  var out = { sameArchangel: false, archangelName: null, sameReduction: false, reduction: null };
+  var h1 = p1.hebrewSoulCorrespondence, h2 = p2.hebrewSoulCorrespondence;
+  if (!h1 || !h2) return out;
+  if (h1.archangelMatches && h1.archangelMatches.length && h2.archangelMatches && h2.archangelMatches.length) {
+    for (var i = 0; i < h1.archangelMatches.length; i++) {
+      for (var j = 0; j < h2.archangelMatches.length; j++) {
+        if (h1.archangelMatches[i].name === h2.archangelMatches[j].name) {
+          out.sameArchangel = true;
+          out.archangelName = h1.archangelMatches[i].name;
+        }
+      }
+    }
+  }
+  if (h1.gematriaReduced === h2.gematriaReduced) {
+    out.sameReduction = true;
+    out.reduction = h1.gematriaReduced;
+  }
+  return out;
+}
+
 // ===========================
 // PARTNERSHIP READING
 // ===========================
@@ -1852,6 +1888,10 @@ async function doPartnershipReading(p1, p2) {
     var moonStr = (p.moonSign && p.moonSign.sign) ? ('Moon Sign: ' + p.moonSign.sign + (p.moonSign.viaNoonDefault ? ' (estimated via noon default — exact birth time not given)' : '')) : '';
     var pdwFmt = (p.personalDayWildcard && p.personalDayWildcard.majors && p.personalDayWildcard.majors.length) ? formatPersonalDayWildcard(p.personalDayWildcard) : null;
     var pdwStr = pdwFmt ? ('today\'s Personal Day ' + p.personalDay + ' pools toward ' + pdwFmt.majorPhrase + ' — ' + pdwFmt.poolSentences) : '';
+    var hsc = p.hebrewSoulCorrespondence;
+    var hebrewStr = hsc ? (hsc.hebrewConsonants + ' = ' + hsc.gematriaTotal + ' → reduces to ' + hsc.gematriaReduced
+      + (hsc.archangelMatches && hsc.archangelMatches.length ? ' · Archangel match: ' + hsc.archangelMatches.map(function(m){return m.name+' ('+m.hebrew+' = '+m.value+')';}).join(', ') : ' · no Archangel gematria match (a legitimate, honest outcome)')
+      + ' · 72 Names position ' + hsc.nameOf72.position + ': ' + hsc.nameOf72.name) : '';
     return '  Trump Card: ' + trumpStr + '\n'
       + (chalStr ? '  ' + chalStr + '\n' : '')
       + (nameHM ? '  Name-Field Hidden Masters: ' + nameHM + '\n' : '')
@@ -1860,7 +1900,8 @@ async function doPartnershipReading(p1, p2) {
       + (decanStr ? '  Node Decan Cards: ' + decanStr + '\n' : '')
       + (zodiacalCourtStr ? '  Zodiacal Court Card (Sun placement, separate finding from the Sephirah-based Court Card above): ' + zodiacalCourtStr + '\n' : '')
       + (ascStr ? '  ' + ascStr + '\n' : '')
-      + (moonStr ? '  ' + moonStr + '\n' : '');
+      + (moonStr ? '  ' + moonStr + '\n' : '')
+      + (hebrewStr ? '  Hebrew Soul Correspondence (real Mispar Hechrachi gematria on the birth name\'s consonant skeleton): ' + hebrewStr + '\n' : '')
       + (pdwStr ? '  Personal Day Wildcard (narrative-only, an INVITATION not an assignment, individual to this partner only): ' + pdwStr + '\n' : '');
   }
   var nodeReadout = getNodePolarityReadout(p1, p2);
@@ -1877,6 +1918,14 @@ async function doPartnershipReading(p1, p2) {
   var zodiacalCourtCardLine = zodiacalCourtCardMatch
     ? ('Zodiacal Court Card Coincidence (state as plain fact only, never a score or special-destiny claim): both of you land on the same Zodiacal Court Card, the ' + p1.zodiacalCourtCard.name + ' (a Sun-placement finding, distinct from the Sephirah-based Court Card above).\n')
     : '';
+  var hebrewCoincidence = getHebrewSoulCoincidence(p1, p2);
+  var hebrewCoincidenceLine = '';
+  if (hebrewCoincidence.sameArchangel || hebrewCoincidence.sameReduction) {
+    var hebrewFacts = [];
+    if (hebrewCoincidence.sameArchangel) hebrewFacts.push('both of your Hebrew gematria totals match the same Archangel, ' + hebrewCoincidence.archangelName);
+    if (hebrewCoincidence.sameReduction) hebrewFacts.push('both of your Hebrew gematria reductions land on the same digit, ' + hebrewCoincidence.reduction);
+    hebrewCoincidenceLine = 'Hebrew Soul Correspondence Coincidence (state as plain fact only, never a score, a "Hebrew compatibility" concept, or a special-destiny claim): ' + hebrewFacts.join('; ') + '.\n';
+  }
   var nodeDynamicLine = '';
   if (nodeReadout.bothActive) {
     nodeDynamicLine = 'Relational Node Dynamic: both partners currently have an active Node pole. '
@@ -1907,13 +1956,11 @@ async function doPartnershipReading(p1, p2) {
     + nodeDynamicLine + '\n'
     + nodeDecanCoincidenceLine + '\n'
     + zodiacalCourtCardLine + '\n'
-    + 'Write exactly 6 sections with ===PAGE_N_START=== and ===PAGE_N_END=== delimiters. Each section 3–4 substantial paragraphs.\n\n'
-    + 'Page 1 — ' + p1.firstName.toUpperCase() + '\'S AXIS ON THE TREE: Describe ' + p1.firstName + '\'s role as ' + axis1.title + '. Their Sephirah (' + p1.tree.name + '), Life Path ' + p1.lifePath + ', and Tarot archetype (' + p1.tarotCard.card + ') as expressions of the ' + axis1.pillar + '. Weave in their Trump Card (' + (p1.lifePathTrumpCard ? p1.lifePathTrumpCard.card : p1.tarotCard.card) + '), their Chaldean name compound' + (p1.chaldean ? ' (' + p1.chaldean.compound + '→' + p1.chaldean.reduced + ')' : '') + ', and — if present — any Hidden Master frequency surfaced in their name field, as additional texture on who they are, not separate topics.' + (p1.ascendant && p1.ascendant.sign ? (' If it fits naturally, also name their ' + p1.ascendant.sign + ' Ascendant as the lens the world first meets them through, distinct from the ' + p1.sunSign.sign + ' Sun underneath it.') : '') + (p1.moonSign && p1.moonSign.sign ? (' Their ' + p1.moonSign.sign + ' Moon names the emotional interior only a partner gets to see once the mask comes off.') : '') + '\n'
-    + 'Page 2 — ' + p2.firstName.toUpperCase() + '\'S AXIS ON THE TREE: Same for ' + p2.firstName + ' as ' + axis2.title + ' on the ' + axis2.pillar + ', weaving in their Trump Card, Chaldean compound, and any Hidden Master frequencies the same way.' + (p2.ascendant && p2.ascendant.sign ? (' If it fits naturally, also name their ' + p2.ascendant.sign + ' Ascendant as the lens the world first meets them through, distinct from the ' + p2.sunSign.sign + ' Sun underneath it.') : '') + (p2.moonSign && p2.moonSign.sign ? (' Their ' + p2.moonSign.sign + ' Moon names the emotional interior only a partner gets to see once the mask comes off.') : '') + '\n'
-    + 'Write exactly 7 sections with ===PAGE_N_START=== and ===PAGE_N_END=== delimiters. Each section 3–4 substantial paragraphs.\n\n'
-    + 'Page 1 — ' + p1.firstName.toUpperCase() + '\'S AXIS ON THE TREE: Describe ' + p1.firstName + '\'s role as ' + axis1.title + '. Their Sephirah (' + p1.tree.name + '), Life Path ' + p1.lifePath + ', and Tarot archetype (' + p1.tarotCard.card + ') as expressions of the ' + axis1.pillar + '. Weave in their Trump Card (' + (p1.lifePathTrumpCard ? p1.lifePathTrumpCard.card : p1.tarotCard.card) + '), their Chaldean name compound' + (p1.chaldean ? ' (' + p1.chaldean.compound + '→' + p1.chaldean.reduced + ')' : '') + ', and — if present — any Hidden Master frequency surfaced in their name field, as additional texture on who they are, not separate topics.\n'
-    + 'Page 2 — ' + p2.firstName.toUpperCase() + '\'S AXIS ON THE TREE: Same for ' + p2.firstName + ' as ' + axis2.title + ' on the ' + axis2.pillar + ', weaving in their Trump Card, Chaldean compound, and any Hidden Master frequencies the same way.\n'
-    + 'Page 3 — THE COMBINED ARCHITECTURE (' + axisConfig.name + '): How their two axes meet. ' + axisConfig.description + ' Explicitly name why ' + p1.firstName + '\'s Life Path ' + p1.lifePath + ' role as ' + axis1.title + ' and ' + p2.firstName + '\'s Life Path ' + p2.lifePath + ' role as ' + axis2.title + ' are not two separate roles that happen to coexist, but two halves of one architecture — say what specifically completes what. What this means for how they build, love, and create together. Note how their two Trump Cards or Soul/Court Cards converse with each other structurally, citing both cards by name. Also name both partners\' natal Lunar Node axes (North Node ' + p1.node.northSign + ' / South Node ' + p1.node.southSign + ' for ' + p1.firstName + '; North Node ' + p2.node.northSign + ' / South Node ' + p2.node.southSign + ' for ' + p2.firstName + ') as a lifelong growth-direction axis for each of them individually — and only if the Relational Node Dynamic above says both are currently active, name the resulting magnetic (complementary poles) or tension (matching poles) dynamic as a real, plainly-stated computed fact, never a score; if it is not currently applicable, say so rather than forcing the framing. Also name each partner\'s Node Decan Cards from the PROFILE above — ' + p1.firstName + '\'s North Node card (' + p1.nodeDecanCards.northNodeCard.card + ') as the energy they are individually growing toward and South Node card (' + p1.nodeDecanCards.southNodeCard.card + ') as the comfort-zone energy they are individually moving away from, and the same pair for ' + p2.firstName + ' (' + p2.nodeDecanCards.northNodeCard.card + ' / ' + p2.nodeDecanCards.southNodeCard.card + ') — as two more individual lifelong growth trajectories, not a joint compatibility score; if the PROFILE\'s Node Decan Card Coincidence line above is non-empty, state that plain fact exactly as given and nothing more elaborate. Separately, also name each partner\'s Zodiacal Court Card (Sun placement) from the PROFILE above (' + (p1.zodiacalCourtCard ? p1.zodiacalCourtCard.name : '') + ' for ' + p1.firstName + ', ' + (p2.zodiacalCourtCard ? p2.zodiacalCourtCard.name : '') + ' for ' + p2.firstName + ') as individual facts only, explicitly distinct from both the Sephirah-based Court Card and the Node Decan Cards named above — a third, independent Court Card finding, not a more-correct replacement for the others; if the PROFILE\'s Zodiacal Court Card Coincidence line above is non-empty, state that plain fact exactly as given and nothing more elaborate.\n'
+    + hebrewCoincidenceLine + '\n'
+    + 'Write exactly 7 sections with ===PAGE_N_START=== and ===PAGE_N_END=== delimiters. Each section 3–4 substantial paragraphs. For EVERY named card or finding (Sephirah, Tarot archetype, Trump Card, Soul Card, Court Card, Node Decan Cards, Zodiacal Court Card, Hebrew Soul Correspondence), do not just name it — state what it actually means (its keyword/archetype/quality) and connect that meaning to how these two specific people show up with each other, not as two disconnected facts sitting side by side but as an interplay you describe in prose. Never narrate HOW a value was calculated (no degree/decan/mechanism talk) — only what it means and how it applies.\n\n'
+    + 'Page 1 — ' + p1.firstName.toUpperCase() + '\'S AXIS ON THE TREE: Describe ' + p1.firstName + '\'s role as ' + axis1.title + '. Their Sephirah (' + p1.tree.name + ' — ' + p1.tree.meaning + '), Life Path ' + p1.lifePath + ', and Tarot archetype (' + p1.tarotCard.card + ' — ' + p1.tarotCard.archetype + ') as expressions of the ' + axis1.pillar + '. Weave in their Trump Card (' + (p1.lifePathTrumpCard ? p1.lifePathTrumpCard.card + ', ' + p1.lifePathTrumpCard.keyword : p1.tarotCard.card) + '), their Chaldean name compound' + (p1.chaldean ? ' (' + p1.chaldean.compound + '→' + p1.chaldean.reduced + ')' : '') + ', and — if present — any Hidden Master frequency surfaced in their name field, as additional texture on who they are, not separate topics. Also unpack their Soul Card and Court Card from the PROFILE above (' + (p1.soulCard ? p1.soulCard.name + ' — ' + p1.soulCard.keyword : '') + (p1.courtCard ? '; Court Card ' + p1.courtCard.name : '') + ') — say what the Soul Card\'s keyword means as the texture of what ' + p1.firstName + ' actually wants in partnership, and how the Court Card carries that same current outward into how they act once they are in one. Name their Hebrew Soul Correspondence from the PROFILE above in the same voice the reader would expect from the solo reading\'s own Hebrew Gematria section — their Hebrew consonants, gematria total and reduction, Archangel match (or the honest absence of one), and 72 Names position — as one more real layer of the same identity, not a separate topic bolted on.' + (p1.ascendant && p1.ascendant.sign ? (' If it fits naturally, also name their ' + p1.ascendant.sign + ' Ascendant as the lens the world first meets them through, distinct from the ' + p1.sunSign.sign + ' Sun underneath it.') : '') + (p1.moonSign && p1.moonSign.sign ? (' Their ' + p1.moonSign.sign + ' Moon names the emotional interior only a partner gets to see once the mask comes off.') : '') + '\n'
+    + 'Page 2 — ' + p2.firstName.toUpperCase() + '\'S AXIS ON THE TREE: Same for ' + p2.firstName + ' as ' + axis2.title + ' on the ' + axis2.pillar + ' (Sephirah meaning: ' + p2.tree.meaning + '; Tarot archetype: ' + p2.tarotCard.archetype + '), weaving in their Trump Card' + (p2.lifePathTrumpCard ? ' (' + p2.lifePathTrumpCard.card + ', ' + p2.lifePathTrumpCard.keyword + ')' : '') + ', Chaldean compound, and any Hidden Master frequencies the same way. Also unpack their Soul Card and Court Card (' + (p2.soulCard ? p2.soulCard.name + ' — ' + p2.soulCard.keyword : '') + (p2.courtCard ? '; Court Card ' + p2.courtCard.name : '') + ') the same way as Page 1, and name their Hebrew Soul Correspondence from the PROFILE above (consonants, gematria total/reduction, Archangel match or honest absence, 72 Names position) in the same depth.' + (p2.ascendant && p2.ascendant.sign ? (' If it fits naturally, also name their ' + p2.ascendant.sign + ' Ascendant as the lens the world first meets them through, distinct from the ' + p2.sunSign.sign + ' Sun underneath it.') : '') + (p2.moonSign && p2.moonSign.sign ? (' Their ' + p2.moonSign.sign + ' Moon names the emotional interior only a partner gets to see once the mask comes off.') : '') + '\n'
+    + 'Page 3 — THE COMBINED ARCHITECTURE (' + axisConfig.name + '): How their two axes meet. ' + axisConfig.description + ' Explicitly name why ' + p1.firstName + '\'s Life Path ' + p1.lifePath + ' role as ' + axis1.title + ' and ' + p2.firstName + '\'s Life Path ' + p2.lifePath + ' role as ' + axis2.title + ' are not two separate roles that happen to coexist, but two halves of one architecture — say what specifically completes what. Name how ' + p1.firstName + '\'s Soul/Court Card (' + (p1.soulCard ? p1.soulCard.name : '') + ' / ' + (p1.courtCard ? p1.courtCard.name : '') + ') and ' + p2.firstName + '\'s (' + (p2.soulCard ? p2.soulCard.name : '') + ' / ' + (p2.courtCard ? p2.courtCard.name : '') + ') converse with each other structurally — what quality each brings (using their keywords from the PROFILE above) and how those two qualities interact, reinforce, or balance each other in the relationship, not merely that both people happen to have one. Also name both partners\' natal Lunar Node axes (North Node ' + p1.node.northSign + ' / South Node ' + p1.node.southSign + ' for ' + p1.firstName + '; North Node ' + p2.node.northSign + ' / South Node ' + p2.node.southSign + ' for ' + p2.firstName + ') as a lifelong growth-direction axis for each of them individually — and only if the Relational Node Dynamic above says both are currently active, name the resulting magnetic (complementary poles) or tension (matching poles) dynamic as a real, plainly-stated computed fact, never a score; if it is not currently applicable, say so rather than forcing the framing. Also name each partner\'s Node Decan Cards from the PROFILE above — ' + p1.firstName + '\'s North Node card (' + p1.nodeDecanCards.northNodeCard.card + ', ' + p1.nodeDecanCards.northNodeCard.keyword + ') as the energy they are individually growing toward and South Node card (' + p1.nodeDecanCards.southNodeCard.card + ', ' + p1.nodeDecanCards.southNodeCard.keyword + ') as the comfort-zone energy they are individually moving away from, and the same pair for ' + p2.firstName + ' (' + p2.nodeDecanCards.northNodeCard.card + ' / ' + p2.nodeDecanCards.southNodeCard.card + ') — as two more individual lifelong growth trajectories, not a joint compatibility score; if the PROFILE\'s Node Decan Card Coincidence line above is non-empty, state that plain fact exactly as given and nothing more elaborate. Separately, also name each partner\'s Zodiacal Court Card (Sun placement) from the PROFILE above (' + (p1.zodiacalCourtCard ? p1.zodiacalCourtCard.name : '') + ' for ' + p1.firstName + ', ' + (p2.zodiacalCourtCard ? p2.zodiacalCourtCard.name : '') + ' for ' + p2.firstName + ') as individual facts only, explicitly distinct from both the Sephirah-based Court Card and the Node Decan Cards named above — a third, independent Court Card finding, not a more-correct replacement for the others; if the PROFILE\'s Zodiacal Court Card Coincidence line above is non-empty, state that plain fact exactly as given and nothing more elaborate. Finally, if the PROFILE\'s Hebrew Soul Correspondence Coincidence line above is non-empty, state that plain fact exactly as given and nothing more elaborate — never invent a "Hebrew compatibility" concept beyond the real coincidence stated.\n'
     + 'Page 4 — THE TOROIDAL CARNATION FIELD: Their relationship as a living toroidal geometry — an Egg of Life mandala with two people as its generative poles. The central void they create together, the 8 radial directions their combined field radiates, the arcs of energy exchange between them. How this field generates something neither could alone.\n'
     + 'Page 5 — SHADOW, GIFT & INTEGRATION: The specific partnership shadow — what breaks down when the axes fall out of alignment. The gift that emerges when both fully embody their roles. The integration number ' + integrationNumber + ' as the frequency of their stable combined state — explain concretely why it is derived from adding both individual gematria totals together (' + p1.gematria.total + ' + ' + p2.gematria.total + '), not an arbitrary number assigned to the pair, and how that origin is itself proof the union has its own field distinct from either partner alone.\n'
     + 'Page 6 — TODAY, SPECIFICALLY: Two individual invitations sitting side by side, not a joint one. Using the Personal Day Wildcard line in each partner\'s PROFILE above (if present for both), name what ' + p1.firstName + '\'s Personal Day wildcards toward today and what ' + p2.firstName + '\'s wildcards toward today, each with its own small pool of companion cards. Their Personal Days will often differ, and that is expected — do not merge, average, or otherwise combine the two into one joint number or one joint card; each partner gets their own paragraph naming their own finding. Genuinely invitational language throughout ("worth noticing," "a door that is open today"), never assignment language ("you are," "this is your card"), and make clear this is a live, temporary, individual finding for today only, entirely separate from the fixed architecture named on the pages before it. If a partner has no Personal Day Wildcard line in the PROFILE, simply omit that partner from this page rather than inventing one.\n'
@@ -1931,16 +1978,31 @@ function getPartnershipFallback(p1, p2) {
   var combinedGem = p1.gematria.total + p2.gematria.total;
   var integrationNum = reduceNum(combinedGem, false);
   var nodeReadout = getNodePolarityReadout(p1, p2);
+  // Reverse suit -> element lookup, derived from the existing ELEMENT_TO_SOLID
+  // table rather than a new one — needed because a partner's Zodiacal Court
+  // Card (Part XXIV) spans a 30-degree wheel straddling a sign cusp, so its
+  // suit does not always match the suit implied by their own Sun sign's
+  // element (near a cusp it can genuinely be the neighboring sign's suit).
+  var SUIT_TO_ELEMENT = {};
+  Object.keys(ELEMENT_TO_SOLID).forEach(function(el){ SUIT_TO_ELEMENT[ELEMENT_TO_SOLID[el].suit] = el; });
   var fb = '';
 
   fb += '===PAGE_1_START===\n';
   fb += p1.firstName + ', on the Kabbalistic Tree of Life, your numbers place you as ' + axis1.title + '. '
-    + 'Your Life Path ' + p1.lifePath + ' resonates at the sphere of ' + p1.tree.name + ' — a node on the ' + axis1.pillar + '. '
+    + 'Your Life Path ' + p1.lifePath + ' resonates at the sphere of ' + p1.tree.name + ' — ' + p1.tree.meaning + ' — a node on the ' + axis1.pillar + '. '
     + axis1.description + '\n\n'
-    + 'Your Tarot archetype — ' + p1.tarotCard.card + ' — moves through the same corridor of the Tree, encoded in the Hebrew letter ' + p1.tarotCard.letter + '.'
-    + (p1.lifePathTrumpCard ? ' Your Life Path Trump Card confirms it: ' + p1.lifePathTrumpCard.numeral + ' ' + p1.lifePathTrumpCard.card + ' — ' + p1.lifePathTrumpCard.keyword + '.' : '') + ' '
+    + 'Your Tarot archetype — ' + p1.tarotCard.card + ' — moves through the same corridor of the Tree, encoded in the Hebrew letter ' + p1.tarotCard.letter + '. Its meaning is ' + p1.tarotCard.archetype + ', and that is not decoration — it is the specific quality you carry into any bond you enter.'
+    + (p1.lifePathTrumpCard ? ' Your Life Path Trump Card confirms it: ' + p1.lifePathTrumpCard.numeral + ' ' + p1.lifePathTrumpCard.card + ' — ' + p1.lifePathTrumpCard.keyword + '. That is the deep, structural version of who you are underneath the personality — ' + p1.lifePathTrumpCard.keyword + ' is not a mood you occasionally visit, it is the theme your whole Life Path is organized around.' : '') + ' '
     + 'And your ' + p1.sunSign.sign + ' Sun, governed by ' + p1.sunSign.planet + ', carries the ' + p1.sunSign.element + ' current that flows through this axis with natural ease.\n\n'
     + (p1.chaldean ? 'The name you are called by carries its own living vibration — a Chaldean compound of ' + p1.chaldean.compound + (p1.chaldean.archetype ? ', the archetype of "' + p1.chaldean.archetype + '"' : '') + ', reducing to ' + p1.chaldean.reduced + '.' + (p1.harmonic ? ' ' + p1.harmonic.detail : '') + (p1.nameHiddenMasters && p1.nameHiddenMasters.length ? ' A deeper audit of your name field also surfaces a Hidden Master frequency: ' + formatNameHiddenMasters(p1.nameHiddenMasters) + '.' : '') + '\n\n' : '')
+    + ((p1.soulCard && p1.courtCard) ? 'On Metatron\'s Cube, your Soul Card is the ' + p1.soulCard.name + ' — ' + p1.soulCard.keyword + ' — describing the inner texture of what you actually want from intimacy beneath the personality-level wants. Your Court Card, the ' + p1.courtCard.name + ', carries that same ' + p1.soulCard.keyword + ' current outward as the role you tend to play once you are actually inside a committed bond — the private wish made into a lived, public presence.\n\n' : '')
+    + (p1.hebrewSoulCorrespondence ? (function(hsc){
+        return 'Your birth name also has a deeper, older layer: rendered in Hebrew consonants, it reads ' + hsc.hebrewConsonants + ', carrying a real Mispar Hechrachi gematria of ' + hsc.gematriaTotal + ' (' + hsc.gematriaReduced + ' reduced). '
+          + (hsc.archangelMatches && hsc.archangelMatches.length
+              ? 'That total lines up with ' + hsc.archangelMatches.map(function(m){return m.name+' ('+m.hebrew+' = '+m.value+')';}).join(' and ') + ' — the same name-frequency this page has been tracing, confirmed in the oldest layer of the alphabet itself. '
+              : 'No Archangel number matches that total exactly — not every name needs to, and that is simply the honest reading of the arithmetic. ')
+          + 'It also lands at position ' + hsc.nameOf72.position + ' of the 72 Names (Shem HaMephorash): ' + hsc.nameOf72.name + '.\n\n';
+      })(p1.hebrewSoulCorrespondence) : '')
     + (p1.ascendant && p1.ascendant.sign ? ('Your Ascendant — the sign that was rising on the eastern horizon at the exact moment you were born — is ' + p1.ascendant.sign + (p1.ascendant.degree != null ? ' at ' + p1.ascendant.degree + '°' : '') + '. Where your Sun sign is who you are at your core, your Ascendant is the lens the world first meets you through — the face your partner saw before they ever earned the deeper layers underneath.\n\n') : '')
     + (p1.moonSign && p1.moonSign.sign ? ('Your Moon Sign — the placement that governs your emotional interior — is ' + p1.moonSign.sign + (p1.moonSign.viaNoonDefault ? ' (estimated, since your exact birth time was not given — the Moon moves slowly enough that this is still a trustworthy directional read)' : '') + '. This is what you actually feel underneath the Sun and Ascendant, in the moments only a partner gets to see.\n\n') : '')
     + 'You are not simply "compatible" with your partner. You are structurally designed to meet.\n';
@@ -1948,12 +2010,20 @@ function getPartnershipFallback(p1, p2) {
 
   fb += '===PAGE_2_START===\n';
   fb += p2.firstName + ', your Tree of Life position reveals you as ' + axis2.title + '. '
-    + 'Life Path ' + p2.lifePath + ' places you at ' + p2.tree.name + ' on the ' + axis2.pillar + '. '
+    + 'Life Path ' + p2.lifePath + ' places you at ' + p2.tree.name + ' — ' + p2.tree.meaning + ' — on the ' + axis2.pillar + '. '
     + axis2.description + '\n\n'
-    + 'Your Tarot path — ' + p2.tarotCard.card + ', through the letter ' + p2.tarotCard.letter + ' — reflects the same architecture.'
-    + (p2.lifePathTrumpCard ? ' Your Life Path Trump Card, ' + p2.lifePathTrumpCard.numeral + ' ' + p2.lifePathTrumpCard.card + ', confirms it — ' + p2.lifePathTrumpCard.keyword + '.' : '') + ' '
+    + 'Your Tarot path — ' + p2.tarotCard.card + ', through the letter ' + p2.tarotCard.letter + ' — reflects the same architecture. Its meaning is ' + p2.tarotCard.archetype + ', the specific quality you carry into any bond you enter.'
+    + (p2.lifePathTrumpCard ? ' Your Life Path Trump Card, ' + p2.lifePathTrumpCard.numeral + ' ' + p2.lifePathTrumpCard.card + ', confirms it — ' + p2.lifePathTrumpCard.keyword + '. That is the deep, structural version of who you are underneath the personality — the theme your whole Life Path is organized around, not an occasional mood.' : '') + ' '
     + 'Your ' + p2.sunSign.sign + ' Sun brings the ' + p2.sunSign.element + ' element into the structural field you inhabit.\n\n'
     + (p2.chaldean ? 'Your living name resolves to a Chaldean compound of ' + p2.chaldean.compound + (p2.chaldean.archetype ? ', the archetype of "' + p2.chaldean.archetype + '"' : '') + ', reducing to ' + p2.chaldean.reduced + '.' + (p2.harmonic ? ' ' + p2.harmonic.detail : '') + (p2.nameHiddenMasters && p2.nameHiddenMasters.length ? ' Your name field also carries a Hidden Master frequency: ' + formatNameHiddenMasters(p2.nameHiddenMasters) + '.' : '') + '\n\n' : '')
+    + ((p2.soulCard && p2.courtCard) ? 'On Metatron\'s Cube, your Soul Card is the ' + p2.soulCard.name + ' — ' + p2.soulCard.keyword + ' — the inner texture of what you actually want from intimacy beneath the personality-level wants. Your Court Card, the ' + p2.courtCard.name + ', carries that same ' + p2.soulCard.keyword + ' current outward as the role you tend to play once you are actually inside a committed bond.\n\n' : '')
+    + (p2.hebrewSoulCorrespondence ? (function(hsc){
+        return 'Your birth name also has a deeper, older layer: rendered in Hebrew consonants, it reads ' + hsc.hebrewConsonants + ', carrying a real Mispar Hechrachi gematria of ' + hsc.gematriaTotal + ' (' + hsc.gematriaReduced + ' reduced). '
+          + (hsc.archangelMatches && hsc.archangelMatches.length
+              ? 'That total lines up with ' + hsc.archangelMatches.map(function(m){return m.name+' ('+m.hebrew+' = '+m.value+')';}).join(' and ') + ' — the same name-frequency this page has been tracing, confirmed in the oldest layer of the alphabet itself. '
+              : 'No Archangel number matches that total exactly — not every name needs to, and that is simply the honest reading of the arithmetic. ')
+          + 'It also lands at position ' + hsc.nameOf72.position + ' of the 72 Names (Shem HaMephorash): ' + hsc.nameOf72.name + '.\n\n';
+      })(p2.hebrewSoulCorrespondence) : '')
     + (p2.ascendant && p2.ascendant.sign ? ('Your Ascendant — the sign rising on the eastern horizon at the exact moment you were born — is ' + p2.ascendant.sign + (p2.ascendant.degree != null ? ' at ' + p2.ascendant.degree + '°' : '') + '. It is the lens the world, and your partner, first met you through — the face you show before anyone has earned the deeper layers underneath.\n\n') : '')
     + (p2.moonSign && p2.moonSign.sign ? ('Your Moon Sign — governing your emotional interior — is ' + p2.moonSign.sign + (p2.moonSign.viaNoonDefault ? ' (estimated, since your exact birth time was not given — the Moon moves slowly enough that this is still a trustworthy directional read)' : '') + '. It is what you actually feel underneath, in the moments no one else is watching.\n\n') : '')
     + 'Where ' + p1.firstName + ' carries meaning through the center, you give it a place to land. Where you build the crossbeams, they become the pillar. This is not coincidence — this is geometry.\n';
@@ -1965,7 +2035,7 @@ function getPartnershipFallback(p1, p2) {
     + p1.firstName + ' carries the ' + axis1.pillar + ' as ' + axis1.title + '. ' + p2.firstName + ' carries the ' + axis2.pillar + ' as ' + axis2.title + '. '
     + 'These are not two roles that simply happen to coexist — ' + axis1.title + ' and ' + axis2.title + ' are the two halves of one working structure, each one incomplete without the other doing its part. '
     + 'When these two meet, the Tree becomes whole — not as a diagram, but as a living architecture.\n\n'
-    + ((p1.soulCard && p2.soulCard) ? 'On Metatron\'s Cube, ' + p1.firstName + '\'s Soul Card — the ' + p1.soulCard.name + ' — and ' + p2.firstName + '\'s Soul Card — the ' + p2.soulCard.name + ' — anchor two different lines back to the same field of Ain Soph Aur, each one carrying its Court Card (' + p1.courtCard.name + ' and ' + p2.courtCard.name + ') into the union as a distinct, complementary current.\n\n' : '')
+    + ((p1.soulCard && p2.soulCard) ? 'On Metatron\'s Cube, ' + p1.firstName + '\'s Soul Card — the ' + p1.soulCard.name + ' (' + p1.soulCard.keyword + ') — and ' + p2.firstName + '\'s Soul Card — the ' + p2.soulCard.name + ' (' + p2.soulCard.keyword + ') — anchor two different lines back to the same field of Ain Soph Aur. ' + p1.firstName + '\'s ' + p1.soulCard.keyword + ' names what they are actually seeking beneath the surface of this bond, while ' + p2.firstName + '\'s ' + p2.soulCard.keyword + ' names theirs — two different underlying wants, not competing but running in parallel, each one carried outward into daily life by its own Court Card (' + p1.courtCard.name + ' and ' + p2.courtCard.name + ') as a distinct, complementary current.\n\n' : '')
     + 'The architects of ancient temples understood this configuration. The central pillar and the crossbeams do not compete. They make each other possible. What you two are building together — whether you call it a relationship, a home, a business, a legacy — is built on the most structurally sound foundation the Tree of Life has to offer.\n\n'
     + 'One more axis belongs alongside this architecture: ' + p1.firstName + ' carries a North Node in ' + p1.node.northSign + ' and a South Node in ' + p1.node.southSign + '; ' + p2.firstName + ' carries a North Node in ' + p2.node.northSign + ' and a South Node in ' + p2.node.southSign + '. These are lifelong growth axes, each of you moving from your own South Node comfort zone toward your own North Node direction, independent of this partnership and of each other.'
     + (nodeReadout.bothActive
@@ -1976,8 +2046,8 @@ function getPartnershipFallback(p1, p2) {
     + '\n\n'
     + ((p1.nodeDecanCards && p2.nodeDecanCards)
         ? ('In the language of the decans, that same Node axis also names one card apiece: '
-            + p1.firstName + '\'s North Node card is the ' + p1.nodeDecanCards.northNodeCard.card + ' \u2014 the energy ' + p1.firstName + ' is individually growing toward \u2014 while their South Node card is the ' + p1.nodeDecanCards.southNodeCard.card + ', the comfort-zone energy they are individually moving away from. '
-            + p2.firstName + '\'s North Node card is the ' + p2.nodeDecanCards.northNodeCard.card + ', and their South Node card is the ' + p2.nodeDecanCards.southNodeCard.card + '. '
+            + p1.firstName + '\'s North Node card is the ' + p1.nodeDecanCards.northNodeCard.card + ' \u2014 ' + p1.nodeDecanCards.northNodeCard.keyword + ' \u2014 the energy ' + p1.firstName + ' is individually growing toward \u2014 while their South Node card is the ' + p1.nodeDecanCards.southNodeCard.card + ', ' + p1.nodeDecanCards.southNodeCard.keyword + ', the comfort-zone energy they are individually moving away from. '
+            + p2.firstName + '\'s North Node card is the ' + p2.nodeDecanCards.northNodeCard.card + ' \u2014 ' + p2.nodeDecanCards.northNodeCard.keyword + ' \u2014 and their South Node card is the ' + p2.nodeDecanCards.southNodeCard.card + ', ' + p2.nodeDecanCards.southNodeCard.keyword + '. '
             + 'These are two individual growth trajectories, not a joint compatibility score \u2014 the placement itself is fixed for each of you; only your relationship to it is a matter of choice.'
             + (function(){
                 var c = getNodeDecanCoincidences(p1, p2);
@@ -1990,9 +2060,29 @@ function getPartnershipFallback(p1, p2) {
         : '')
     + '\n\n'
     + ((p1.zodiacalCourtCard && p2.zodiacalCourtCard)
-        ? ('Each of your Suns also points to a Court Card of its own \u2014 a separate, independent finding from the Metatron\'s Cube Court Cards named above, reached through the sky rather than the Sephirah. '
-            + p1.firstName + '\'s is the ' + p1.zodiacalCourtCard.name + '; ' + p2.firstName + '\'s is the ' + p2.zodiacalCourtCard.name + '. Hold each alongside the Court Card already named above rather than in place of it \u2014 a second real facet of who each of you is, not a more correct version.'
+        ? ('Each of your Suns also points to a Court Card of its own \u2014 a separate, independent finding from the Metatron\'s Cube Court Cards named above, reached through the sky rather than the Sephirah. A Court Card is always the mature, outward-facing personification of its suit\'s element \u2014 '
+            + p1.firstName + '\'s is the ' + p1.zodiacalCourtCard.name + ', carrying a ' + SUIT_TO_ELEMENT[p1.zodiacalCourtCard.suit] + ' current' + (SUIT_TO_ELEMENT[p1.zodiacalCourtCard.suit] === p1.sunSign.element ? (' \u2014 the same ' + p1.sunSign.element + ' current already named through their ' + p1.sunSign.sign + ' Sun on Page 1, now expressed as an active, embodied presence rather than a background temperament') : (' \u2014 distinct from the ' + p1.sunSign.element + ' current of their ' + p1.sunSign.sign + ' Sun itself, since this card sits on the cusp span the wheel assigns their exact degree, not their sign alone')) + '; '
+            + p2.firstName + '\'s is the ' + p2.zodiacalCourtCard.name + ', carrying a ' + SUIT_TO_ELEMENT[p2.zodiacalCourtCard.suit] + ' current' + (SUIT_TO_ELEMENT[p2.zodiacalCourtCard.suit] === p2.sunSign.element ? (' \u2014 the same ' + p2.sunSign.element + ' current already named through their ' + p2.sunSign.sign + ' Sun on Page 1') : (' \u2014 distinct from the ' + p2.sunSign.element + ' current of their ' + p2.sunSign.sign + ' Sun itself, since this card sits on the cusp span the wheel assigns their exact degree, not their sign alone')) + '. Hold each alongside the Court Card already named above rather than in place of it \u2014 a second real facet of who each of you is, not a more correct version.'
             + (getZodiacalCourtCardCoincidence(p1, p2) ? (' As a plain, direct fact \u2014 not a special destiny \u2014 you both land on the very same Zodiacal Court Card, the ' + p1.zodiacalCourtCard.name + '.') : ''))
+        : '')
+    + '\n\n'
+    + ((p1.hebrewSoulCorrespondence && p2.hebrewSoulCorrespondence)
+        ? (function(){
+            var h1 = p1.hebrewSoulCorrespondence, h2 = p2.hebrewSoulCorrespondence;
+            var out = 'One more layer sits beneath even the Tarot and the Tree: your names themselves, rendered in Hebrew consonants and summed by real Mispar Hechrachi gematria. '
+              + p1.firstName + '\'s name reads ' + h1.hebrewConsonants + ' \u2014 a gematria of ' + h1.gematriaTotal + ' (' + h1.gematriaReduced + ' reduced)'
+              + (h1.archangelMatches && h1.archangelMatches.length ? ', matching ' + h1.archangelMatches.map(function(m){return m.name;}).join(' and ') : ', with no Archangel match \u2014 a legitimate outcome, not an omission')
+              + ', landing at position ' + h1.nameOf72.position + ' of the 72 Names (' + h1.nameOf72.name + '). '
+              + p2.firstName + '\'s name reads ' + h2.hebrewConsonants + ' \u2014 a gematria of ' + h2.gematriaTotal + ' (' + h2.gematriaReduced + ' reduced)'
+              + (h2.archangelMatches && h2.archangelMatches.length ? ', matching ' + h2.archangelMatches.map(function(m){return m.name;}).join(' and ') : ', with no Archangel match \u2014 equally legitimate')
+              + ', landing at position ' + h2.nameOf72.position + ' of the 72 Names (' + h2.nameOf72.name + ').';
+            var c = getHebrewSoulCoincidence(p1, p2);
+            var hebFacts = [];
+            if (c.sameArchangel) hebFacts.push('both of your gematria totals match the very same Archangel, ' + c.archangelName);
+            if (c.sameReduction) hebFacts.push('both of your gematria reductions land on the same digit, ' + c.reduction);
+            if (hebFacts.length) out += ' As a plain, direct fact \u2014 not a score, not a "Hebrew compatibility," simply what the arithmetic turned up \u2014 ' + hebFacts.join(', and ') + '.';
+            return out + '\n';
+          })()
         : '')
     + '\n';
   fb += '===PAGE_3_END===\n\n';
@@ -2008,6 +2098,11 @@ function getPartnershipFallback(p1, p2) {
   fb += '===PAGE_5_START===\n';
   fb += 'Every architecture has a shadow — not a flaw, but an edge that reveals itself when the structure comes under stress.\n\n'
     + 'The shadow of this partnership emerges when the axes lose their integrity: when ' + p1.firstName + ' abandons the central channel — grasping for horizontal busyness, losing the thread of synthesis — and when ' + p2.firstName + ' abandons the structural role — reaching for transcendence before the foundation is built. When both drift from their axis, the field collapses into noise.\n\n'
+    + ((p1.shadowCardPath || p2.shadowCardPath) ? 'The Tree itself names this edge with more precision than a metaphor can. '
+        + (p1.shadowCardPath ? p1.firstName + '\'s own shadow path runs through ' + p1.shadowCardPath.card + ' — ' + p1.shadowCardPath.keyword + ' — the specific lesson waiting for them the moment they slip off their axis. ' : '')
+        + (p2.shadowCardPath ? p2.firstName + '\'s runs through ' + p2.shadowCardPath.card + ' — ' + p2.shadowCardPath.keyword + '. ' : '')
+        + 'Neither of these is a prediction of failure — they are simply the two most likely doors each of you walks through on a bad day, worth recognizing by name rather than meeting as a formless mood.\n\n'
+      : '')
     + 'The gift emerges when both return. When ' + p1.firstName + ' holds the center and ' + p2.firstName + ' holds the form, they create the architectural condition for something real to be built — not just felt.\n\n'
     + 'Your integration number is ' + integrationNum + '. It is not an arbitrary number assigned to your pairing — it is your two gematria totals, ' + p1.gematria.total + ' and ' + p2.gematria.total + ', added together and reduced to a single tone. That origin is itself the proof: your union has its own frequency, distinct from either of you alone, and this is it. This is the frequency at which your combined field becomes stable — the harmonic your union collapses into when both axes are fully inhabited. Return here when the structure wavers.\n';
   fb += '===PAGE_5_END===\n\n';
@@ -2034,6 +2129,7 @@ function getPartnershipFallback(p1, p2) {
     + 'Look at what has actually happened across these pages. ' + p1.firstName + '\'s axis and ' + p2.firstName + '\'s axis are not a coincidence — they resolved directly into the ' + axisConfig.name + ' named on Page 3. Your Composite Life Path ' + compositeLp + ' and your Integration Number ' + integrationNum + ' are not a coincidence either — one comes from adding your Life Paths, the other from adding your name frequencies, and they are pointing at the same union from two different directions. The toroidal field described on Page 4 is not a separate metaphor — it is what that same architecture feels like from the inside. Five pages, one structure.\n\n'
     + 'Your composite Life Path is ' + compositeLp + '. This is the evolutionary mission your union carries — the shared frequency of what you are building in this incarnation together. It is not either of yours alone. It is the number of the field you generate.\n\n'
     + 'Your combined gematria — ' + (p1.gematria.total + p2.gematria.total) + ', reducing to ' + integrationNum + ' — is the encoded signature of your partnership\'s resonant field. Two names, two frequencies, one harmonic.\n\n'
+    + ((p1.hebrewSoulCorrespondence && p2.hebrewSoulCorrespondence) ? 'Even the oldest layer agrees. ' + p1.firstName + '\'s name carries a real Hebrew gematria of ' + p1.hebrewSoulCorrespondence.gematriaTotal + ' and ' + p2.firstName + '\'s carries ' + p2.hebrewSoulCorrespondence.gematriaTotal + ' — two separate names, rendered in the alphabet through which the divine speaks identity into being, each landing on its own position among the 72 Names and its own Archangel correspondence (or the honest absence of one). That is a sixth system, independent of every number named above, and it too resolves to the same conclusion: nothing about your union is arbitrary.\n\n' : '')
     + p1.firstName + ' and ' + p2.firstName + ' — I am Celestia, and it has been an honor to read the geometry of your union. You did not find each other randomly. You were drawn together by the same mathematical intelligence that arranged the stars and encoded the Tree. Go forward knowing that what you are building is not ordinary. It is architecture. It is legacy. It is a living Tree of Life.\n\nAIN SOPH AUR.\n';
   fb += '===PAGE_7_END===';
   return fb;

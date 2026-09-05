@@ -412,4 +412,24 @@ When writing or editing anything that reaches `getFallbackReading()`, `getPartne
 
 ---
 
+## Part XXVII — Hebrew Soul Correspondence Now Also Surfaced in Partnership Readings
+
+The Hebrew Soul Correspondence layer (`computeHebrewSoulCorrespondence()` — real Mispar Hechrachi gematria on the birth name's transliterated Hebrew consonant skeleton, Archangel gematria match, and 72 Names/Shem HaMephorash position) was already computed and reader-facing for the solo reading. It was not, until now, computed at all for partnership readings — a real gap, not a presentation choice, since `computePartnerProfile()` never called it. This Part records the fix, which is pure reuse: no new letter-value table, no new Archangel gematria value, and no new 72-Names table was introduced or re-verified. The exact same function already covered by this document's sourcing is now also called once per partner.
+
+### 27.1 — What changed
+
+`computePartnerProfile()` now calls `computeHebrewSoulCorrespondence(firstName, sephInfo)` for each partner independently and carries the result on the profile as `hebrewSoulCorrespondence`, exactly the field name and shape the solo profile already uses. As the existing comment on `computePartnerProfile()` already notes for the Chaldean/Hidden-Master layers, the partnership intake form collects only a single name field per partner, so that one name doubles as the "full birth name" this layer expects — the same accepted limitation already documented for those other layers, not a new one.
+
+`getPartnershipFallback()` and `doPartnershipReading()`'s AI prompt now name each partner's Hebrew consonants, real gematria total and reduction, Archangel match (or the honest, explicitly-stated absence of one), and 72 Names position, in the same voice and depth the solo reading's own Hebrew Gematria Correspondence paragraph already uses.
+
+### 27.2 — Coincidence reporting
+
+Following the exact same standing rule as every other relational finding in this Codex (Part XVIII.2, Part XX §20.5, Part XXI §21.7, Part XXIV's zodiacal-court-card check): if two partners' Hebrew Soul Correspondences coincide — either an exact match to the same Archangel, or the same gematria reduction digit — `getHebrewSoulCoincidence(p1, p2)` reports that as a **plain, direct, binary fact only**, never a score, a "Hebrew compatibility" concept, or a special-destiny claim. Absence of any such coincidence is simply the ordinary case, not a negative finding.
+
+### 27.3 — What this does not add
+
+No new Hebrew letter-value table, no new Archangel gematria value, no new 72-Names table, and no synastry-style scoring of any kind. Every sentence added under this Part traces to the same `computeHebrewSoulCorrespondence()` output already verified for the solo reading; only the call site (once per partner instead of once per solo subject) and the coincidence check (new, but following the established plain-fact-only pattern from Parts XVIII/XX/XXI/XXIV) are new.
+
+---
+
 *W3BB Worldwide · Codex Logic V07 · Addendum to V06 · All additions are cross-verified against at least one other system already established in this Codex, with the derivation shown — no assertion stands alone.*
