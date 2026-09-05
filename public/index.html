@@ -709,7 +709,7 @@ body {
     <div data-id="266" style="margin-top:2rem;border-top:1px solid rgba(176,138,255,0.15);padding-top:1.5rem;">
       <div data-id="267" style="font-family:'Courier New',monospace;font-size:0.62rem;letter-spacing:0.4em;color:#c9a84c;margin-bottom:0.3rem;">🎙️ VOICE SETTINGS (OPTIONAL: AZURE AI SPEECH UPGRADE)</div>
       <div data-id="268" style="font:700 1.1rem Georgia,serif;color:#e8e0ff;margin-bottom:0.6rem;">Voice Settings — Optional Azure AI Speech Upgrade</div>
-      <p data-id="269" style="font-size:0.8rem;color:#8a7aaa;line-height:1.6;margin-bottom:1rem;">By default the reading is narrated for free using the voice already built into your browser (preferring an "Aria" voice when one is available). Entering an Azure Cognitive Services Speech key and region below is entirely optional — it upgrades narration to a paid Azure neural voice instead. Both fields are required only if you want to use this upgrade. Stored only in your browser's local storage — never in any file or server.</p>
+      <p data-id="269" style="font-size:0.8rem;color:#8a7aaa;line-height:1.6;margin-bottom:1rem;">By default the reading is narrated for free using the voice already built into your browser (preferring a "Natasha" voice — Microsoft's Australian English voice — when one is available, falling back to "Aria" or your browser's own default otherwise). Entering an Azure Cognitive Services Speech key and region below is entirely optional — it upgrades narration to a paid Azure neural voice instead. Both fields are required only if you want to use this upgrade. Stored only in your browser's local storage — never in any file or server.</p>
 
       <div data-id="270" style="margin-bottom:0.8rem;">
         <label data-id="271" style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#c9a84c;display:block;margin-bottom:0.4rem;">API KEY</label>
@@ -725,11 +725,11 @@ body {
         <label data-id="274" style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#c9a84c;display:block;margin-bottom:0.4rem;">VOICE</label>
         <select data-id="275" id="azure-voice-select" class="cosmic-select" style="width:100%;">
           <optgroup label="— FEMALE VOICES —">
-            <option value="en-US-AriaNeural">Aria — Warm American ✦ Recommended</option>
+            <option value="en-US-AriaNeural">Aria — Warm American</option>
             <option value="en-US-JennyNeural">Jenny — Friendly American</option>
             <option value="en-US-SaraNeural">Sara — Soft American</option>
             <option value="en-GB-SoniaNeural">Sonia — Crisp British</option>
-            <option value="en-AU-NatashaNeural">Natasha — Warm Australian</option>
+            <option value="en-AU-NatashaNeural">Natasha — Warm Australian ✦ Recommended</option>
             <option value="en-IE-EmilyNeural">Emily — Irish Mystique</option>
           </optgroup>
           <optgroup label="— MALE VOICES —">
@@ -755,11 +755,11 @@ body {
         <select data-id="287" id="azure-intro-voice-select" class="cosmic-select" style="width:100%;margin-bottom:0.6rem;">
           <option value="">— None (use fallback voice) —</option>
           <optgroup label="— FEMALE VOICES —">
-            <option value="en-US-AriaNeural">Aria — Warm American ✦ Recommended</option>
+            <option value="en-US-AriaNeural">Aria — Warm American</option>
             <option value="en-US-JennyNeural">Jenny — Friendly American</option>
             <option value="en-US-SaraNeural">Sara — Soft American</option>
             <option value="en-GB-SoniaNeural">Sonia — Crisp British</option>
-            <option value="en-AU-NatashaNeural">Natasha — Warm Australian</option>
+            <option value="en-AU-NatashaNeural">Natasha — Warm Australian ✦ Recommended</option>
             <option value="en-IE-EmilyNeural">Emily — Irish Mystique</option>
           </optgroup>
           <optgroup label="— MALE VOICES —">
@@ -1129,7 +1129,8 @@ async function appSdkSpeak(text) {
 
 // Browser TTS — this is now the DEFAULT free voice path (per project owner
 // request: "just connect the free Microsoft voice that is in the browser...
-// keep the australian Aria or whatever voice my browser is using now").
+// keep the australian Aria or whatever voice my browser is using now",
+// later refined to specifically prefer Microsoft's Australian "Natasha" voice).
 // Azure AI Speech (above) remains available as an optional paid upgrade for
 // anyone who saves an API key in the admin panel; AppSDK's own voice is kept
 // only as a further fallback (see _fallbackSpeakLong) for environments where
@@ -1150,24 +1151,29 @@ function browserSpeak(text, onEnd) {
     if (onEnd) onEnd();
   }
 
-  // Prefer any voice with "Aria" in its name (case-insensitive substring) —
-  // this covers both the common US English "Microsoft Aria Online (Natural)"
-  // neural voice and any Australian-flavored "Aria"-named voice a given
-  // browser/OS ships. If no Aria voice is found anywhere in the list, leave
+  // Prefer any voice with "Natasha" in its name (case-insensitive substring)
+  // — this is Microsoft's Australian English voice ("Microsoft Natasha
+  // Online (Natural) - English (Australia)" on Windows/Edge). Falls back to
+  // any "Aria" voice if no Natasha voice is present (covers browsers/OSes
+  // that ship one but not the other), and if neither is found, leaves
   // utter.voice unset entirely — that makes the browser speak with its own
   // currently-configured default voice ("whatever voice my browser is using
   // now") instead of forcing any particular voice or lang. Setting
   // utter.voice to a found voice already carries that voice's own .lang, so
   // we never hardcode a lang here.
-  function pickAriaVoice(voices) {
-    for (var i = 0; i < voices.length; i++) {
+  function pickPreferredVoice(voices) {
+    var i;
+    for (i = 0; i < voices.length; i++) {
+      if (voices[i].name && voices[i].name.toLowerCase().indexOf('natasha') !== -1) return voices[i];
+    }
+    for (i = 0; i < voices.length; i++) {
       if (voices[i].name && voices[i].name.toLowerCase().indexOf('aria') !== -1) return voices[i];
     }
     return null;
   }
 
   function speakWithVoices(voices) {
-    var v = pickAriaVoice(voices);
+    var v = pickPreferredVoice(voices);
     if (v) utter.voice = v;
     // else: utter.voice stays unset -> browser's own current default voice/lang is used
     window.speechSynthesis.speak(utter);
@@ -1251,7 +1257,7 @@ async function speakLongText(fullText, onFinish) {
 
   var apiKey = localStorage.getItem('azure_api_key');
   var region = localStorage.getItem('azure_region');
-  var voiceId = localStorage.getItem('azure_voice_id') || 'en-US-AriaNeural';
+  var voiceId = localStorage.getItem('azure_voice_id') || 'en-AU-NatashaNeural';
 
   if (apiKey && region) {
     var azSuccess = await _trySpeakAzureChunks(fullText, apiKey, region, voiceId);
@@ -1283,7 +1289,7 @@ async function speakIntroText(fullText, onFinish) {
 
   var apiKey = localStorage.getItem('azure_api_key');
   var region = localStorage.getItem('azure_region');
-  var introVoiceId = localStorage.getItem('azure_intro_voice_id') || localStorage.getItem('azure_voice_id') || 'en-US-AriaNeural';
+  var introVoiceId = localStorage.getItem('azure_intro_voice_id') || localStorage.getItem('azure_voice_id') || 'en-AU-NatashaNeural';
 
   if (apiKey && region) {
     var azSuccess = await _trySpeakAzureChunks(fullText, apiKey, region, introVoiceId);
@@ -1354,7 +1360,7 @@ async function speakText(text) {
 
   var apiKey = localStorage.getItem('azure_api_key');
   var region = localStorage.getItem('azure_region');
-  var voiceId = localStorage.getItem('azure_voice_id') || 'en-US-AriaNeural';
+  var voiceId = localStorage.getItem('azure_voice_id') || 'en-AU-NatashaNeural';
 
   if (apiKey && region) {
     try {
@@ -2316,7 +2322,7 @@ function logPurchase(buyerName, buyerEmail, orderId, tier) {
 function loadAzureSettings() {
   var savedKey = localStorage.getItem('azure_api_key');
   var savedRegion = localStorage.getItem('azure_region') || '';
-  var savedVoice = localStorage.getItem('azure_voice_id') || 'en-US-AriaNeural';
+  var savedVoice = localStorage.getItem('azure_voice_id') || 'en-AU-NatashaNeural';
   var savedIntroVoice = localStorage.getItem('azure_intro_voice_id') || '';
   var keyInput = document.getElementById('azure-api-key-input');
   var regionInput = document.getElementById('azure-region-input');
@@ -2379,7 +2385,7 @@ document.getElementById('azure-test-btn').addEventListener('click', async functi
   var status = document.getElementById('azure-status');
   var key = localStorage.getItem('azure_api_key');
   var region = localStorage.getItem('azure_region');
-  var voice = localStorage.getItem('azure_voice_id') || 'en-US-AriaNeural';
+  var voice = localStorage.getItem('azure_voice_id') || 'en-AU-NatashaNeural';
   if (!key || !region) {
     status.textContent = '⚠️ Save your API key and region first.';
     status.style.color = '#ff9ed2';
