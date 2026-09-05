@@ -7141,16 +7141,20 @@ function _openPDF(doc, filename) {
 
 // ===========================
 // PERSONAL TONE — Web Audio playback engine
-// Sustained ambient pad (chord) + a slow melody sequence + a numerology-
-// driven rhythm + a generated short reverb, all synthesized client-side
-// via the Web Audio API. No external audio files, no external API/backend.
-// Loops indefinitely until Stop is pressed; Stop actually cancels every
-// scheduled oscillator/gain ramp, not just the UI state.
+// Sustained choir-like pad (chord) + a harp-like plucked melody sequence +
+// a numerology-driven rhythm + a generated short reverb, all synthesized
+// client-side via the Web Audio API. No external audio files, no external
+// API/backend, no library — every timbre below (detuned-oscillator +
+// formant-filter choir voices, Karplus-Strong plucked strings) is built
+// from raw AudioContext nodes. Loops indefinitely until Stop is pressed;
+// Stop actually cancels/disconnects every node in play — oscillators,
+// vibrato LFOs, formant filters and the pluck's ScriptProcessorNode alike —
+// not just the UI state.
 // ===========================
 var PersonalTone = (function() {
   var ctx = null;
   var masterGain = null, dryGain = null, reverbGain = null, convolver = null;
-  var activeNodes = [];   // every live {osc,gain} pair, for a hard stop
+  var activeNodes = [];   // every live voice ({gain, oscillators?, processors?, disconnectables}), for a hard stop
   var playToken = 0;      // bumped on stop/replay so old scheduleLoop() recursion halts
   var playing = false;
 
@@ -7197,55 +7201,179 @@ var PersonalTone = (function() {
     gainNode.connect(convolver);
   }
 
-  // A soft, sustained pad tone (sine wave) with a slow linear attack —
-  // never a hard gain step, so it never clicks/pops.
+  // A choir-like sustained pad: 3 oscillators per note, each a few cents
+  // apart in tune (the same physical fact that makes several real singers
+  // holding a unison sound like "a choir" rather than one flat tone),
+  // each with its own slow subtle vibrato LFO (real sustained voices are
+  // never perfectly steady in pitch — without it a held tone reads as
+  // mechanical), summed and passed through two bandpass filters tuned to
+  // rough first/second formants of an "ah" vowel (~750Hz / ~1150Hz,
+  // standard values for that vowel in vocal-acoustics references) so the
+  // result reads as voice-like rather than a generic synth pad. Same slow
+  // linear attack as before — never a hard gain step, so it never
+  // clicks/pops.
   function startSustainedTone(freq, atSecOffset, level) {
-    var osc = ctx.createOscillator();
-    osc.type = 'sine';
-    osc.frequency.value = freq;
-    var gain = ctx.createGain();
     var startAt = ctx.currentTime + atSecOffset;
+    var detuneCents = [-6, 0, 6]; // "several real voices", never perfectly in tune with each other
+    var oscillators = [];
+    var lfos = [];
+
+    // Sums the unison layers before the formant filters shape the vowel.
+    var mix = ctx.createGain();
+    mix.gain.value = 1 / detuneCents.length;
+
+    detuneCents.forEach(function(cents) {
+      var osc = ctx.createOscillator();
+      osc.type = 'sawtooth'; // harmonically rich source for the formant filters to carve a vowel out of
+      osc.frequency.value = freq;
+      osc.detune.value = cents;
+
+      var lfo = ctx.createOscillator();
+      lfo.type = 'sine';
+      lfo.frequency.value = 5.4 + Math.random() * 0.8; // ~5-6Hz vibrato, slightly different per layer
+      var lfoDepth = ctx.createGain();
+      lfoDepth.gain.value = 4; // +/- a few cents of pitch wobble — subtle, not a wide vibrato
+      lfo.connect(lfoDepth);
+      lfoDepth.connect(osc.detune);
+      lfo.start(startAt);
+
+      osc.connect(mix);
+      osc.start(startAt);
+      oscillators.push(osc);
+      lfos.push(lfo);
+    });
+
+    // Two parallel bandpass "formants" — moderate Q so this stays a warm
+    // vowel color rather than a honky, screamingly resonant filter sweep.
+    var formant1 = ctx.createBiquadFilter();
+    formant1.type = 'bandpass';
+    formant1.frequency.value = 750; // F1 for an "ah" vowel
+    formant1.Q.value = 4;
+    var formant2 = ctx.createBiquadFilter();
+    formant2.type = 'bandpass';
+    formant2.frequency.value = 1150; // F2 for an "ah" vowel
+    formant2.Q.value = 3;
+    mix.connect(formant1);
+    mix.connect(formant2);
+
+    var gain = ctx.createGain();
     gain.gain.setValueAtTime(0, startAt);
     gain.gain.linearRampToValueAtTime(level, startAt + 3.5);
-    osc.connect(gain);
+    formant1.connect(gain);
+    formant2.connect(gain);
     connectVoice(gain);
-    osc.start(startAt);
-    var voice = { osc: osc, gain: gain };
+
+    // `gain` stays the single node the chord-pulse loop below ramps
+    // directly (same contract as before); everything else is tracked here
+    // purely so stop()/clearActiveNodes() can silence and disconnect the
+    // whole choir voice, not just its final gain stage.
+    var voice = {
+      gain: gain,
+      oscillators: oscillators.concat(lfos),
+      disconnectables: oscillators.concat(lfos, [mix, formant1, formant2, gain])
+    };
     activeNodes.push(voice);
     return voice;
   }
 
-  // A short, soft melody note (triangle wave — gentler than square/sawtooth)
-  // with its own attack/release envelope, scheduled at a future offset.
+  // A harp-like plucked string via Karplus-Strong synthesis: fill a short
+  // ring buffer exactly one pitch-period long with noise (the "pluck"),
+  // then repeatedly output the oldest sample while replacing it with the
+  // decayed average of itself and its neighbor — the classic Karplus-Strong
+  // feedback loop, which produces the bright-attack / smoothly-darkening
+  // decay of a real plucked string for free, with no separate filter
+  // envelope needed. This runs on a ScriptProcessorNode rather than an
+  // AudioWorklet: this feature is a single inline <script> with no build
+  // step or ES-module loading, so there is no separate file to hand
+  // audioWorklet.addModule() (a Blob-URL worklet is possible but adds a
+  // second async-loading path and a real risk of first-note silence while
+  // it resolves); ScriptProcessorNode is deprecated but still universally
+  // supported and lets the per-sample feedback loop live inline like
+  // everything else here. See PR notes for the tradeoffs.
   function scheduleMelodyNote(freq, atSecOffset, durationSec, level) {
-    var osc = ctx.createOscillator();
-    osc.type = 'triangle';
-    osc.frequency.value = freq;
-    var gain = ctx.createGain();
     var startAt = ctx.currentTime + atSecOffset;
-    var attack = Math.min(0.6, durationSec * 0.3);
-    var release = Math.min(0.9, durationSec * 0.4);
+    var period = Math.max(2, Math.round(ctx.sampleRate / freq));
+    var ring = new Float32Array(period);
+    for (var i = 0; i < period; i++) ring[i] = Math.random() * 2 - 1; // the pluck: a noise burst at the string's pitch period
+    var ringIdx = 0;
+
+    // A real harp note rings out well past its beat slot, so let the decay
+    // run long instead of hard-cutting at durationSec. How many feedback
+    // passes fit in that time depends on the period (higher notes have a
+    // shorter period, so need a lower per-pass decay factor to die out in
+    // the same wall-clock time as a low note).
+    var ringSeconds = Math.max(1.2, durationSec * 1.8);
+    var totalSamples = Math.round(ctx.sampleRate * ringSeconds);
+    var passes = Math.max(1, totalSamples / period);
+    var decay = Math.min(0.9995, Math.max(0.9, Math.pow(0.0008, 1 / passes)));
+    var samplesLeft = totalSamples;
+
+    var processor = ctx.createScriptProcessor(1024, 1, 1);
+    processor.onaudioprocess = function(e) {
+      var out = e.outputBuffer.getChannelData(0);
+      for (var n = 0; n < out.length; n++) {
+        if (samplesLeft <= 0) { out[n] = 0; continue; }
+        var current = ring[ringIdx];
+        var next = ring[(ringIdx + 1) % period];
+        ring[ringIdx] = decay * 0.5 * (current + next); // Karplus-Strong: 2-tap average + decay feedback
+        out[n] = current;
+        ringIdx = (ringIdx + 1) % period;
+        samplesLeft--;
+      }
+    };
+
+    var gain = ctx.createGain();
+    var attack = Math.min(0.008, durationSec * 0.1); // a few ms — just enough to avoid a click at pluck onset
     gain.gain.setValueAtTime(0, startAt);
     gain.gain.linearRampToValueAtTime(level, startAt + attack);
-    gain.gain.setValueAtTime(level, startAt + Math.max(attack, durationSec - release));
-    gain.gain.linearRampToValueAtTime(0.0001, startAt + durationSec);
-    osc.connect(gain);
+    // A safety fade at the very end of the ring window, well after the
+    // string's own Karplus-Strong decay has already died away — insurance
+    // against a click on disconnect, not a second envelope fighting the
+    // string's natural decay.
+    gain.gain.setValueAtTime(level, startAt + Math.max(attack, ringSeconds - 0.05));
+    gain.gain.linearRampToValueAtTime(0.0001, startAt + ringSeconds);
+
+    processor.connect(gain);
     connectVoice(gain);
-    osc.start(startAt);
-    osc.stop(startAt + durationSec + 0.05);
-    activeNodes.push({ osc: osc, gain: gain });
+
+    var voice = { gain: gain, processors: [processor], disconnectables: [processor, gain] };
+    activeNodes.push(voice);
+
+    // ScriptProcessorNode has no "stop()" of its own; disconnect it once
+    // the string has rung out so it isn't left running (and referenced in
+    // activeNodes) for the rest of an indefinitely-looping playback
+    // session. A later hard stop() just does this same cleanup early via
+    // clearActiveNodes() below, so this timeout finding the voice already
+    // gone is expected and harmless.
+    setTimeout(function() {
+      try { processor.onaudioprocess = null; } catch (e) { /* already torn down */ }
+      try { processor.disconnect(); } catch (e) { /* already torn down */ }
+      try { gain.disconnect(); } catch (e) { /* already torn down */ }
+      var idx = activeNodes.indexOf(voice);
+      if (idx !== -1) activeNodes.splice(idx, 1);
+    }, Math.max(50, (atSecOffset + ringSeconds) * 1000));
   }
 
+  // Hard-stops and disconnects every live node from every voice shape
+  // above — the choir pad's oscillator/LFO stack and formant filters, and
+  // the harp pluck's ScriptProcessorNode — not just each voice's final
+  // gain stage.
   function clearActiveNodes() {
     var now = ctx ? ctx.currentTime : 0;
     activeNodes.forEach(function(n) {
       try {
         n.gain.gain.cancelScheduledValues(now);
         n.gain.gain.setValueAtTime(0.0001, now);
-        n.osc.stop(now + 0.05);
-        n.osc.disconnect();
-        n.gain.disconnect();
       } catch (e) { /* already stopped — fine */ }
+      (n.oscillators || []).forEach(function(o) {
+        try { o.stop(now + 0.05); } catch (e) { /* already stopped — fine */ }
+      });
+      (n.processors || []).forEach(function(p) {
+        try { p.onaudioprocess = null; } catch (e) { /* already torn down */ }
+      });
+      (n.disconnectables || []).forEach(function(node) {
+        try { node.disconnect(); } catch (e) { /* already disconnected — fine */ }
+      });
     });
     activeNodes = [];
   }
