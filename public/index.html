@@ -326,6 +326,29 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* ===== ARCHETYPE QUIZ ===== */
+.quiz-progress-track {
+  width: 100%; max-width: 320px; height: 6px; border-radius: 3px;
+  background: rgba(176,138,255,0.15); overflow: hidden;
+}
+.quiz-progress-fill {
+  height: 100%; border-radius: 3px;
+  background: linear-gradient(90deg, #c9a84c, #b08aff);
+  transition: width 0.4s ease; width: 0%;
+}
+.quiz-option-btn {
+  display: block; width: 100%; text-align: left;
+  padding: 0.9rem 1.2rem; border-radius: 14px; cursor: pointer;
+  background: rgba(15,8,35,0.85); border: 1px solid rgba(176,138,255,0.2);
+  color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.92rem;
+  transition: all 0.25s;
+}
+.quiz-option-btn:hover {
+  border-color: rgba(201,168,76,0.6);
+  background: rgba(30,15,55,0.95);
+  transform: translateY(-1px);
+}
+
 @media (max-width: 640px) {
   .cosmic-card { padding: 1rem; }
   .cta-btn { padding: 0.75rem 1.5rem; font-size: 0.9rem; }
@@ -373,6 +396,19 @@ body {
         <div><span style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.2em;color:#c9a84c;">SACRED GEOMETRY</span><br><span style="font-size:0.82rem;color:#9b8ec4;line-height:1.5;">You are not a list of traits. You are a living mandala — an Egg of Life where all five systems activate different nodes of your soul's field.</span></div>
       </div>
     </div>
+
+    <!-- ===== ARCHETYPE QUIZ FUNNEL ENTRY BANNER =====
+         Promotional hook into the lightweight $1 quiz funnel -- see
+         "ARCHETYPE QUIZ FUNNEL" script section for the flow. Kept visually
+         inline with the app's existing card language (cosmic-card, gold/
+         violet gradient, label-mono) rather than a new visual style. -->
+    <button id="quiz-entry-banner" class="cosmic-card w-full" style="max-width:420px;margin-bottom:1.75rem;text-align:left;cursor:pointer;border-color:rgba(201,168,76,0.35);background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(176,138,255,0.08));display:flex;align-items:center;gap:0.9rem;">
+      <span style="font-size:1.6rem;flex-shrink:0;">✦</span>
+      <span>
+        <span class="font-serif" style="display:block;color:#e8e0ff;font-size:1rem;font-weight:700;line-height:1.4;">Find out if your personal archetype matches your stars.</span>
+        <span style="display:block;color:var(--text-muted);font-size:0.82rem;margin-top:0.25rem;line-height:1.5;">Take our 5-minute Archetype Quiz and find out now! Just $1 to reveal your result.</span>
+      </span>
+    </button>
 
     <div data-id="10" class="cosmic-card w-full" style="max-width:420px;">
       <label data-id="11" class="label-mono block mb-2">FULL BIRTH NAME</label>
@@ -427,6 +463,89 @@ body {
       <button data-id="34" id="hook-btn" class="cta-btn w-full mt-5" style="font-size:1.05rem;">✦ Reveal My Blueprint</button>
       <p data-id="35" class="text-center mt-3" style="color:var(--text-muted); font-size:0.72rem; opacity:0.7;">🔒 Your information is never sent anywhere or shared — it's remembered only in this browser so you don't have to retype it. <a href="#" data-cs-clear-saved="hook" style="color:var(--text-muted);text-decoration:underline;opacity:0.85;">Clear saved info</a></p>
     </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     ARCHETYPE QUIZ FUNNEL SCREENS
+     Lightweight $1 quiz funnel -- see the "ARCHETYPE QUIZ FUNNEL"
+     script section near the end of the file for all logic. This is
+     explicitly NOT the real computed reading: honesty framing appears
+     on both screen-quiz-intro and screen-quiz-reveal below.
+     ============================================================ -->
+
+<!-- ===== SCREEN QUIZ INTRO ===== -->
+<div id="screen-quiz-intro" class="screen">
+  <div style="max-width:520px;width:100%;padding:2rem 1.5rem;margin:0 auto;display:flex;flex-direction:column;align-items:center;min-height:100vh;justify-content:center;text-align:center;">
+    <p class="label-mono mb-3" style="color:var(--accent-gold);">✦ THE ARCHETYPE QUIZ ✦</p>
+    <h1 class="gradient-title font-serif text-3xl md:text-4xl font-bold mb-5" style="line-height:1.2;">Does Your Gut Match Your Chart?</h1>
+    <p style="color:var(--text-muted); font-size:0.95rem; line-height:1.75; margin-bottom:1.5rem;">8 quick questions about how you think, feel, and choose. No birth data required — this quiz guesses your Codex Archetype from your personality alone.</p>
+    <div class="cosmic-card w-full mb-6" style="text-align:left;border-color:rgba(176,138,255,0.3);">
+      <p style="color:#e8e0ff;font-size:0.85rem;line-height:1.7;margin:0;">
+        <strong style="color:var(--accent-gold);">Quick heads up:</strong> this is a fun, 5-minute personality-preference quiz — not a computed numerology or astrology reading. Your answers nudge you toward one of our real Codex Archetypes, but it's a guess based on how you think and feel, not on your actual birth chart. Think of it as a fifth, just-for-fun voice alongside Numerology, Astrology, Kabbalah, and Tarot — the only one of the five that isn't actually calculated. The real point isn't the guess itself; it's what happens when you test it against the real thing. Take your full reading afterward — calculated from your actual birth chart — and find out whether your instincts and the stars are pointing at the same archetype.
+      </p>
+    </div>
+    <button id="quiz-start-btn" class="cta-btn w-full" style="font-size:1.05rem;max-width:340px;">✦ Start the Quiz ✦</button>
+    <button id="quiz-intro-back-btn" class="skip-btn mt-4">← Back</button>
+  </div>
+</div>
+
+<!-- ===== SCREEN QUIZ QUESTIONS ===== -->
+<div id="screen-quiz-questions" class="screen">
+  <div style="max-width:560px;width:100%;padding:2rem 1.5rem;margin:0 auto;display:flex;flex-direction:column;align-items:center;min-height:100vh;justify-content:center;">
+    <p id="quiz-progress-label" class="label-mono mb-2" style="color:var(--accent-gold);">QUESTION 1 OF 8</p>
+    <div class="quiz-progress-track mb-6"><div id="quiz-progress-fill" class="quiz-progress-fill"></div></div>
+    <h2 id="quiz-question-text" class="font-serif text-xl md:text-2xl font-bold mb-6" style="text-align:center;color:#e8e0ff;line-height:1.4;"></h2>
+    <div id="quiz-options" style="width:100%;display:flex;flex-direction:column;gap:0.75rem;"></div>
+  </div>
+</div>
+
+<!-- ===== SCREEN QUIZ LEAD CAPTURE ===== -->
+<div id="screen-quiz-lead" class="screen">
+  <div style="max-width:460px;width:100%;padding:2rem 1.5rem;margin:0 auto;display:flex;flex-direction:column;align-items:center;min-height:100vh;justify-content:center;">
+    <p class="label-mono mb-2" style="color:var(--accent-gold);">✦ YOUR ARCHETYPE IS READY ✦</p>
+    <h2 class="gradient-title font-serif text-2xl font-bold mb-3" style="text-align:center;">Almost There</h2>
+    <p style="color:#9b8ec4;font-size:0.9rem;line-height:1.65;text-align:center;margin:0 0 1.8rem;">Where should we send your Archetype result?</p>
+    <div style="width:100%;display:flex;flex-direction:column;gap:0.85rem;">
+      <input id="quiz-lead-name" type="text" class="cosmic-input" placeholder="Your name" autocomplete="name" />
+      <input id="quiz-lead-email" type="email" class="cosmic-input" placeholder="Your email address" autocomplete="email" />
+      <div id="val-quiz-lead" class="validation-msg" style="text-align:center;"></div>
+      <button id="quiz-lead-btn" class="cta-btn w-full" style="font-size:1rem;">✦ Continue ✦</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SCREEN QUIZ PAYWALL ===== -->
+<div id="screen-quiz-paywall" class="screen">
+  <div style="max-width:460px;width:100%;padding:2rem 1.5rem;margin:0 auto;display:flex;flex-direction:column;align-items:center;min-height:100vh;justify-content:center;text-align:center;">
+    <div class="orb" style="margin-bottom:1.5rem;"></div>
+    <p class="label-mono mb-2" style="color:var(--accent-gold);">✦ CALCULATION COMPLETE ✦</p>
+    <h2 class="gradient-title font-serif text-2xl md:text-3xl font-bold mb-3">Your Archetype Has Been Calculated<span id="quiz-paywall-name"></span></h2>
+    <p style="color:#9b8ec4;font-size:0.95rem;line-height:1.7;margin-bottom:1.75rem;">Celestia has your quick-guess Archetype ready. Pay $1 to reveal your result and see how it compares to your real Codex Blueprint.</p>
+    <button id="quiz-paywall-btn" class="cta-btn w-full" style="font-size:1.05rem;max-width:320px;">✦ Reveal My Archetype — $1 ✦</button>
+    <p style="color:var(--text-muted); font-size:0.7rem; opacity:0.7; margin-top:0.75rem;">🔒 Secure Square checkout</p>
+  </div>
+</div>
+
+<!-- ===== SCREEN QUIZ REVEAL + UPSELL ===== -->
+<div id="screen-quiz-reveal" class="screen">
+  <div style="max-width:640px;width:100%;padding:2.5rem 1.5rem 3rem;margin:0 auto;display:flex;flex-direction:column;align-items:center;">
+    <p class="label-mono mb-2" style="color:var(--accent-gold);">✦ YOUR RESULT ✦</p>
+    <h2 id="quiz-reveal-name" class="gradient-title font-serif text-2xl font-bold mb-4" style="text-align:center;"></h2>
+    <div class="reading-orb" style="width:160px;height:160px;margin-bottom:1rem;">
+      <span class="lp-number" id="quiz-reveal-archetype" style="font-size:1.25rem;text-align:center;padding:0 0.5rem;"></span>
+    </div>
+    <p id="quiz-reveal-blurb" style="color:#e8e0ff;font-size:1rem;line-height:1.7;text-align:center;max-width:480px;margin-bottom:1.5rem;"></p>
+    <div class="cosmic-card w-full mb-8" style="max-width:520px;border-color:rgba(176,138,255,0.3);">
+      <p style="color:#9b8ec4;font-size:0.85rem;line-height:1.7;margin:0;text-align:center;">
+        Based on your answers, this is your gut-level Archetype — a guess drawn purely from your personality and preferences, not your birth chart. Now the real question: <strong style="color:var(--accent-gold);">does the universe agree?</strong> Your full reading is calculated from your actual birth chart across real Numerology, Astrology, Kabbalah, and Tarot — get it below and find out whether your instincts and the stars are pointing at the same thing.
+      </p>
+    </div>
+    <div class="divider w-full">✦ ─────── ✦</div>
+    <h3 class="font-serif text-xl md:text-2xl mb-2 text-center gradient-title mt-2">See If Your Quiz Answers Were Right</h3>
+    <p class="text-center mb-6" style="color:var(--text-muted); font-size:0.9rem; font-style:italic;">Get your full reading — computed from your actual birth date and name across Numerology, Astrology, Kabbalah, Tarot, and Sacred Geometry — and find out.</p>
+    <div id="quizTierCards" class="flex flex-col gap-4 w-full mb-4" style="max-width:520px;"></div>
+    <button id="quiz-reveal-restart-btn" class="skip-btn mt-4">↩ Take the Quiz Again</button>
   </div>
 </div>
 
@@ -3160,6 +3279,28 @@ var TIERS = [
     ]
   }
 ];
+
+// Deliberately NOT pushed into TIERS -- TIERS drives the real-reading offer
+// grid (renderTierCards() over screen-teaser's #tierCards), and the $1 quiz
+// reveal is a separate, cheaper product that must never appear mixed into
+// that grid. It reuses the exact same openPaymentModal()/Square/
+// sessionStorage/restoreAfterSquareReturn pipeline as every tier above --
+// see findPurchasableTier(), openPaymentModal(), and the square-checkout-btn
+// handler below.
+var ARCHETYPE_QUIZ_TIER = {
+  slug: 'archetype-quiz', name: 'Archetype Quiz Reveal', price: '1.00', pages: 0,
+  tagline: 'Your quick-guess Codex Archetype, revealed instantly.',
+  includes: [
+    '✦ Your best-match Archetype from this 5-minute quiz',
+    'A fun, honest guess — not a computed reading',
+    'A path into your real full Blueprint below'
+  ]
+};
+
+function findPurchasableTier(slug) {
+  return TIERS.find(function(t) { return t.slug === slug; })
+    || (slug === ARCHETYPE_QUIZ_TIER.slug ? ARCHETYPE_QUIZ_TIER : null);
+}
 
 // ===========================
 // HOOK SCREEN SPIRAL -- a golden logarithmic spiral (growth rate matching
@@ -6139,10 +6280,21 @@ function getFallbackReading(){
   var pdw=p.personalDayWildcard||getPersonalDayWildcard(pd);
   var tc=p.tarotCard||TAROT_PATHS[1];
   var ca=p.codexArchetype||'The Integrator';
+  // QUIZ ARCHETYPE CONFIRMATION -- see storeQuizArchetypeGuess()/
+  // getStoredQuizArchetypeGuess() in the ARCHETYPE QUIZ FUNNEL section. If
+  // this person took the fun personality-preference quiz at some earlier
+  // point in this same browser, compare its guessed Archetype to the real,
+  // computed one above -- a plain, honest match/no-match fact, exactly like
+  // every other coincidence-style finding in this Codex (Part XVIII \u00a718.2
+  // and its reaffirmations). Only the match case is surfaced (a genuine
+  // delight moment); a no-match is simply a fun quiz that didn't land on
+  // the same label, not a "finding" worth narrating.
+  var quizGuess = getStoredQuizArchetypeGuess();
+  var quizArchetypeMatched = !!(quizGuess && quizGuess === ca);
   var fb='';
 
   fb+='===PAGE_1_START===\n';
-  fb+=p.firstName+', you are '+ca+'. This is not a title \u2014 it is a recognition. Your Life Path '+p.lifePath+', as '+lpData.title+', meets the '+p.sunSign.element+' current of your '+p.sunSign.sign+' Sun, and together they land you at '+p.tree.name+' on the Kabbalistic Tree of Life \u2014 '+p.tree.meaning+'. Three coordinates. One being. The center of your mandala is not above you or ahead of you. It is you.\n\n'+lpData.teaser+'\n\nYour gift \u2014 '+lpData.gift+' \u2014 is not something you earned. It is what you arrived with. When Numerology, Astrology, and Kabbalah all converge on the same essential truth about a soul, that truth becomes impossible to dismiss.\n';
+  fb+=p.firstName+', you are '+ca+'. This is not a title \u2014 it is a recognition. Your Life Path '+p.lifePath+', as '+lpData.title+', meets the '+p.sunSign.element+' current of your '+p.sunSign.sign+' Sun, and together they land you at '+p.tree.name+' on the Kabbalistic Tree of Life \u2014 '+p.tree.meaning+'. Three coordinates. One being. The center of your mandala is not above you or ahead of you. It is you.\n\n'+(quizArchetypeMatched ? ('Before this reading even began, your own Archetype Quiz guessed '+ca+' \u2014 and here it is again, confirmed by your actual birth chart. Your instincts were right.\n\n') : '')+lpData.teaser+'\n\nYour gift \u2014 '+lpData.gift+' \u2014 is not something you earned. It is what you arrived with. When Numerology, Astrology, and Kabbalah all converge on the same essential truth about a soul, that truth becomes impossible to dismiss.\n';
   if (p.ascendant && p.ascendant.sign) {
     fb+='\nYour Ascendant \u2014 the sign that was rising on the eastern horizon at the exact moment you were born \u2014 is '+p.ascendant.sign+(p.ascendant.degree!=null?' at '+p.ascendant.degree+'\u00b0':'')+'. Where your Sun sign is who you are at your core, your Ascendant is the lens the world first meets you through \u2014 the face you show before anyone has earned the deeper layers underneath.\n';
   }
@@ -6239,6 +6391,12 @@ async function doReading() {
   var lpTitle = (LP_DATA[p.lifePath]||LP_DATA[reduceNum(p.lifePath,false)]||LP_DATA[6]).title;
   var tc = p.tarotCard || TAROT_PATHS[1];
   var ca = p.codexArchetype || 'The Integrator';
+  // QUIZ ARCHETYPE CONFIRMATION -- same honest match/no-match fact as
+  // getFallbackReading() above (see getStoredQuizArchetypeGuess()). Only
+  // surfaced to the AI prompt when it actually matched; a no-match is left
+  // out rather than narrated.
+  var quizGuess = getStoredQuizArchetypeGuess();
+  var quizArchetypeMatched = !!(quizGuess && quizGuess === ca);
 
   // Resolve the optional Ascendant lookup (kicked off on submit) before building
   // the prompt. getAscendant() never throws and resolves null on any skip/failure.
@@ -6307,10 +6465,16 @@ async function doReading() {
   var nodeLine = (p.node && p.node.northSign) ? ('Lunar Nodes (lifelong axis): North Node in ' + p.node.northSign + ' (outward-growth direction), South Node in ' + p.node.southSign + ' (karmic comfort zone)' + (p.node.activePole ? ('. Currently active: ' + p.firstName + ' is presently moving through a real activation of the ' + (p.node.activePole === 'north' ? 'North' : 'South') + ' Node \u2014 a season worth naming, not an everyday state.') : '') + '\n') : '';
   var nodeDecanCardsLine = (p.nodeDecanCards) ? ('Node Decan Cards (in the language of the decans): North Node card is the ' + p.nodeDecanCards.northNodeCard.card + ' (keyword "' + p.nodeDecanCards.northNodeCard.keyword + '") \u2014 the growth-toward energy; South Node card is the ' + p.nodeDecanCards.southNodeCard.card + ' (keyword "' + p.nodeDecanCards.southNodeCard.keyword + '") \u2014 the shadow/comfort-zone energy.\n') : '';
   var hebrewSoulLine = p.hebrewSoulCorrespondence ? ('Hebrew Soul Correspondence (full birth name, real Mispar Hechrachi gematria): consonants ' + p.hebrewSoulCorrespondence.hebrewConsonants + ', total ' + p.hebrewSoulCorrespondence.gematriaTotal + ' \u2192 ' + p.hebrewSoulCorrespondence.gematriaReduced + '. ' + (p.hebrewSoulCorrespondence.archangelMatches.length ? 'Archangel match: ' + p.hebrewSoulCorrespondence.archangelMatches.map(function(m){return m.name + ' (' + m.hebrew + ' = ' + m.value + ')';}).join(', ') + '. ' : 'No Archangel match. ') + '72 Names position ' + p.hebrewSoulCorrespondence.nameOf72.position + ': ' + p.hebrewSoulCorrespondence.nameOf72.name + '.\n') : '';
+  // QUIZ ARCHETYPE CONFIRMATION -- only added to the prompt when this
+  // person's earlier fun personality-preference quiz (same browser)
+  // happened to guess the same Archetype the real chart just computed. A
+  // plain, honest match fact, not a score -- see quizArchetypeMatched above.
+  var quizArchetypeLine = quizArchetypeMatched ? ('Archetype Quiz Confirmation: before this reading was generated, ' + p.firstName + ' took the fun, personality-based Archetype Quiz (no birth data used) in this same browser and it guessed ' + ca + ' \u2014 the exact same Archetype this real, computed chart just landed on independently.\n') : '';
 
   var prompt ='You are Celestia, the oracle of Circles Squared \u2014 Taurus Codex Geometry. Generate a complete 9-section reading for ' + p.firstName + ' using the unified narrative approach: weave all systems (Astrology, Pythagorean & Chaldean Numerology, Gematria/Kabbalah, Tarot, Metatron\'s Cube, Sacred Geometry) into ONE seamless identity story. Never isolate systems in their own paragraph and move on \u2014 every time you introduce a new system\'s finding, explicitly say how it reinforces, explains, or adds a new angle on what has already been established earlier in the reading, by name (cite the specific earlier number, card, or Sephirah you are connecting it to). Rich, warm, poetic, second-person prose. Be specific to the exact data.\n\n'
     + 'PROFILE:\n'
     + 'Codex Archetype: ' + ca + '\n'
+    + quizArchetypeLine
     + 'Life Path: ' + p.lifePath + ' (' + lpTitle + ')\n'
     + 'Expression: ' + (p.expression||'?') + '  Soul Urge: ' + (p.soulUrge||'?') + '  Personality: ' + (p.personality||'?') + '  Birthday Number: ' + (p.birthdayNumber||'?') + '  Gematria Total: ' + (p.gematria?p.gematria.total:'?') + ' \u2192 ' + (p.gematria?p.gematria.reduced:'?') + '\n'
     + chaldeanLine
@@ -6330,7 +6494,7 @@ async function doReading() {
     + 'Personal Year 2026: ' + p.personalYear2026 + (p.personalMonth != null ? ('  Personal Month (current): ' + p.personalMonth) : '') + (p.personalDay != null ? ('  Personal Day (today): ' + p.personalDay) : '') + '\n'
     + personalDayWildcardLine
     + '\nWrite exactly 9 sections with ===PAGE_N_START=== and ===PAGE_N_END=== delimiters on their own lines (each delimiter on its own line, no other text on that line). Each section: 7\u20139 rich, deeply personal paragraphs (not 5\u20136 \u2014 these pages need to visually fill a full printed page, so write substantially more per page than feels like the minimum). Each paragraph should be 4\u20136 full sentences, not 2\u20133 \u2014 a thin, single-idea paragraph is not acceptable. Every paragraph must reference ' + p.firstName + ' by name at least once and cite the specific numbers or symbols from their profile, and should work in as many of the person\'s actual named numbers, cards, Sephiroth, and archetypes as genuinely fit \u2014 not just one per paragraph. When a paragraph starts to feel thin or abstract, do not move on to the next idea yet: stay with the same point and add a concrete second layer \u2014 what this finding actually looks like in ' + p.firstName + '\'s daily choices, relationships, or work, a specific example of the pattern playing out, or a second data point from the profile that deepens (not repeats) the first. No generic affirmations, no padding with synonyms of a sentence already written \u2014 every added sentence must carry new, specific content. Celestia speaks with warm authority, poetic depth, and precision.\n\n'
-    + 'Page 1 \u2014 IDENTITY ESSENCE: Open with the exact phrase "' + p.firstName + ', you are ' + ca + '." Then paint a full-portrait synthesis: how Life Path ' + p.lifePath + ' (' + lpTitle + ') shapes the core drive, how ' + p.sunSign.sign + ' Sun infuses it with elemental character (' + p.sunSign.element + ', ruled by ' + p.sunSign.planet + ')' + (p.ascendant && p.ascendant.sign ? ', how their ' + p.ascendant.sign + ' Ascendant colors the lens the world first meets them through' : '') + ', and how ' + p.tree.name + ' on the Tree of Life places this soul at a specific energetic address in creation. Explain what the Codex Archetype ' + ca + ' means as a living identity \u2014 not a label but a mandate.' + (p.node && p.node.northSign ? (' If it fits naturally, name their North Node in ' + p.node.northSign + ' as the lifelong outward direction the soul is growing toward and their South Node in ' + p.node.southSign + ' as the inward comfort zone they are moving away from \u2014 this is a lifelong developmental axis, not a daily forecast, so treat it as one more coordinate on the same portrait rather than a separate topic.' + (p.node.activePole ? (' Note also that ' + p.firstName + ' is moving through a real, present-tense activation of their ' + (p.node.activePole === 'north' ? 'North' : 'South') + ' Node right now \u2014 a season worth naming explicitly, since it is not the everyday state of this axis.') : '')) : '') + (p.nodeDecanCards ? (' In the language of the decans, that same Node axis also names one Minor Arcana card apiece: the ' + p.nodeDecanCards.northNodeCard.card + ' for the North Node \u2014 name this as the energy ' + p.firstName + ' is growing TOWARD \u2014 and the ' + p.nodeDecanCards.southNodeCard.card + ' for the South Node \u2014 name this as the shadow/comfort-zone energy ' + p.firstName + ' is moving AWAY from. Frame this as a growth trajectory, not a moral judgment: the South Node card is not "bad," it is simply the familiar gravity the North Node card is inviting ' + p.firstName + ' beyond. Make clear the placement itself is fixed \u2014 only how ' + p.firstName + ' works with it, moment by moment, is a matter of choice. Do not explain decans, degrees, or planetary rulerships to the reader \u2014 simply name the cards and their meaning.') : '') + ' End by naming the specific gift this soul arrived with, and name it as a thread the reading will keep picking back up \u2014 the same gift the reader will recognize again in the Tarot archetype, the shadow work, and the closing blessing.\n'
+    + 'Page 1 \u2014 IDENTITY ESSENCE: Open with the exact phrase "' + p.firstName + ', you are ' + ca + '." Then paint a full-portrait synthesis: how Life Path ' + p.lifePath + ' (' + lpTitle + ') shapes the core drive, how ' + p.sunSign.sign + ' Sun infuses it with elemental character (' + p.sunSign.element + ', ruled by ' + p.sunSign.planet + ')' + (p.ascendant && p.ascendant.sign ? ', how their ' + p.ascendant.sign + ' Ascendant colors the lens the world first meets them through' : '') + ', and how ' + p.tree.name + ' on the Tree of Life places this soul at a specific energetic address in creation. Explain what the Codex Archetype ' + ca + ' means as a living identity \u2014 not a label but a mandate.' + (p.node && p.node.northSign ? (' If it fits naturally, name their North Node in ' + p.node.northSign + ' as the lifelong outward direction the soul is growing toward and their South Node in ' + p.node.southSign + ' as the inward comfort zone they are moving away from \u2014 this is a lifelong developmental axis, not a daily forecast, so treat it as one more coordinate on the same portrait rather than a separate topic.' + (p.node.activePole ? (' Note also that ' + p.firstName + ' is moving through a real, present-tense activation of their ' + (p.node.activePole === 'north' ? 'North' : 'South') + ' Node right now \u2014 a season worth naming explicitly, since it is not the everyday state of this axis.') : '')) : '') + (p.nodeDecanCards ? (' In the language of the decans, that same Node axis also names one Minor Arcana card apiece: the ' + p.nodeDecanCards.northNodeCard.card + ' for the North Node \u2014 name this as the energy ' + p.firstName + ' is growing TOWARD \u2014 and the ' + p.nodeDecanCards.southNodeCard.card + ' for the South Node \u2014 name this as the shadow/comfort-zone energy ' + p.firstName + ' is moving AWAY from. Frame this as a growth trajectory, not a moral judgment: the South Node card is not "bad," it is simply the familiar gravity the North Node card is inviting ' + p.firstName + ' beyond. Make clear the placement itself is fixed \u2014 only how ' + p.firstName + ' works with it, moment by moment, is a matter of choice. Do not explain decans, degrees, or planetary rulerships to the reader \u2014 simply name the cards and their meaning.') : '') + (quizArchetypeMatched ? (' Also work in, naturally and once, that before this reading was even generated, ' + p.firstName + ' took the fun, personality-based Archetype Quiz in this same browser and it guessed ' + ca + ' \u2014 the same Archetype this real chart just landed on independently; frame this as one more instance of convergence across systems, the way this reading already treats the Life Path/Sun Sign/Sephirah agreement, and be clear the quiz itself is not a calculated system, just an honest personality-based guess that happened to land in the same place as the real math.') : '') + ' End by naming the specific gift this soul arrived with, and name it as a thread the reading will keep picking back up \u2014 the same gift the reader will recognize again in the Tarot archetype, the shadow work, and the closing blessing.\n'
     + 'Page 2 \u2014 ARCHETYPAL SIGNATURE: Explore the full mythic narrative. ' + tc.card + ' (Path ' + tc.path + ', letter ' + tc.letter + ') is the archetype ' + p.firstName + ' is living' + (p.lifePathTrumpCard ? ', confirmed by the Life Path Trump Card ' + p.lifePathTrumpCard.numeral + ' ' + p.lifePathTrumpCard.card : '') + '. Explain what this card means as a life-force not just a symbol, how the ' + p.sunSign.sign + ' Sun amplifies or challenges this path, and how the Kabbalistic letter ' + tc.letter + ' encodes a specific teaching in their very name. Name the mythic figures, gods, or archetypes associated with this path. Explicitly tie this Tarot archetype back to the Life Path ' + p.lifePath + ' and Codex Archetype ' + ca + ' named on Page 1 — show that the Tarot card is not a second, unrelated topic but the same mandate speaking in a different language, and say so directly. Describe what it feels like to embody ' + tc.card + ' fully vs. when it is suppressed.\n'
     + 'Page 3 \u2014 FREQUENCY PATTERN: Decode the name. Life Path ' + p.lifePath + ' is the birth frequency. Expression ' + (p.expression||'?') + ' is the gift encoded in every letter of "' + p.firstName + '". Soul Urge ' + (p.soulUrge||'?') + ' is the private longing beneath the surface. Gematria total ' + (p.gematria?p.gematria.total:'?') + ' reducing to ' + (p.gematria?p.gematria.reduced:'?') + ' is the name\'s sacred numerical signature.' + (p.chaldean ? ' The Chaldean compound of the name ' + p.firstName + ' is actually called by resolves to ' + p.chaldean.compound + ' (' + p.chaldean.reduced + '), a living-identity number layered atop the birth frequency.' : '') + ' Explicitly connect the Gematria total ' + (p.gematria?p.gematria.total:'?') + ' back to the Life Path ' + p.lifePath + ' established on Page 1 \u2014 name both numbers together and say plainly why a name-frequency and a birth-frequency landing on the same core tone is not coincidence but confirmation, two instruments playing the same note. Explain what happens when ' + p.firstName + ' aligns with vs. resists this frequency.\n'
     + 'Page 4 \u2014 THE FIELD GEOMETRY: ' + p.firstName + '\'s identity is a living Egg of Life \u2014 eight interlocking circles of force. Map which nodes are most activated: ' + p.tree.name + ' (Kabbalah), ' + tc.card + ' (Tarot), ' + p.sunSign.sign + ' (Astrology), Life Path ' + p.lifePath + ' (Numerology), gematria ' + (p.gematria?p.gematria.reduced:'?') + ' (Gematria), and Sacred Geometry as the container. Explain what it means that these systems converge on a single being — specifically call out at least one node where two systems from earlier pages (e.g. the Life Path from Page 1 and the Gematria reduction from Page 3, or the Tarot path from Page 2 and the Sephirah) sit on the same point of the geometry, not adjacent-but-separate points. Describe the energetic field this soul radiates and how others experience it. Name the specific intersection points where power concentrates.\n'
@@ -6464,8 +6628,8 @@ function startOracleReading() {
 // ===========================
 // TIER CARD RENDERING (CHANGE 3 — Partnership support)
 // ===========================
-function renderTierCards() {
-  var container = document.getElementById('tierCards');
+function renderTierCards(containerId) {
+  var container = document.getElementById(containerId || 'tierCards');
   if (!container) return;
   container.innerHTML = '';
 
@@ -6546,7 +6710,7 @@ function renderTierCards() {
 // PAYMENT MODAL
 // ===========================
 function openPaymentModal(slug) {
-  selectedTier = TIERS.find(function(t) { return t.slug === slug; });
+  selectedTier = findPurchasableTier(slug);
   if (!selectedTier) return;
 
   document.getElementById('modal-tier-name').textContent = selectedTier.name;
@@ -6555,8 +6719,11 @@ function openPaymentModal(slug) {
     return '<div>' + inc + '</div>';
   }).join('');
 
-  var p = window._readingProfile;
-  if (p.email) document.getElementById('modal-email').value = p.email;
+  // Prefill email from whichever flow is active -- the real-reading profile,
+  // or (for the archetype-quiz tier) the quiz's own lead-capture profile.
+  var p = window._readingProfile || {};
+  var prefillEmail = (window._quizProfile && window._quizProfile.email) || p.email;
+  if (prefillEmail) document.getElementById('modal-email').value = prefillEmail;
 
   document.getElementById('val-modal-email').textContent = '';
   document.getElementById('payment-modal').classList.add('show');
@@ -6575,7 +6742,9 @@ var SQUARE_LINKS = {
   'initiation': 'https://square.link/u/hmFNvTqn',
   'unveiling':  'https://square.link/u/Q22hm6Yg',
   'blueprint':  'https://square.link/u/kbAvRDTL',
-  'partnership':'https://square.link/u/gXbjV2R3'
+  'partnership':'https://square.link/u/gXbjV2R3',
+  // TODO(owner): replace with the real $1 Square checkout link before launch.
+  'archetype-quiz': 'https://square.link/u/PLACEHOLDER_QUIZ'
 };
 
 document.getElementById('square-checkout-btn').addEventListener('click', function() {
@@ -6590,7 +6759,12 @@ document.getElementById('square-checkout-btn').addEventListener('click', functio
   var squareUrl = SQUARE_LINKS[selectedTier.slug];
   if (!squareUrl) { alert('Checkout link not available. Please try again.'); return; }
   try {
-    sessionStorage.setItem('cs_pending_profile', JSON.stringify(window._readingProfile));
+    // The archetype-quiz tier hands off the quiz's own pending profile
+    // (name/email/computed archetype) through the exact same
+    // cs_pending_profile/cs_pending_tier/cs_pending_email sessionStorage
+    // keys the real reading flow already uses -- see restoreAfterSquareReturn().
+    var pendingProfile = (selectedTier.slug === ARCHETYPE_QUIZ_TIER.slug) ? window._quizProfile : window._readingProfile;
+    sessionStorage.setItem('cs_pending_profile', JSON.stringify(pendingProfile));
     sessionStorage.setItem('cs_pending_tier', selectedTier.slug);
     sessionStorage.setItem('cs_pending_email', email);
   } catch(e) {}
@@ -8392,6 +8566,11 @@ document.getElementById('gate-submit-btn').addEventListener('click', function() 
 // SQUARE PAYMENT RETURN RESTORE
 // ===========================
 function restoreAfterSquareReturn(tierSlug) {
+  // The $1 archetype-quiz tier reveals a quiz result, not a full computed
+  // reading -- hand it off to its own restore path (same sessionStorage
+  // keys, different screen) instead of running the full-reading logic below.
+  if (tierSlug === ARCHETYPE_QUIZ_TIER.slug) { restoreQuizAfterSquareReturn(); return; }
+
   var profileJson = sessionStorage.getItem('cs_pending_profile');
   var email = sessionStorage.getItem('cs_pending_email') || '';
   if (!profileJson) { showScreen('hook'); return; }
@@ -8436,6 +8615,271 @@ function restoreAfterSquareReturn(tierSlug) {
     sessionStorage.removeItem('cs_pending_email');
   } catch(e) {}
 }
+
+// ============================================================
+// ARCHETYPE QUIZ FUNNEL
+// ------------------------------------------------------------
+// A lightweight, fun personality-preference quiz -- explicitly NOT a
+// computed numerology/astrology reading. It nudges a running score toward
+// one of the app's own real Codex Archetypes (see CODEX_ARCHETYPES /
+// getCodexArchetype() above -- these are the exact same archetype names
+// the real reading engine produces from actual Life Path + Sun Sign
+// convergence) so results feel earned and on-brand, but the mechanism here
+// is simple quiz-style point tallying, not a numerology calculation.
+//
+// Funnel: hook CTA -> quiz-intro (honesty framing) -> 8 questions
+// -> lead capture (name/email, saved via the existing saveLeadToSupabase())
+// -> $1 paywall (openPaymentModal('archetype-quiz'), same Square/
+//    sessionStorage pipeline as every other tier) -> Square redirect
+// -> restoreQuizAfterSquareReturn() on ?paid=archetype-quiz -> reveal
+//    (second honesty framing + upsell into the real TIERS via
+//    renderTierCards('quizTierCards')).
+// ============================================================
+
+var QUIZ_QUESTIONS = [
+  {
+    q: "When you're facing a brand-new challenge, you're most likely to...",
+    options: [
+      { t: 'Charge in first and figure it out as you go', a: 'The Trailblazer' },
+      { t: 'Sense how everyone else feels about it before deciding', a: 'The Empath' },
+      { t: 'Turn it into a story worth telling', a: 'The Illuminator' },
+      { t: 'Build a clear plan before taking a single step', a: 'The Architect' }
+    ]
+  },
+  {
+    q: 'Your ideal weekend looks like...',
+    options: [
+      { t: "Trying something spontaneous, somewhere you've never been", a: 'The Catalyst' },
+      { t: 'Hosting people you love and making sure everyone feels cared for', a: 'The Healer' },
+      { t: 'Quiet time alone with a book or deep in thought', a: 'The Sage' },
+      { t: 'Working through something intense that changes how you see yourself', a: 'The Alchemist' }
+    ]
+  },
+  {
+    q: 'Friends would describe you as the one who...',
+    options: [
+      { t: "Always says what everyone else is afraid to say", a: 'The Trailblazer' },
+      { t: "Knows how you're feeling before you say a word", a: 'The Empath' },
+      { t: 'Turns any room into a story worth remembering', a: 'The Illuminator' },
+      { t: 'Has a plan for everything, even things nobody asked about', a: 'The Architect' }
+    ]
+  },
+  {
+    q: 'When something goes wrong, your instinct is to...',
+    options: [
+      { t: 'Move fast, adapt, and find the next opportunity', a: 'The Catalyst' },
+      { t: 'Comfort whoever is hurting before anything else', a: 'The Healer' },
+      { t: "Step back and reflect on what it's really trying to teach you", a: 'The Sage' },
+      { t: 'Use it as fuel to become something stronger', a: 'The Alchemist' }
+    ]
+  },
+  {
+    q: 'Which symbol calls to you most?',
+    options: [
+      { t: '🔥 A bold flame — unstoppable momentum', a: 'The Trailblazer' },
+      { t: '🌊 A deep wave — flowing and receptive', a: 'The Empath' },
+      { t: '✨ Radiant light — expressive and warm', a: 'The Illuminator' },
+      { t: '◻ A precise square — grounded and exact', a: 'The Architect' }
+    ]
+  },
+  {
+    q: 'In a group project, you naturally become the one who...',
+    options: [
+      { t: "Gets everyone moving before the talking's even finished", a: 'The Catalyst' },
+      { t: 'Makes sure no one feels unheard', a: 'The Healer' },
+      { t: 'Asks the quiet question that changes the whole direction', a: 'The Sage' },
+      { t: 'Pushes hardest for the strongest possible outcome', a: 'The Alchemist' }
+    ]
+  },
+  {
+    q: 'Your idea of real freedom is...',
+    options: [
+      { t: 'Being first through a door no one else dared open', a: 'The Trailblazer' },
+      { t: 'Being fully understood by the people closest to you', a: 'The Empath' },
+      { t: 'Expressing exactly who you are without holding back', a: 'The Illuminator' },
+      { t: 'Having full control over how your own life is structured', a: 'The Architect' }
+    ]
+  },
+  {
+    q: 'If your life had a single theme, it would be...',
+    options: [
+      { t: 'Adventure', a: 'The Catalyst' },
+      { t: 'Devotion', a: 'The Healer' },
+      { t: 'Wisdom', a: 'The Sage' },
+      { t: 'Transformation', a: 'The Alchemist' }
+    ]
+  }
+];
+
+// One-paragraph flavor text per possible result -- all names drawn from the
+// real CODEX_ARCHETYPES table above, kept brand-consistent with the app's
+// existing tone.
+var QUIZ_ARCHETYPE_BLURBS = {
+  'The Trailblazer': "You lead before anyone asks you to — bold, first-mover energy that doesn't wait for permission.",
+  'The Empath': 'You feel a room before you understand it with your mind — your gift is emotional attunement.',
+  'The Illuminator': 'You turn everything you touch into story and light — expression is how you process the world.',
+  'The Architect': 'You build structure out of chaos — your mind naturally organizes what everyone else finds overwhelming.',
+  'The Catalyst': 'You thrive on change and momentum — freedom and forward motion are non-negotiable for you.',
+  'The Healer': 'You put care and harmony first — your presence calms whatever room you walk into.',
+  'The Sage': 'You go deep instead of wide — reflection and meaning matter more to you than noise.',
+  'The Alchemist': "You transform pressure into power — intensity doesn't scare you, it refines you."
+};
+
+var quizState = { index: 0, picks: [], scores: {}, result: null };
+
+function startArchetypeQuiz() {
+  quizState = { index: 0, picks: [], scores: {}, result: null };
+  showScreen('quiz-intro');
+}
+
+function beginQuizQuestions() {
+  quizState.index = 0;
+  renderQuizQuestion();
+  showScreen('quiz-questions');
+}
+
+function renderQuizQuestion() {
+  var i = quizState.index;
+  var total = QUIZ_QUESTIONS.length;
+  var qd = QUIZ_QUESTIONS[i];
+  document.getElementById('quiz-progress-label').textContent = 'QUESTION ' + (i + 1) + ' OF ' + total;
+  document.getElementById('quiz-progress-fill').style.width = ((i / total) * 100) + '%';
+  document.getElementById('quiz-question-text').textContent = qd.q;
+  var wrap = document.getElementById('quiz-options');
+  wrap.innerHTML = '';
+  qd.options.forEach(function(opt) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'quiz-option-btn';
+    btn.textContent = opt.t;
+    btn.addEventListener('click', function() { selectQuizOption(opt.a); });
+    wrap.appendChild(btn);
+  });
+}
+
+function selectQuizOption(archetype) {
+  quizState.picks.push(archetype);
+  quizState.scores[archetype] = (quizState.scores[archetype] || 0) + 1;
+  quizState.index++;
+  if (quizState.index < QUIZ_QUESTIONS.length) {
+    renderQuizQuestion();
+  } else {
+    document.getElementById('quiz-progress-fill').style.width = '100%';
+    quizState.result = computeQuizArchetype();
+    storeQuizArchetypeGuess(quizState.result);
+    showScreen('quiz-lead');
+  }
+}
+
+// Stashes the quiz's guessed Archetype in localStorage (NOT sessionStorage --
+// this needs to survive well past a single Square-checkout round trip,
+// potentially days or weeks, until the person eventually buys a real
+// reading in this same browser). Read back later by doReading()/
+// getFallbackReading() to report an honest match/no-match fact against the
+// real, computed Codex Archetype -- see the "QUIZ ARCHETYPE CONFIRMATION"
+// section near computeQuizArchetype's real-reading counterpart. Wrapped in
+// try/catch per this codebase's existing defensive localStorage pattern
+// (see logPurchase()).
+var CS_QUIZ_GUESS_KEY = 'cs_quiz_archetype_guess';
+function storeQuizArchetypeGuess(archetype) {
+  try {
+    localStorage.setItem(CS_QUIZ_GUESS_KEY, JSON.stringify({
+      archetype: archetype,
+      storedAt: new Date().toISOString()
+    }));
+  } catch (e) { console.warn('Quiz archetype guess could not be stored:', e); }
+}
+
+// Reads back a previously-stored quiz guess, if any exists in this browser.
+// Returns the archetype string, or null if none was ever stored (the common
+// case -- most people generating a real reading never took the quiz first).
+// Deliberately left in localStorage after being read (not cleared) so a
+// re-view of the same reading, or a PDF regeneration, still shows the same
+// honest fact -- see doReading()/getFallbackReading() call sites.
+function getStoredQuizArchetypeGuess() {
+  try {
+    var raw = localStorage.getItem(CS_QUIZ_GUESS_KEY);
+    if (!raw) return null;
+    var parsed = JSON.parse(raw);
+    return (parsed && parsed.archetype) || null;
+  } catch (e) { return null; }
+}
+
+// Simple, transparent scoring: each answer adds one point to its mapped
+// archetype; highest total wins. Tiebreak rule (documented per the task
+// spec): among archetypes tied for the top score, the one whose FIRST pick
+// occurred earliest in the quiz wins -- a fixed, deterministic rule, not a
+// random one.
+function computeQuizArchetype() {
+  var scores = quizState.scores;
+  var bestScore = -1;
+  Object.keys(scores).forEach(function(a) {
+    if (scores[a] > bestScore) bestScore = scores[a];
+  });
+  var tied = Object.keys(scores).filter(function(a) { return scores[a] === bestScore; });
+  if (tied.length === 1) return tied[0];
+  for (var i = 0; i < quizState.picks.length; i++) {
+    if (tied.indexOf(quizState.picks[i]) !== -1) return quizState.picks[i];
+  }
+  return tied[0];
+}
+
+function showQuizPaywall(name) {
+  var nameEl = document.getElementById('quiz-paywall-name');
+  if (nameEl) nameEl.textContent = name ? (', ' + name.split(' ')[0] + '!') : '!';
+  showScreen('quiz-paywall');
+}
+
+function showQuizReveal(quiz) {
+  window._quizProfile = quiz;
+  var firstName = quiz && quiz.firstName ? quiz.firstName.split(' ')[0] : '';
+  document.getElementById('quiz-reveal-name').textContent = firstName
+    ? (firstName.toUpperCase() + "'S QUICK-GUESS ARCHETYPE")
+    : 'YOUR QUICK-GUESS ARCHETYPE';
+  var archetype = (quiz && quiz.quizArchetype) || 'The Integrator';
+  document.getElementById('quiz-reveal-archetype').textContent = archetype;
+  document.getElementById('quiz-reveal-blurb').textContent = QUIZ_ARCHETYPE_BLURBS[archetype] || '';
+  showScreen('quiz-reveal');
+  renderTierCards('quizTierCards');
+}
+
+function restoreQuizAfterSquareReturn() {
+  var profileJson = sessionStorage.getItem('cs_pending_profile');
+  if (!profileJson) { showScreen('hook'); return; }
+  var quiz;
+  try { quiz = JSON.parse(profileJson); } catch (e) { showScreen('hook'); return; }
+  showQuizReveal(quiz);
+  try {
+    window.history.replaceState({}, '', window.location.pathname);
+    sessionStorage.removeItem('cs_pending_profile');
+    sessionStorage.removeItem('cs_pending_tier');
+    sessionStorage.removeItem('cs_pending_email');
+  } catch (e) {}
+}
+
+document.getElementById('quiz-entry-banner').addEventListener('click', startArchetypeQuiz);
+document.getElementById('quiz-start-btn').addEventListener('click', beginQuizQuestions);
+document.getElementById('quiz-intro-back-btn').addEventListener('click', function() { showScreen('hook'); });
+document.getElementById('quiz-reveal-restart-btn').addEventListener('click', startArchetypeQuiz);
+
+document.getElementById('quiz-lead-btn').addEventListener('click', function() {
+  var name = document.getElementById('quiz-lead-name').value.trim();
+  var email = document.getElementById('quiz-lead-email').value.trim();
+  var errEl = document.getElementById('val-quiz-lead');
+  if (!name) { errEl.textContent = 'Please enter your name.'; return; }
+  if (!email || email.indexOf('@') === -1) { errEl.textContent = 'Please enter a valid email address.'; return; }
+  errEl.textContent = '';
+  // Reuse the existing lead-capture pipeline (same "leads" Supabase table
+  // every other funnel entry point writes to) -- passed profile:null since
+  // this lead has no real birth-data profile, just like a bare-email lead.
+  saveLeadToSupabase(name, email, null);
+  window._quizProfile = { firstName: name, email: email, quizArchetype: quizState.result, quizScores: quizState.scores };
+  showQuizPaywall(name);
+});
+
+document.getElementById('quiz-paywall-btn').addEventListener('click', function() {
+  openPaymentModal(ARCHETYPE_QUIZ_TIER.slug);
+});
 
 // ===========================
 // INIT
