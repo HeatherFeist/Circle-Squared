@@ -425,7 +425,7 @@ body {
       <p class="mb-4" style="color:var(--text-muted); font-size:0.72rem; opacity:0.75;">Your Ascendant (Rising Sign) needs an exact time and place. Your Moon sign only needs a place — we can still estimate it from a noon default if you check this box. Skip either and your reading proceeds normally without them.</p>
 
       <button data-id="34" id="hook-btn" class="cta-btn w-full mt-5" style="font-size:1.05rem;">✦ Reveal My Blueprint</button>
-      <p data-id="35" class="text-center mt-3" style="color:var(--text-muted); font-size:0.72rem; opacity:0.7;">🔒 Your information is never stored or shared.</p>
+      <p data-id="35" class="text-center mt-3" style="color:var(--text-muted); font-size:0.72rem; opacity:0.7;">🔒 Your information is never sent anywhere or shared — it's remembered only in this browser so you don't have to retype it. <a href="#" data-cs-clear-saved="hook" style="color:var(--text-muted);text-decoration:underline;opacity:0.85;">Clear saved info</a></p>
     </div>
   </div>
 </div>
@@ -839,6 +839,7 @@ body {
       </div>
       <button id="admin-pdf-btn" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.6rem 1.4rem;background:linear-gradient(135deg,#c9a84c,#f0d070);color:#0a0015;font-weight:700;font-size:0.85rem;border:none;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;">✦ Generate &amp; Download PDF</button>
       <div id="admin-pdf-status" style="font-size:0.75rem;color:#5a4a7a;min-height:1.2em;margin-top:0.5rem;"></div>
+      <p style="font-size:0.68rem;color:#5a4a7a;margin-top:0.4rem;">This form remembers what you typed (this browser only) so you don't have to retype it next time. <a href="#" data-cs-clear-saved="admin-solo" style="color:#5a4a7a;text-decoration:underline;">Clear saved info</a></p>
     </div>
 
     <!-- ===== PARTNERSHIP PDF GENERATOR ===== -->
@@ -917,6 +918,7 @@ body {
 
       <button id="partner-generate-btn" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.6rem 1.4rem;background:linear-gradient(135deg,#ff9ed2,#ff6ab4);color:#0a0015;font-weight:700;font-size:0.82rem;border:none;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;width:100%;justify-content:center;">💞 Generate Partnership Reading</button>
       <div id="partner-status" style="font-size:0.75rem;color:#ff9ed2;min-height:1.5em;margin-top:0.5rem;text-align:center;"></div>
+      <p style="font-size:0.68rem;color:#8a7aaa;text-align:center;margin-top:-0.4rem;margin-bottom:0.5rem;">This form remembers what you typed (this browser only). <a href="#" data-cs-clear-saved="admin-partner" style="color:#8a7aaa;text-decoration:underline;">Clear saved info</a></p>
       <button id="partner-pdf-btn" style="display:none;margin-top:0.5rem;padding:0.6rem 1.4rem;background:linear-gradient(135deg,#c9a84c,#f0d070);color:#0a0015;font-weight:700;font-size:0.82rem;border:none;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;width:100%;">📄 Download Partnership PDF</button>
       <button id="partner-listen-btn" style="display:none;margin-top:0.5rem;padding:0.6rem 1.4rem;background:linear-gradient(135deg,rgba(255,158,210,0.15),rgba(176,138,255,0.15));border:1px solid rgba(255,158,210,0.35);color:#ff9ed2;font-weight:700;font-size:0.82rem;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;width:100%;">&#x1F50A; Listen to Partnership Reading</button>
       <div id="partner-narration-progress" style="display:none;margin-top:0.7rem;padding:0.8rem 1rem;background:rgba(8,4,35,0.85);border:1px solid rgba(255,158,210,0.22);border-radius:10px;text-align:center;">
@@ -2455,6 +2457,131 @@ function courtCardFor(soulSephId, suit){
     }
   });
 })();
+
+// ===========================
+// FORM INPUT PERSISTENCE (birth-data / name / email autofill)
+// ===========================
+// The reading-intake forms are highly custom JS-driven widgets, not plain
+// native <form>s with name/autocomplete attributes the browser can reliably
+// remember — so ordinary browser autofill doesn't kick in here. This gives
+// the project owner the same "it remembers what I typed" experience, but
+// implemented ourselves via localStorage, entirely client-side.
+//
+// One shared helper, since the public solo hook form, the admin solo PDF
+// form, and the two halves of the admin partnership form are all the same
+// shape underneath (plain text inputs, plain selects, and — on every one of
+// them — an "I don't know my exact birth time" checkbox that gates a
+// birth-time row): each form gets its own single JSON blob in localStorage
+// (never scattered per-field keys), each field is saved on realistic user
+// interaction (input/change — never merely on load, which would just
+// re-save nothing), and saved values are restored once at page load, only
+// for field ids that actually have a stored value — so a field nobody ever
+// saved is left at its normal default, and (since this only ever runs once,
+// synchronously, before the user can have typed anything) a field the user
+// is mid-interaction with is never at risk of being clobbered.
+//
+// Mirrors the try{...}catch(e){} defensive style already used for
+// localStorage elsewhere in this file (see logPurchase below) so a browser
+// that blocks localStorage (private browsing, etc.) just runs the form
+// normally with no persistence, never a broken page.
+function csSetupFormPersistence(storageKey, fieldIds, checkboxIds) {
+  checkboxIds = checkboxIds || [];
+  var saved = {};
+  try { saved = JSON.parse(localStorage.getItem(storageKey) || '{}') || {}; } catch(e) { saved = {}; }
+
+  function save() {
+    try {
+      var data = {};
+      fieldIds.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) data[id] = el.value;
+      });
+      checkboxIds.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) data[id] = el.checked;
+      });
+      localStorage.setItem(storageKey, JSON.stringify(data));
+    } catch(e) {}
+  }
+
+  function restore() {
+    try {
+      fieldIds.forEach(function(id) {
+        if (!(id in saved)) return;
+        var el = document.getElementById(id);
+        if (el) el.value = saved[id];
+      });
+      checkboxIds.forEach(function(id) {
+        if (!(id in saved)) return;
+        var el = document.getElementById(id);
+        if (el) {
+          el.checked = !!saved[id];
+          // Re-fire the same 'change' handling the checkbox already wires
+          // up manually (disabling/dimming the birth-time row), so a
+          // restored "I don't know my time" checkbox gates the time
+          // selects exactly as if the user had just clicked it.
+          el.dispatchEvent(new Event('change'));
+        }
+      });
+    } catch(e) {}
+  }
+
+  function clearSaved() {
+    try { localStorage.removeItem(storageKey); } catch(e) {}
+    saved = {};
+    fieldIds.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    checkboxIds.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) { el.checked = false; el.dispatchEvent(new Event('change')); }
+    });
+  }
+
+  try {
+    fieldIds.concat(checkboxIds).forEach(function(id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      var evt = (el.tagName === 'SELECT' || el.type === 'checkbox') ? 'change' : 'input';
+      el.addEventListener(evt, save);
+    });
+  } catch(e) {}
+
+  restore();
+  return { save: save, restore: restore, clear: clearSaved };
+}
+
+// Public-facing solo reading intake ("hook") form, plus the email-gate's
+// email field (typed manually further along the same flow, same reading).
+var csHookFormPersistence = csSetupFormPersistence('cs_saved_form_input', [
+  'hook-fullname', 'hook-usedname', 'hook-month', 'hook-day', 'hook-year',
+  'hook-time-hour', 'hook-time-minute', 'hook-time-ampm', 'hook-birthplace', 'gate-email'
+], ['hook-no-birthtime']);
+
+// Admin panel — "Generate Any Reading PDF" solo customer form.
+var csAdminSoloFormPersistence = csSetupFormPersistence('cs_saved_admin_solo_form', [
+  'admin-pdf-name', 'admin-pdf-month', 'admin-pdf-day', 'admin-pdf-year',
+  'admin-pdf-time-hour', 'admin-pdf-time-minute', 'admin-pdf-time-ampm', 'admin-pdf-birthplace'
+], ['admin-pdf-no-birthtime']);
+
+// Admin panel — Partnership PDF generator, both souls' fields in one blob.
+var csAdminPartnerFormPersistence = csSetupFormPersistence('cs_saved_admin_partner_form', [
+  'p1-name', 'p1-month', 'p1-day', 'p1-year', 'p1-time-hour', 'p1-time-minute', 'p1-time-ampm', 'p1-birthplace',
+  'p2-name', 'p2-month', 'p2-day', 'p2-year', 'p2-time-hour', 'p2-time-minute', 'p2-time-ampm', 'p2-birthplace'
+], ['p1-no-birthtime', 'p2-no-birthtime']);
+
+// Small "Clear saved info" links (see markup near each form) all delegate
+// through one click listener rather than three near-identical ones.
+document.addEventListener('click', function(e) {
+  var target = e.target.closest ? e.target.closest('[data-cs-clear-saved]') : null;
+  if (!target) return;
+  e.preventDefault();
+  var which = target.getAttribute('data-cs-clear-saved');
+  if (which === 'hook') csHookFormPersistence.clear();
+  else if (which === 'admin-solo') csAdminSoloFormPersistence.clear();
+  else if (which === 'admin-partner') csAdminPartnerFormPersistence.clear();
+});
 
 // ===========================
 // OWNER EMAIL & PURCHASE LOGGING
