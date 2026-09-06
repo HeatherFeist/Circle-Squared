@@ -6771,6 +6771,50 @@ document.getElementById('square-checkout-btn').addEventListener('click', functio
   window.location.href = squareUrl;
 });
 
+// ===========================
+// DYNAMIC SQUARE CHECKOUT (new, additive -- not wired into any UI yet)
+// ===========================
+// This calls the new netlify/functions/create-checkout.js serverless
+// function, which creates a Square Payment Link on the fly for an
+// arbitrary dollar amount (server-side, using SQUARE_ACCESS_TOKEN --
+// see docs/SQUARE_DYNAMIC_CHECKOUT_SETUP.md). It is intentionally
+// separate from SQUARE_LINKS/openPaymentModal() above, which keep using
+// Square's pre-made fixed-price links exactly as before.
+//
+// Intended future use: group readings priced at $10 x N people (N up to
+// 9), where the price isn't known ahead of time so a fixed Square link
+// can't cover every N. A future feature would call this like:
+//
+//   createDynamicCheckout(10 * numPeople * 100, 'Group Reading — ' + numPeople + ' people', 'group-reading')
+//     .catch(function(err) { alert('Could not start checkout: ' + err.message); });
+//
+// On success this redirects the whole page to the real Square checkout
+// URL, and Square redirects back to '/?paid=<redirectSlug>' on
+// completion -- the same round-trip pattern SQUARE_LINKS already uses.
+function createDynamicCheckout(amountCents, description, redirectSlug) {
+  return fetch('/.netlify/functions/create-checkout', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      amountCents: amountCents,
+      description: description,
+      redirectSlug: redirectSlug
+    })
+  })
+    .then(function(res) {
+      return res.json().then(function(data) {
+        if (!res.ok || !data || !data.checkoutUrl) {
+          throw new Error((data && data.error) || 'Could not create checkout link.');
+        }
+        return data;
+      });
+    })
+    .then(function(data) {
+      window.location.href = data.checkoutUrl;
+      return data;
+    });
+}
+
 function showSuccessScreen(buyerName, buyerEmail, orderId, tier) {
   logPurchase(buyerName, buyerEmail, orderId, tier);
 
