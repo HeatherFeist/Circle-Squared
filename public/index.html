@@ -518,7 +518,12 @@ body {
 <!-- ===== SCREEN QUIZ PAYWALL ===== -->
 <div id="screen-quiz-paywall" class="screen">
   <div style="max-width:460px;width:100%;padding:2rem 1.5rem;margin:0 auto;display:flex;flex-direction:column;align-items:center;min-height:100vh;justify-content:center;text-align:center;">
-    <div class="orb" style="margin-bottom:1.5rem;"></div>
+    <!-- Admin test bypass: 5 quick taps on the orb reveals the result for
+         free, skipping Square entirely -- mirrors the existing 5-tap
+         gesture that opens the main admin panel (_adminTaps), so a site
+         owner can verify the quiz's reveal/upsell flow without spending
+         real money on every test. -->
+    <div id="quiz-paywall-orb" class="orb" style="margin-bottom:1.5rem;cursor:pointer;"></div>
     <p class="label-mono mb-2" style="color:var(--accent-gold);">✦ CALCULATION COMPLETE ✦</p>
     <h2 class="gradient-title font-serif text-2xl md:text-3xl font-bold mb-3">Your Archetype Has Been Calculated<span id="quiz-paywall-name"></span></h2>
     <p style="color:#9b8ec4;font-size:0.95rem;line-height:1.7;margin-bottom:1.75rem;">Celestia has your quick-guess Archetype ready. Pay $1 to reveal your result and see how it compares to your real Codex Blueprint.</p>
@@ -8924,6 +8929,27 @@ document.getElementById('quiz-lead-btn').addEventListener('click', function() {
 document.getElementById('quiz-paywall-btn').addEventListener('click', function() {
   openPaymentModal(ARCHETYPE_QUIZ_TIER.slug);
 });
+
+// Admin test bypass -- 5 taps on the paywall orb within 3 seconds reveals
+// the quiz result for free, without ever touching Square. Same gesture
+// pattern as the site's existing _adminTaps admin-panel unlock, so this
+// requires no separate password and stays consistent with how "admin"
+// access already works everywhere else in this app. Never logs a
+// purchase (logPurchase is not called), so it never pollutes real revenue
+// numbers in the admin panel.
+var _quizAdminTaps = 0, _quizAdminTapTimer = null;
+var quizPaywallOrb = document.getElementById('quiz-paywall-orb');
+if (quizPaywallOrb) {
+  quizPaywallOrb.addEventListener('click', function() {
+    _quizAdminTaps++;
+    clearTimeout(_quizAdminTapTimer);
+    _quizAdminTapTimer = setTimeout(function() { _quizAdminTaps = 0; }, 3000);
+    if (_quizAdminTaps >= 5) {
+      _quizAdminTaps = 0;
+      showQuizReveal(window._quizProfile);
+    }
+  });
+}
 
 // ===========================
 // INIT
