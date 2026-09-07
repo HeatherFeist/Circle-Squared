@@ -478,7 +478,7 @@ body {
 <div id="screen-quiz-intro" class="screen">
   <div style="max-width:520px;width:100%;padding:2rem 1.5rem;margin:0 auto;display:flex;flex-direction:column;align-items:center;min-height:100vh;justify-content:center;text-align:center;">
     <p class="label-mono mb-3" style="color:var(--accent-gold);">✦ THE ARCHETYPE QUIZ ✦</p>
-    <h1 class="gradient-title font-serif text-3xl md:text-4xl font-bold mb-5" style="line-height:1.2;">Does Your Gut Match Your Chart?</h1>
+    <h1 class="gradient-title font-serif text-3xl md:text-4xl font-bold mb-5" style="line-height:1.2;">What's Your Codex Archetype? Find Out With Our Custom Quiz And See If Your Personality Matches Your Stars</h1>
     <p style="color:var(--text-muted); font-size:0.95rem; line-height:1.75; margin-bottom:1.5rem;">8 quick questions about how you think, feel, and choose. No birth data required — this quiz guesses your Codex Archetype from your personality alone.</p>
     <div class="cosmic-card w-full mb-6" style="text-align:left;border-color:rgba(176,138,255,0.3);">
       <p style="color:#e8e0ff;font-size:0.85rem;line-height:1.7;margin:0;">
@@ -518,11 +518,16 @@ body {
 <!-- ===== SCREEN QUIZ PAYWALL ===== -->
 <div id="screen-quiz-paywall" class="screen">
   <div style="max-width:460px;width:100%;padding:2rem 1.5rem;margin:0 auto;display:flex;flex-direction:column;align-items:center;min-height:100vh;justify-content:center;text-align:center;">
-    <div class="orb" style="margin-bottom:1.5rem;"></div>
+    <!-- Admin test bypass: 5 quick taps on the orb reveals the result for
+         free, skipping Square entirely -- mirrors the existing 5-tap
+         gesture that opens the main admin panel (_adminTaps), so a site
+         owner can verify the quiz's reveal/upsell flow without spending
+         real money on every test. -->
+    <div id="quiz-paywall-orb" class="orb" style="margin-bottom:1.5rem;cursor:pointer;"></div>
     <p class="label-mono mb-2" style="color:var(--accent-gold);">✦ CALCULATION COMPLETE ✦</p>
     <h2 class="gradient-title font-serif text-2xl md:text-3xl font-bold mb-3">Your Archetype Has Been Calculated<span id="quiz-paywall-name"></span></h2>
     <p style="color:#9b8ec4;font-size:0.95rem;line-height:1.7;margin-bottom:1.75rem;">Celestia has your quick-guess Archetype ready. Pay $1 to reveal your result and see how it compares to your real Codex Blueprint.</p>
-    <button id="quiz-paywall-btn" class="cta-btn w-full" style="font-size:1.05rem;max-width:320px;">✦ Reveal My Archetype — $1 ✦</button>
+    <button id="quiz-paywall-btn" class="cta-btn w-full" style="font-size:1.05rem;max-width:320px;">✦ Unlock Result for $1 ✦</button>
     <p style="color:var(--text-muted); font-size:0.7rem; opacity:0.7; margin-top:0.75rem;">🔒 Secure Square checkout</p>
   </div>
 </div>
@@ -543,7 +548,10 @@ body {
     </div>
     <div class="divider w-full">✦ ─────── ✦</div>
     <h3 class="font-serif text-xl md:text-2xl mb-2 text-center gradient-title mt-2">See If Your Quiz Answers Were Right</h3>
-    <p class="text-center mb-6" style="color:var(--text-muted); font-size:0.9rem; font-style:italic;">Get your full reading — computed from your actual birth date and name across Numerology, Astrology, Kabbalah, Tarot, and Sacred Geometry — and find out.</p>
+    <p class="text-center mb-6" style="color:var(--text-muted); font-size:0.9rem; font-style:italic;">Get your full reading — computed from your actual birth date and name across Numerology, Astrology, Kabbalah, Tarot, and Sacred Geometry — and compare it to the guess above.</p>
+    <button id="quiz-reveal-blueprint-btn" class="cta-btn w-full" style="font-size:1.05rem;max-width:400px;margin-bottom:0.6rem;">✦ Get My Full Reading — $29.99 ✦</button>
+    <p class="text-center mb-6" style="color:var(--text-muted); font-size:0.72rem; opacity:0.75;">🔒 Secure Square checkout · The Complete Blueprint, our most popular reading</p>
+    <p class="text-center mb-3" style="color:var(--text-muted); font-size:0.78rem;">Or choose a different reading:</p>
     <div id="quizTierCards" class="flex flex-col gap-4 w-full mb-4" style="max-width:520px;"></div>
     <button id="quiz-reveal-restart-btn" class="skip-btn mt-4">↩ Take the Quiz Again</button>
   </div>
@@ -3253,7 +3261,7 @@ var TIERS = [
     ]
   },
   {
-    slug:'blueprint', name:'The Complete Blueprint', price:'99.00', pages:9, badge:'Best Value',
+    slug:'blueprint', name:'The Complete Blueprint', price:'29.99', pages:9, badge:'Best Value',
     tagline:'All five systems. Every star, number, path & sacred geometry.',
     includes: [
       'Everything in The Unveiling (pages 1\u20136)',
@@ -6741,10 +6749,10 @@ document.getElementById('close-payment-modal').addEventListener('click', functio
 var SQUARE_LINKS = {
   'initiation': 'https://square.link/u/hmFNvTqn',
   'unveiling':  'https://square.link/u/Q22hm6Yg',
-  'blueprint':  'https://square.link/u/kbAvRDTL',
+  'blueprint':  'https://square.link/u/h2JafWje',
   'partnership':'https://square.link/u/gXbjV2R3',
   // TODO(owner): replace with the real $1 Square checkout link before launch.
-  'archetype-quiz': 'https://square.link/u/PLACEHOLDER_QUIZ'
+  'archetype-quiz': 'https://square.link/u/wS1Ls7Fo'
 };
 
 document.getElementById('square-checkout-btn').addEventListener('click', function() {
@@ -8906,6 +8914,27 @@ document.getElementById('quiz-start-btn').addEventListener('click', beginQuizQue
 document.getElementById('quiz-intro-back-btn').addEventListener('click', function() { showScreen('hook'); });
 document.getElementById('quiz-reveal-restart-btn').addEventListener('click', startArchetypeQuiz);
 
+// "Get My Full Reading" on the quiz reveal screen -- the real Blueprint
+// reading needs actual birth data the quiz never collects (it's a
+// personality-preference guess only, no DOB), so this can't jump straight
+// to checkout the way openPaymentModal() normally does. Instead it
+// pre-fills whatever the quiz already collected (name, email) into the
+// real intake form and sends the person into the normal reading flow --
+// they still enter their real birth date, see their full teaser with the
+// Complete Blueprint already the prominent "Best Value" pick, and check
+// out from there. This keeps the reading's own data-integrity intact
+// (never computing a real reading without real birth data) while still
+// funneling the quiz's momentum toward the comparison the quiz itself
+// promises.
+document.getElementById('quiz-reveal-blueprint-btn').addEventListener('click', function() {
+  var quiz = window._quizProfile || {};
+  var nameField = document.getElementById('hook-fullname');
+  var emailField = document.getElementById('gate-email');
+  if (nameField && quiz.firstName && !nameField.value) nameField.value = quiz.firstName;
+  if (emailField && quiz.email && !emailField.value) emailField.value = quiz.email;
+  showScreen('hook');
+});
+
 document.getElementById('quiz-lead-btn').addEventListener('click', function() {
   var name = document.getElementById('quiz-lead-name').value.trim();
   var email = document.getElementById('quiz-lead-email').value.trim();
@@ -8924,6 +8953,27 @@ document.getElementById('quiz-lead-btn').addEventListener('click', function() {
 document.getElementById('quiz-paywall-btn').addEventListener('click', function() {
   openPaymentModal(ARCHETYPE_QUIZ_TIER.slug);
 });
+
+// Admin test bypass -- 5 taps on the paywall orb within 3 seconds reveals
+// the quiz result for free, without ever touching Square. Same gesture
+// pattern as the site's existing _adminTaps admin-panel unlock, so this
+// requires no separate password and stays consistent with how "admin"
+// access already works everywhere else in this app. Never logs a
+// purchase (logPurchase is not called), so it never pollutes real revenue
+// numbers in the admin panel.
+var _quizAdminTaps = 0, _quizAdminTapTimer = null;
+var quizPaywallOrb = document.getElementById('quiz-paywall-orb');
+if (quizPaywallOrb) {
+  quizPaywallOrb.addEventListener('click', function() {
+    _quizAdminTaps++;
+    clearTimeout(_quizAdminTapTimer);
+    _quizAdminTapTimer = setTimeout(function() { _quizAdminTaps = 0; }, 3000);
+    if (_quizAdminTaps >= 5) {
+      _quizAdminTaps = 0;
+      showQuizReveal(window._quizProfile);
+    }
+  });
+}
 
 // ===========================
 // INIT
