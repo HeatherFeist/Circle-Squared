@@ -687,6 +687,18 @@ body {
 
       <div data-id="190" id="tierCards" class="flex flex-col gap-4 w-full mb-8"></div>
 
+      <!-- Group Reading (3-25 people) entry point -- deliberately NOT one
+           more card in the TIERS grid above (a Group Reading isn't a fixed-
+           content product; its price and page count both scale with
+           headcount, see GROUP_TIERS). This single CTA opens the dedicated
+           group intake screen (#screen-group) instead. -->
+      <div class="cosmic-card" style="width:100%;max-width:480px;margin:0 auto 2rem;padding:1.2rem 1.4rem;text-align:center;border-color:rgba(80,220,200,0.28);">
+        <div style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.35em;color:#50dcc8;margin-bottom:0.4rem;">✦ FOR FAMILIES &amp; FRIEND GROUPS ✦</div>
+        <div style="font:700 1.1rem Georgia,serif;color:#e8e0ff;margin-bottom:0.4rem;">Group Reading — 3 to 25 People</div>
+        <p style="font-size:0.78rem;color:#8a7aaa;line-height:1.5;margin:0 0 0.8rem;">Everyone gets their own page, plus the real energetic patterns and standout pairings across the whole group.</p>
+        <button id="open-group-intake-btn" class="cta-btn w-full" style="font-size:0.9rem;padding:0.7rem 1.5rem;background:linear-gradient(135deg,#50dcc8,#2fa898);">🌙 Start a Group Reading →</button>
+      </div>
+
       <!-- Sacred Geometry Layered Build — Codex Logic V06 §14/§16: literal
            Cartesian construction (Flower of Life → Fruit of Life → Tree of
            Life + Veils → Metatron's Cube → Tarot capstone), one continuous
@@ -735,6 +747,34 @@ body {
   </div>
 </div>
 
+<!-- ===== SCREEN GROUP: GROUP READING INTAKE (3-25 people) ===== -->
+<div id="screen-group" class="screen">
+  <div class="cosmic-card" style="max-width:560px;width:100%;margin:2rem auto;padding:1.6rem 1.4rem;">
+    <div style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.35em;color:#50dcc8;margin-bottom:0.4rem;text-align:center;">✦ GROUP READING ✦</div>
+    <h2 style="font:700 1.3rem Georgia,serif;color:#e8e0ff;text-align:center;margin:0 0 0.4rem;">Add Your Group (3–25 People)</h2>
+    <p style="font-size:0.78rem;color:#8a7aaa;text-align:center;line-height:1.5;margin:0 0 1.2rem;">For family, friends, and group activities — everyone gets their own page, plus the real patterns across the whole group. Birth time and place are optional for each person.</p>
+
+    <div id="group-people-list"></div>
+
+    <button id="group-add-person-btn" type="button" style="width:100%;margin:0.6rem 0 1rem;padding:0.55rem;background:rgba(80,220,200,0.12);border:1px solid rgba(80,220,200,0.35);color:#50dcc8;border-radius:10px;cursor:pointer;font-family:'Courier New',monospace;font-size:0.75rem;letter-spacing:0.05em;">+ Add Another Person</button>
+
+    <div id="group-price-display" style="text-align:center;padding:0.9rem;border-radius:10px;background:rgba(80,220,200,0.08);border:1px solid rgba(80,220,200,0.22);margin-bottom:1rem;">
+      <div style="font-family:'Courier New',monospace;font-size:0.58rem;letter-spacing:0.25em;color:#50dcc8;">CURRENT GROUP SIZE</div>
+      <div id="group-price-count" style="font:700 1.3rem Georgia,serif;color:#e8e0ff;margin:0.2rem 0;">3 people</div>
+      <div id="group-price-amount" style="font:700 1.6rem Georgia,serif;background:linear-gradient(135deg,#50dcc8,#2fa898);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">$55.00</div>
+    </div>
+
+    <div style="margin-bottom:0.8rem;">
+      <label style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#50dcc8;display:block;margin-bottom:0.4rem;">DELIVERY EMAIL</label>
+      <input id="group-contact-email" type="email" class="cosmic-input" placeholder="you@example.com" style="padding:0.6rem 0.9rem;width:100%;" autocomplete="off" />
+    </div>
+
+    <div id="group-status" style="font-size:0.75rem;color:#ff9ed2;min-height:1.4em;margin-bottom:0.6rem;text-align:center;"></div>
+    <button id="group-continue-btn" class="cta-btn w-full" style="font-size:0.92rem;padding:0.75rem 1.5rem;background:linear-gradient(135deg,#50dcc8,#2fa898);">Continue to Payment →</button>
+    <button id="group-back-btn" type="button" style="width:100%;margin-top:0.6rem;padding:0.5rem;background:none;border:none;color:#6a5a9a;cursor:pointer;font-size:0.78rem;">← Back</button>
+  </div>
+</div>
+
 <!-- ===== PAYMENT MODAL ===== -->
 <div data-id="206" id="payment-modal" class="payment-overlay">
   <div data-id="207" class="cosmic-card text-center" style="max-width:480px; width:100%; border-color:rgba(201,168,76,0.4); max-height:90vh; overflow-y:auto; position:relative;">
@@ -747,6 +787,16 @@ body {
       <label data-id="214" class="label-mono block mb-2" style="text-align:left;">EMAIL FOR PDF DELIVERY</label>
       <input data-id="215" type="email" id="modal-email" placeholder="your@email.com" class="cosmic-input" autocomplete="email" />
       <div data-id="216" class="validation-msg" id="val-modal-email"></div>
+    </div>
+    <div class="mb-4" style="text-align:left;">
+      <a href="#" id="promo-toggle-link" style="font-size:0.75rem;color:#8a7ab8;text-decoration:underline;">Have a promo code?</a>
+      <div id="promo-code-row" hidden style="margin-top:0.6rem;">
+        <div style="display:flex;gap:0.5rem;">
+          <input type="text" id="promo-code-input" placeholder="PROMO CODE" class="cosmic-input" style="text-transform:uppercase;flex:1;" autocomplete="off" />
+          <button type="button" id="promo-apply-btn" style="padding:0 1.1rem;background:rgba(176,138,255,0.15);border:1px solid rgba(176,138,255,0.4);border-radius:8px;color:#b08aff;font-size:0.82rem;font-weight:600;cursor:pointer;white-space:nowrap;">Apply</button>
+        </div>
+        <div class="validation-msg" id="val-promo-code"></div>
+      </div>
     </div>
     <button id="square-checkout-btn" style="display:inline-flex;align-items:center;justify-content:center;gap:0.5rem;padding:0.9rem 2rem;background:linear-gradient(135deg,#006AFF,#00a6ff);color:#fff;font-weight:700;font-size:0.95rem;border:none;border-radius:50px;cursor:pointer;width:100%;box-shadow:0 0 25px rgba(0,106,255,0.35);transition:box-shadow 0.3s;">&#x2756; Proceed to Secure Checkout</button>
     <div style="font-size:0.68rem;color:#3a2a5a;margin-top:0.5rem;">&#x1F512; Secure Square checkout &middot; All major cards accepted</div>
@@ -2482,7 +2532,541 @@ function generatePartnershipPDF(p1, p2, pages) {
 }
 
 // ===========================
-// W3BB CODEX SECTION 5.4/6.2 — THE 22 PATHS + MAJOR ARCANA
+// GROUP READING (3-25 people)
+// ===========================
+// Reuses computePartnerProfile() once per person -- the exact same solo-
+// battery function the partnership reading already calls (Life Path,
+// Expression, Soul Urge, Sun sign, Sephirah, Life Path Trump Card,
+// Soul/Court Card, natal Node axis, Node Decan Cards, Zodiacal Court Card,
+// Hebrew Soul Correspondence). No new computation function is written for
+// any of that -- only the elemental Node polarity (Part XXVIII, above) is
+// new, and it too is computed once per person from data already on the
+// profile (p.node.northSign).
+//
+// Output structure follows the project owner's explicit direction (see PR
+// description): one condensed individual section per person, a Group
+// Energetic Overview of real aggregate counts, and a bounded Standout
+// Pairings list -- never exhaustive pairwise prose, never a numeric score.
+
+// Compute one person's full profile plus the additive elemental Node
+// polarity finding. `person` is {firstName, month, day, year}.
+function computeGroupPersonProfile(person) {
+  var p = computePartnerProfile(person.firstName, person.month, person.day, person.year);
+  p.elementalNodePolarity = (p.node && p.node.northSign) ? getElementalNodePolarity(p.node.northSign) : null;
+  return p;
+}
+
+function computeGroupProfiles(people) {
+  return people.map(computeGroupPersonProfile);
+}
+
+// ── Group Energetic Overview: real, computed aggregate facts only ──
+// No invented composite "group score" -- only counts/distributions of real
+// per-person data already computed above.
+function computeGroupOverview(profiles) {
+  var n = profiles.length;
+  var suitCounts = {Wands:0, Cups:0, Swords:0, Pentacles:0};
+  var axisCounts = {vertical:0, horizontal:0};
+  var polarityCounts = {outward:0, inward:0};
+  var sephirahCounts = {}; // sephId -> {name, count, members:[firstName]}
+  var trumpCounts = {}; // card name -> {count, members}
+
+  profiles.forEach(function(p) {
+    if (p.elementSuit && suitCounts.hasOwnProperty(p.elementSuit)) suitCounts[p.elementSuit]++;
+    if (p.axisRole && axisCounts.hasOwnProperty(p.axisRole)) axisCounts[p.axisRole]++;
+    if (p.elementalNodePolarity && polarityCounts.hasOwnProperty(p.elementalNodePolarity)) polarityCounts[p.elementalNodePolarity]++;
+    if (p.tree && p.tree.sephId != null) {
+      var key = p.tree.sephId;
+      if (!sephirahCounts[key]) sephirahCounts[key] = { name: p.tree.name, count: 0, members: [] };
+      sephirahCounts[key].count++;
+      sephirahCounts[key].members.push(p.firstName);
+    }
+    if (p.lifePathTrumpCard && p.lifePathTrumpCard.card) {
+      var tkey = p.lifePathTrumpCard.card;
+      if (!trumpCounts[tkey]) trumpCounts[tkey] = { count: 0, members: [], keyword: p.lifePathTrumpCard.keyword };
+      trumpCounts[tkey].count++;
+      trumpCounts[tkey].members.push(p.firstName);
+    }
+  });
+
+  // Only genuine 3+-person clusters are reported as shared paths -- a
+  // coincidence of 2 is already covered by the pairwise Standout Pairings
+  // section below, so the Overview reserves "shared by the group" language
+  // for the rarer, more notable 3+ case.
+  var sharedSephiroth = Object.keys(sephirahCounts).map(function(k){return sephirahCounts[k];}).filter(function(s){return s.count>=3;});
+  var sharedTrumpPaths = Object.keys(trumpCounts).map(function(k){return {card:k, count:trumpCounts[k].count, members:trumpCounts[k].members, keyword:trumpCounts[k].keyword};}).filter(function(t){return t.count>=3;});
+
+  return {
+    total: n,
+    suitCounts: suitCounts,
+    axisCounts: axisCounts,
+    polarityCounts: polarityCounts,
+    sharedSephiroth: sharedSephiroth,
+    sharedTrumpPaths: sharedTrumpPaths
+  };
+}
+
+// ── Standout Pairings: bounded, ranked, plain-fact-only ──
+// See docs/CODEX_LOGIC_V07.md Part XXIX for the full rule this codifies.
+// Scans ALL pairs (cheap even at 25 people = 300 pairs) but narrates only a
+// bounded, notable subset -- never every pair, never a numeric score.
+function computePairCoincidences(p1, p2) {
+  var facts = [];
+  var count = 0;
+  if (p1.tree && p2.tree && p1.tree.sephId != null && p1.tree.sephId === p2.tree.sephId) {
+    facts.push('both land on the same Sephirah, ' + p1.tree.name);
+    count++;
+  }
+  if (p1.lifePathTrumpCard && p2.lifePathTrumpCard && p1.lifePathTrumpCard.card === p2.lifePathTrumpCard.card) {
+    facts.push('both share the same Life Path Trump Card, ' + p1.lifePathTrumpCard.card);
+    count++;
+  }
+  var decan = getNodeDecanCoincidences(p1, p2);
+  if (decan.sameNorthCard) { facts.push('both land on the same North Node card, the ' + p1.nodeDecanCards.northNodeCard.card); count++; }
+  if (decan.sameSouthCard) { facts.push('both land on the same South Node card, the ' + p1.nodeDecanCards.southNodeCard.card); count++; }
+  if (decan.crossMatch) { facts.push('one’s North Node card is exactly the other’s South Node card'); count++; }
+  if (getZodiacalCourtCardCoincidence(p1, p2)) {
+    facts.push('both land on the same Zodiacal Court Card, the ' + p1.zodiacalCourtCard.name);
+    count++;
+  }
+  var heb = getHebrewSoulCoincidence(p1, p2);
+  if (heb.sameArchangel) { facts.push('both Hebrew gematria totals match the same Archangel, ' + heb.archangelName); count++; }
+  return { facts: facts, count: count };
+}
+
+function computeStandoutPairings(profiles) {
+  var n = profiles.length;
+  var allPairs = [];
+  for (var i = 0; i < n; i++) {
+    for (var j = i + 1; j < n; j++) {
+      var p1 = profiles[i], p2 = profiles[j];
+      if (!p1.elementalNodePolarity || !p2.elementalNodePolarity) continue;
+      var complementary = (p1.elementalNodePolarity !== p2.elementalNodePolarity);
+      var coin = computePairCoincidences(p1, p2);
+      allPairs.push({
+        p1: p1, p2: p2,
+        complementary: complementary,
+        coincidenceCount: coin.count,
+        coincidenceFacts: coin.facts
+      });
+    }
+  }
+
+  var totalPairCount = allPairs.length;
+  // Small enough group -- show every real pair rather than an artificially
+  // truncated "top N" (per the project owner's explicit direction).
+  var showAll = totalPairCount <= 6;
+
+  var harmonious = allPairs.filter(function(pr){ return pr.complementary && pr.coincidenceCount >= 1; })
+    .sort(function(a,b){ return b.coincidenceCount - a.coincidenceCount; });
+  var friction = allPairs.filter(function(pr){ return !pr.complementary; })
+    .sort(function(a,b){ return b.coincidenceCount - a.coincidenceCount; });
+
+  var CAP = 8;
+  if (!showAll) {
+    harmonious = harmonious.slice(0, CAP);
+    friction = friction.slice(0, CAP);
+  }
+
+  return {
+    totalPairsScanned: totalPairCount,
+    showAll: showAll,
+    harmonious: harmonious,
+    friction: friction
+  };
+}
+
+// ── Condensed per-person reading section (Celestia voice, Part XXVI
+// meaning-first, no mechanics) ──
+// Condensed deliberately for group context -- a 25-person reading cannot
+// carry full 9-page-solo depth per person. See PR body for this judgment
+// call.
+function formatGroupPersonSection(p) {
+  var lpData = LP_DATA[p.lifePath] || LP_DATA[reduceNum(p.lifePath, false)] || LP_DATA[6];
+  var trump = p.lifePathTrumpCard;
+  var out = p.firstName + ' carries Life Path ' + p.lifePath + ' (' + lpData.title + '), anchored at ' + p.tree.name + ' on the Tree of Life — ' + p.tree.meaning + '. ';
+  out += 'Their ' + p.sunSign.sign + ' Sun brings a ' + p.sunSign.element + ' current into everything they do';
+  out += (trump ? (', confirmed by their Life Path Trump Card, ' + trump.card + ' — ' + trump.keyword + '.') : '.') + ' ';
+  if (p.soulCard && p.courtCard) {
+    out += 'On Metatron’s Cube, their Soul Card is the ' + p.soulCard.name + ' (' + p.soulCard.keyword + '), carried outward into daily life as the ' + p.courtCard.name + '. ';
+  }
+  if (p.nodeDecanCards) {
+    out += 'Their North Node points them toward the ' + p.nodeDecanCards.northNodeCard.card + ' — the energy they are growing into — while their South Node, the ' + p.nodeDecanCards.southNodeCard.card + ', names the familiar comfort zone they are moving beyond. ';
+  }
+  if (p.elementalNodePolarity) {
+    out += p.firstName + ' carries ' + (p.elementalNodePolarity === 'outward' ? 'an outward-pushing' : 'an inward-pulling') + ' Node current, part of what shapes how they move alongside the rest of this group. ';
+  }
+  return out.trim();
+}
+
+function formatGroupOverviewSection(overview, groupOverviewLabel) {
+  var n = overview.total;
+  var suitLines = ['Wands (Fire)', 'Cups (Water)', 'Swords (Air)', 'Pentacles (Earth)'].map(function(label) {
+    var key = label.split(' ')[0];
+    var c = overview.suitCounts[key] || 0;
+    return c + ' of you carr' + (c === 1 ? 'ies' : 'y') + ' ' + label + ' energy';
+  });
+  var out = 'Across all ' + n + ' of you, the group’s elemental spectrum breaks down as follows: ' + suitLines.join('; ') + '.\n\n';
+  out += 'On the Tree of Life’s central architecture, ' + overview.axisCounts.vertical + ' of you carry the Vertical Integrator role (the central channel) and ' + overview.axisCounts.horizontal + ' carry the Horizontal Architect role (the crossbeams) — the real, computed distribution of structural roles across this group.\n\n';
+  if (overview.polarityCounts.outward || overview.polarityCounts.inward) {
+    out += 'By elemental Node polarity, ' + overview.polarityCounts.outward + ' of you carry an outward-pushing North Node current and ' + overview.polarityCounts.inward + ' carry an inward-pulling one — a real, always-available axis (distinct from the rare day-specific Node activation used elsewhere in solo and partnership readings) that shapes which pairings below read as magnetic versus tension.\n\n';
+  }
+  if (overview.sharedSephiroth.length) {
+    out += overview.sharedSephiroth.map(function(s) {
+      return s.count + ' of you — ' + s.members.join(', ') + ' — share the same Sephirah, ' + s.name + '.';
+    }).join(' ') + '\n\n';
+  }
+  if (overview.sharedTrumpPaths.length) {
+    out += overview.sharedTrumpPaths.map(function(t) {
+      return t.count + ' of you — ' + t.members.join(', ') + ' — share the same Life Path Trump Card, ' + t.card + ' (' + t.keyword + ').';
+    }).join(' ') + '\n\n';
+  }
+  if (!overview.sharedSephiroth.length && !overview.sharedTrumpPaths.length) {
+    out += 'No single Sephirah or Trump Card is shared by three or more of you — an honest, ordinary outcome, not a gap; this simply means the group’s architecture is spread widely rather than clustered.\n\n';
+  }
+  return out.trim();
+}
+
+function formatPairFact(pr) {
+  var name1 = pr.p1.firstName, name2 = pr.p2.firstName;
+  var base = pr.complementary
+    ? (name1 + ' and ' + name2 + ' carry complementary Node currents — one outward-pushing, one inward-pulling — a magnetic pairing where their two directions of pull can circulate rather than compete.')
+    : (name1 + ' and ' + name2 + ' both carry ' + pr.p1.elementalNodePolarity + '-' + (pr.p1.elementalNodePolarity === 'outward' ? 'pushing' : 'pulling') + ' Node energy, which can mean two people leaning the same direction without a natural counterbalance — not a bad placement, simply one that asks for a deliberate choice to make room for other directions in the group.');
+  if (pr.coincidenceFacts.length) {
+    base += ' On top of that, ' + pr.coincidenceFacts.join('; ') + '.';
+  }
+  return base;
+}
+
+function formatStandoutPairingsSection(pairings) {
+  var out = '';
+  if (pairings.showAll) {
+    out += 'This group is small enough that every real pairing is worth naming rather than trimming to a shortlist.\n\n';
+  } else {
+    out += 'Scanning all ' + pairings.totalPairsScanned + ' possible pairings in this group, here are the ones worth naming — selected for genuine rarity and simultaneous coincidence, not an exhaustive list.\n\n';
+  }
+  if (pairings.harmonious.length) {
+    out += 'HARMONIOUS / MAGNETIC PAIRINGS:\n' + pairings.harmonious.map(function(pr){ return '• ' + formatPairFact(pr); }).join('\n') + '\n\n';
+  } else {
+    out += 'No pairing in this group combines complementary Node polarity with an additional real coincidence — an honest, ordinary outcome.\n\n';
+  }
+  if (pairings.friction.length) {
+    out += 'TENSION PAIRINGS:\n' + pairings.friction.map(function(pr){ return '• ' + formatPairFact(pr); }).join('\n') + '\n\n';
+  }
+  return out.trim();
+}
+
+// Reader-facing fallback text for the group reading -- meaning-first, no
+// mechanics narration (Part XXVI), plain binary facts only for every
+// relational finding (Part XVIII, extended to groups per Part XXIX).
+// Returns a structured object (NOT the ===PAGE_N_START/END=== convention
+// parseReadingPages() uses, since that parser hard-caps at 9 pages -- far
+// too few for a 25-person reading. See PR body for this judgment call.
+function getGroupFallback(profiles) {
+  var overview = computeGroupOverview(profiles);
+  var pairings = computeStandoutPairings(profiles);
+  var names = profiles.map(function(p){return p.firstName;});
+  var intro = 'Welcome, ' + names.join(', ') + '. What follows is not ' + profiles.length + ' separate readings sitting side by side — it is one real, computed picture of how this group’s numbers, signs, and paths actually distribute, plus the handful of pairings between you that are genuinely worth naming.';
+  return {
+    intro: intro,
+    overviewText: formatGroupOverviewSection(overview),
+    people: profiles.map(function(p) {
+      return { firstName: p.firstName, text: formatGroupPersonSection(p) };
+    }),
+    pairingsText: formatStandoutPairingsSection(pairings),
+    blessing: 'AIN SOPH AUR — the limitless light this whole reading traces back to — holds all ' + profiles.length + ' of you, individually and together. I am Celestia, and it has been an honor to read this group’s geometry.',
+    overview: overview,
+    pairings: pairings
+  };
+}
+
+// Minimal AI-prompt path, mirroring doPartnershipReading()'s conventions
+// (Celestia voice, explicit "never narrate mechanics" instruction, plain-
+// fact-only relational language) but returning the same structured shape
+// getGroupFallback() does rather than the 9-page-capped delimiter format,
+// for the same reason noted above. Used opportunistically; the fallback
+// above is what every group reading can always fall back to.
+async function doGroupReading(profiles) {
+  var overview = computeGroupOverview(profiles);
+  var pairings = computeStandoutPairings(profiles);
+  var profileLines = profiles.map(function(p) {
+    var lpData = LP_DATA[p.lifePath] || LP_DATA[reduceNum(p.lifePath, false)] || LP_DATA[6];
+    return p.firstName + ': Life Path ' + p.lifePath + ' (' + lpData.title + ') · ' + p.sunSign.sign + ' Sun · ' + p.tree.name
+      + (p.lifePathTrumpCard ? ' · Trump Card ' + p.lifePathTrumpCard.card : '')
+      + (p.soulCard ? ' · Soul Card ' + p.soulCard.name : '')
+      + (p.nodeDecanCards ? ' · North Node card ' + p.nodeDecanCards.northNodeCard.card : '')
+      + (p.elementalNodePolarity ? ' · Elemental Node polarity: ' + p.elementalNodePolarity : '');
+  }).join('\n');
+
+  var prompt = 'You are Celestia, oracle of Circles Squared. Generate a group reading for ' + profiles.length + ' people: ' + profiles.map(function(p){return p.firstName;}).join(', ') + '. '
+    + 'This is entertainment for a family or friend group, not a workplace or compatibility-score product. Write in Celestia’s warm, poetic, second-person voice. Never narrate HOW a value was calculated (no degree/decan/mechanism talk) -- only what each finding means. Never invent a numeric score, percentage, or compatibility rating for any pairing -- report only real, computed, binary facts.\n\n'
+    + 'PROFILE:\n' + profileLines + '\n\n'
+    + 'GROUP OVERVIEW (real, computed distribution -- report these counts honestly, never invent a composite score): '
+    + 'Elemental suits -- ' + JSON.stringify(overview.suitCounts) + '. Axis roles -- ' + JSON.stringify(overview.axisCounts) + '. Elemental Node polarity -- ' + JSON.stringify(overview.polarityCounts) + '.\n\n'
+    + 'Write these sections using ===SECTION_NAME_START=== / ===SECTION_NAME_END=== delimiters: OVERVIEW (2-3 paragraphs naming the real distributions above as a group energetic portrait), then one PERSON_<firstname> section per person (1 condensed paragraph each, Life Path/Sun sign/Sephirah/Trump Card/Soul Card/Node in the established voice), then PAIRINGS (name only the standout pairings the data supports -- complementary Node polarity for magnetic pairs, matching polarity for tension pairs, each combined with any other real coincidence -- as plain described facts, never a score), then BLESSING (a short closing blessing invoking AIN SOPH AUR for the whole group).';
+
+  try {
+    var text = await generateReading(prompt);
+    var parsed = parseGroupReadingSections(text, profiles);
+    if (parsed) return parsed;
+  } catch (e) { /* fall through to fallback */ }
+  return getGroupFallback(profiles);
+}
+
+// Generalized section parser for the group reading's own delimiter names
+// (SECTION_NAME_START/END, not the fixed ===PAGE_N=== convention, since
+// group readings have a variable number of sections -- one per person).
+function parseGroupReadingSections(fullText, profiles) {
+  function extract(tag) {
+    var s = '===' + tag + '_START===', e = '===' + tag + '_END===';
+    var si = fullText.indexOf(s), ei = fullText.indexOf(e);
+    if (si === -1 || ei === -1) return null;
+    return fullText.slice(si + s.length, ei).trim();
+  }
+  var overviewText = extract('OVERVIEW');
+  var pairingsText = extract('PAIRINGS');
+  var blessing = extract('BLESSING');
+  if (!overviewText || !pairingsText || !blessing) return null;
+  var people = [];
+  for (var i = 0; i < profiles.length; i++) {
+    var t = extract('PERSON_' + profiles[i].firstName.toUpperCase());
+    if (!t) return null; // require every person to keep this honest -- no silent gaps
+    people.push({ firstName: profiles[i].firstName, text: t });
+  }
+  return {
+    intro: 'Welcome, ' + profiles.map(function(p){return p.firstName;}).join(', ') + '.',
+    overviewText: overviewText,
+    people: people,
+    pairingsText: pairingsText,
+    blessing: blessing,
+    overview: computeGroupOverview(profiles),
+    pairings: computeStandoutPairings(profiles)
+  };
+}
+
+// ── PDF generation ──
+// A condensed cover + per-person + overview + pairings PDF, reusing the
+// same visual language (palette, starfield, footer) as
+// generatePartnershipPDF() above, sized for a variable 3-25-person group
+// rather than the fixed 2-person layout.
+function generateGroupPDF(profiles, content) {
+  var jsPDFLib = (window.jspdf && window.jspdf.jsPDF) ? window.jspdf.jsPDF : (window.jsPDF || null);
+  if (!jsPDFLib) { alert('PDF generator still loading — please wait.'); return; }
+  var doc = new jsPDFLib({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  var W = 210, H = 297;
+  var BG = [2, 0, 20], GHOST = [18, 8, 52];
+  var GOLD = [201, 168, 76], PURPLE = [176, 138, 255], TEAL = [80, 220, 200], WHITE = [232, 224, 255], MUTED = [120, 100, 170], DIM = [50, 35, 90];
+
+  function pdfBg() { doc.setFillColor(BG[0], BG[1], BG[2]); doc.rect(0, 0, W, H, 'F'); }
+  function pdfStars(seed, n) {
+    var x = seed;
+    for (var i = 0; i < n; i++) {
+      x = (x * 1664525 + 1013904223) % 4294967296; var sx = (x % 1000) / 1000 * W;
+      x = (x * 1664525 + 1013904223) % 4294967296; var sy = (x % 1000) / 1000 * H;
+      var r = (i % 7 === 0) ? 0.6 : (i % 3 === 0) ? 0.4 : 0.25;
+      doc.setFillColor(190, 180, 230); doc.circle(sx, sy, r, 'F');
+    }
+  }
+  function pdfFooter(pn, tot) {
+    doc.setFont('courier', 'normal'); doc.setFontSize(5.5);
+    doc.setTextColor(Math.round(DIM[0]*1.5), Math.round(DIM[1]*1.5), Math.round(DIM[2]*1.5));
+    doc.text('CIRCLES SQUARED  ·  GROUP READING', 14, H - 6);
+    doc.text('PAGE ' + pn + ' OF ' + tot, W - 14, H - 6, { align: 'right' });
+  }
+  function pageHeader(sys, title, color) {
+    doc.setFillColor(GHOST[0], GHOST[1], GHOST[2]); doc.rect(0, 0, W, 30, 'F');
+    doc.setFont('courier', 'bold'); doc.setFontSize(6.5); doc.setTextColor(color[0], color[1], color[2]);
+    doc.text(sys.toUpperCase(), 14, 12);
+    doc.setFont('times', 'bold'); doc.setFontSize(15); doc.setTextColor(WHITE[0], WHITE[1], WHITE[2]);
+    doc.text(title, 14, 23);
+  }
+  function bodyText(text, y, color, size) {
+    doc.setFont('times', 'normal'); doc.setFontSize(size || 10); doc.setTextColor((color||WHITE)[0], (color||WHITE)[1], (color||WHITE)[2]);
+    var lines = doc.splitTextToSize(text, W - 28);
+    doc.text(lines, 14, y);
+    return y + lines.length * (size ? size * 0.42 : 4.6);
+  }
+
+  var totalPages = 2 + profiles.length; // cover + overview + one per person + pairings(+blessing folded in)
+  totalPages = 3 + profiles.length; // cover + overview + N person pages + pairings/blessing
+
+  // ===== COVER =====
+  pdfBg(); pdfStars(91, 150);
+  doc.setFont('courier', 'bold'); doc.setFontSize(7.5); doc.setTextColor(PURPLE[0], PURPLE[1], PURPLE[2]);
+  doc.text('C I R C L E S   S Q U A R E D', W / 2, 40, { align: 'center' });
+  doc.setFont('times', 'bold'); doc.setFontSize(26); doc.setTextColor(252, 250, 255);
+  doc.text('GROUP READING', W / 2, 60, { align: 'center' });
+  doc.setFont('courier', 'normal'); doc.setFontSize(8); doc.setTextColor(GOLD[0], GOLD[1], GOLD[2]);
+  doc.text(profiles.length + ' SOULS', W / 2, 69, { align: 'center' });
+  doc.setFont('times', 'normal'); doc.setFontSize(12); doc.setTextColor(WHITE[0], WHITE[1], WHITE[2]);
+  var nameLines = doc.splitTextToSize(profiles.map(function(p){return p.firstName;}).join(' · '), W - 40);
+  doc.text(nameLines, W / 2, 90, { align: 'center' });
+  doc.setFont('times', 'italic'); doc.setFontSize(10); doc.setTextColor(MUTED[0], MUTED[1], MUTED[2]);
+  var introLines = doc.splitTextToSize(content.intro, W - 40);
+  doc.text(introLines, W / 2, 130, { align: 'center' });
+  pdfFooter(1, totalPages);
+
+  // ===== GROUP OVERVIEW =====
+  doc.addPage(); pdfBg(); pdfStars(133, 90);
+  pageHeader('GROUP ENERGETIC OVERVIEW', 'The Whole Field, Named', GOLD);
+  bodyText(content.overviewText, 42, WHITE, 9.5);
+  pdfFooter(2, totalPages);
+
+  // ===== ONE PAGE PER PERSON =====
+  profiles.forEach(function(p, idx) {
+    doc.addPage(); pdfBg(); pdfStars(200 + idx * 17, 80);
+    pageHeader(p.firstName.toUpperCase(), p.firstName, PURPLE);
+    var y = bodyText(content.people[idx].text, 42, WHITE, 9.5);
+    pdfFooter(3 + idx, totalPages);
+  });
+
+  // ===== STANDOUT PAIRINGS + BLESSING =====
+  doc.addPage(); pdfBg(); pdfStars(777, 100);
+  pageHeader('STANDOUT PAIRINGS', 'What the Data Actually Shows', TEAL);
+  var yy = bodyText(content.pairingsText, 42, WHITE, 8.8);
+  yy = Math.min(yy + 8, H - 40);
+  doc.setFont('times', 'italic'); doc.setFontSize(9); doc.setTextColor(GOLD[0], GOLD[1], GOLD[2]);
+  var blessLines = doc.splitTextToSize(content.blessing, W - 28);
+  doc.text(blessLines, 14, yy);
+  pdfFooter(3 + profiles.length, totalPages);
+
+  var filename = 'circles-squared-group-' + profiles.length + '-people.pdf';
+  _openPDF(doc, filename);
+}
+
+// ── Group intake screen wiring ──
+// Collects full name + full birth date per person (required) -- the exact
+// minimum computePartnerProfile() needs, and the only inputs the group
+// computation battery (Life Path, Expression, Soul Urge, Sun sign,
+// Sephirah, Trump Card, Soul/Court Card, natal Node axis, Node Decan
+// Cards, Zodiacal Court Card, Hebrew Soul Correspondence) actually
+// requires -- none of that battery needs birth time/place. Birth time/
+// place (which only power Ascendant/Moon Sign, per
+// kickOffPartnerAscendantMoonLookups()) are therefore not collected in
+// this first pass of the group intake; every person simply takes the same
+// graceful-degradation path the partnership form already uses when a
+// person skips those fields (Ascendant/Moon Sign are absent from their
+// profile, and every reader-facing section already guards on their
+// presence before mentioning them). A future pass could add the same
+// per-person optional time/place fields the partnership form has, one
+// prefixed pair of promises per person, exactly as
+// kickOffPartnerAscendantMoonLookups() already does for two people.
+var MIN_GROUP_SIZE = 3, MAX_GROUP_SIZE = 25;
+var _groupPersonCount = 0;
+
+function groupPersonRowHtml(idx) {
+  return '<div class="group-person-row" data-idx="' + idx + '" style="border:1px solid rgba(80,220,200,0.18);border-radius:10px;padding:0.7rem 0.8rem;margin-bottom:0.6rem;">'
+    + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">'
+    + '<span style="font-family:Courier New,monospace;font-size:0.58rem;letter-spacing:0.2em;color:#50dcc8;">PERSON ' + (idx + 1) + '</span>'
+    + '<button type="button" class="group-remove-person-btn" data-idx="' + idx + '" style="background:none;border:none;color:#8a7aaa;cursor:pointer;font-size:0.72rem;">Remove</button>'
+    + '</div>'
+    + '<input class="cosmic-input group-person-name" type="text" placeholder="Full name" style="padding:0.5rem 0.8rem;width:100%;margin-bottom:0.4rem;" />'
+    + '<div style="display:flex;gap:0.4rem;">'
+    + '<input class="cosmic-input group-person-month" type="number" min="1" max="12" placeholder="M" style="padding:0.5rem;text-align:center;flex:1;" />'
+    + '<input class="cosmic-input group-person-day" type="number" min="1" max="31" placeholder="D" style="padding:0.5rem;text-align:center;flex:1;" />'
+    + '<input class="cosmic-input group-person-year" type="number" min="1900" max="2020" placeholder="YYYY" style="padding:0.5rem;text-align:center;flex:1.5;" />'
+    + '</div>'
+    + '</div>';
+}
+
+function renderGroupPriceDisplay() {
+  var list = document.getElementById('group-people-list');
+  var count = list ? list.querySelectorAll('.group-person-row').length : 0;
+  var tier = groupTierForCount(count);
+  var countEl = document.getElementById('group-price-count');
+  var priceEl = document.getElementById('group-price-amount');
+  var addBtn = document.getElementById('group-add-person-btn');
+  if (countEl) countEl.textContent = count + (count === 1 ? ' person' : ' people');
+  if (priceEl) priceEl.textContent = tier ? ('$' + tier.price) : (count < MIN_GROUP_SIZE ? 'Add ' + (MIN_GROUP_SIZE - count) + ' more' : '—');
+  if (addBtn) addBtn.disabled = (count >= MAX_GROUP_SIZE);
+  document.querySelectorAll('.group-remove-person-btn').forEach(function(btn) {
+    btn.disabled = (count <= MIN_GROUP_SIZE);
+    btn.style.opacity = (count <= MIN_GROUP_SIZE) ? '0.35' : '1';
+  });
+}
+
+function addGroupPersonRow() {
+  var list = document.getElementById('group-people-list');
+  if (!list) return;
+  var count = list.querySelectorAll('.group-person-row').length;
+  if (count >= MAX_GROUP_SIZE) return;
+  _groupPersonCount++;
+  var wrapper = document.createElement('div');
+  wrapper.innerHTML = groupPersonRowHtml(_groupPersonCount);
+  list.appendChild(wrapper.firstChild);
+  renderGroupPriceDisplay();
+}
+
+function initGroupIntakeScreen() {
+  var list = document.getElementById('group-people-list');
+  if (!list) return;
+  list.innerHTML = '';
+  _groupPersonCount = 0;
+  for (var i = 0; i < MIN_GROUP_SIZE; i++) addGroupPersonRow();
+  var statusEl = document.getElementById('group-status');
+  if (statusEl) statusEl.textContent = '';
+}
+
+document.getElementById('open-group-intake-btn').addEventListener('click', function() {
+  initGroupIntakeScreen();
+  showScreen('group');
+});
+
+document.getElementById('group-back-btn').addEventListener('click', function() {
+  showScreen('teaser');
+});
+
+document.getElementById('group-add-person-btn').addEventListener('click', function() {
+  addGroupPersonRow();
+});
+
+document.getElementById('group-people-list').addEventListener('click', function(e) {
+  var btn = e.target.closest('.group-remove-person-btn');
+  if (!btn) return;
+  var list = document.getElementById('group-people-list');
+  if (list.querySelectorAll('.group-person-row').length <= MIN_GROUP_SIZE) return;
+  var row = btn.closest('.group-person-row');
+  if (row) row.remove();
+  renderGroupPriceDisplay();
+});
+
+document.getElementById('group-continue-btn').addEventListener('click', function() {
+  var statusEl = document.getElementById('group-status');
+  var rows = document.querySelectorAll('#group-people-list .group-person-row');
+  var count = rows.length;
+  if (count < MIN_GROUP_SIZE || count > MAX_GROUP_SIZE) {
+    statusEl.textContent = '⚠️ A Group Reading needs between ' + MIN_GROUP_SIZE + ' and ' + MAX_GROUP_SIZE + ' people.';
+    return;
+  }
+  var people = [];
+  for (var i = 0; i < rows.length; i++) {
+    var row = rows[i];
+    var firstName = (row.querySelector('.group-person-name').value || '').trim();
+    var month = parseInt(row.querySelector('.group-person-month').value, 10);
+    var day = parseInt(row.querySelector('.group-person-day').value, 10);
+    var year = parseInt(row.querySelector('.group-person-year').value, 10);
+    if (!firstName || !month || !day || !year) {
+      statusEl.textContent = '⚠️ Please fill in every person’s name and full date of birth (Person ' + (i + 1) + ' is missing something).';
+      return;
+    }
+    people.push({ firstName: firstName, month: month, day: day, year: year });
+  }
+  var email = (document.getElementById('group-contact-email').value || '').trim();
+  if (!email || !email.includes('@')) {
+    statusEl.textContent = '⚠️ Please enter a delivery email for the group PDF.';
+    return;
+  }
+  var tier = groupTierForCount(count);
+  if (!tier) {
+    statusEl.textContent = '⚠️ Could not find a price for ' + count + ' people. Please try again.';
+    return;
+  }
+  statusEl.textContent = '';
+  window._groupPeople = people;
+  window._groupContactEmail = email;
+  openPaymentModal(tier.slug);
+});
+
 // Path numbers 11-32, each connecting two Sephiroth (by SEPHIROTH id 1-10),
 // each carrying one Major Arcana card with its W3BB activation keyword.
 // ===========================
@@ -2811,14 +3395,18 @@ document.addEventListener('click', function(e) {
 // ===========================
 var OWNER_EMAIL = 'heatherf@constructivedesignsinc.org';
 
-function logPurchase(buyerName, buyerEmail, orderId, tier) {
+// priceOverride/isPromo are optional (used by the promo-code redemption
+// path below to log a $0 entry instead of the tier's real price) -- every
+// existing call site omits them and behaves exactly as before.
+function logPurchase(buyerName, buyerEmail, orderId, tier, priceOverride, isPromo) {
   try {
     var purchases = JSON.parse(localStorage.getItem('cs_purchases') || '[]');
     purchases.unshift({
       id: orderId, date: new Date().toISOString(),
       buyer: buyerName || 'Anonymous', email: buyerEmail || 'not provided',
       tier: tier ? tier.name : 'Unknown', pages: tier ? tier.pages : '?',
-      price: tier ? '$' + tier.price : 'unknown',
+      price: priceOverride || (tier ? '$' + tier.price : 'unknown'),
+      promo: !!isPromo,
       profile: window._readingProfile ? {
         name: window._readingProfile.firstName, dob: window._readingProfile.dob,
         sunSign: window._readingProfile.sunSign ? window._readingProfile.sunSign.sign : '',
@@ -2961,7 +3549,13 @@ function showAdminPanel() {
   try { purchases = JSON.parse(localStorage.getItem('cs_purchases') || '[]'); } catch(e){}
   var total = 0;
   purchases.forEach(function(p) { var val = parseFloat((p.price || '$0').replace('$','')); if (!isNaN(val)) total += val; });
-  var avg = purchases.length > 0 ? (total / purchases.length) : 0;
+  // Promo-code redemptions log a real $0 entry (see logPurchase()/the PROMO
+  // CODES section) so they show up in the list below and in the order
+  // count, but they contribute $0 to total revenue and are excluded from
+  // this average -- a free comp shouldn't drag down the average PAID order
+  // value the way a real $0 bug would.
+  var paidPurchases = purchases.filter(function(p) { return !p.promo; });
+  var avg = paidPurchases.length > 0 ? (total / paidPurchases.length) : 0;
   var revEl = document.getElementById('adminRevTotal');
   var cntEl = document.getElementById('adminOrderCount');
   var avgEl = document.getElementById('adminAvgOrder');
@@ -2986,6 +3580,7 @@ function showAdminPanel() {
           + '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;">'
           + '<span style="font-size:0.72rem;background:rgba(176,138,255,0.1);border:1px solid rgba(176,138,255,0.2);border-radius:20px;padding:2px 8px;color:#9b8ec4;">' + (p.tier||'\u2014') + '</span>'
           + '<span style="font-size:0.72rem;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);border-radius:20px;padding:2px 8px;color:#c9a84c;">' + (p.pages||'?') + ' pages</span>'
+          + (p.promo ? '<span style="font-size:0.72rem;background:rgba(255,158,210,0.15);border:1px solid rgba(255,158,210,0.35);border-radius:20px;padding:2px 8px;color:#ff9ed2;font-weight:700;">\u2726 PROMO</span>' : '')
           + (p.profile && p.profile.name ? '<span style="font-size:0.72rem;background:rgba(255,158,210,0.08);border:1px solid rgba(255,158,210,0.15);border-radius:20px;padding:2px 8px;color:#ff9ed2;">LP' + (p.profile.lifePath||'') + ' \u00b7 ' + (p.profile.sunSign||'') + '</span>' : '')
           + '</div>'
           + '<div style="margin-top:0.5rem;font-size:0.68rem;color:#3a2a5a;font-family:Courier New,monospace;">Order: ' + (p.id||'N/A') + '</div></div>';
@@ -3305,9 +3900,264 @@ var ARCHETYPE_QUIZ_TIER = {
   ]
 };
 
+// Deliberately NOT pushed into TIERS -- same reasoning as ARCHETYPE_QUIZ_TIER
+// above: TIERS drives the fixed real-reading offer grid (one card per tier),
+// and a Group Reading is not a fixed-content product the same way -- it is one
+// intake flow (3-25 people) whose price and Square link are looked up by
+// headcount from this table. Reuses the exact same openPaymentModal()/
+// SQUARE_LINKS/sessionStorage/restoreAfterSquareReturn pipeline as every other
+// tier -- see findPurchasableTier(), openPaymentModal(), and the group intake
+// screen's own "Continue to Payment" handler below. This is entertainment for
+// families, friend groups, and group activities -- never workplace/HR framing
+// (that is explicitly deferred to a separate future "Enterprise" product).
+//
+// `pages` reflects content scope the same way `partnership`'s pages:6 does --
+// here, one condensed page per person plus 2 shared group-synthesis pages
+// (Group Energetic Overview, Standout Pairings).
+var GROUP_TIERS = [
+  {
+    slug:'group3', name:'Group Reading — 3 People', price:'55.00', pages:5, badge:null,
+    tagline:'3 souls, one shared reading — every person\'s own page, plus the real patterns across the group.',
+    includes: [
+      '\ud83c\udf33 One condensed reading page per person (Life Path, Sun sign, Sephirah, Trump Card, Soul/Court Card, Node axis)',
+      '\u2726 Group Energetic Overview \u2014 real elemental, axis-role, and shared-path distributions across all 3 of you',
+      '\u2756 Standout Pairings \u2014 the genuinely notable magnetic and tension pairings the data supports, never a score',
+      '5-page personalized PDF'
+    ], squareUrl: 'https://square.link/u/Uyx2Ip0j'
+  },
+  {
+    slug:'group4', name:'Group Reading — 4 People', price:'66.00', pages:6, badge:null,
+    tagline:'4 souls, one shared reading — every person\'s own page, plus the real patterns across the group.',
+    includes: [
+      '\ud83c\udf33 One condensed reading page per person (Life Path, Sun sign, Sephirah, Trump Card, Soul/Court Card, Node axis)',
+      '\u2726 Group Energetic Overview \u2014 real elemental, axis-role, and shared-path distributions across all 4 of you',
+      '\u2756 Standout Pairings \u2014 the genuinely notable magnetic and tension pairings the data supports, never a score',
+      '6-page personalized PDF'
+    ], squareUrl: 'https://square.link/u/3HrYJlie'
+  },
+  {
+    slug:'group5', name:'Group Reading — 5 People', price:'77.00', pages:7, badge:null,
+    tagline:'5 souls, one shared reading — every person\'s own page, plus the real patterns across the group.',
+    includes: [
+      '\ud83c\udf33 One condensed reading page per person (Life Path, Sun sign, Sephirah, Trump Card, Soul/Court Card, Node axis)',
+      '\u2726 Group Energetic Overview \u2014 real elemental, axis-role, and shared-path distributions across all 5 of you',
+      '\u2756 Standout Pairings \u2014 the genuinely notable magnetic and tension pairings the data supports, never a score',
+      '7-page personalized PDF'
+    ], squareUrl: 'https://square.link/u/ucMgmKVK'
+  },
+  {
+    slug:'group6', name:'Group Reading — 6 People', price:'88.00', pages:8, badge:null,
+    tagline:'6 souls, one shared reading — every person\'s own page, plus the real patterns across the group.',
+    includes: [
+      '\ud83c\udf33 One condensed reading page per person (Life Path, Sun sign, Sephirah, Trump Card, Soul/Court Card, Node axis)',
+      '\u2726 Group Energetic Overview \u2014 real elemental, axis-role, and shared-path distributions across all 6 of you',
+      '\u2756 Standout Pairings \u2014 the genuinely notable magnetic and tension pairings the data supports, never a score',
+      '8-page personalized PDF'
+    ], squareUrl: 'https://square.link/u/ojoZEyib'
+  },
+  {
+    slug:'group7', name:'Group Reading — 7 People', price:'99.00', pages:9, badge:null,
+    tagline:'7 souls, one shared reading — every person\'s own page, plus the real patterns across the group.',
+    includes: [
+      '\ud83c\udf33 One condensed reading page per person (Life Path, Sun sign, Sephirah, Trump Card, Soul/Court Card, Node axis)',
+      '\u2726 Group Energetic Overview \u2014 real elemental, axis-role, and shared-path distributions across all 7 of you',
+      '\u2756 Standout Pairings \u2014 the genuinely notable magnetic and tension pairings the data supports, never a score',
+      '9-page personalized PDF'
+    ], squareUrl: 'https://square.link/u/r0n1b0Kj'
+  },
+  {
+    slug:'group8', name:'Group Reading — 8 People', price:'111.00', pages:10, badge:null,
+    tagline:'8 souls, one shared reading — every person\'s own page, plus the real patterns across the group.',
+    includes: [
+      '\ud83c\udf33 One condensed reading page per person (Life Path, Sun sign, Sephirah, Trump Card, Soul/Court Card, Node axis)',
+      '\u2726 Group Energetic Overview \u2014 real elemental, axis-role, and shared-path distributions across all 8 of you',
+      '\u2756 Standout Pairings \u2014 the genuinely notable magnetic and tension pairings the data supports, never a score',
+      '10-page personalized PDF'
+    ], squareUrl: 'https://square.link/u/TRJRZtZM'
+  },
+  {
+    slug:'group9', name:'Group Reading — 9 People', price:'122.00', pages:11, badge:null,
+    tagline:'9 souls, one shared reading — every person\'s own page, plus the real patterns across the group.',
+    includes: [
+      '\ud83c\udf33 One condensed reading page per person (Life Path, Sun sign, Sephirah, Trump Card, Soul/Court Card, Node axis)',
+      '\u2726 Group Energetic Overview \u2014 real elemental, axis-role, and shared-path distributions across all 9 of you',
+      '\u2756 Standout Pairings \u2014 the genuinely notable magnetic and tension pairings the data supports, never a score',
+      '11-page personalized PDF'
+    ], squareUrl: 'https://square.link/u/r0lckJBi'
+  },
+  {
+    slug:'group10', name:'Group Reading — 10 People', price:'133.00', pages:12, badge:null,
+    tagline:'10 souls, one shared reading — every person\'s own page, plus the real patterns across the group.',
+    includes: [
+      '\ud83c\udf33 One condensed reading page per person (Life Path, Sun sign, Sephirah, Trump Card, Soul/Court Card, Node axis)',
+      '\u2726 Group Energetic Overview \u2014 real elemental, axis-role, and shared-path distributions across all 10 of you',
+      '\u2756 Standout Pairings \u2014 the genuinely notable magnetic and tension pairings the data supports, never a score',
+      '12-page personalized PDF'
+    ], squareUrl: 'https://square.link/u/ncph8vOw'
+  },
+  {
+    slug:'group11', name:'Group Reading — 11 People', price:'144.00', pages:13, badge:null,
+    tagline:'11 souls, one shared reading — every person\'s own page, plus the real patterns across the group.',
+    includes: [
+      '\ud83c\udf33 One condensed reading page per person (Life Path, Sun sign, Sephirah, Trump Card, Soul/Court Card, Node axis)',
+      '\u2726 Group Energetic Overview \u2014 real elemental, axis-role, and shared-path distributions across all 11 of you',
+      '\u2756 Standout Pairings \u2014 the genuinely notable magnetic and tension pairings the data supports, never a score',
+      '13-page personalized PDF'
+    ], squareUrl: 'https://square.link/u/G9bletQn'
+  },
+  {
+    slug:'group12', name:'Group Reading — 12 People', price:'155.00', pages:14, badge:null,
+    tagline:'12 souls, one shared reading — every person\'s own page, plus the real patterns across the group.',
+    includes: [
+      '\ud83c\udf33 One condensed reading page per person (Life Path, Sun sign, Sephirah, Trump Card, Soul/Court Card, Node axis)',
+      '\u2726 Group Energetic Overview \u2014 real elemental, axis-role, and shared-path distributions across all 12 of you',
+      '\u2756 Standout Pairings \u2014 the genuinely notable magnetic and tension pairings the data supports, never a score',
+      '14-page personalized PDF'
+    ], squareUrl: 'https://square.link/u/iMHcUBZ9'
+  },
+  {
+    slug:'group13', name:'Group Reading — 13 People', price:'166.00', pages:15, badge:null,
+    tagline:'13 souls, one shared reading — every person\'s own page, plus the real patterns across the group.',
+    includes: [
+      '\ud83c\udf33 One condensed reading page per person (Life Path, Sun sign, Sephirah, Trump Card, Soul/Court Card, Node axis)',
+      '\u2726 Group Energetic Overview \u2014 real elemental, axis-role, and shared-path distributions across all 13 of you',
+      '\u2756 Standout Pairings \u2014 the genuinely notable magnetic and tension pairings the data supports, never a score',
+      '15-page personalized PDF'
+    ], squareUrl: 'https://square.link/u/TqXrRBQm'
+  },
+  {
+    slug:'group14', name:'Group Reading — 14 People', price:'177.00', pages:16, badge:null,
+    tagline:'14 souls, one shared reading — every person\'s own page, plus the real patterns across the group.',
+    includes: [
+      '\ud83c\udf33 One condensed reading page per person (Life Path, Sun sign, Sephirah, Trump Card, Soul/Court Card, Node axis)',
+      '\u2726 Group Energetic Overview \u2014 real elemental, axis-role, and shared-path distributions across all 14 of you',
+      '\u2756 Standout Pairings \u2014 the genuinely notable magnetic and tension pairings the data supports, never a score',
+      '16-page personalized PDF'
+    ], squareUrl: 'https://square.link/u/fqTmerF9'
+  },
+  {
+    slug:'group15', name:'Group Reading — 15 People', price:'188.00', pages:17, badge:null,
+    tagline:'15 souls, one shared reading — every person\'s own page, plus the real patterns across the group.',
+    includes: [
+      '\ud83c\udf33 One condensed reading page per person (Life Path, Sun sign, Sephirah, Trump Card, Soul/Court Card, Node axis)',
+      '\u2726 Group Energetic Overview \u2014 real elemental, axis-role, and shared-path distributions across all 15 of you',
+      '\u2756 Standout Pairings \u2014 the genuinely notable magnetic and tension pairings the data supports, never a score',
+      '17-page personalized PDF'
+    ], squareUrl: 'https://square.link/u/cxDnZAVu'
+  },
+  {
+    slug:'group16', name:'Group Reading — 16 People', price:'199.00', pages:18, badge:null,
+    tagline:'16 souls, one shared reading — every person\'s own page, plus the real patterns across the group.',
+    includes: [
+      '\ud83c\udf33 One condensed reading page per person (Life Path, Sun sign, Sephirah, Trump Card, Soul/Court Card, Node axis)',
+      '\u2726 Group Energetic Overview \u2014 real elemental, axis-role, and shared-path distributions across all 16 of you',
+      '\u2756 Standout Pairings \u2014 the genuinely notable magnetic and tension pairings the data supports, never a score',
+      '18-page personalized PDF'
+    ], squareUrl: 'https://square.link/u/nR6b0cCL'
+  },
+  {
+    slug:'group17', name:'Group Reading — 17 People', price:'211.00', pages:19, badge:null,
+    tagline:'17 souls, one shared reading — every person\'s own page, plus the real patterns across the group.',
+    includes: [
+      '\ud83c\udf33 One condensed reading page per person (Life Path, Sun sign, Sephirah, Trump Card, Soul/Court Card, Node axis)',
+      '\u2726 Group Energetic Overview \u2014 real elemental, axis-role, and shared-path distributions across all 17 of you',
+      '\u2756 Standout Pairings \u2014 the genuinely notable magnetic and tension pairings the data supports, never a score',
+      '19-page personalized PDF'
+    ], squareUrl: 'https://square.link/u/QERZXqoz'
+  },
+  {
+    slug:'group18', name:'Group Reading — 18 People', price:'222.00', pages:20, badge:null,
+    tagline:'18 souls, one shared reading — every person\'s own page, plus the real patterns across the group.',
+    includes: [
+      '\ud83c\udf33 One condensed reading page per person (Life Path, Sun sign, Sephirah, Trump Card, Soul/Court Card, Node axis)',
+      '\u2726 Group Energetic Overview \u2014 real elemental, axis-role, and shared-path distributions across all 18 of you',
+      '\u2756 Standout Pairings \u2014 the genuinely notable magnetic and tension pairings the data supports, never a score',
+      '20-page personalized PDF'
+    ], squareUrl: 'https://square.link/u/4kMMBEyg'
+  },
+  {
+    slug:'group19', name:'Group Reading — 19 People', price:'233.00', pages:21, badge:null,
+    tagline:'19 souls, one shared reading — every person\'s own page, plus the real patterns across the group.',
+    includes: [
+      '\ud83c\udf33 One condensed reading page per person (Life Path, Sun sign, Sephirah, Trump Card, Soul/Court Card, Node axis)',
+      '\u2726 Group Energetic Overview \u2014 real elemental, axis-role, and shared-path distributions across all 19 of you',
+      '\u2756 Standout Pairings \u2014 the genuinely notable magnetic and tension pairings the data supports, never a score',
+      '21-page personalized PDF'
+    ], squareUrl: 'https://square.link/u/DComSHhk'
+  },
+  {
+    slug:'group20', name:'Group Reading — 20 People', price:'244.00', pages:22, badge:null,
+    tagline:'20 souls, one shared reading — every person\'s own page, plus the real patterns across the group.',
+    includes: [
+      '\ud83c\udf33 One condensed reading page per person (Life Path, Sun sign, Sephirah, Trump Card, Soul/Court Card, Node axis)',
+      '\u2726 Group Energetic Overview \u2014 real elemental, axis-role, and shared-path distributions across all 20 of you',
+      '\u2756 Standout Pairings \u2014 the genuinely notable magnetic and tension pairings the data supports, never a score',
+      '22-page personalized PDF'
+    ], squareUrl: 'https://square.link/u/557guWRO'
+  },
+  {
+    slug:'group21', name:'Group Reading — 21 People', price:'255.00', pages:23, badge:null,
+    tagline:'21 souls, one shared reading — every person\'s own page, plus the real patterns across the group.',
+    includes: [
+      '\ud83c\udf33 One condensed reading page per person (Life Path, Sun sign, Sephirah, Trump Card, Soul/Court Card, Node axis)',
+      '\u2726 Group Energetic Overview \u2014 real elemental, axis-role, and shared-path distributions across all 21 of you',
+      '\u2756 Standout Pairings \u2014 the genuinely notable magnetic and tension pairings the data supports, never a score',
+      '23-page personalized PDF'
+    ], squareUrl: 'https://square.link/u/pYk94FIc'
+  },
+  {
+    slug:'group22', name:'Group Reading — 22 People', price:'266.00', pages:24, badge:null,
+    tagline:'22 souls, one shared reading — every person\'s own page, plus the real patterns across the group.',
+    includes: [
+      '\ud83c\udf33 One condensed reading page per person (Life Path, Sun sign, Sephirah, Trump Card, Soul/Court Card, Node axis)',
+      '\u2726 Group Energetic Overview \u2014 real elemental, axis-role, and shared-path distributions across all 22 of you',
+      '\u2756 Standout Pairings \u2014 the genuinely notable magnetic and tension pairings the data supports, never a score',
+      '24-page personalized PDF'
+    ], squareUrl: 'https://square.link/u/IDAISsbi'
+  },
+  {
+    slug:'group23', name:'Group Reading — 23 People', price:'277.00', pages:25, badge:null,
+    tagline:'23 souls, one shared reading — every person\'s own page, plus the real patterns across the group.',
+    includes: [
+      '\ud83c\udf33 One condensed reading page per person (Life Path, Sun sign, Sephirah, Trump Card, Soul/Court Card, Node axis)',
+      '\u2726 Group Energetic Overview \u2014 real elemental, axis-role, and shared-path distributions across all 23 of you',
+      '\u2756 Standout Pairings \u2014 the genuinely notable magnetic and tension pairings the data supports, never a score',
+      '25-page personalized PDF'
+    ], squareUrl: 'https://square.link/u/s5BbYXYN'
+  },
+  {
+    slug:'group24', name:'Group Reading — 24 People', price:'288.00', pages:26, badge:null,
+    tagline:'24 souls, one shared reading — every person\'s own page, plus the real patterns across the group.',
+    includes: [
+      '\ud83c\udf33 One condensed reading page per person (Life Path, Sun sign, Sephirah, Trump Card, Soul/Court Card, Node axis)',
+      '\u2726 Group Energetic Overview \u2014 real elemental, axis-role, and shared-path distributions across all 24 of you',
+      '\u2756 Standout Pairings \u2014 the genuinely notable magnetic and tension pairings the data supports, never a score',
+      '26-page personalized PDF'
+    ], squareUrl: 'https://square.link/u/ctgIHLyj'
+  },
+  {
+    slug:'group25', name:'Group Reading — 25 People', price:'299.00', pages:27, badge:null,
+    tagline:'25 souls, one shared reading — every person\'s own page, plus the real patterns across the group.',
+    includes: [
+      '\ud83c\udf33 One condensed reading page per person (Life Path, Sun sign, Sephirah, Trump Card, Soul/Court Card, Node axis)',
+      '\u2726 Group Energetic Overview \u2014 real elemental, axis-role, and shared-path distributions across all 25 of you',
+      '\u2756 Standout Pairings \u2014 the genuinely notable magnetic and tension pairings the data supports, never a score',
+      '27-page personalized PDF'
+    ], squareUrl: 'https://square.link/u/jbmWeWa4'
+  },
+];
+
+// headcount (3-25) -> the matching GROUP_TIERS entry. Used by both the live
+// price display in the group intake screen and the checkout handoff.
+function groupTierForCount(n) {
+  return GROUP_TIERS.find(function(t) { return t.slug === 'group' + n; }) || null;
+}
+
 function findPurchasableTier(slug) {
   return TIERS.find(function(t) { return t.slug === slug; })
-    || (slug === ARCHETYPE_QUIZ_TIER.slug ? ARCHETYPE_QUIZ_TIER : null);
+    || (slug === ARCHETYPE_QUIZ_TIER.slug ? ARCHETYPE_QUIZ_TIER : null)
+    || GROUP_TIERS.find(function(t) { return t.slug === slug; })
+    || null;
 }
 
 // ===========================
@@ -4200,6 +5050,36 @@ function getCurrentNodePolarity(birthDateObj) {
     transitSign: transitSign,
     activePole: activePole // null unless the transit is actually conjunct-by-sign
   };
+}
+
+// ===========================
+// W3BB CODEX V07 PART XXVIII — ELEMENTAL NODE POLARITY (always-available,
+// for group/relational pairing — see docs/CODEX_LOGIC_V07.md Part XXVIII)
+// ===========================
+// A SEPARATE, ADDITIVE finding from getCurrentNodePolarity() above. That
+// function is the honest, rare-conjunction-only "currently active pole"
+// readout and is NOT touched by this addition. This one instead classifies
+// a person's natal North Node by its zodiac ELEMENT — a real, documented
+// astrological convention (the masculine/diurnal vs. feminine/nocturnal
+// sign classification: Fire and Air signs are traditionally "masculine"/
+// outward-expressing, Earth and Water signs "feminine"/inward-receiving —
+// see docs/CODEX_LOGIC_V07.md Part XXVIII for full sourcing). Because every
+// natal chart has a North Node sign (no rarity gate, unlike the transiting-
+// conjunction event above), this is ALWAYS computable — which is exactly
+// why it, not getCurrentNodePolarity(), is the mechanism used for group
+// reading pairings, where an always-on signal is required.
+//
+// Reuses the existing DECAN_SIGN_SUIT sign->suit lookup (Part XXI, above in
+// this file) rather than hardcoding a new sign->element table: a sign's
+// suit already encodes its element (Wands=Fire, Swords=Air, Pentacles=
+// Earth, Cups=Water — see ELEMENT_TO_SOLID), so DECAN_SIGN_SUIT[sign] is
+// reused for that lookup, just as decanCardForLongitude() and
+// courtCardForLongitude() already reuse it above.
+function getElementalNodePolarity(natalNorthNodeSign) {
+  var suit = DECAN_SIGN_SUIT[natalNorthNodeSign];
+  if (suit === 'Wands' || suit === 'Swords') return 'outward'; // Fire / Air
+  if (suit === 'Pentacles' || suit === 'Cups') return 'inward'; // Earth / Water
+  return null; // defensive only — every real zodiac sign resolves above
 }
 
 // ===========================
@@ -6728,12 +7608,24 @@ function openPaymentModal(slug) {
   }).join('');
 
   // Prefill email from whichever flow is active -- the real-reading profile,
-  // or (for the archetype-quiz tier) the quiz's own lead-capture profile.
+  // the quiz's own lead-capture profile (archetype-quiz tier), or the
+  // group intake screen's own single delivery-contact email field (a group
+  // has one PDF delivered to one contact, not one email per person).
   var p = window._readingProfile || {};
-  var prefillEmail = (window._quizProfile && window._quizProfile.email) || p.email;
+  var prefillEmail = (window._quizProfile && window._quizProfile.email) || window._groupContactEmail || p.email;
   if (prefillEmail) document.getElementById('modal-email').value = prefillEmail;
 
   document.getElementById('val-modal-email').textContent = '';
+
+  // Reset the promo-code field every time the modal opens, so a leftover
+  // error/code from a previous tier never bleeds into this one.
+  var promoRow = document.getElementById('promo-code-row');
+  var promoInput = document.getElementById('promo-code-input');
+  var promoErr = document.getElementById('val-promo-code');
+  if (promoRow) promoRow.hidden = true;
+  if (promoInput) promoInput.value = '';
+  if (promoErr) promoErr.textContent = '';
+
   document.getElementById('payment-modal').classList.add('show');
 
   // Square checkout handled by square-checkout-btn click handler
@@ -6752,7 +7644,32 @@ var SQUARE_LINKS = {
   'blueprint':  'https://square.link/u/h2JafWje',
   'partnership':'https://square.link/u/ki4RJtRj',
   // TODO(owner): replace with the real $1 Square checkout link before launch.
-  'archetype-quiz': 'https://square.link/u/wS1Ls7Fo'
+  'archetype-quiz': 'https://square.link/u/wS1Ls7Fo',
+  // Group Reading (3-25 people) -- one fixed-price Square link per
+  // headcount, exactly like every tier above; see GROUP_TIERS.
+  'group3':  'https://square.link/u/Uyx2Ip0j',
+  'group4':  'https://square.link/u/3HrYJlie',
+  'group5':  'https://square.link/u/ucMgmKVK',
+  'group6':  'https://square.link/u/ojoZEyib',
+  'group7':  'https://square.link/u/r0n1b0Kj',
+  'group8':  'https://square.link/u/TRJRZtZM',
+  'group9':  'https://square.link/u/r0lckJBi',
+  'group10': 'https://square.link/u/ncph8vOw',
+  'group11': 'https://square.link/u/G9bletQn',
+  'group12': 'https://square.link/u/iMHcUBZ9',
+  'group13': 'https://square.link/u/TqXrRBQm',
+  'group14': 'https://square.link/u/fqTmerF9',
+  'group15': 'https://square.link/u/cxDnZAVu',
+  'group16': 'https://square.link/u/nR6b0cCL',
+  'group17': 'https://square.link/u/QERZXqoz',
+  'group18': 'https://square.link/u/4kMMBEyg',
+  'group19': 'https://square.link/u/DComSHhk',
+  'group20': 'https://square.link/u/557guWRO',
+  'group21': 'https://square.link/u/pYk94FIc',
+  'group22': 'https://square.link/u/IDAISsbi',
+  'group23': 'https://square.link/u/s5BbYXYN',
+  'group24': 'https://square.link/u/ctgIHLyj',
+  'group25': 'https://square.link/u/jbmWeWa4'
 };
 
 document.getElementById('square-checkout-btn').addEventListener('click', function() {
@@ -6771,12 +7688,143 @@ document.getElementById('square-checkout-btn').addEventListener('click', functio
     // (name/email/computed archetype) through the exact same
     // cs_pending_profile/cs_pending_tier/cs_pending_email sessionStorage
     // keys the real reading flow already uses -- see restoreAfterSquareReturn().
-    var pendingProfile = (selectedTier.slug === ARCHETYPE_QUIZ_TIER.slug) ? window._quizProfile : window._readingProfile;
+    // A Group Reading tier (slug starting "group") hands off an ARRAY of
+    // raw per-person birth data (window._groupPeople, set by the group
+    // intake screen's "Continue to Payment" handler) instead of a single
+    // profile object -- restoreAfterSquareReturn() branches on this same
+    // "group"-prefixed slug to know to expect an array and recompute each
+    // person's profile from it after payment returns.
+    var pendingProfile = (selectedTier.slug === ARCHETYPE_QUIZ_TIER.slug) ? window._quizProfile
+      : (selectedTier.slug.indexOf('group') === 0) ? window._groupPeople
+      : window._readingProfile;
     sessionStorage.setItem('cs_pending_profile', JSON.stringify(pendingProfile));
     sessionStorage.setItem('cs_pending_tier', selectedTier.slug);
     sessionStorage.setItem('cs_pending_email', email);
   } catch(e) {}
   window.location.href = squareUrl;
+});
+
+// ===========================
+// PROMO CODES (free checkout)
+// ===========================
+// Lets a customer skip Square entirely by entering a promo code inside
+// #payment-modal. Codes are never hardcoded here or anywhere else in this
+// file -- every code lives only in Supabase's promo_codes table, checked
+// through the redeem_promo_code() RPC (see supabase/promo_codes_schema.sql
+// and docs/PROMO_CODES_SETUP.md). That table has RLS enabled with NO
+// direct anon grants, so this fetch() can only ever learn "is THIS ONE
+// typed code valid for THIS ONE tier" -- it can never list, enumerate, or
+// guess at other codes.
+//
+// On success this reuses the exact same finalizeReadingPurchase() /
+// finalizeGroupPurchase() / showQuizReveal() rendering logic the real
+// Square-return path uses (see restoreAfterSquareReturn() and friends
+// above) -- called directly against the in-memory window._readingProfile /
+// window._groupPeople / window._quizProfile the current flow already
+// built, with no sessionStorage round-trip and no page reload, since there
+// is no external checkout to return from.
+async function redeemPromoCode(code, tierSlug) {
+  var res = await fetch(SUPABASE_URL + '/rest/v1/rpc/redeem_promo_code', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY
+    },
+    body: JSON.stringify({ p_code: code, p_tier_slug: tierSlug })
+  });
+  if (!res.ok) { throw new Error('Promo check request failed (' + res.status + ')'); }
+  return res.json();
+}
+
+function promoFailureMessage(result) {
+  var reason = result && result.reason;
+  if (reason === 'not_found') return 'That code was not recognized. Please double-check it and try again.';
+  if (reason === 'inactive') return 'That code is no longer active.';
+  if (reason === 'expired') return 'That code has expired.';
+  if (reason === 'max_uses_reached') return 'That code has already been fully redeemed.';
+  if (reason === 'wrong_tier') return 'That code does not apply to this reading.';
+  return 'That code is invalid.';
+}
+
+// Renders the SAME reveal/success screen a real Square payment would, for
+// whichever tier type is currently selected -- solo/partnership reading,
+// the $1 archetype quiz, or a Group Reading -- using whatever in-memory
+// profile data that tier's own intake flow already collected.
+function completePromoPurchase(code, email) {
+  var tier = selectedTier;
+  var orderId = 'PROMO-' + Date.now();
+  var priceLabel = '$0 (promo: ' + code.toUpperCase() + ')';
+
+  if (tier.slug === ARCHETYPE_QUIZ_TIER.slug) {
+    var quiz = window._quizProfile || {};
+    quiz.email = quiz.email || email;
+    showQuizReveal(quiz);
+    logPurchase(quiz.firstName || 'Anonymous', email, orderId, tier, priceLabel, true);
+    return;
+  }
+  if (tier.slug.indexOf('group') === 0) {
+    var people = window._groupPeople;
+    if (!people || !people.length) {
+      alert('Your group details were lost -- please re-enter the group and try again.');
+      return;
+    }
+    finalizeGroupPurchase(people, tier, email, orderId, priceLabel, true);
+    return;
+  }
+  var profile = window._readingProfile;
+  if (!profile) {
+    alert('Your reading details were lost -- please start over.');
+    return;
+  }
+  finalizeReadingPurchase(profile, tier, email, orderId, priceLabel, true);
+}
+
+document.getElementById('promo-toggle-link').addEventListener('click', function(e) {
+  e.preventDefault();
+  var row = document.getElementById('promo-code-row');
+  row.hidden = !row.hidden;
+  if (!row.hidden) document.getElementById('promo-code-input').focus();
+});
+
+document.getElementById('promo-apply-btn').addEventListener('click', function() {
+  var btn = this;
+  var input = document.getElementById('promo-code-input');
+  var errEl = document.getElementById('val-promo-code');
+  var code = (input.value || '').trim();
+  if (!code) { errEl.textContent = 'Please enter a code.'; return; }
+  if (!selectedTier) { errEl.textContent = 'Please choose a reading first.'; return; }
+
+  // Promo checkout still needs a delivery email, exactly like Square
+  // checkout does -- reuse the same email field/validation.
+  var email = document.getElementById('modal-email').value.trim();
+  if (!email || !email.includes('@')) {
+    document.getElementById('val-modal-email').textContent = 'Please enter your email for PDF delivery.';
+    document.getElementById('modal-email').focus();
+    return;
+  }
+  document.getElementById('val-modal-email').textContent = '';
+
+  errEl.style.color = '';
+  errEl.textContent = 'Checking code…';
+  btn.disabled = true;
+
+  redeemPromoCode(code, selectedTier.slug).then(function(result) {
+    btn.disabled = false;
+    if (!result || !result.valid) {
+      errEl.textContent = promoFailureMessage(result);
+      return;
+    }
+    errEl.textContent = '';
+    var appliedCode = code;
+    input.value = '';
+    document.getElementById('payment-modal').classList.remove('show');
+    completePromoPurchase(appliedCode, email);
+  }).catch(function(err) {
+    btn.disabled = false;
+    console.warn('Promo code check failed:', err);
+    errEl.textContent = "Couldn't verify that code -- please check your connection and try again.";
+  });
 });
 
 // ===========================
@@ -6823,12 +7871,14 @@ function createDynamicCheckout(amountCents, description, redirectSlug) {
     });
 }
 
-function showSuccessScreen(buyerName, buyerEmail, orderId, tier) {
-  logPurchase(buyerName, buyerEmail, orderId, tier);
+// priceOverride/isPromo are optional -- see logPurchase() above. Every
+// existing (real Square) call site omits them and is unaffected.
+function showSuccessScreen(buyerName, buyerEmail, orderId, tier, priceOverride, isPromo) {
+  logPurchase(buyerName, buyerEmail, orderId, tier, priceOverride, isPromo);
 
   document.getElementById('success-buyer-name').textContent = buyerName ? ('Welcome, ' + buyerName + '.') : '';
   document.getElementById('success-tier-name').textContent = 'Circles Squared \u2014 ' + tier.name + ' (' + tier.pages + '-page PDF)';
-  document.getElementById('success-tier-price').textContent = '$' + tier.price;
+  document.getElementById('success-tier-price').textContent = priceOverride || ('$' + tier.price);
   document.getElementById('success-email-display').textContent = 'Delivery: ' + (buyerEmail || 'Not provided');
   document.getElementById('success-order-id').textContent = 'Order: ' + orderId;
 
@@ -6865,12 +7915,69 @@ function showSuccessScreen(buyerName, buyerEmail, orderId, tier) {
   });
 }
 
+// Group-Reading counterpart to showSuccessScreen() above -- same modal,
+// same sessionStorage/logPurchase pipeline, but safe for an ARRAY of
+// per-person profiles instead of window._readingProfile, and kicks off
+// doGroupReading() (AI attempt, falling back to getGroupFallback()) rather
+// than doReading().
+// priceOverride/isPromo are optional -- see logPurchase() above. Every
+// existing (real Square) call site omits them and is unaffected.
+function showGroupSuccessScreen(buyerEmail, orderId, tier, profiles, priceOverride, isPromo) {
+  logPurchase('Group of ' + profiles.length, buyerEmail, orderId, tier, priceOverride, isPromo);
+
+  document.getElementById('success-buyer-name').textContent = 'Welcome — your group of ' + profiles.length + ' is ready.';
+  document.getElementById('success-tier-name').textContent = 'Circles Squared — ' + tier.name + ' (' + tier.pages + '-page PDF)';
+  document.getElementById('success-tier-price').textContent = priceOverride || ('$' + tier.price);
+  document.getElementById('success-email-display').textContent = 'Delivery: ' + (buyerEmail || 'Not provided');
+  document.getElementById('success-order-id').textContent = 'Order: ' + orderId;
+
+  var names = profiles.map(function(p){ return p.firstName; }).join(', ');
+  var subject = encodeURIComponent('🌙 New Circles Squared Purchase — ' + tier.name);
+  var body = encodeURIComponent(
+    'NEW PURCHASE RECEIVED\n\nOrder ID: ' + orderId + '\nDate: ' + new Date().toLocaleString() + '\n\nBUYER\nEmail: ' + (buyerEmail||'N/A') + '\n\nPURCHASE\nTier: ' + tier.name + '\nPages: ' + tier.pages + '\nPrice: $' + tier.price + '\n\nGROUP\nPeople (' + profiles.length + '): ' + names + '\n\nSend PDF to: ' + (buyerEmail||'ask buyer')
+  );
+  document.getElementById('notifyOwnerBtn').href = 'mailto:' + OWNER_EMAIL + '?subject=' + subject + '&body=' + body;
+
+  document.getElementById('payment-success').classList.add('show');
+
+  var dlBtn = document.getElementById('download-pdf-btn');
+  if (dlBtn) { dlBtn.innerHTML = '⏳ Preparing your group PDF...'; dlBtn.disabled = true; }
+  window._groupReadingPromise = doGroupReading(profiles).then(function(content) {
+    window._groupContent = content;
+    if (dlBtn) { dlBtn.innerHTML = '📄 Download Your Group PDF'; dlBtn.disabled = false; }
+  }).catch(function() {
+    window._groupContent = getGroupFallback(profiles);
+    if (dlBtn) { dlBtn.innerHTML = '📄 Download Your Group PDF'; dlBtn.disabled = false; }
+  });
+}
+
 document.getElementById('close-success-overlay').addEventListener('click', function() {
   document.getElementById('payment-success').classList.remove('show');
-  unlockFullReading();
+  if (selectedTier && selectedTier.slug && selectedTier.slug.indexOf('group') === 0) {
+    showScreen('hook');
+  } else {
+    unlockFullReading();
+  }
 });
 
 document.getElementById('download-pdf-btn').addEventListener('click', function() {
+  // Group Reading tier -- entirely separate content shape (an array of
+  // per-person profiles plus a group-overview/pairings object), so this
+  // branches off before any of the solo window._allPages logic below.
+  if (selectedTier && selectedTier.slug && selectedTier.slug.indexOf('group') === 0) {
+    var gBtn = document.getElementById('download-pdf-btn');
+    if (window._groupProfiles && window._groupContent) {
+      generateGroupPDF(window._groupProfiles, window._groupContent);
+    } else if (window._groupReadingPromise) {
+      gBtn.innerHTML = '⏳ Preparing your PDF...'; gBtn.disabled = true;
+      window._groupReadingPromise.then(function() {
+        generateGroupPDF(window._groupProfiles, window._groupContent);
+        gBtn.innerHTML = '📄 Download Your Group PDF';
+        gBtn.disabled = false;
+      });
+    }
+    return;
+  }
   var allReady = window._allPages && window._allPages.filter(function(pg) { return pg; }).length;
   if (!allReady && _readingPromise) {
     var btn = document.getElementById('download-pdf-btn');
@@ -8617,18 +9724,55 @@ document.getElementById('gate-submit-btn').addEventListener('click', function() 
 // ===========================
 // SQUARE PAYMENT RETURN RESTORE
 // ===========================
-function restoreAfterSquareReturn(tierSlug) {
-  // The $1 archetype-quiz tier reveals a quiz result, not a full computed
-  // reading -- hand it off to its own restore path (same sessionStorage
-  // keys, different screen) instead of running the full-reading logic below.
-  if (tierSlug === ARCHETYPE_QUIZ_TIER.slug) { restoreQuizAfterSquareReturn(); return; }
+// Group Reading restore path -- the pending profile is an ARRAY of raw
+// per-person birth data (see the square-checkout-btn handler's
+// window._groupPeople handoff), not a single profile object, so this is a
+// dedicated branch rather than trying to squeeze an array through the
+// solo restoreAfterSquareReturn() logic below (which assumes exactly one
+// window._readingProfile and drives solo-only DOM like the sacred-geometry
+// mandala).
+// Core "unlock a Group Reading" logic, factored out of
+// restoreGroupAfterSquareReturn() below so the promo-code path (see PROMO
+// CODES section further down) can call the exact same rendering logic
+// directly with the in-memory window._groupPeople array, without a
+// sessionStorage round-trip or a page reload. priceOverride/isPromo are
+// optional and forwarded to showGroupSuccessScreen()/logPurchase(); the
+// real Square return path (below) omits them and is unaffected.
+function finalizeGroupPurchase(people, tier, email, orderId, priceOverride, isPromo) {
+  selectedTier = tier;
+  var profiles = computeGroupProfiles(people);
+  window._groupProfiles = profiles;
+  window._groupContent = null;
+  showGroupSuccessScreen(email, orderId, tier, profiles, priceOverride, isPromo);
+}
 
-  var profileJson = sessionStorage.getItem('cs_pending_profile');
+function restoreGroupAfterSquareReturn(tierSlug) {
+  var peopleJson = sessionStorage.getItem('cs_pending_profile');
   var email = sessionStorage.getItem('cs_pending_email') || '';
-  if (!profileJson) { showScreen('hook'); return; }
-  try { window._readingProfile = JSON.parse(profileJson); } catch(e) { showScreen('hook'); return; }
-  var tier = TIERS.find(function(t) { return t.slug === tierSlug; });
-  if (!tier) { showScreen('hook'); return; }
+  if (!peopleJson) { showScreen('hook'); return; }
+  var people;
+  try { people = JSON.parse(peopleJson); } catch(e) { showScreen('hook'); return; }
+  var tier = GROUP_TIERS.find(function(t) { return t.slug === tierSlug; });
+  if (!tier || !people || !people.length) { showScreen('hook'); return; }
+  var orderId = 'SQ-' + Date.now();
+  finalizeGroupPurchase(people, tier, email, orderId);
+  try {
+    window.history.replaceState({}, '', window.location.pathname);
+    sessionStorage.removeItem('cs_pending_profile');
+    sessionStorage.removeItem('cs_pending_tier');
+    sessionStorage.removeItem('cs_pending_email');
+  } catch(e) {}
+}
+
+// Core "unlock a solo/partnership reading" logic, factored out of
+// restoreAfterSquareReturn() below so the promo-code path (see PROMO CODES
+// section further down) can call the exact same rendering logic directly
+// with the in-memory window._readingProfile, without a sessionStorage
+// round-trip or a page reload. priceOverride/isPromo are optional and
+// forwarded to showSuccessScreen()/logPurchase(); the real Square return
+// path (below) omits them and is unaffected.
+function finalizeReadingPurchase(profile, tier, email, orderId, priceOverride, isPromo) {
+  window._readingProfile = profile;
   selectedTier = tier;
   _readingReady = false;
   _readingPromise = doReading().then(function(){ _readingReady = true; }).catch(function(){ _readingReady = true; });
@@ -8658,8 +9802,27 @@ function restoreAfterSquareReturn(tierSlug) {
   if (waveform) waveform.classList.add('paused');
   var oracleStatus = document.getElementById('oracle-status');
   if (oracleStatus) oracleStatus.textContent = 'Payment confirmed. Your blueprint is ready.';
+  showSuccessScreen(p.firstName, email, orderId, tier, priceOverride, isPromo);
+}
+
+function restoreAfterSquareReturn(tierSlug) {
+  // The $1 archetype-quiz tier reveals a quiz result, not a full computed
+  // reading -- hand it off to its own restore path (same sessionStorage
+  // keys, different screen) instead of running the full-reading logic below.
+  if (tierSlug === ARCHETYPE_QUIZ_TIER.slug) { restoreQuizAfterSquareReturn(); return; }
+  // Group Reading tier (slug starting "group") -- own restore path, see
+  // restoreGroupAfterSquareReturn() above.
+  if (tierSlug && tierSlug.indexOf('group') === 0) { restoreGroupAfterSquareReturn(tierSlug); return; }
+
+  var profileJson = sessionStorage.getItem('cs_pending_profile');
+  var email = sessionStorage.getItem('cs_pending_email') || '';
+  if (!profileJson) { showScreen('hook'); return; }
+  var profile;
+  try { profile = JSON.parse(profileJson); } catch(e) { showScreen('hook'); return; }
+  var tier = TIERS.find(function(t) { return t.slug === tierSlug; });
+  if (!tier) { showScreen('hook'); return; }
   var orderId = 'SQ-' + Date.now();
-  showSuccessScreen(p.firstName, email, orderId, tier);
+  finalizeReadingPurchase(profile, tier, email, orderId);
   try {
     window.history.replaceState({}, '', window.location.pathname);
     sessionStorage.removeItem('cs_pending_profile');
