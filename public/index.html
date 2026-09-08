@@ -886,7 +886,26 @@ body {
     <div data-id="266" style="margin-top:2rem;border-top:1px solid rgba(176,138,255,0.15);padding-top:1.5rem;">
       <div data-id="267" style="font-family:'Courier New',monospace;font-size:0.62rem;letter-spacing:0.4em;color:#c9a84c;margin-bottom:0.3rem;">🎙️ VOICE SETTINGS (OPTIONAL: AZURE AI SPEECH UPGRADE)</div>
       <div data-id="268" style="font:700 1.1rem Georgia,serif;color:#e8e0ff;margin-bottom:0.6rem;">Voice Settings — Optional Azure AI Speech Upgrade</div>
-      <p data-id="269" style="font-size:0.8rem;color:#8a7aaa;line-height:1.6;margin-bottom:1rem;">By default the reading is narrated for free using the voice already built into your browser (preferring an "Aria" voice when one is available). Entering an Azure Cognitive Services Speech key and region below is entirely optional — it upgrades narration to a paid Azure neural voice instead. Both fields are required only if you want to use this upgrade. Stored only in your browser's local storage — never in any file or server.</p>
+      <p data-id="269" style="font-size:0.8rem;color:#8a7aaa;line-height:1.6;margin-bottom:1rem;">By default the reading is narrated for free using the voice already built into your browser (preferring an "Aria" voice when one is available, or you can pick an exact voice yourself below). Entering an Azure Cognitive Services Speech key and region below is entirely optional — it upgrades narration to a paid Azure neural voice instead. Both fields are required only if you want to use this upgrade. Stored only in your browser's local storage — never in any file or server.</p>
+
+      <!-- Free Browser Voice picker — lets someone choose exactly which
+           installed browser/OS voice narrates readings when no Azure key is
+           saved, instead of relying on the automatic "Aria" name search
+           (which can't be guaranteed to find the right voice on every
+           browser/OS combination). Populated dynamically from
+           speechSynthesis.getVoices() -- see populateBrowserVoiceSelect(). -->
+      <div data-id="290" style="margin-bottom:1.4rem;padding-bottom:1.2rem;border-bottom:1px dashed rgba(176,138,255,0.15);">
+        <div data-id="291" style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#c9a84c;display:block;margin-bottom:0.4rem;">FREE BROWSER VOICE</div>
+        <p data-id="292" style="font-size:0.78rem;color:#8a7aaa;line-height:1.6;margin-bottom:0.6rem;">Choose exactly which voice already installed on this device/browser should narrate readings when no Azure key is saved above. This list comes straight from your browser, so pick whichever one actually sounds right when you test it. Leave unset to keep the automatic "Aria" search as the default.</p>
+        <select data-id="293" id="browser-voice-select" class="cosmic-select" style="width:100%;margin-bottom:0.6rem;">
+          <option value="">— Automatic (search for an "Aria" voice) —</option>
+        </select>
+        <div data-id="294" style="display:flex;gap:0.6rem;margin-bottom:0.6rem;flex-wrap:wrap;">
+          <button data-id="295" id="browser-voice-save-btn" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.55rem 1.2rem;background:linear-gradient(135deg,#c9a84c,#f0d070);color:#0a0015;font-weight:700;font-size:0.82rem;border:none;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;">💾 Save Voice</button>
+          <button data-id="296" id="browser-voice-test-btn" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.55rem 1.2rem;background:none;border:1px solid rgba(176,138,255,0.3);color:#b08aff;font-size:0.82rem;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;">🔊 Test Voice</button>
+        </div>
+        <div data-id="297" id="browser-voice-status" style="font-size:0.75rem;color:#5a4a7a;min-height:1.2em;margin-top:0.3rem;"></div>
+      </div>
 
       <div data-id="270" style="margin-bottom:0.8rem;">
         <label data-id="271" style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#c9a84c;display:block;margin-bottom:0.4rem;">API KEY</label>
@@ -1352,6 +1371,68 @@ async function appSdkSpeak(text) {
   }
 }
 
+// Module-level cache for the browser voice picked for THIS page session.
+// browserSpeak() is called once per narrated chunk/section, and a single
+// reading is very often made up of several sequential browserSpeak() calls
+// (see narrateBlueprintReading/narratePartnershipReading — each section is
+// its own speakLongText() -> browserSpeak() call). Resolving the voice fresh
+// on every single call was the root cause of narration audibly switching
+// voice mid-reading:
+//   1. speechSynthesis.getVoices() is asynchronous and browser-dependent —
+//      right after page load it can return only a partial list (or nothing),
+//      with more voices (including network/remote voices) arriving in later
+//      batches. The very first chunk could resolve against a thin/empty
+//      list (no "Aria" match -> utter.voice left unset -> the OS/browser's
+//      own generic default voice, matching the "robotic male" report), while
+//      a later chunk resolved fresh against a fuller list and found a
+//      different match.
+//   2. Even once the list was fully loaded, re-running the name search on
+//      every call was fragile — nothing guaranteed two independent calls
+//      would agree.
+// Resolving once and reusing the exact same SpeechSynthesisVoice object for
+// every subsequent chunk fixes both: the whole reading now speaks in one
+// consistent voice. Resolution is only cached once getVoices() has actually
+// returned a non-empty list (see speakWithVoices below) — an empty list
+// tells us nothing, so we leave it unresolved and let the next call retry.
+var _resolvedBrowserVoice = null;
+var _browserVoiceResolved = false;
+
+// Explicit picker override (admin panel "Free Browser Voice" setting) — if
+// the user has picked an exact voice, match it by name+lang (name alone
+// isn't unique across languages, e.g. multiple "Maria" voices in different
+// locales) against the CURRENT browser's voice list. Returns null (and logs
+// a warning) if the saved voice can't be found here, e.g. because the pick
+// was made in a different browser — callers fall back to the automatic
+// search in that case rather than erroring.
+function findExplicitBrowserVoice(voices) {
+  var name = localStorage.getItem('browser_voice_name');
+  if (!name) return null;
+  var lang = localStorage.getItem('browser_voice_lang') || '';
+  for (var i = 0; i < voices.length; i++) {
+    if (voices[i].name === name && (!lang || voices[i].lang === lang)) return voices[i];
+  }
+  console.warn('[Voice] Saved browser voice "' + name + '" (' + lang + ') was not found in this browser\'s voice list — falling back to automatic voice selection.');
+  return null;
+}
+
+// Prefer any voice with "Aria" as a standalone word in its name (word
+// boundary, case-insensitive) — this covers both the common US English
+// "Microsoft Aria Online (Natural)" neural voice and any Australian-flavored
+// "Aria"-named voice a given browser/OS ships. A plain substring match here
+// was the other real bug behind this report: it also matched "aria" inside
+// completely unrelated names like the Dutch voice "Maria" (M-ARIA), which is
+// exactly the "Dutch female" voice users heard narration switch to mid-
+// reading. If no Aria voice is found anywhere in the list, return null —
+// callers leave utter.voice unset, which makes the browser speak with its
+// own currently-configured default voice ("whatever voice my browser is
+// using now") instead of forcing any particular voice or lang.
+function pickAriaVoice(voices) {
+  for (var i = 0; i < voices.length; i++) {
+    if (voices[i].name && /\baria\b/i.test(voices[i].name)) return voices[i];
+  }
+  return null;
+}
+
 // Browser TTS — this is now the DEFAULT free voice path (per project owner
 // request: "just connect the free Microsoft voice that is in the browser...
 // keep the australian Aria or whatever voice my browser is using now").
@@ -1375,25 +1456,19 @@ function browserSpeak(text, onEnd) {
     if (onEnd) onEnd();
   }
 
-  // Prefer any voice with "Aria" in its name (case-insensitive substring) —
-  // this covers both the common US English "Microsoft Aria Online (Natural)"
-  // neural voice and any Australian-flavored "Aria"-named voice a given
-  // browser/OS ships. If no Aria voice is found anywhere in the list, leave
-  // utter.voice unset entirely — that makes the browser speak with its own
-  // currently-configured default voice ("whatever voice my browser is using
-  // now") instead of forcing any particular voice or lang. Setting
-  // utter.voice to a found voice already carries that voice's own .lang, so
-  // we never hardcode a lang here.
-  function pickAriaVoice(voices) {
-    for (var i = 0; i < voices.length; i++) {
-      if (voices[i].name && voices[i].name.toLowerCase().indexOf('aria') !== -1) return voices[i];
-    }
-    return null;
-  }
-
   function speakWithVoices(voices) {
-    var v = pickAriaVoice(voices);
-    if (v) utter.voice = v;
+    if (!_browserVoiceResolved && voices && voices.length) {
+      // Explicit admin-panel pick wins; automatic Aria search is the
+      // fallback for anyone who hasn't chosen one. Resolved exactly once per
+      // page session and cached above so every later chunk/section of this
+      // (and any subsequent) reading reuses the identical voice object.
+      _resolvedBrowserVoice = findExplicitBrowserVoice(voices) || pickAriaVoice(voices);
+      _browserVoiceResolved = true;
+    }
+    // else: voices list is still empty -- leave _browserVoiceResolved false
+    // so the next browserSpeak() call retries rather than permanently
+    // caching "no voice" just because this particular call was too early.
+    if (_resolvedBrowserVoice) utter.voice = _resolvedBrowserVoice;
     // else: utter.voice stays unset -> browser's own current default voice/lang is used
     window.speechSynthesis.speak(utter);
   }
@@ -3461,6 +3536,101 @@ document.getElementById('azure-save-btn').addEventListener('click', function() {
 });
 
 // ===========================
+// FREE BROWSER VOICE ADMIN SETTINGS
+// ===========================
+// Populates the "Free Browser Voice" <select> from speechSynthesis.getVoices()
+// -- handles the same async-population quirk as browserSpeak() above: some
+// browsers return an empty list on the very first call, only filling in
+// after 'voiceschanged' fires. Safe to call more than once (e.g. once
+// immediately and once again from voiceschanged) since it always rebuilds
+// the option list from scratch rather than appending, so voices are never
+// duplicated.
+function populateBrowserVoiceSelect() {
+  var select = document.getElementById('browser-voice-select');
+  if (!select || !window.speechSynthesis) return;
+  var voices = window.speechSynthesis.getVoices();
+  if (!voices || !voices.length) return;
+
+  var savedName = localStorage.getItem('browser_voice_name') || '';
+  var savedLang = localStorage.getItem('browser_voice_lang') || '';
+
+  select.innerHTML = '<option value="">— Automatic (search for an "Aria" voice) —</option>';
+  for (var i = 0; i < voices.length; i++) {
+    var v = voices[i];
+    var opt = document.createElement('option');
+    opt.value = v.name + '|' + v.lang;
+    opt.textContent = v.name + ' — ' + v.lang;
+    if (v.name === savedName && v.lang === savedLang) opt.selected = true;
+    select.appendChild(opt);
+  }
+}
+
+if (window.speechSynthesis) {
+  // Populate immediately (works when voices are already loaded) and again
+  // whenever the browser (re)announces its voice list.
+  populateBrowserVoiceSelect();
+  window.speechSynthesis.addEventListener('voiceschanged', populateBrowserVoiceSelect);
+}
+
+function loadBrowserVoiceSettings() {
+  populateBrowserVoiceSelect();
+}
+
+document.getElementById('browser-voice-save-btn').addEventListener('click', function() {
+  var select = document.getElementById('browser-voice-select');
+  var status = document.getElementById('browser-voice-status');
+  var val = select.value;
+  if (!val) {
+    localStorage.removeItem('browser_voice_name');
+    localStorage.removeItem('browser_voice_lang');
+    status.textContent = '✅ Reset to automatic voice selection.';
+    status.style.color = '#c9a84c';
+    return;
+  }
+  var sep = val.indexOf('|');
+  var name = sep === -1 ? val : val.substring(0, sep);
+  var lang = sep === -1 ? '' : val.substring(sep + 1);
+  localStorage.setItem('browser_voice_name', name);
+  localStorage.setItem('browser_voice_lang', lang);
+  status.textContent = '✅ Voice saved! This exact voice will narrate readings on the free browser-voice path.';
+  status.style.color = '#c9a84c';
+});
+
+document.getElementById('browser-voice-test-btn').addEventListener('click', function() {
+  var select = document.getElementById('browser-voice-select');
+  var status = document.getElementById('browser-voice-status');
+  if (!window.speechSynthesis) {
+    status.textContent = '⚠️ This browser does not support speech synthesis.';
+    status.style.color = '#ff9ed2';
+    return;
+  }
+  var voices = window.speechSynthesis.getVoices();
+  var val = select.value;
+  var voice = null;
+  if (val) {
+    var sep = val.indexOf('|');
+    var name = sep === -1 ? val : val.substring(0, sep);
+    var lang = sep === -1 ? '' : val.substring(sep + 1);
+    for (var i = 0; i < voices.length; i++) {
+      if (voices[i].name === name && voices[i].lang === lang) { voice = voices[i]; break; }
+    }
+  } else {
+    voice = pickAriaVoice(voices);
+  }
+  status.textContent = '🎙️ Testing voice...';
+  status.style.color = '#b08aff';
+  window.speechSynthesis.cancel();
+  var utter = new SpeechSynthesisUtterance('The oracle is ready. Your blueprint awaits.');
+  utter.rate = 0.95;
+  utter.pitch = 0.75;
+  utter.volume = 1.0;
+  if (voice) utter.voice = voice;
+  utter.onend = function() { status.textContent = '✅ Voice test finished.'; status.style.color = '#c9a84c'; };
+  utter.onerror = function() { status.textContent = '❌ Voice test failed to play.'; status.style.color = '#ff9ed2'; };
+  window.speechSynthesis.speak(utter);
+});
+
+// ===========================
 // FREEASTROAPI ADMIN SETTINGS (ASCENDANT)
 // ===========================
 function loadAstroSettings() {
@@ -3589,6 +3759,8 @@ function showAdminPanel() {
   }
   // Load Azure AI Speech settings when admin panel opens
   loadAzureSettings();
+  // Load Free Browser Voice picker options/selection when admin panel opens
+  loadBrowserVoiceSettings();
   // Load FreeAstroAPI (Ascendant) settings when admin panel opens
   loadAstroSettings();
   panel.style.display = 'block';
