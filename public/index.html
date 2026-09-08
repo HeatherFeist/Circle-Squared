@@ -2773,27 +2773,147 @@ function computeStandoutPairings(profiles) {
   };
 }
 
+// ── Cross-person weaving for group paragraphs ──
+// Generalizes getPartnershipFallback()'s technique of interleaving two
+// people's findings inside shared sentences (not a separate "pairings"
+// section) to N people: for a given person, scan the people already
+// introduced earlier in the SAME reading and, where a genuine real
+// connection exists, name it inside this person's own paragraph. Every
+// check here reuses a comparison the rest of this Codex already makes —
+// same Sephirah and same Life Path Trump Card (computePairCoincidences),
+// same elemental suit (computeGroupOverview's suitCounts), the same
+// Vertical/Horizontal axis architecture already named in
+// getPartnershipFallback()/AXIS_CONFIGS, and complementary elemental Node
+// polarity (computeStandoutPairings) — never a new kind of "connection."
+function findGroupCrossReference(p, priorProfiles) {
+  if (!priorProfiles || !priorProfiles.length) return null;
+  var i, other;
+  for (i = 0; i < priorProfiles.length; i++) {
+    other = priorProfiles[i];
+    if (p.tree && other.tree && p.tree.sephId != null && p.tree.sephId === other.tree.sephId) {
+      return { other: other, kind: 'sephirah' };
+    }
+  }
+  for (i = 0; i < priorProfiles.length; i++) {
+    other = priorProfiles[i];
+    if (p.lifePathTrumpCard && other.lifePathTrumpCard && p.lifePathTrumpCard.card === other.lifePathTrumpCard.card) {
+      return { other: other, kind: 'trump' };
+    }
+  }
+  for (i = 0; i < priorProfiles.length; i++) {
+    other = priorProfiles[i];
+    if (p.elementSuit && other.elementSuit && p.elementSuit === other.elementSuit) {
+      return { other: other, kind: 'suit' };
+    }
+  }
+  for (i = 0; i < priorProfiles.length; i++) {
+    other = priorProfiles[i];
+    if (p.axisRole && other.axisRole && p.axisRole !== other.axisRole) {
+      return { other: other, kind: 'axisComplement' };
+    }
+  }
+  for (i = 0; i < priorProfiles.length; i++) {
+    other = priorProfiles[i];
+    if (p.axisRole && other.axisRole && p.axisRole === other.axisRole) {
+      return { other: other, kind: 'axisSame' };
+    }
+  }
+  for (i = 0; i < priorProfiles.length; i++) {
+    other = priorProfiles[i];
+    if (p.elementalNodePolarity && other.elementalNodePolarity && p.elementalNodePolarity !== other.elementalNodePolarity) {
+      return { other: other, kind: 'polarityComplement' };
+    }
+  }
+  return null;
+}
+
+function formatGroupCrossReference(p, ref) {
+  var other = ref.other, name = p.firstName, oName = other.firstName;
+  if (ref.kind === 'sephirah') {
+    return name + ' shares something exact with ' + oName + ': the same Sephirah, ' + p.tree.name + ' — ' + p.tree.meaning + ' is not a theme ' + name + ' is carrying alone in this room.';
+  }
+  if (ref.kind === 'trump') {
+    return name + '\'s Life Path Trump Card, ' + p.lifePathTrumpCard.card + ', is the very same card already named for ' + oName + ' — two different Life Paths arriving at the identical mythic teaching.';
+  }
+  if (ref.kind === 'suit') {
+    return 'Where ' + oName + '\'s ' + other.sunSign.element + ' current already set a tone for this room through the suit of ' + other.elementSuit + ', ' + name + '\'s own ' + p.sunSign.element + ' Sun runs that exact same suit — one more voice singing in the same register.';
+  }
+  if (ref.kind === 'axisComplement') {
+    var oAxis = AXIS_ROLES[other.axisRole], pAxis = AXIS_ROLES[p.axisRole];
+    return 'Where ' + oName + ' carries ' + oAxis.pillar + ' as ' + oAxis.title + ', ' + name + '\'s own ' + pAxis.title + ' gives that current somewhere real to land — the same Cornerstone geometry the Tree names whenever a Vertical meets a Horizontal.';
+  }
+  if (ref.kind === 'axisSame') {
+    var axis = AXIS_ROLES[p.axisRole];
+    return name + ' and ' + oName + ' both carry the same ' + axis.title + ' role on the Tree — two people building at the identical structural level, doubling that current in the room rather than balancing it.';
+  }
+  if (ref.kind === 'polarityComplement') {
+    return name + '\'s Node current pulls ' + (p.elementalNodePolarity === 'outward' ? 'outward' : 'inward') + ', the mirror of ' + oName + '\'s ' + (other.elementalNodePolarity === 'outward' ? 'outward' : 'inward') + ' pull — a magnetic pairing already alive in this room before the Standout Pairings below ever name it directly.';
+  }
+  return '';
+}
+
 // ── Condensed per-person reading section (Celestia voice, Part XXVI
 // meaning-first, no mechanics) ──
 // Condensed deliberately for group context -- a 25-person reading cannot
 // carry full 9-page-solo depth per person. See PR body for this judgment
 // call.
-function formatGroupPersonSection(p) {
+//
+// Rewritten (see PR: "rewrite group reading braiding") to break the old
+// fixed 5-clause template: sentence construction is rotated per person by
+// index so consecutive paragraphs in the same reading do not read as
+// mad-libbed from one identical skeleton, a real cross-reference to an
+// already-introduced person is woven in wherever one genuinely exists
+// (findGroupCrossReference above), and the paragraph closes by naming this
+// person's own place within the Group Overview's real, already-computed
+// distribution -- the same counts formatGroupOverviewSection reports.
+function elementArticle(el) { return /^[aeiou]/i.test(el || '') ? 'an' : 'a'; }
+
+function formatGroupPersonSection(p, idx, priorProfiles, overview) {
   var lpData = LP_DATA[p.lifePath] || LP_DATA[reduceNum(p.lifePath, false)] || LP_DATA[6];
   var trump = p.lifePathTrumpCard;
-  var out = p.firstName + ' carries Life Path ' + p.lifePath + ' (' + lpData.title + '), anchored at ' + p.tree.name + ' on the Tree of Life — ' + p.tree.meaning + '. ';
-  out += 'Their ' + p.sunSign.sign + ' Sun brings a ' + p.sunSign.element + ' current into everything they do';
-  out += (trump ? (', confirmed by their Life Path Trump Card, ' + trump.card + ' — ' + trump.keyword + '.') : '.') + ' ';
-  if (p.soulCard && p.courtCard) {
-    out += 'On Metatron’s Cube, their Soul Card is the ' + p.soulCard.name + ' (' + p.soulCard.keyword + '), carried outward into daily life as the ' + p.courtCard.name + '. ';
+  var n = idx || 0;
+  var art = elementArticle(p.sunSign.element);
+
+  var openers = [
+    function(){ return p.firstName + ' carries Life Path ' + p.lifePath + ' (' + lpData.title + '), anchored at ' + p.tree.name + ' on the Tree of Life — ' + p.tree.meaning + '.'; },
+    function(){ return 'At the center of ' + p.firstName + '\'s chart sits Life Path ' + p.lifePath + ' — ' + lpData.title + ' — landing them at ' + p.tree.name + ' on the Tree, ' + p.tree.meaning + '.'; },
+    function(){ return p.tree.name + ' is where ' + p.firstName + '\'s Life Path ' + p.lifePath + ' (' + lpData.title + ') comes to rest on the Tree of Life — ' + p.tree.meaning + '.'; },
+    function(){ return 'Life Path ' + p.lifePath + ' makes ' + p.firstName + ' ' + lpData.title + ', and the Tree places that role squarely at ' + p.tree.name + ' — ' + p.tree.meaning + '.'; }
+  ];
+  var sunClauses = [
+    function(){ return 'Their ' + p.sunSign.sign + ' Sun brings ' + art + ' ' + p.sunSign.element + ' current into everything they do' + (trump ? (', confirmed by their Life Path Trump Card, ' + trump.card + ' — ' + trump.keyword + '.') : '.'); },
+    function(){ return p.firstName + '\'s ' + p.sunSign.sign + ' Sun runs ' + art + ' ' + p.sunSign.element + ' current underneath all of it' + (trump ? (', the same teaching their Life Path Trump Card ' + trump.card + ' — ' + trump.keyword + ' — already confirms.') : '.'); },
+    function(){ return 'Underneath that, ' + elementArticle(p.sunSign.sign) + ' ' + p.sunSign.sign + ' Sun colors everything ' + p.firstName + ' does with ' + p.sunSign.element + (trump ? (', and the Life Path Trump Card ' + trump.card + ' (' + trump.keyword + ') says the same thing in a different language.') : '.'); }
+  ];
+  var soulClauses = [
+    function(){ return 'On Metatron’s Cube, their Soul Card is the ' + p.soulCard.name + ' (' + p.soulCard.keyword + '), carried outward into daily life as the ' + p.courtCard.name + '.'; },
+    function(){ return 'Metatron’s Cube names the inner want beneath that as the ' + p.soulCard.name + ' (' + p.soulCard.keyword + '), showing up outwardly as the ' + p.courtCard.name + '.'; }
+  ];
+  var nodeClauses = [
+    function(){ return 'Their North Node points them toward the ' + p.nodeDecanCards.northNodeCard.card + ' — the energy they are growing into — while their South Node, the ' + p.nodeDecanCards.southNodeCard.card + ', names the familiar comfort zone they are moving beyond.'; },
+    function(){ return p.firstName + ' is growing toward the ' + p.nodeDecanCards.northNodeCard.card + ' by North Node, still shadowed by the more familiar ' + p.nodeDecanCards.southNodeCard.card + ' of the South Node behind them.'; }
+  ];
+  var polarityClauses = [
+    function(){ return p.firstName + ' carries ' + (p.elementalNodePolarity === 'outward' ? 'an outward-pushing' : 'an inward-pulling') + ' Node current, part of what shapes how they move alongside the rest of this group.'; },
+    function(){ return 'That Node current runs ' + (p.elementalNodePolarity === 'outward' ? 'outward' : 'inward') + ' for ' + p.firstName + ' — one more thread in how they sit inside this particular group.'; }
+  ];
+
+  var parts = [];
+  parts.push(openers[n % openers.length]());
+  parts.push(sunClauses[(n + 1) % sunClauses.length]());
+  if (p.soulCard && p.courtCard) parts.push(soulClauses[(n + 2) % soulClauses.length]());
+  if (p.nodeDecanCards) parts.push(nodeClauses[(n + 1) % nodeClauses.length]());
+  if (p.elementalNodePolarity) parts.push(polarityClauses[n % polarityClauses.length]());
+
+  var crossRef = findGroupCrossReference(p, priorProfiles);
+  if (crossRef) parts.push(formatGroupCrossReference(p, crossRef));
+
+  if (overview && p.elementSuit && overview.suitCounts && overview.suitCounts[p.elementSuit] > 1) {
+    var suitLabelMap = {Wands:'Fire', Cups:'Water', Swords:'Air', Pentacles:'Earth'};
+    parts.push(p.firstName + ' is one of ' + overview.suitCounts[p.elementSuit] + ' of you in this room carrying ' + p.elementSuit + ' (' + (suitLabelMap[p.elementSuit] || p.sunSign.element) + ') energy.');
   }
-  if (p.nodeDecanCards) {
-    out += 'Their North Node points them toward the ' + p.nodeDecanCards.northNodeCard.card + ' — the energy they are growing into — while their South Node, the ' + p.nodeDecanCards.southNodeCard.card + ', names the familiar comfort zone they are moving beyond. ';
-  }
-  if (p.elementalNodePolarity) {
-    out += p.firstName + ' carries ' + (p.elementalNodePolarity === 'outward' ? 'an outward-pushing' : 'an inward-pulling') + ' Node current, part of what shapes how they move alongside the rest of this group. ';
-  }
-  return out.trim();
+
+  return parts.join(' ').trim();
 }
 
 function formatGroupOverviewSection(overview, groupOverviewLabel) {
@@ -2824,15 +2944,59 @@ function formatGroupOverviewSection(overview, groupOverviewLabel) {
   return out.trim();
 }
 
-function formatPairFact(pr) {
+// Several distinct sentence constructions for the same two qualifying
+// conditions (complementary Node polarity / matching Node polarity), so
+// that when multiple pairs in a group share the identical plain condition
+// with no other distinguishing coincidence, they read as different
+// sentences rather than the literal same sentence with the names swapped.
+// `idx` rotates through these deterministically per pairing.
+var MAGNETIC_PAIR_TEMPLATES = [
+  function(n1, n2){ return n1 + ' and ' + n2 + ' carry complementary Node currents — one outward-pushing, one inward-pulling — a magnetic pairing where their two directions of pull can circulate rather than compete.'; },
+  function(n1, n2){ return 'Between ' + n1 + ' and ' + n2 + ', the Node current runs in opposite directions, which tends to feel less like two people negotiating a difference and more like a circuit completing itself.'; },
+  function(n1, n2){ return n1 + '\'s Node energy pulls one way, ' + n2 + '\'s pulls the other — a complementary, magnetic pairing rather than a competing one.'; },
+  function(n1, n2){ return 'Set ' + n1 + ' next to ' + n2 + ' and the Node polarity flips from outward to inward — opposite currents that are built to circulate together.'; }
+];
+var FRICTION_PAIR_TEMPLATES = [
+  function(n1, n2, pol){ return n1 + ' and ' + n2 + ' both carry ' + pol + ' Node energy, which can mean two people leaning the same direction without a natural counterbalance — not a bad placement, simply one that asks for a deliberate choice to make room for other directions in the group.'; },
+  function(n1, n2, pol){ return n1 + ' and ' + n2 + ' are leaning the same way on the Node axis — both ' + pol + ' — so the counterbalance in this pair has to be chosen on purpose rather than arriving naturally.'; },
+  function(n1, n2, pol){ return 'No natural counterweight sits between ' + n1 + ' and ' + n2 + ': both run ' + pol + ' Node energy, which is not a flaw, just a pairing that will need one of them to consciously hold the other direction.'; }
+];
+
+function polarityLabel(pol) { return pol + (pol === 'outward' ? '-pushing' : '-pulling'); }
+
+function formatPairFact(pr, idx) {
   var name1 = pr.p1.firstName, name2 = pr.p2.firstName;
+  var n = idx || 0;
   var base = pr.complementary
-    ? (name1 + ' and ' + name2 + ' carry complementary Node currents — one outward-pushing, one inward-pulling — a magnetic pairing where their two directions of pull can circulate rather than compete.')
-    : (name1 + ' and ' + name2 + ' both carry ' + pr.p1.elementalNodePolarity + '-' + (pr.p1.elementalNodePolarity === 'outward' ? 'pushing' : 'pulling') + ' Node energy, which can mean two people leaning the same direction without a natural counterbalance — not a bad placement, simply one that asks for a deliberate choice to make room for other directions in the group.');
+    ? MAGNETIC_PAIR_TEMPLATES[n % MAGNETIC_PAIR_TEMPLATES.length](name1, name2)
+    : FRICTION_PAIR_TEMPLATES[n % FRICTION_PAIR_TEMPLATES.length](name1, name2, polarityLabel(pr.p1.elementalNodePolarity));
   if (pr.coincidenceFacts.length) {
     base += ' On top of that, ' + pr.coincidenceFacts.join('; ') + '.';
   }
   return base;
+}
+
+// Union-Find over people, used only to cluster "plain" pairs (same
+// qualifying condition, zero distinguishing coincidenceFacts) so a whole
+// same-polarity cluster is named once instead of as N nearly-identical
+// two-person bullets. Pairs that DO carry an extra real coincidence stay
+// individual, since the extra fact already differentiates them.
+function clusterPlainPairs(pairs) {
+  var parent = {};
+  function find(x) { if (parent[x] === undefined) parent[x] = x; while (parent[x] !== x) { parent[x] = parent[parent[x]]; x = parent[x]; } return x; }
+  function union(a, b) { var ra = find(a), rb = find(b); if (ra !== rb) parent[ra] = rb; }
+  var byName = {};
+  pairs.forEach(function(pr) {
+    byName[pr.p1.firstName] = pr.p1; byName[pr.p2.firstName] = pr.p2;
+    union(pr.p1.firstName, pr.p2.firstName);
+  });
+  var groups = {};
+  Object.keys(byName).forEach(function(name) {
+    var root = find(name);
+    if (!groups[root]) groups[root] = [];
+    groups[root].push(byName[name]);
+  });
+  return Object.keys(groups).map(function(k){ return groups[k]; }).filter(function(g){ return g.length >= 3; });
 }
 
 function formatStandoutPairingsSection(pairings) {
@@ -2842,13 +3006,35 @@ function formatStandoutPairingsSection(pairings) {
   } else {
     out += 'Scanning all ' + pairings.totalPairsScanned + ' possible pairings in this group, here are the ones worth naming — selected for genuine rarity and simultaneous coincidence, not an exhaustive list.\n\n';
   }
+
   if (pairings.harmonious.length) {
-    out += 'HARMONIOUS / MAGNETIC PAIRINGS:\n' + pairings.harmonious.map(function(pr){ return '• ' + formatPairFact(pr); }).join('\n') + '\n\n';
+    out += 'HARMONIOUS / MAGNETIC PAIRINGS:\n' + pairings.harmonious.map(function(pr, i){ return '• ' + formatPairFact(pr, i); }).join('\n') + '\n\n';
   } else {
     out += 'No pairing in this group combines complementary Node polarity with an additional real coincidence — an honest, ordinary outcome.\n\n';
   }
+
   if (pairings.friction.length) {
-    out += 'TENSION PAIRINGS:\n' + pairings.friction.map(function(pr){ return '• ' + formatPairFact(pr); }).join('\n') + '\n\n';
+    // Split friction pairs into "plain" (no extra coincidence -- the exact
+    // duplicate-sentence case this fixes) and "distinguished" (carries a
+    // real extra coincidence, already unique enough to stand alone).
+    var plain = pairings.friction.filter(function(pr){ return !pr.coincidenceFacts.length; });
+    var distinguished = pairings.friction.filter(function(pr){ return pr.coincidenceFacts.length > 0; });
+    var clusters = clusterPlainPairs(plain);
+    var clusteredNames = {};
+    clusters.forEach(function(g){ g.forEach(function(p){ clusteredNames[p.firstName] = true; }); });
+    var remainingPlain = plain.filter(function(pr){ return !clusteredNames[pr.p1.firstName] || !clusteredNames[pr.p2.firstName]; });
+
+    var lines = [];
+    clusters.forEach(function(g) {
+      var pol = polarityLabel(g[0].elementalNodePolarity);
+      var names = g.map(function(p){return p.firstName;});
+      var nameList = names.slice(0, -1).join(', ') + ', and ' + names[names.length - 1];
+      lines.push('• ' + nameList + ' all carry the same ' + pol + ' Node current, which as a cluster suggests this group leans structurally toward that direction as a whole rather than it being one or two people\'s individual pattern — worth naming once, together, rather than as ' + g.length + ' separate near-identical pairings.');
+    });
+    remainingPlain.forEach(function(pr, i) { lines.push('• ' + formatPairFact(pr, i)); });
+    distinguished.forEach(function(pr, i) { lines.push('• ' + formatPairFact(pr, i)); });
+
+    out += 'TENSION PAIRINGS:\n' + lines.join('\n') + '\n\n';
   }
   return out.trim();
 }
@@ -2867,8 +3053,8 @@ function getGroupFallback(profiles) {
   return {
     intro: intro,
     overviewText: formatGroupOverviewSection(overview),
-    people: profiles.map(function(p) {
-      return { firstName: p.firstName, text: formatGroupPersonSection(p) };
+    people: profiles.map(function(p, idx) {
+      return { firstName: p.firstName, text: formatGroupPersonSection(p, idx, profiles.slice(0, idx), overview) };
     }),
     pairingsText: formatStandoutPairingsSection(pairings),
     blessing: 'AIN SOPH AUR — the limitless light this whole reading traces back to — holds all ' + profiles.length + ' of you, individually and together. I am Celestia, and it has been an honor to read this group’s geometry.',
@@ -2888,19 +3074,26 @@ async function doGroupReading(profiles) {
   var pairings = computeStandoutPairings(profiles);
   var profileLines = profiles.map(function(p) {
     var lpData = LP_DATA[p.lifePath] || LP_DATA[reduceNum(p.lifePath, false)] || LP_DATA[6];
-    return p.firstName + ': Life Path ' + p.lifePath + ' (' + lpData.title + ') · ' + p.sunSign.sign + ' Sun · ' + p.tree.name
+    var axis = p.axisRole && AXIS_ROLES[p.axisRole] ? AXIS_ROLES[p.axisRole].title : null;
+    return p.firstName + ': Life Path ' + p.lifePath + ' (' + lpData.title + ') · ' + p.sunSign.sign + ' Sun (' + p.sunSign.element + ') · ' + p.tree.name
       + (p.lifePathTrumpCard ? ' · Trump Card ' + p.lifePathTrumpCard.card : '')
       + (p.soulCard ? ' · Soul Card ' + p.soulCard.name : '')
+      + (p.elementSuit ? ' · Elemental Suit ' + p.elementSuit : '')
+      + (axis ? ' · Axis Role ' + axis : '')
       + (p.nodeDecanCards ? ' · North Node card ' + p.nodeDecanCards.northNodeCard.card : '')
       + (p.elementalNodePolarity ? ' · Elemental Node polarity: ' + p.elementalNodePolarity : '');
   }).join('\n');
 
   var prompt = 'You are Celestia, oracle of Circles Squared. Generate a group reading for ' + profiles.length + ' people: ' + profiles.map(function(p){return p.firstName;}).join(', ') + '. '
     + 'This is entertainment for a family or friend group, not a workplace or compatibility-score product. Write in Celestia’s warm, poetic, second-person voice. Never narrate HOW a value was calculated (no degree/decan/mechanism talk) -- only what each finding means. Never invent a numeric score, percentage, or compatibility rating for any pairing -- report only real, computed, binary facts.\n\n'
-    + 'PROFILE:\n' + profileLines + '\n\n'
+    + 'PROFILE (people are listed in the same order their sections should appear -- each person after the first can genuinely be compared only to the people listed ABOVE them, since those are the only people "already introduced" in the finished reading):\n' + profileLines + '\n\n'
     + 'GROUP OVERVIEW (real, computed distribution -- report these counts honestly, never invent a composite score): '
     + 'Elemental suits -- ' + JSON.stringify(overview.suitCounts) + '. Axis roles -- ' + JSON.stringify(overview.axisCounts) + '. Elemental Node polarity -- ' + JSON.stringify(overview.polarityCounts) + '.\n\n'
-    + 'Write these sections using ===SECTION_NAME_START=== / ===SECTION_NAME_END=== delimiters: OVERVIEW (2-3 paragraphs naming the real distributions above as a group energetic portrait), then one PERSON_<firstname> section per person (1 condensed paragraph each, Life Path/Sun sign/Sephirah/Trump Card/Soul Card/Node in the established voice), then PAIRINGS (name only the standout pairings the data supports -- complementary Node polarity for magnetic pairs, matching polarity for tension pairs, each combined with any other real coincidence -- as plain described facts, never a score), then BLESSING (a short closing blessing invoking AIN SOPH AUR for the whole group).';
+    + 'CRITICAL -- avoid the flat, isolated-then-bulleted-pairings shape entirely. Do this the way the two-person partnership reading already does it: weave real comparisons INSIDE sentences about a specific person, not only in a separate pairings list. Two structural rules govern the whole output:\n'
+    + '(1) PER-PERSON VARIATION: Do not write every PERSON_<name> section from the identical sentence skeleton. Vary how each paragraph opens and closes, and vary the order facts are introduced in, person to person, the way a human writer naturally varies phrasing -- two people\'s paragraphs in this same reading should never read as obviously mad-libbed from one template. Every fact must still be real and drawn only from the PROFILE above -- vary HOW it is said, never invent WHAT is said.\n'
+    + '(2) REAL CROSS-REFERENCES INSIDE PARAGRAPHS: For each person after the first, look back at the people already listed above them in the PROFILE and, where a genuine real connection exists (the exact same Sephirah, the exact same Life Path Trump Card, the same Elemental Suit, a complementary or matching Axis Role the way Cornerstone/Twin Pillar/Foundation configurations already work in the two-person reading, or complementary Elemental Node polarity), weave ONE such reference into that person\'s OWN paragraph, in the partnership reading\'s own style -- e.g. "Where Marcus\'s Air current sets the tone for this room\'s Vertical axis, Priya\'s Water brings something the group doesn\'t otherwise have." Do not force a connection where none of those real criteria are actually met for anyone listed above this person -- some people legitimately get no cross-reference -- but this must genuinely happen for a meaningful fraction of the group, not zero. Also have a person\'s own paragraph name their place inside the real Group Overview counts above where it fits naturally (e.g. "one of the X of you carrying Pentacles energy").\n\n'
+    + 'For the PAIRINGS section specifically: when several pairs in this group share the exact same qualifying condition with no other distinguishing coincidence (for example, four different people who all simply carry the same outward-pushing Node polarity with nothing else notable between any two of them), do NOT write one nearly-identical bulleted sentence per pair. Either vary the sentence construction meaningfully pair to pair, or -- better, when three or more people share the identical plain condition -- consolidate them into ONE sentence naming the whole cluster together (e.g. "Priya, Dante, Solveig, and Yara all carry the same outward-pushing Node current, which as a cluster suggests...") instead of N separate nearly-identical two-person bullets. Pairs that DO carry a real additional coincidence (same Sephirah, same Trump Card, etc. on top of the polarity) are already distinguished by that fact and may stay as individual bullets.\n\n'
+    + 'Write these sections using ===SECTION_NAME_START=== / ===SECTION_NAME_END=== delimiters: OVERVIEW (2-3 paragraphs naming the real distributions above as a group energetic portrait), then one PERSON_<firstname> section per person, in PROFILE order (1 condensed paragraph each, Life Path/Sun sign/Sephirah/Trump Card/Soul Card/Node in the established voice, following rules (1) and (2) above), then PAIRINGS (name only the standout pairings the data supports -- complementary Node polarity for magnetic pairs, matching polarity for tension pairs, each combined with any other real coincidence -- as plain described facts, never a score, following the clustering/variation rule above), then BLESSING (a short closing blessing invoking AIN SOPH AUR for the whole group).';
 
   try {
     var text = await generateReading(prompt);
@@ -2941,6 +3134,24 @@ function parseGroupReadingSections(fullText, profiles) {
   };
 }
 
+// ── PDF text sanitizer ──
+// jsPDF's built-in "times"/"courier" fonts only carry a WinAnsi-ish glyph
+// set (see the standard 14 PDF fonts) -- they do NOT include the "✦" (Master
+// Number archetype titles like "The Master Teacher ✦" use it) or "✧" glyphs.
+// Handing that character straight to doc.text()/splitTextToSize() breaks
+// that whole run's text encoding in the generated PDF -- it renders as
+// garbled, character-spaced junk (e.g. "(cid:0)H(cid:0)e(cid:0)a..."), not
+// just a missing glyph. This is a PDF-body-text-only concern: the on-screen
+// reading keeps the ✦ freely, since the browser's own font renders it fine.
+// Confirmed affected: any group member carrying a Master Number (11/22/33/
+// 44) Life Path, whose LP_DATA title (e.g. "The Illuminator ✦") is woven
+// into formatGroupPersonSection()'s text and lands in content.people[idx].text
+// below.
+function sanitizeForPdfText(text) {
+  if (!text) return text;
+  return String(text).replace(/[✦✧]/g, '').replace(/[ \t]{2,}/g, ' ');
+}
+
 // ── PDF generation ──
 // A condensed cover + per-person + overview + pairings PDF, reusing the
 // same visual language (palette, starfield, footer) as
@@ -2979,7 +3190,7 @@ function generateGroupPDF(profiles, content) {
   }
   function bodyText(text, y, color, size) {
     doc.setFont('times', 'normal'); doc.setFontSize(size || 10); doc.setTextColor((color||WHITE)[0], (color||WHITE)[1], (color||WHITE)[2]);
-    var lines = doc.splitTextToSize(text, W - 28);
+    var lines = doc.splitTextToSize(sanitizeForPdfText(text), W - 28);
     doc.text(lines, 14, y);
     return y + lines.length * (size ? size * 0.42 : 4.6);
   }
@@ -2999,7 +3210,7 @@ function generateGroupPDF(profiles, content) {
   var nameLines = doc.splitTextToSize(profiles.map(function(p){return p.firstName;}).join(' · '), W - 40);
   doc.text(nameLines, W / 2, 90, { align: 'center' });
   doc.setFont('times', 'italic'); doc.setFontSize(10); doc.setTextColor(MUTED[0], MUTED[1], MUTED[2]);
-  var introLines = doc.splitTextToSize(content.intro, W - 40);
+  var introLines = doc.splitTextToSize(sanitizeForPdfText(content.intro), W - 40);
   doc.text(introLines, W / 2, 130, { align: 'center' });
   pdfFooter(1, totalPages);
 
@@ -3023,7 +3234,7 @@ function generateGroupPDF(profiles, content) {
   var yy = bodyText(content.pairingsText, 42, WHITE, 8.8);
   yy = Math.min(yy + 8, H - 40);
   doc.setFont('times', 'italic'); doc.setFontSize(9); doc.setTextColor(GOLD[0], GOLD[1], GOLD[2]);
-  var blessLines = doc.splitTextToSize(content.blessing, W - 28);
+  var blessLines = doc.splitTextToSize(sanitizeForPdfText(content.blessing), W - 28);
   doc.text(blessLines, 14, yy);
   pdfFooter(3 + profiles.length, totalPages);
 
@@ -7287,6 +7498,7 @@ document.getElementById('hook-btn').addEventListener('click', function(){
 
   var tarotCard = getTarotCard(gematria.total, lp);
   var codexArchetype = getCodexArchetype(lp, sunSign.element);
+  var axisRole = getAxisRole(lp);
 
   // ── LAYER 7: Hebrew Soul Correspondence (real gematria, full birth name) ──
   var hebrewSoulCorrespondence = computeHebrewSoulCorrespondence(fullBirthName, sephInfo);
@@ -7295,6 +7507,7 @@ document.getElementById('hook-btn').addEventListener('click', function(){
     firstName: firstName, fullName: fullBirthName, fullBirthName: fullBirthName, usedName: usedName, dob: dob,
     month: month, day: day, year: year,
     lifePath: lp, lpTitle: lpData.title, lpTeaser: lpData.teaser, lpGift: lpData.gift,
+    axisRole: axisRole,
     sunSign: sunSign, tree: sephInfo,
     treePosition: { sephId: sephInfo.sephId },
     hiddenMaster: hiddenMaster, nameHiddenMasters: nameHiddenMasters,
@@ -7411,6 +7624,10 @@ function getFallbackReading(){
       fb+='\nThe ancient art of decans \u2014 a system that assigns each stretch of the zodiac its own Tarot card \u2014 names this axis even more precisely. Your North Node card is the '+p.nodeDecanCards.northNodeCard.card+', naming '+p.nodeDecanCards.northNodeCard.keyword+' as the specific texture of what you are growing toward. Your South Node card is the '+p.nodeDecanCards.southNodeCard.card+', naming '+p.nodeDecanCards.southNodeCard.keyword+' as the texture of the comfort-zone energy you are moving away from. Neither card is a verdict: the '+p.nodeDecanCards.southNodeCard.card+' is not something wrong with you, it is simply the gravity that is easiest to fall back into, and the '+p.nodeDecanCards.northNodeCard.card+' is not a finish line, it is the direction the growth keeps pointing. The placement itself does not move \u2014 it was fixed the moment you were born \u2014 only your relationship to it, moment by moment, is yours to choose.\n';
     }
   }
+  if (p.axisRole && AXIS_ROLES[p.axisRole]) {
+    var soloAxis = AXIS_ROLES[p.axisRole];
+    fb+='\nThe Tree of Life also names the shape of the role you play in any structure you are part of. Your Life Path places you on '+soloAxis.pillar+' — you are '+soloAxis.title+'. '+soloAxis.description+' This is not about who you are alone in a room; it is the architecture you bring into every partnership, family, or team you join.\n';
+  }
   fb+='\nTwo more coordinates sharpen this portrait further. Your Birthday Number \u2014 '+(p.birthdayNumber||'?')+' \u2014 drawn from the day of the month you were born, is a specific talent layered directly onto your Life Path, a tool you were handed at birth and have likely been using since childhood without ever putting a name to it. Your Personality Number \u2014 '+(p.personality||'?')+' \u2014 is the impression you make in the first few seconds before anyone gets to know the rest of you: the surface texture over the deeper Expression and Soul Urge numbers this reading unpacks on the next page. None of these numbers stand alone. Each is a facet cut into the same stone.\n\n'+ca+' is not a decoration sitting on top of your chart. It is a mandate \u2014 the specific shape your Life Path '+p.lifePath+', your '+p.sunSign.sign+' Sun, and your '+p.tree.name+' placement all agree you are here to carry. Hold onto the gift named above; this reading keeps returning to it, recognizing it again in the Tarot archetype on the next page, in the shadow work further in, and in Celestia\'s closing blessing at the very end. It is the same thread the whole way through, just spoken in a different language each time.\n';
   fb+='===PAGE_1_END===\n\n';
 
@@ -7449,7 +7666,6 @@ function getFallbackReading(){
     var pdwFmt = formatPersonalDayWildcard(pdw);
     fb += '\nPersonal Day '+pd+' opens one more door, and it is worth naming as an invitation rather than a verdict: today wildcards toward '+pdwFmt.majorPhrase+' — '+(pdw.majors.length>1?'not as a forced choice between them, but as a field of live possibility you can lean into either direction of today':'as the live possibility available to lean into today')+'. '+pdwFmt.poolSentences+' None of this replaces the '+tc.card+' path named earlier in this reading, and none of it is fixed the way your birth chart is fixed — it simply names what today, specifically, is offering you room to explore, gone again once Personal Day '+pd+' rolls forward into tomorrow\'s number.\n';
   }
-  fb+='Your Personality Number is '+(p.personality||'unknown')+' \u2014 the impression you make before you speak a single word. You are in Personal Year '+py+' in 2026. This cycle has a specific quality \u2014 a tone that colors every decision, relationship, and opportunity of this year.\n\n'+(py<=3?'This is a year of planting. The seeds you put down now \u2014 in projects, relationships, identity \u2014 will define the harvest of the next cycle. As '+ca+', the key is to act from vision, not from fear.':py<=6?'This is a year of deepening. Connections forged now carry long-term significance. Your field is stabilizing around its true form.':'This is a year of revelation and completion. Old structures that no longer serve are falling away. As '+ca+', this is not loss \u2014 it is liberation. What remains will be exactly what is meant to carry forward.')+'\n\nPersonal Year '+py+' is not a separate forecast bolted onto your chart \u2014 it is Life Path '+p.lifePath+' in motion through time, the same core number counted forward year by year until it comes back around to itself. For '+ca+', this Personal Year '+py+' activates the part of your field that governs '+p.sunSign.sign+' energy. The timing is not accidental.\n\nPractically, this looks less like a mood and more like a series of small forks in the road. '+(py<=3?'Say yes to the invitation, the idea, or the collaboration that feels slightly too soon \u2014 Personal Year '+py+' rewards those who move before they feel fully ready, because the readiness only ever arrives after the first step, not before it.':py<=6?'Say yes to the relationship, agreement, or commitment that asks you to stay rather than start something new \u2014 Personal Year '+py+' rewards depth over breadth, and the temptation to scatter your energy across something newer and shinier is exactly what this year asks you to resist.':'Say yes to the ending you have been putting off \u2014 Personal Year '+py+' rewards honest closure over quiet avoidance, and what looks like loss from inside the year will look like liberation from outside it.')+' Say no to whatever would keep you circling the same lesson a second time; your Birthday Number '+(p.birthdayNumber||'?')+' has already given you the tool to recognize when that is happening.\n\nThis Personal Year narrows further the closer you look. Right now you are moving through Personal Month '+pm+' — the same yearly theme, focused down onto the chapter you are actually living this month — and today itself falls in Personal Day '+pd+', the smallest and most immediate ring of this same cycle. None of these three numbers is a separate forecast; Personal Day '+pd+' is Personal Month '+pm+' in motion, and Personal Month '+pm+' is Personal Year '+py+' in motion, the same way Personal Year is Life Path '+p.lifePath+' in motion through time. When you want to know what today is actually asking of you, Personal Day '+pd+' is the most precise instrument this reading has to offer.\n';
   fb+='===PAGE_7_END===\n\n';
 
   fb+='===PAGE_8_START===\n';
@@ -7590,6 +7806,11 @@ async function doReading() {
     + 'Sephirah: ' + p.tree.name + ' \u2014 ' + p.tree.meaning + '\n'
     + 'Tarot Path ' + tc.path + ': ' + tc.card + ' (' + tc.letter + ') \u2014 ' + tc.archetype + '\n'
     + (p.lifePathTrumpCard ? ('Life Path Trump Card (Major Arcana, Path ' + p.lifePathTrumpCard.num + '): ' + p.lifePathTrumpCard.numeral + ' ' + p.lifePathTrumpCard.card + ', keyword ' + p.lifePathTrumpCard.keyword + '\n') : '')
+    + (p.primaryPath && p.primaryPath.viaKetherBridge ? 'Kether Bridge: this Trump Card path connects directly to Kether via the rare Master 11 wiring\n' : '')
+    + (p.primaryPath && p.primaryPath.masterCoActive ? 'Dual Trump Card (Master 33): ' + (p.trumpPaths && p.trumpPaths[0] ? p.trumpPaths[0].card : '') + ' and ' + (p.trumpPaths && p.trumpPaths[1] ? p.trumpPaths[1].card : '') + ', co-active as one braided current\n' : '')
+    + 'Element Suit (Metatron\'s Cube): ' + (p.elementSuit || '?') + '\n'
+    + (p.shadowCardPath ? ('Shadow Card (Metatron\'s Cube shadow path): ' + p.shadowCardPath.card + ' (' + p.shadowCardPath.numeral + ', ' + p.shadowCardPath.keyword + ')\n') : '')
+    + (p.axisRole && AXIS_ROLES[p.axisRole] ? ('Axis Role: ' + AXIS_ROLES[p.axisRole].title + ' (' + AXIS_ROLES[p.axisRole].pillar + ')\n') : '')
     + metatronLine
     + zodiacalCourtCardLine
     + (p.hiddenMaster ? 'Hidden Master Number: ' + p.hiddenMaster + '\n' : '')
@@ -7598,16 +7819,13 @@ async function doReading() {
     + 'Personal Year 2026: ' + p.personalYear2026 + (p.personalMonth != null ? ('  Personal Month (current): ' + p.personalMonth) : '') + (p.personalDay != null ? ('  Personal Day (today): ' + p.personalDay) : '') + '\n'
     + personalDayWildcardLine
     + '\nWrite exactly 9 sections with ===PAGE_N_START=== and ===PAGE_N_END=== delimiters on their own lines (each delimiter on its own line, no other text on that line). Each section: 7\u20139 rich, deeply personal paragraphs (not 5\u20136 \u2014 these pages need to visually fill a full printed page, so write substantially more per page than feels like the minimum). Each paragraph should be 4\u20136 full sentences, not 2\u20133 \u2014 a thin, single-idea paragraph is not acceptable. Every paragraph must reference ' + p.firstName + ' by name at least once and cite the specific numbers or symbols from their profile, and should work in as many of the person\'s actual named numbers, cards, Sephiroth, and archetypes as genuinely fit \u2014 not just one per paragraph. When a paragraph starts to feel thin or abstract, do not move on to the next idea yet: stay with the same point and add a concrete second layer \u2014 what this finding actually looks like in ' + p.firstName + '\'s daily choices, relationships, or work, a specific example of the pattern playing out, or a second data point from the profile that deepens (not repeats) the first. No generic affirmations, no padding with synonyms of a sentence already written \u2014 every added sentence must carry new, specific content. Celestia speaks with warm authority, poetic depth, and precision.\n\n'
-    + 'Page 1 \u2014 IDENTITY ESSENCE: Open with the exact phrase "' + p.firstName + ', you are ' + ca + '." Then paint a full-portrait synthesis: how Life Path ' + p.lifePath + ' (' + lpTitle + ') shapes the core drive, how ' + p.sunSign.sign + ' Sun infuses it with elemental character (' + p.sunSign.element + ', ruled by ' + p.sunSign.planet + ')' + (p.ascendant && p.ascendant.sign ? ', how their ' + p.ascendant.sign + ' Ascendant colors the lens the world first meets them through' : '') + ', and how ' + p.tree.name + ' on the Tree of Life places this soul at a specific energetic address in creation. Explain what the Codex Archetype ' + ca + ' means as a living identity \u2014 not a label but a mandate.' + (p.node && p.node.northSign ? (' If it fits naturally, name their North Node in ' + p.node.northSign + ' as the lifelong outward direction the soul is growing toward and their South Node in ' + p.node.southSign + ' as the inward comfort zone they are moving away from \u2014 this is a lifelong developmental axis, not a daily forecast, so treat it as one more coordinate on the same portrait rather than a separate topic.' + (p.node.activePole ? (' Note also that ' + p.firstName + ' is moving through a real, present-tense activation of their ' + (p.node.activePole === 'north' ? 'North' : 'South') + ' Node right now \u2014 a season worth naming explicitly, since it is not the everyday state of this axis.') : '')) : '') + (p.nodeDecanCards ? (' In the language of the decans, that same Node axis also names one Minor Arcana card apiece: the ' + p.nodeDecanCards.northNodeCard.card + ' for the North Node \u2014 name this as the energy ' + p.firstName + ' is growing TOWARD \u2014 and the ' + p.nodeDecanCards.southNodeCard.card + ' for the South Node \u2014 name this as the shadow/comfort-zone energy ' + p.firstName + ' is moving AWAY from. Frame this as a growth trajectory, not a moral judgment: the South Node card is not "bad," it is simply the familiar gravity the North Node card is inviting ' + p.firstName + ' beyond. Make clear the placement itself is fixed \u2014 only how ' + p.firstName + ' works with it, moment by moment, is a matter of choice. Do not explain decans, degrees, or planetary rulerships to the reader \u2014 simply name the cards and their meaning.') : '') + (quizArchetypeMatched ? (' Also work in, naturally and once, that before this reading was even generated, ' + p.firstName + ' took the fun, personality-based Archetype Quiz in this same browser and it guessed ' + ca + ' \u2014 the same Archetype this real chart just landed on independently; frame this as one more instance of convergence across systems, the way this reading already treats the Life Path/Sun Sign/Sephirah agreement, and be clear the quiz itself is not a calculated system, just an honest personality-based guess that happened to land in the same place as the real math.') : '') + ' End by naming the specific gift this soul arrived with, and name it as a thread the reading will keep picking back up \u2014 the same gift the reader will recognize again in the Tarot archetype, the shadow work, and the closing blessing.\n'
-    + 'Page 2 \u2014 ARCHETYPAL SIGNATURE: Explore the full mythic narrative. ' + tc.card + ' (Path ' + tc.path + ', letter ' + tc.letter + ') is the archetype ' + p.firstName + ' is living' + (p.lifePathTrumpCard ? ', confirmed by the Life Path Trump Card ' + p.lifePathTrumpCard.numeral + ' ' + p.lifePathTrumpCard.card : '') + '. Explain what this card means as a life-force not just a symbol, how the ' + p.sunSign.sign + ' Sun amplifies or challenges this path, and how the Kabbalistic letter ' + tc.letter + ' encodes a specific teaching in their very name. Name the mythic figures, gods, or archetypes associated with this path. Explicitly tie this Tarot archetype back to the Life Path ' + p.lifePath + ' and Codex Archetype ' + ca + ' named on Page 1 — show that the Tarot card is not a second, unrelated topic but the same mandate speaking in a different language, and say so directly. Describe what it feels like to embody ' + tc.card + ' fully vs. when it is suppressed.\n'
+    + 'Page 1 \u2014 IDENTITY ESSENCE: Open with the exact phrase "' + p.firstName + ', you are ' + ca + '." Then paint a full-portrait synthesis: how Life Path ' + p.lifePath + ' (' + lpTitle + ') shapes the core drive, how ' + p.sunSign.sign + ' Sun infuses it with elemental character (' + p.sunSign.element + ', ruled by ' + p.sunSign.planet + ')' + (p.ascendant && p.ascendant.sign ? ', how their ' + p.ascendant.sign + ' Ascendant colors the lens the world first meets them through' : '') + ', and how ' + p.tree.name + ' on the Tree of Life places this soul at a specific energetic address in creation. Explain what the Codex Archetype ' + ca + ' means as a living identity \u2014 not a label but a mandate.' + (p.node && p.node.northSign ? (' If it fits naturally, name their North Node in ' + p.node.northSign + ' as the lifelong outward direction the soul is growing toward and their South Node in ' + p.node.southSign + ' as the inward comfort zone they are moving away from \u2014 this is a lifelong developmental axis, not a daily forecast, so treat it as one more coordinate on the same portrait rather than a separate topic.' + (p.node.activePole ? (' Note also that ' + p.firstName + ' is moving through a real, present-tense activation of their ' + (p.node.activePole === 'north' ? 'North' : 'South') + ' Node right now \u2014 a season worth naming explicitly, since it is not the everyday state of this axis.') : '')) : '') + (p.nodeDecanCards ? (' In the language of the decans, that same Node axis also names one Minor Arcana card apiece: the ' + p.nodeDecanCards.northNodeCard.card + ' for the North Node \u2014 name this as the energy ' + p.firstName + ' is growing TOWARD \u2014 and the ' + p.nodeDecanCards.southNodeCard.card + ' for the South Node \u2014 name this as the shadow/comfort-zone energy ' + p.firstName + ' is moving AWAY from. Frame this as a growth trajectory, not a moral judgment: the South Node card is not "bad," it is simply the familiar gravity the North Node card is inviting ' + p.firstName + ' beyond. Make clear the placement itself is fixed \u2014 only how ' + p.firstName + ' works with it, moment by moment, is a matter of choice. Do not explain decans, degrees, or planetary rulerships to the reader \u2014 simply name the cards and their meaning.') : '') + (quizArchetypeMatched ? (' Also work in, naturally and once, that before this reading was even generated, ' + p.firstName + ' took the fun, personality-based Archetype Quiz in this same browser and it guessed ' + ca + ' \u2014 the same Archetype this real chart just landed on independently; frame this as one more instance of convergence across systems, the way this reading already treats the Life Path/Sun Sign/Sephirah agreement, and be clear the quiz itself is not a calculated system, just an honest personality-based guess that happened to land in the same place as the real math.') : '') + (p.axisRole && AXIS_ROLES[p.axisRole] ? (' Also name their role on the Tree\'s own architecture: ' + p.firstName + ' carries ' + AXIS_ROLES[p.axisRole].pillar + ' \u2014 ' + AXIS_ROLES[p.axisRole].title + '. ' + AXIS_ROLES[p.axisRole].description + ' Present this as the shape ' + p.firstName + ' brings into any structure or relationship, not a solitary trait.') : '') + ' End by naming the specific gift this soul arrived with, and name it as a thread the reading will keep picking back up \u2014 the same gift the reader will recognize again in the Tarot archetype, the shadow work, and the closing blessing.\n'
+    + 'Page 2 \u2014 ARCHETYPAL SIGNATURE: Explore the full mythic narrative. ' + tc.card + ' (Path ' + tc.path + ', letter ' + tc.letter + ') is the archetype ' + p.firstName + ' is living' + (p.lifePathTrumpCard ? ', confirmed by the Life Path Trump Card ' + p.lifePathTrumpCard.numeral + ' ' + p.lifePathTrumpCard.card : '') + '. Explain what this card means as a life-force not just a symbol, how the ' + p.sunSign.sign + ' Sun amplifies or challenges this path, and how the Kabbalistic letter ' + tc.letter + ' encodes a specific teaching in their very name. Name the mythic figures, gods, or archetypes associated with this path. Explicitly tie this Tarot archetype back to the Life Path ' + p.lifePath + ' and Codex Archetype ' + ca + ' named on Page 1 — show that the Tarot card is not a second, unrelated topic but the same mandate speaking in a different language, and say so directly. Describe what it feels like to embody ' + tc.card + ' fully vs. when it is suppressed.' + (p.primaryPath && p.primaryPath.viaKetherBridge ? ' Because ' + p.firstName + '\'s Life Path carries the Master Number 11, name the Kether Bridge explicitly: the Trump Card path does not follow the standard formula, it connects directly to Kether, the crown Sephirah, a rare direct wiring reserved for the most intuitively-charged Master Number.' : '') + (p.primaryPath && p.primaryPath.masterCoActive ? ' Because ' + p.firstName + '\'s Life Path carries the Master Number 33, name that it does not resolve to a single Trump Card but two, co-active at once (' + (p.trumpPaths && p.trumpPaths[0] ? p.trumpPaths[0].card : 'The World') + ' and ' + (p.trumpPaths && p.trumpPaths[1] ? p.trumpPaths[1].card : 'The Lovers') + '), running as one braided current rather than a sequence to move through \u2014 read both cards as one teaching in stereo.' : '') + ' Also name that on Metatron\'s Cube, ' + p.firstName + '\'s elemental current (' + p.sunSign.element + ') translates into the suit of ' + (p.elementSuit || 'this element\'s suit') + ', the same suit their Soul Card and Court Card are drawn from later in this reading \u2014 the suit is simply the element speaking in the language of the Minor Arcana, not a second, unrelated system.' + '\n'
     + 'Page 3 \u2014 FREQUENCY PATTERN: Decode the name. Life Path ' + p.lifePath + ' is the birth frequency. Expression ' + (p.expression||'?') + ' is the gift encoded in every letter of "' + p.firstName + '". Soul Urge ' + (p.soulUrge||'?') + ' is the private longing beneath the surface. Gematria total ' + (p.gematria?p.gematria.total:'?') + ' reducing to ' + (p.gematria?p.gematria.reduced:'?') + ' is the name\'s sacred numerical signature.' + (p.chaldean ? ' The Chaldean compound of the name ' + p.firstName + ' is actually called by resolves to ' + p.chaldean.compound + ' (' + p.chaldean.reduced + '), a living-identity number layered atop the birth frequency.' : '') + ' Explicitly connect the Gematria total ' + (p.gematria?p.gematria.total:'?') + ' back to the Life Path ' + p.lifePath + ' established on Page 1 \u2014 name both numbers together and say plainly why a name-frequency and a birth-frequency landing on the same core tone is not coincidence but confirmation, two instruments playing the same note. Explain what happens when ' + p.firstName + ' aligns with vs. resists this frequency.\n'
     + 'Page 4 \u2014 THE FIELD GEOMETRY: ' + p.firstName + '\'s identity is a living Egg of Life \u2014 eight interlocking circles of force. Map which nodes are most activated: ' + p.tree.name + ' (Kabbalah), ' + tc.card + ' (Tarot), ' + p.sunSign.sign + ' (Astrology), Life Path ' + p.lifePath + ' (Numerology), gematria ' + (p.gematria?p.gematria.reduced:'?') + ' (Gematria), and Sacred Geometry as the container. Explain what it means that these systems converge on a single being — specifically call out at least one node where two systems from earlier pages (e.g. the Life Path from Page 1 and the Gematria reduction from Page 3, or the Tarot path from Page 2 and the Sephirah) sit on the same point of the geometry, not adjacent-but-separate points. Describe the energetic field this soul radiates and how others experience it. Name the specific intersection points where power concentrates.\n'
-    + 'Page 5 \u2014 SHADOW & GIFT: Be specific and unflinching. The shadow of ' + tc.card + ' for someone with ' + p.sunSign.sign + ' energy is specific \u2014 name it precisely. Describe the exact pattern that repeats when this shadow is unconscious. Then name the exact gift that emerges when it is integrated. Include what the ' + p.tree.name + ' position on the Tree reveals about the specific initiation ' + p.firstName + ' is moving through. This section should feel like someone finally named something the reader has always felt but never had words for.\n'
+    + 'Page 5 \u2014 SHADOW & GIFT: Be specific and unflinching. The shadow of ' + tc.card + ' for someone with ' + p.sunSign.sign + ' energy is specific \u2014 name it precisely. Describe the exact pattern that repeats when this shadow is unconscious. Then name the exact gift that emerges when it is integrated. Include what the ' + p.tree.name + ' position on the Tree reveals about the specific initiation ' + p.firstName + ' is moving through. This section should feel like someone finally named something the reader has always felt but never had words for.' + (p.shadowCardPath ? (' Metatron\'s Cube names this shadow even more precisely: the path running from ' + p.firstName + '\'s Soul Sephirah, ' + p.tree.name + ', toward Malkuth is the ' + p.shadowCardPath.card + ' (' + p.shadowCardPath.numeral + ', "' + p.shadowCardPath.keyword + '") \u2014 name this specific card as the exact corridor ' + p.firstName + '\'s unintegrated material travels when avoided rather than faced head-on, not a generic "shadow" in the abstract.') : '') + '\n'
     + 'Page 6 \u2014 THE HIDDEN ARCHITECTURE: The paths flowing into and out of ' + p.tree.name + ' on the Tree of Life are the hidden curriculum of ' + p.firstName + '\'s spiritual life. Name the specific adjacent Sephiroth and what each corridor of initiation teaches. ' + (p.hiddenMaster ? 'Hidden Master Number ' + p.hiddenMaster + ' layers a second frequency over everything \u2014 explain what this master vibration demands and how it interacts with Life Path ' + p.lifePath + '. ' : '') + (p.nameHiddenMasters && p.nameHiddenMasters.length ? 'A deeper audit of the full birth name also surfaces its own Hidden Master frequencies (' + formatNameHiddenMasters(p.nameHiddenMasters) + ') \u2014 name-field callings distinct from the Life Path itself. ' : '') + 'Discuss the Hebrew letter system encoded in the name and Tarot path.' + (p.hebrewSoulCorrespondence ? ' Weave in the Hebrew Soul Correspondence directly: the birth name transliterated to Hebrew consonants (' + p.hebrewSoulCorrespondence.hebrewConsonants + ') carries a real gematria of ' + p.hebrewSoulCorrespondence.gematriaTotal + (p.hebrewSoulCorrespondence.archangelMatches.length ? ', matching Archangel ' + p.hebrewSoulCorrespondence.archangelMatches[0].name + ' (' + p.hebrewSoulCorrespondence.archangelMatches[0].hebrew + ' = ' + p.hebrewSoulCorrespondence.archangelMatches[0].value + ') — name this connection explicitly, showing the arithmetic.' : ', with no Archangel match at that exact number — state this plainly rather than forcing a connection.') + ' Also name the 72 Names position (' + p.hebrewSoulCorrespondence.nameOf72.position + ': ' + p.hebrewSoulCorrespondence.nameOf72.name + ') as the name\'s corresponding position among the 72 Names.' : '') + ' Explain what the deeper architecture reveals about purpose that the surface numbers only hint at.\n'
     + 'Page 7 \u2014 TIMING & CYCLES: Personal Year ' + p.personalYear2026 + ' in 2026 has a specific energetic quality \u2014 describe it fully. What is this year asking ' + p.firstName + ' to do, release, begin, or complete? How does Personal Year ' + p.personalYear2026 + ' interact with the Codex Archetype ' + ca + '? Name it as the current chapter of the same Life Path ' + p.lifePath + ' story established on Page 1 — this cycle is that same core thread in motion through time — at most one light sentence acknowledging these numbers nest within each other, not an explanation of the mechanism.' + (p.personalMonth != null && p.personalDay != null ? (' Then narrow the lens twice more: describe what Personal Month ' + p.personalMonth + ' feels like and invites this month, and what Personal Day ' + p.personalDay + ' feels like and invites today specifically — focus on the lived feeling and the invitation, not on how the numbers are derived from one another.') : '') + (pdwFmtPrompt ? (' Close this page by naming the Personal Day Wildcard: today wildcards toward ' + pdwFmtPrompt.majorPhrase + ', with a small pool of companion cards nearby (' + pdwFmtPrompt.poolSentences + '). Frame this with genuinely invitational language — "worth noticing," "a door that is open today," "one possibility among the pool" — never assignment language like "you are" or "this is your card," and never explain how the pool of cards was assembled. Make explicit that this is a live, temporary possibility for today only, gone once tomorrow arrives, and is separate from the fixed, birth-locked ' + tc.card + ' Trump Card named earlier — never conflate the two or imply the wildcard replaces or outranks it.') : '') + ' Name the specific opportunities and risks of this cycle. Describe the 9-year cycle this year sits within and where ' + p.firstName + ' is in that larger arc. What decisions made in 2026 will echo for years to come?\n'
-    + 'Page 7 \u2014 TIMING & CYCLES: Personal Year ' + p.personalYear2026 + ' in 2026 has a specific energetic quality \u2014 describe it fully. What is this year asking ' + p.firstName + ' to do, release, begin, or complete? How does Personal Year ' + p.personalYear2026 + ' interact with the Codex Archetype ' + ca + '? Name it as the current chapter of the same Life Path ' + p.lifePath + ' story established on Page 1 — this cycle number is not a new topic, it is that same core number in motion through time.' + (p.personalMonth != null && p.personalDay != null ? (' Then narrow the lens twice more: explain how Personal Month ' + p.personalMonth + ' focuses this year\'s theme onto the present month, and how Personal Day ' + p.personalDay + ' focuses it once more onto today specifically — make explicit that Personal Day, Personal Month, and Personal Year are the same cycle at three nested scales, not three separate topics.') : '') + ' Name the specific opportunities and risks of this cycle. Describe the 9-year cycle this year sits within and where ' + p.firstName + ' is in that larger arc. What decisions made in 2026 will echo for years to come?\n'
-    + 'Page 8 \u2014 RELATIONAL GEOMETRY: Describe the full relational field ' + p.firstName + ' emanates. Life Path ' + p.lifePath + ' creates a specific type of partner dynamic \u2014 explain it in depth. The ' + tc.card + ' archetype shapes how ' + p.firstName + ' shows up in love, what they unconsciously seek, and what they need to feel truly met. Describe the element (' + p.sunSign.element + ') in relationship: what it attracts, what it resists. Name the Life Paths and archetypes most naturally resonant with ' + p.firstName + '. Include what sacred partnership looks like for this Codex Archetype.\n'
-    + 'Page 7 \u2014 TIMING & CYCLES: Personal Year ' + p.personalYear2026 + ' in 2026 has a specific energetic quality \u2014 describe it fully. What is this year asking ' + p.firstName + ' to do, release, begin, or complete? How does Personal Year ' + p.personalYear2026 + ' interact with the Codex Archetype ' + ca + '? Name it as the current chapter of the same Life Path ' + p.lifePath + ' story established on Page 1 — this cycle number is not a new topic, it is that same core number in motion through time. Name the specific opportunities and risks of this cycle. Describe the 9-year cycle this year sits within and where ' + p.firstName + ' is in that larger arc. What decisions made in 2026 will echo for years to come?\n'
     + 'Page 8 \u2014 RELATIONAL GEOMETRY: Describe the full relational field ' + p.firstName + ' emanates. Life Path ' + p.lifePath + ' creates a specific type of partner dynamic \u2014 explain it in depth. The ' + tc.card + ' archetype shapes how ' + p.firstName + ' shows up in love, what they unconsciously seek, and what they need to feel truly met. Describe the element (' + p.sunSign.element + ') in relationship: what it attracts, what it resists. Name the Life Paths and archetypes most naturally resonant with ' + p.firstName + '. Include what sacred partnership looks like for this Codex Archetype.' + (p.node && p.node.northSign ? (' Their North Node in ' + p.node.northSign + ' also names what kind of partnership stretches them toward growth, versus the South Node in ' + p.node.southSign + ' describing the relational comfort zone that feels safest but can become a rut — name both plainly as a lifelong relational axis, not a prediction.') : '') + '\n'
     + 'Page 9 \u2014 CAREER, PURPOSE & AIN SOPH AUR: What is ' + p.firstName + ' building in this lifetime? Use Expression ' + (p.expression||'?') + ' and Life Path ' + p.lifePath + ' to map the specific domains where this soul is meant to contribute. Name the career fields, creative expressions, leadership roles, or service paths aligned with ' + ca + '.' + (p.soulCard && p.courtCard ? ' Weave in the Metatron\'s Cube reading \u2014 Soul Card ' + p.soulCard.name + ' and Court Card ' + p.courtCard.name + ' \u2014 as the geometry beneath this purpose.' : '') + (p.zodiacalCourtCard ? ' Separately, also name the Zodiacal Court Card (Sun placement) \u2014 the ' + p.zodiacalCourtCard.name + ' \u2014 as a second, independent Court Card finding reached through ' + p.firstName + '\'s own Sun placement in the sky rather than the Sephirah, never implying it replaces or outranks the Metatron\'s Cube Court Card named just above.' : '') + ' Describe the legacy this soul is here to leave. Before the blessing, write one real synthesis paragraph \u2014 not a generic "everything is connected" statement, but naming at least two or three SPECIFIC cross-system pairings from earlier in this reading and stating outright why they are not a coincidence (for example: Life Path ' + p.lifePath + ' and the Trump Card ' + trumpCardName + ' arriving at the same core teaching; the Gematria reduction and the Sephirah ' + p.tree.name + ' pointing at the same address; the Personal Year and the Codex Archetype moving in the same direction). Then close with Celestia\'s full personal blessing to ' + p.firstName + ' invoking AIN SOPH AUR \u2014 warm, specific, and sacred. This closing should feel like a blessing received from the oracle herself, one who has been reading all nine pages as one chart, not nine.';
 
