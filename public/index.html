@@ -1007,6 +1007,70 @@ body {
         </div>
       </div>
 
+      <!-- Enhanced Free Voice (Beta) — Kokoro-82M, an open-source
+           (Apache-2.0) neural TTS model running entirely client-side via
+           WASM through the kokoro-js npm package (itself built on
+           Transformers.js/onnxruntime-web). Sits BETWEEN the default free
+           browser voice above and the paid Azure upgrade below as a third,
+           opt-in tier -- noticeably more natural than the robotic default
+           browser voice, still $0 and still nothing sent to any server, at
+           the cost of a one-time ~90MB model download the first time it's
+           enabled (cached by the browser afterward). See
+           loadKokoroVoice()/kokoroSpeak()/isKokoroReady() and
+           docs/CODEX_LOGIC_V07.md Part XXXII. -->
+      <div data-id="298" style="margin-bottom:1.4rem;padding-bottom:1.2rem;border-bottom:1px dashed rgba(176,138,255,0.15);">
+        <div data-id="299" style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#c9a84c;display:block;margin-bottom:0.4rem;">🧬 ENHANCED FREE VOICE (BETA) — OPEN-SOURCE NEURAL VOICE</div>
+        <p data-id="300" style="font-size:0.78rem;color:#8a7aaa;line-height:1.6;margin-bottom:0.6rem;">A free, open-source neural voice (Kokoro-82M, Apache-2.0 licensed) that sounds noticeably more natural than the default browser voice above. It still runs entirely in your browser — nothing is ever sent to a server — but the first time you enable it, it has to download a one-time set of model weights (about 90MB, quantized) before it can speak. After that first download your browser caches it and every later reading uses it instantly. This is a completely different, smaller technology than the Azure upgrade below: it does not use Azure's named voices ("Aria," "Natasha," etc.) — Kokoro ships its own small set of named voices, picked below.</p>
+        <select data-id="301" id="kokoro-voice-select" class="cosmic-select" style="width:100%;margin-bottom:0.6rem;">
+          <optgroup label="— US ENGLISH: FEMALE —">
+            <option value="af_heart">Heart — American ✦ Recommended</option>
+            <option value="af_bella">Bella — American</option>
+            <option value="af_nicole">Nicole — American</option>
+            <option value="af_sarah">Sarah — American</option>
+            <option value="af_nova">Nova — American</option>
+            <option value="af_sky">Sky — American</option>
+            <option value="af_alloy">Alloy — American</option>
+            <option value="af_aoede">Aoede — American</option>
+            <option value="af_jessica">Jessica — American</option>
+            <option value="af_kore">Kore — American</option>
+            <option value="af_river">River — American</option>
+          </optgroup>
+          <optgroup label="— US ENGLISH: MALE —">
+            <option value="am_michael">Michael — American</option>
+            <option value="am_adam">Adam — American</option>
+            <option value="am_echo">Echo — American</option>
+            <option value="am_eric">Eric — American</option>
+            <option value="am_fenrir">Fenrir — American</option>
+            <option value="am_liam">Liam — American</option>
+            <option value="am_onyx">Onyx — American</option>
+            <option value="am_puck">Puck — American</option>
+            <option value="am_santa">Santa — American</option>
+          </optgroup>
+          <optgroup label="— BRITISH ENGLISH: FEMALE —">
+            <option value="bf_emma">Emma — British</option>
+            <option value="bf_isabella">Isabella — British</option>
+            <option value="bf_alice">Alice — British</option>
+            <option value="bf_lily">Lily — British</option>
+          </optgroup>
+          <optgroup label="— BRITISH ENGLISH: MALE —">
+            <option value="bm_george">George — British</option>
+            <option value="bm_fable">Fable — British</option>
+            <option value="bm_lewis">Lewis — British</option>
+            <option value="bm_daniel">Daniel — British</option>
+          </optgroup>
+        </select>
+        <div data-id="302" style="display:flex;gap:0.6rem;margin-bottom:0.6rem;flex-wrap:wrap;">
+          <button data-id="303" id="kokoro-enable-btn" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.55rem 1.2rem;background:linear-gradient(135deg,#c9a84c,#f0d070);color:#0a0015;font-weight:700;font-size:0.82rem;border:none;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;">⬇ Enable &amp; Download Voice</button>
+          <button data-id="304" id="kokoro-test-btn" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.55rem 1.2rem;background:none;border:1px solid rgba(176,138,255,0.3);color:#b08aff;font-size:0.82rem;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;">🔊 Test Voice</button>
+        </div>
+        <div data-id="305" id="kokoro-progress-wrap" style="display:none;margin-bottom:0.6rem;">
+          <div style="background:rgba(176,138,255,0.1);border-radius:20px;height:8px;overflow:hidden;">
+            <div id="kokoro-progress-bar" style="background:linear-gradient(135deg,#c9a84c,#f0d070);height:100%;width:0%;transition:width 0.2s;"></div>
+          </div>
+        </div>
+        <div data-id="306" id="kokoro-voice-status" style="font-size:0.75rem;color:#5a4a7a;min-height:1.2em;margin-top:0.3rem;">This device/browser must support WebAssembly (nearly all modern browsers do). If the download or setup ever fails, readings simply keep narrating with the default free browser voice above — this tier never breaks narration.</div>
+      </div>
+
       <div data-id="270" style="margin-bottom:0.8rem;">
         <label data-id="271" style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#c9a84c;display:block;margin-bottom:0.4rem;">API KEY</label>
         <input data-id="272" type="password" id="azure-api-key-input" class="cosmic-input" placeholder="Azure Speech subscription key" style="font-family:'Courier New',monospace;font-size:0.88rem;" />
@@ -1553,6 +1617,210 @@ function readBrowserVoiceRate() {
   return 0.95;
 }
 
+// ===========================
+// ENHANCED FREE VOICE (BETA) — Kokoro-82M open-source neural voice
+// ===========================
+// Kokoro-82M (hexgrad, Apache-2.0 license) via the "kokoro-js" npm package,
+// itself built on Transformers.js/onnxruntime-web. Runs entirely
+// client-side (WASM) — nothing is ever sent to a server. Sits BETWEEN the
+// default free browser voice (above) and the paid Azure upgrade (below) as
+// a third, opt-in tier. See the admin panel's "Enhanced Free Voice (Beta)"
+// section and docs/CODEX_LOGIC_V07.md Part XXXII for the full write-up.
+//
+// Real, verified facts (checked against the npm registry and the model's
+// own GitHub repo/README before writing this, not guessed):
+//   - Package: kokoro-js, Apache-2.0, currently published at version 1.2.1.
+//     Its package.json declares both an "unpkg" and "jsdelivr" field
+//     pointing at "./dist/kokoro.web.js" — an ESM bundle built specifically
+//     for the browser (rollup.config.js in the hexgrad/kokoro repo builds
+//     three separate targets; kokoro.web.js is the browser one, with
+//     @huggingface/transformers bundled in rather than left external).
+//   - Model: "onnx-community/Kokoro-82M-v1.0-ONNX" on Hugging Face — the
+//     exact model id kokoro-js's own README example uses. The ONNX export
+//     comes in several quantizations; "q8" (8-bit quantized) is roughly
+//     90MB, vs. ~326MB for the unquantized fp32 export. "q8" + device
+//     "wasm" is deliberately used below (not WebGPU/fp32) to keep the
+//     one-time download in a range that's reasonable to ask a free-tier
+//     visitor to opt into.
+//   - Kokoro ships a small FIXED set of 28 named English voices (11 US
+//     female, 9 US male, 4 British female, 4 British male) — no custom
+//     voice cloning, no arbitrary named voices the way Azure has "Aria"/
+//     "Natasha"/etc. The full, real list (from kokoro.js/src/voices.js in
+//     the hexgrad/kokoro repo) is what populates the <select> above.
+//   - generate(text, { voice, speed }) DOES support a numeric speed
+//     multiplier (default 1) — confirmed directly from kokoro.js's own
+//     source (kokoro.js/src/kokoro.js). So the existing "Narration Speed"
+//     slider (readBrowserVoiceRate()) applies to this tier too, unlike a
+//     library that turned out not to support rate control at all.
+//   - generate() is async and returns a Transformers.js RawAudio object
+//     (24kHz PCM) with a .toBlob() method — there is no direct
+//     SpeechSynthesisUtterance equivalent, so playback goes through a real
+//     <audio> element via the exact same currentAudio/URL.createObjectURL
+//     pattern azureSpeak() (above) already uses, so mute/stop and the rest
+//     of the app's playback-state wiring keep working unmodified regardless
+//     of which voice tier is actually speaking.
+//
+// Loaded lazily via a dynamic import() of the pinned CDN URL below — NOT a
+// <script> tag in <head> — specifically so nothing about this tier is
+// fetched, parsed, or downloaded until the admin panel's "Enable & Download
+// Voice" button is actually clicked. Normal page load, and every reading
+// for the ~99% of people who never open this setting, is completely
+// unaffected by this feature's mere existence in the codebase.
+var KOKORO_CDN_URL = 'https://cdn.jsdelivr.net/npm/kokoro-js@1.2.1/dist/kokoro.web.js';
+var KOKORO_MODEL_ID = 'onnx-community/Kokoro-82M-v1.0-ONNX';
+
+var _kokoroTTS = null;          // the loaded KokoroTTS instance, for THIS page session only -- never persisted, never auto-restored on a fresh page load
+var _kokoroLoadPromise = null;  // in-flight load, so an overlapping Test-Voice click while Enable is still downloading shares the same download rather than starting a second one
+var _kokoroInitFailed = false;  // sticky per-session flag: once a load OR a generate() call has failed, stop retrying Kokoro on our own for the rest of this session and just use the default browser voice
+
+// The gate every narration call site checks (via browserSpeak() below).
+// Deliberately requires BOTH the saved admin preference AND a successful
+// load THIS session -- a stale "enabled" flag left over from a previous
+// visit never silently re-triggers a ~90MB download in the middle of a
+// reading. After a page refresh, re-opening Voice Settings and clicking
+// "Enable & Download Voice" again is what actually starts using it again.
+function isKokoroReady() {
+  return !_kokoroInitFailed && localStorage.getItem('enhanced_voice_enabled') === 'true' && !!_kokoroTTS;
+}
+
+function getKokoroVoiceName() {
+  return localStorage.getItem('enhanced_voice_name') || 'af_heart';
+}
+
+// Loads (lazily, once per session, de-duped) the kokoro-js library and the
+// Kokoro-82M ONNX weights. onProgress(pct, label), if given, is called
+// repeatedly: pct is a 0-100 integer once real loaded/total byte counts are
+// available, or null for status-only updates (still worth showing a label
+// for) before byte counts are known. Resolves with the ready KokoroTTS
+// instance; rejects (never hangs, never silently swallows) on any failure
+// so callers can show a real error and fall back to the default voice.
+function loadKokoroVoice(onProgress) {
+  if (_kokoroTTS) return Promise.resolve(_kokoroTTS);
+  if (_kokoroLoadPromise) return _kokoroLoadPromise;
+
+  if (typeof WebAssembly === 'undefined') {
+    return Promise.reject(new Error('This browser does not support WebAssembly, which the enhanced voice requires.'));
+  }
+
+  var promise = (async function() {
+    var mod = await import(KOKORO_CDN_URL);
+    var KokoroTTS = mod.KokoroTTS;
+    if (!KokoroTTS) throw new Error('kokoro-js loaded but did not export KokoroTTS as expected.');
+    var tts = await KokoroTTS.from_pretrained(KOKORO_MODEL_ID, {
+      dtype: 'q8',    // ~90MB quantized weights -- see the size note in the block comment above
+      device: 'wasm', // works in every modern browser; WebGPU is not attempted automatically (see note above on why)
+      progress_callback: function(info) {
+        if (!onProgress || !info) return;
+        // Transformers.js progress events vary by `status` -- only
+        // 'progress' reliably carries loaded/total byte counts to compute
+        // a real percentage from. Other statuses just update the label so
+        // the person sees *something* moving before byte counts exist yet.
+        if (info.status === 'progress' && typeof info.loaded === 'number' && typeof info.total === 'number' && info.total > 0) {
+          onProgress(Math.round((info.loaded / info.total) * 100), info.file || 'model weights');
+        } else if (info.status === 'initiate') {
+          onProgress(null, 'Starting download: ' + (info.file || 'model files') + '…');
+        } else if (info.status === 'done') {
+          onProgress(null, 'Finished: ' + (info.file || 'a file') + '.');
+        } else if (info.status === 'ready') {
+          onProgress(100, 'Ready.');
+        }
+      }
+    });
+    _kokoroTTS = tts;
+    return tts;
+  })();
+
+  _kokoroLoadPromise = promise;
+  promise.catch(function(err) {
+    console.error('[Kokoro] failed to load the enhanced voice:', err);
+    _kokoroInitFailed = true;
+  }).finally(function() {
+    _kokoroLoadPromise = null;
+  });
+
+  return promise;
+}
+
+// Splits text into chunks for Kokoro the same way _trySpeakAzureChunks
+// (above) does for Azure, but shorter (400 chars vs. Azure's 1800): Kokoro
+// runs inference on THIS device's own CPU/WASM runtime rather than a fast
+// remote server, so shorter chunks keep the wait before the first sound
+// plays reasonable, and let stopSpeech()/mute actually interrupt between
+// chunks instead of only after an entire multi-paragraph section finishes
+// generating.
+function _kokoroChunkText(fullText) {
+  var sentences = fullText.match(/[^.!?]+[.!?]+/g) || [fullText];
+  var chunks = [];
+  var current = '';
+  for (var i = 0; i < sentences.length; i++) {
+    if ((current + sentences[i]).length > 400 && current.length > 0) {
+      chunks.push(current.trim());
+      current = sentences[i];
+    } else {
+      current += sentences[i];
+    }
+  }
+  if (current.trim()) chunks.push(current.trim());
+  return chunks;
+}
+
+// Generates and plays exactly one chunk through Kokoro, using the SAME
+// currentAudio + <audio> + URL.createObjectURL contract azureSpeak() (above)
+// already uses -- so the rest of the app's mute/stop/progress wiring, which
+// only ever knows about `currentAudio` and `window.speechSynthesis`, keeps
+// working correctly no matter which voice tier is actually speaking.
+async function _kokoroSpeakChunk(text, voiceName, rate) {
+  var rawAudio = await _kokoroTTS.generate(text, { voice: voiceName, speed: rate });
+  var blob = rawAudio.toBlob();
+  var url = URL.createObjectURL(blob);
+  var audio = new Audio(url);
+  currentAudio = audio;
+  try {
+    await _withTimeout(audio.play(), 5000, '[Kokoro] audio.play()');
+  } catch (playErr) {
+    URL.revokeObjectURL(url);
+    throw playErr;
+  }
+  return new Promise(function(resolve, reject) {
+    audio.addEventListener('ended', function() { URL.revokeObjectURL(url); resolve(); });
+    audio.addEventListener('error', function(e) { URL.revokeObjectURL(url); reject(e); });
+  });
+}
+
+// The enhanced-voice narration path — only ever called from browserSpeak()
+// below, and only when isKokoroReady() is true. Generates and plays
+// chunk-by-chunk (honoring stopSpeech()/mute between chunks exactly like
+// the Azure path does), and on ANY failure mid-reading falls back to the
+// untouched native browser-voice path (_nativeBrowserSpeak, below) for
+// whatever text hadn't played yet — so a Kokoro error never leaves a
+// reading silent, and never breaks the default tier for anyone else.
+async function kokoroSpeak(text, onEnd) {
+  var voiceName = getKokoroVoiceName();
+  // Kokoro's generate() takes a literal speed multiplier (1 = normal) --
+  // see the block comment above confirming this is real, not assumed --
+  // so the same admin "Narration Speed" slider value used for the native
+  // browser voice applies here too.
+  var rate = readBrowserVoiceRate();
+  var chunks = _kokoroChunkText(text);
+  var finished = false;
+  function finish() { if (finished) return; finished = true; if (onEnd) onEnd(); }
+
+  for (var i = 0; i < chunks.length; i++) {
+    if (_speakCancelled || isMuted) { finish(); return; }
+    try {
+      await _kokoroSpeakChunk(chunks[i], voiceName, rate);
+    } catch (e) {
+      console.error('[Kokoro] generation/playback error mid-reading -- falling back to the default browser voice for the remainder of this narration:', e);
+      _kokoroInitFailed = true;
+      currentAudio = null;
+      _nativeBrowserSpeak(chunks.slice(i).join(' '), finish);
+      return;
+    }
+  }
+  currentAudio = null;
+  finish();
+}
+
 // Browser TTS — this is now the DEFAULT free voice path (per project owner
 // request: "just connect the free Microsoft voice that is in the browser...
 // keep the australian Aria or whatever voice my browser is using now").
@@ -1560,7 +1828,17 @@ function readBrowserVoiceRate() {
 // anyone who saves an API key in the admin panel; AppSDK's own voice is kept
 // only as a further fallback (see _fallbackSpeakLong) for environments where
 // speechSynthesis itself isn't available at all.
+//
+// This is also the single integration point for the Enhanced Free Voice
+// (Beta) tier: when it's enabled AND has successfully loaded this session
+// (isKokoroReady()), Kokoro speaks instead -- otherwise every line below is
+// completely unchanged from before this feature existed.
 function browserSpeak(text, onEnd) {
+  if (isKokoroReady()) { kokoroSpeak(text, onEnd); return; }
+  _nativeBrowserSpeak(text, onEnd);
+}
+
+function _nativeBrowserSpeak(text, onEnd) {
   if (!window.speechSynthesis) { if (onEnd) onEnd(); return; }
   window.speechSynthesis.cancel();
   var utter = new SpeechSynthesisUtterance(text);
@@ -4150,6 +4428,129 @@ document.getElementById('browser-voice-test-btn').addEventListener('click', func
 });
 
 // ===========================
+// ENHANCED FREE VOICE (BETA) ADMIN SETTINGS — Kokoro-82M
+// ===========================
+// Restores the saved voice pick and reflects current enabled/loaded state
+// into the button label + status text whenever the admin panel opens.
+// Never touches _kokoroTTS/isKokoroReady() itself — opening the panel must
+// never trigger a download on its own, only the Enable button does that.
+function loadKokoroVoiceSettings() {
+  var select = document.getElementById('kokoro-voice-select');
+  var savedVoice = localStorage.getItem('enhanced_voice_name');
+  if (select && savedVoice) select.value = savedVoice;
+  updateKokoroEnableButton();
+}
+
+function updateKokoroEnableButton() {
+  var btn = document.getElementById('kokoro-enable-btn');
+  var status = document.getElementById('kokoro-voice-status');
+  if (!btn) return;
+  var enabledFlag = localStorage.getItem('enhanced_voice_enabled') === 'true';
+  if (_kokoroTTS && enabledFlag) {
+    btn.textContent = '✅ Enabled — Click to Disable';
+    if (status) { status.textContent = '✅ Enhanced voice is loaded and active for narration this session.'; status.style.color = '#c9a84c'; }
+  } else if (enabledFlag && !_kokoroTTS) {
+    btn.textContent = '⬇ Enable & Download Voice';
+    if (status) { status.textContent = 'Enabled previously, but not loaded this session yet — click to download and activate it again (a page refresh clears the in-memory model, per the note above).'; status.style.color = '#8a7aaa'; }
+  } else {
+    btn.textContent = '⬇ Enable & Download Voice';
+  }
+}
+
+document.getElementById('kokoro-voice-select').addEventListener('change', function() {
+  localStorage.setItem('enhanced_voice_name', this.value);
+});
+
+document.getElementById('kokoro-enable-btn').addEventListener('click', function() {
+  var status = document.getElementById('kokoro-voice-status');
+  var progressWrap = document.getElementById('kokoro-progress-wrap');
+  var progressBar = document.getElementById('kokoro-progress-bar');
+
+  // Already enabled+loaded -- this click means "disable" (no unload of the
+  // in-memory model needed; isKokoroReady() simply stops returning true).
+  if (isKokoroReady()) {
+    localStorage.setItem('enhanced_voice_enabled', 'false');
+    updateKokoroEnableButton();
+    status.textContent = 'Enhanced voice disabled. Readings will use the default free browser voice above again.';
+    status.style.color = '#8a7aaa';
+    return;
+  }
+
+  var select = document.getElementById('kokoro-voice-select');
+  localStorage.setItem('enhanced_voice_name', select.value);
+
+  if (typeof WebAssembly === 'undefined') {
+    status.textContent = '⚠️ This browser does not support WebAssembly, so the enhanced voice cannot run here. The default free browser voice above is completely unaffected.';
+    status.style.color = '#ff9ed2';
+    return;
+  }
+
+  _kokoroInitFailed = false; // an explicit click means "try again", even if a previous attempt this session failed
+  progressWrap.style.display = 'block';
+  progressBar.style.width = '0%';
+  status.textContent = '⬇️ Downloading enhanced voice model (about 90MB, one time only)…';
+  status.style.color = '#b08aff';
+
+  loadKokoroVoice(function(pct, label) {
+    if (typeof pct === 'number') progressBar.style.width = pct + '%';
+    status.textContent = '⬇️ ' + (typeof pct === 'number' ? pct + '% — ' : '') + (label || 'Downloading…');
+    status.style.color = '#b08aff';
+  }).then(function() {
+    localStorage.setItem('enhanced_voice_enabled', 'true');
+    progressBar.style.width = '100%';
+    status.textContent = '✅ Enhanced voice downloaded and ready! Readings will use it for the rest of this session.';
+    status.style.color = '#c9a84c';
+    updateKokoroEnableButton();
+  }).catch(function(err) {
+    console.error('[Kokoro] enable/download failed:', err);
+    localStorage.setItem('enhanced_voice_enabled', 'false');
+    progressWrap.style.display = 'none';
+    status.textContent = '❌ Could not load the enhanced voice (' + (err && err.message ? err.message : 'unknown error') + '). The default free browser voice above still works normally.';
+    status.style.color = '#ff9ed2';
+    updateKokoroEnableButton();
+  });
+});
+
+document.getElementById('kokoro-test-btn').addEventListener('click', function() {
+  var status = document.getElementById('kokoro-voice-status');
+  var progressWrap = document.getElementById('kokoro-progress-wrap');
+  var progressBar = document.getElementById('kokoro-progress-bar');
+  var select = document.getElementById('kokoro-voice-select');
+  var voiceName = select.value;
+  localStorage.setItem('enhanced_voice_name', voiceName);
+
+  if (typeof WebAssembly === 'undefined') {
+    status.textContent = '⚠️ This browser does not support WebAssembly, so the enhanced voice cannot run here.';
+    status.style.color = '#ff9ed2';
+    return;
+  }
+
+  status.textContent = _kokoroTTS ? '🎙️ Testing voice...' : '⬇️ Downloading enhanced voice model (about 90MB, one time only)…';
+  status.style.color = '#b08aff';
+  if (!_kokoroTTS) progressWrap.style.display = 'block';
+
+  loadKokoroVoice(function(pct, label) {
+    if (_kokoroTTS) return; // already loaded -- no need to keep updating the progress bar
+    if (typeof pct === 'number') progressBar.style.width = pct + '%';
+    status.textContent = '⬇️ ' + (typeof pct === 'number' ? pct + '% — ' : '') + (label || 'Downloading…');
+    status.style.color = '#b08aff';
+  }).then(function(tts) {
+    progressWrap.style.display = 'none';
+    status.textContent = '🎙️ Testing voice...';
+    status.style.color = '#b08aff';
+    return _kokoroSpeakChunk('The oracle is ready. Your blueprint awaits.', voiceName, readBrowserVoiceRate());
+  }).then(function() {
+    status.textContent = '✅ Voice test finished.';
+    status.style.color = '#c9a84c';
+  }).catch(function(err) {
+    console.error('[Kokoro] test voice failed:', err);
+    progressWrap.style.display = 'none';
+    status.textContent = '❌ Voice test failed (' + (err && err.message ? err.message : 'unknown error') + '). The default free browser voice above still works normally.';
+    status.style.color = '#ff9ed2';
+  });
+});
+
+// ===========================
 // FREEASTROAPI ADMIN SETTINGS (ASCENDANT)
 // ===========================
 function loadAstroSettings() {
@@ -4280,6 +4681,8 @@ function showAdminPanel() {
   loadAzureSettings();
   // Load Free Browser Voice picker options/selection when admin panel opens
   loadBrowserVoiceSettings();
+  // Load Enhanced Free Voice (Beta) picker/enabled-state when admin panel opens
+  loadKokoroVoiceSettings();
   // Load FreeAstroAPI (Ascendant) settings when admin panel opens
   loadAstroSettings();
   panel.style.display = 'block';
