@@ -3415,6 +3415,67 @@ var PATH_TABLE = [
 function pathByNumber(n){ return PATH_TABLE.find(function(p){ return p.num===n; }); }
 function pathBetween(sephA,sephB){ return PATH_TABLE.find(function(p){ return (p.a===sephA&&p.b===sephB)||(p.a===sephB&&p.b===sephA); }); }
 
+// W3BB CODEX V07 -- Deepened Trump Card treatment, no invented card meanings.
+// Every phrase used here already exists in the codebase: TAROT_PATHS.archetype
+// (the same comma-separated descriptive phrase already printed on Page 2) and
+// PATH_TABLE's own Golden Dawn keyword for that same path number (already used
+// elsewhere for the Life Path Trump Card / Shadow Card, just not yet surfaced
+// for the person's own Tarot Path card on Page 2). This function only unpacks
+// and recombines that existing data -- it never adds a claim about a specific
+// card that is not already traceable to one of those two sources.
+function lowerFirst(s){ return (s && typeof s === 'string') ? s.charAt(0).toLowerCase() + s.slice(1) : s; }
+function trumpCardArchetypeParts(tarotCard){
+  var parts = ((tarotCard && tarotCard.archetype) || '').split(',').map(function(s){ return s.trim(); }).filter(Boolean);
+  var core = parts[0] || (tarotCard && tarotCard.archetype) || '';
+  var second = parts[1] || core;
+  // Only a genuinely distinct third phrase counts as "third" -- most of the
+  // 22 archetype strings carry three comma-separated phrases, but a couple
+  // (e.g. The Fool's "Pure potential, the breath before the first step")
+  // carry only two. Falling back to `second` there would repeat the same
+  // phrase twice in the deepened prose below, so `hasThird` lets that prose
+  // adapt honestly instead of manufacturing a false third layer.
+  var hasThird = !!parts[2];
+  return { core: core, second: second, third: hasThird ? parts[2] : second, hasThird: hasThird };
+}
+// Reader-facing deepening of the existing Page 2 Trump Card treatment: what
+// this card's own already-established archetype phrase and Golden Dawn
+// keyword actually feel like from the inside, in embodied/suppressed form.
+function buildTrumpCardDepth(tarotCard, sunSign){
+  if (!tarotCard || !tarotCard.card) return '';
+  var parts = trumpCardArchetypeParts(tarotCard);
+  var pe = pathByNumber(tarotCard.path);
+  var kw = pe ? pe.keyword : null;
+  var out = '\nAt its root, ' + tarotCard.card + ' is about ' + lowerFirst(parts.core) + '.' + (kw ? ' The Golden Dawn tradition names this exact path’s own keyword as ' + kw + ' — one more word for the same current already named above.' : '') + ' This energy does not stay abstract or symbolic in your life: it shows up, concretely, as ' + lowerFirst(parts.second) + (parts.hasThird ? ', and at its deepest layer, as ' + lowerFirst(parts.third) : '') + '. That layered structure — root' + (parts.hasThird ? ', expression, depth' : ' and expression') + ' — is what ' + tarotCard.card + ' actually feels like from the inside, not merely a picture on a card.\n';
+  out += '\nWhen you are embodying ' + tarotCard.card + ' fully, ' + lowerFirst(parts.second) + ' is not effort — it becomes the shape your days take by default' + (sunSign && sunSign.element && sunSign.sign ? ', the same way the ' + sunSign.element + ' current in your ' + sunSign.sign + ' Sun does not have to be summoned; it is simply how you already move' : '') + '. When it is suppressed instead, that same current does not vanish; it changes address, turning inward until it surfaces as restlessness, a low static hum of ' + lowerFirst(parts.third) + ' with nowhere honest to go. The difference between the two states is rarely about capacity — you already carry ' + tarotCard.card + '’s full charge either way — it is almost always about permission.\n';
+  return out;
+}
+// W3BB CODEX V07 PART XXX -- New connective sentence between the person's
+// PERMANENT Trump Card (fixed at birth, TAROT_PATHS/PATH_TABLE data already
+// established earlier in the reading) and whichever Nodal Choice orientation
+// they picked for TODAY. Draws only on that same card's own archetype phrase
+// and Golden Dawn keyword (see buildTrumpCardDepth above) plus the orientation
+// framing already established in buildNodalChoiceSection() -- no new claim
+// about any specific card is introduced independently of that existing data.
+// Returns '' when there is no orientation chosen or no Trump Card to name, so
+// callers that already guard on nodalChoice/nodeDecanCards stay unaffected.
+function getTrumpCardNodalConnection(nodalChoice, tarotCard){
+  if (!nodalChoice || !tarotCard || !tarotCard.card) return '';
+  var parts = trumpCardArchetypeParts(tarotCard);
+  var pe = pathByNumber(tarotCard.path);
+  var label = pe && pe.keyword ? (parts.core + ', or what the Golden Dawn tradition simply calls ' + pe.keyword) : parts.core;
+  var lead = 'Your ' + tarotCard.card + ' energy does not change day to day — but today, ';
+  if (nodalChoice === 'north') {
+    return lead + 'having leaned toward your North Node’s growth, here is how that permanent current is finding a specific outlet: the same ' + lowerFirst(label) + ' that ' + tarotCard.card + ' has always carried in you is exactly what makes reaching for something unfamiliar today feel less like risk and more like your own nature simply getting room to move forward.';
+  }
+  if (nodalChoice === 'south') {
+    return lead + 'having chosen to work with your South Node’s familiar strength, here is how that permanent current is finding a specific outlet: the same ' + lowerFirst(label) + ' that ' + tarotCard.card + ' has always carried in you is exactly the steady ground that makes resting in what you already know, today, feel like restoration rather than retreat.';
+  }
+  if (nodalChoice === 'both') {
+    return lead + 'having chosen to hold both poles of the axis at once, here is how that permanent current is finding a specific outlet: the same ' + lowerFirst(label) + ' that ' + tarotCard.card + ' has always carried in you is exactly what lets you move toward the unfamiliar and rest in the familiar in the same day, without either one canceling the other out.';
+  }
+  return '';
+}
+
 // W3BB CODEX SECTION 5.5 — Primary Path / Life Path Trump Card
 // Standard rule: mapped = (base mod 22) + 11, clamped [11,32].
 // Life Path 33 (Codex Logic V05, Sections 7.1-7.2): 33 is explicitly "Beyond
@@ -6167,32 +6228,47 @@ function formatPersonalDayWildcard(pdw) {
 // Personal Day Wildcard field (Part XXV). Used both inside
 // getFallbackReading() and in the live DOM note under the Nodal Choice
 // buttons -- one function, not two drifting copies of the same idea.
-function getNodalChoiceReaderSentence(nodalChoice, nodeDecanCards) {
+function getNodalChoiceReaderSentence(nodalChoice, nodeDecanCards, tarotCard) {
   if (!nodalChoice || !nodeDecanCards) return '';
   var north = nodeDecanCards.northNodeCard.card, south = nodeDecanCards.southNodeCard.card;
   var closing = ' This is an expression of the orientation you chose for today, not a prediction of what today will bring.';
+  var sentence = '';
   if (nodalChoice === 'north') {
-    return 'Since you are leaning into your North Node for this reading, read today’s wildcard field through that same growth-and-unfamiliar-possibility lens: let whichever companion card feels least familiar be the one worth trying first, the same way your North Node card, the ' + north + ', keeps inviting you past what is merely comfortable.' + closing;
+    sentence = 'Since you are leaning into your North Node for this reading, read today’s wildcard field through that same growth-and-unfamiliar-possibility lens: let whichever companion card feels least familiar be the one worth trying first, the same way your North Node card, the ' + north + ', keeps inviting you past what is merely comfortable.';
+  } else if (nodalChoice === 'south') {
+    sentence = 'Since you are choosing to work with your South Node for this reading, read today’s wildcard field through a restoration-and-existing-strength lens instead: let whichever companion card feels most familiar be the one you lean on, the same steadying gravity your South Node card, the ' + south + ', already knows how to hold.';
+  } else if (nodalChoice === 'both') {
+    sentence = 'Since you are choosing to hold the axis for this reading, today’s wildcard field becomes a bridge reading: rather than picking between the two poles, look at how your North Node card (the ' + north + ') and South Node card (the ' + south + ') might actually cooperate today — where the ' + north + '’s outward pull could open a door and the ' + south + '’s steadier familiarity could help you walk through it without losing your footing. The wildcard card is the meeting point between them, not a tie-breaker.';
+  } else {
+    return '';
   }
-  if (nodalChoice === 'south') {
-    return 'Since you are choosing to work with your South Node for this reading, read today’s wildcard field through a restoration-and-existing-strength lens instead: let whichever companion card feels most familiar be the one you lean on, the same steadying gravity your South Node card, the ' + south + ', already knows how to hold.' + closing;
-  }
-  if (nodalChoice === 'both') {
-    return 'Since you are choosing to hold the axis for this reading, today’s wildcard field becomes a bridge reading: rather than picking between the two poles, look at how your North Node card (the ' + north + ') and South Node card (the ' + south + ') might actually cooperate today — where the ' + north + '’s outward pull could open a door and the ' + south + '’s steadier familiarity could help you walk through it without losing your footing. The wildcard card is the meeting point between them, not a tie-breaker.' + closing;
-  }
-  return '';
+  // W3BB CODEX V07 -- Part XXX extension: connect the person's PERMANENT
+  // Trump Card (fixed at birth) to whichever Node orientation they chose for
+  // today. Additive to the existing sentence above, never a replacement --
+  // see getTrumpCardNodalConnection()'s comment for the derivation rule.
+  var trumpConnection = getTrumpCardNodalConnection(nodalChoice, tarotCard);
+  return (trumpConnection ? (sentence + ' ' + trumpConnection) : sentence) + closing;
 }
 
 // AI-prompt instruction phrasing of the same idea, for doReading()'s Page 7
 // spec -- an instruction TO Celestia, not reader-facing text itself.
-function getNodalChoicePromptInstruction(nodalChoice, nodeDecanCards, firstName) {
+function getNodalChoicePromptInstruction(nodalChoice, nodeDecanCards, firstName, tarotCard) {
   if (!nodalChoice || !nodeDecanCards) return '';
   var north = nodeDecanCards.northNodeCard.card, south = nodeDecanCards.southNodeCard.card;
   var noPredict = ' Frame this as an expression of the orientation ' + firstName + ' chose for today, not as a prediction of what today will bring.';
-  if (nodalChoice === 'north') return ' ' + firstName + ' has chosen to lean toward their North Node for this reading, so frame today’s wildcard field through a growth-and-unfamiliar-possibility lens, explicitly connecting it back to their North Node card, the ' + north + '.' + noPredict;
-  if (nodalChoice === 'south') return ' ' + firstName + ' has chosen to work with their South Node for this reading, so frame today’s wildcard field through a restoration-and-existing-strength lens, explicitly connecting it back to their South Node card, the ' + south + '.' + noPredict;
-  if (nodalChoice === 'both') return ' ' + firstName + ' has chosen to hold the axis for this reading, so write today’s wildcard field as a bridge reading: examine how their North Node card (' + north + ') and South Node card (' + south + ') might cooperate today rather than compete, naming both by name, and let the wildcard card be the meeting point between them rather than a choice between two options.' + noPredict;
-  return '';
+  var instr = '';
+  if (nodalChoice === 'north') instr = ' ' + firstName + ' has chosen to lean toward their North Node for this reading, so frame today’s wildcard field through a growth-and-unfamiliar-possibility lens, explicitly connecting it back to their North Node card, the ' + north + '.';
+  else if (nodalChoice === 'south') instr = ' ' + firstName + ' has chosen to work with their South Node for this reading, so frame today’s wildcard field through a restoration-and-existing-strength lens, explicitly connecting it back to their South Node card, the ' + south + '.';
+  else if (nodalChoice === 'both') instr = ' ' + firstName + ' has chosen to hold the axis for this reading, so write today’s wildcard field as a bridge reading: examine how their North Node card (' + north + ') and South Node card (' + south + ') might cooperate today rather than compete, naming both by name, and let the wildcard card be the meeting point between them rather than a choice between two options.';
+  else return '';
+  // W3BB CODEX V07 -- Part XXX extension: ask the AI for the same permanent-
+  // Trump-Card-to-chosen-orientation synthesis the fallback reading builds
+  // deterministically via getTrumpCardNodalConnection() -- same idea, phrased
+  // as an instruction to Celestia rather than pre-written reader-facing text.
+  if (tarotCard && tarotCard.card) {
+    instr += ' Also add one more connecting sentence naming that ' + firstName + '’s permanent Trump Card, the ' + tarotCard.card + ' (' + tarotCard.archetype + '), does not change day to day, but explain concretely how that fixed archetype’s own established energy is finding a specific outlet today through this chosen Node orientation — a real synthesis of the fixed card meeting the day’s chosen direction, naming an actual connection between the card’s own keyword/energy and the orientation’s own framing, not two facts stapled together.';
+  }
+  return instr + noPredict;
 }
 
 // Builds the interactive Nodal Choice section's HTML (solo reading only).
@@ -6213,7 +6289,7 @@ function buildNodalChoiceSection(p) {
     return 'flex:1;min-width:150px;padding:0.9rem 0.8rem;border-radius:8px;cursor:pointer;font:600 0.85rem Georgia,serif;text-align:center;transition:all 0.2s;'
       + (isActive ? 'background:#c9a84c;color:#1a0a30;border:1px solid #c9a84c;' : 'background:rgba(176,138,255,0.12);color:#e8e0ff;border:1px solid rgba(176,138,255,0.3);');
   }
-  var liveNote = active ? getNodalChoiceReaderSentence(active, p.nodeDecanCards)
+  var liveNote = active ? getNodalChoiceReaderSentence(active, p.nodeDecanCards, p.tarotCard)
     : 'Choose an orientation above, and see below how it shapes today’s Personal Day possibilities.';
   return ''
     + '<div id="nodal-choice-section" style="margin:2rem 0 2.5rem;padding:1.5rem 1.25rem;border:1px solid rgba(176,138,255,0.25);border-radius:14px;background:rgba(18,8,38,0.4);">'
@@ -6268,7 +6344,7 @@ function setNodalChoice(choice) {
   });
   var noteEl = document.getElementById('nodal-choice-live-note');
   if (noteEl && window._readingProfile && window._readingProfile.nodeDecanCards) {
-    noteEl.textContent = getNodalChoiceReaderSentence(choice, window._readingProfile.nodeDecanCards);
+    noteEl.textContent = getNodalChoiceReaderSentence(choice, window._readingProfile.nodeDecanCards, window._readingProfile.tarotCard);
   }
 }
 
@@ -7873,7 +7949,8 @@ function getFallbackReading(){
   fb+='In the ancient language of the Tarot, you walk the path of '+tc.card+'. This is Path '+tc.path+' on the Tree of Life, encoded through the Hebrew letter '+tc.letter+' \u2014 '+tc.archetype+'.'+(p.lifePathTrumpCard ? ' Your Life Path Trump Card confirms it: '+p.lifePathTrumpCard.numeral+' '+p.lifePathTrumpCard.card+' \u2014 '+p.lifePathTrumpCard.keyword+'.' : '')+'\n\nThe '+tc.card+' does not describe what you do. It describes what you ARE in the world \u2014 the mythic role your soul agreed to play before incarnation. And it is no coincidence that your '+p.sunSign.sign+' Sun and this Tarot archetype vibrate in the same frequency. They confirm each other.\n\nThis path between Sephiroth is not merely symbolic. It is the precise corridor of consciousness your soul travels. The Hebrew letter '+tc.letter+' carries a specific vibrational teaching, and that teaching is written in your very name.\n'
     +(p.primaryPath && p.primaryPath.viaKetherBridge ? '\nBecause your Life Path carries the Master Number 11, your Trump Card path does not follow the standard formula \u2014 it connects directly to Kether, the crown Sephirah, via what the Codex calls the Kether Bridge. This is a rare, direct wiring reserved for the most intuitively-charged Master Number, and it means your hidden architecture skips a rung most charts have to climb one Sephirah at a time.\n' : '')
     +(p.primaryPath && p.primaryPath.masterCoActive ? '\nBecause your Life Path carries the Master Number 33, it does not resolve to a single Trump Card but two, co-active at once \u2014 '+(p.trumpPaths&&p.trumpPaths[0]?p.trumpPaths[0].card:'The World')+' and '+(p.trumpPaths&&p.trumpPaths[1]?p.trumpPaths[1].card:'The Lovers')+', running as one braided current rather than a sequence you move through. Very few charts carry this double signal; read both cards as one teaching in stereo, not two options competing for your attention.\n' : '')
-    +'\nOn Metatron\'s Cube, your elemental current \u2014 '+p.sunSign.element+' \u2014 translates into the suit of '+(p.elementSuit||'this element\'s suit')+', the same suit your Soul Card and Court Card are drawn from later in this reading. Card and suit are not two separate systems bolted together: the suit is simply the element speaking in the language of the Minor Arcana, the same '+p.sunSign.element+' current that shapes your Sun sign showing up again in a different room of the same house.\n\nWhen you are embodying '+tc.card+' fully, it tends to look like decisive follow-through on the very impulse most people talk themselves out of \u2014 you say the thing, you make the move, you close the loop others leave open. When it is suppressed, that same energy does not vanish; it turns inward and shows up as restlessness, a nagging sense of watching your own life from just outside it. The difference is rarely about capacity. It is almost always about permission.\n';
+    +'\nOn Metatron\'s Cube, your elemental current \u2014 '+p.sunSign.element+' \u2014 translates into the suit of '+(p.elementSuit||'this element\'s suit')+', the same suit your Soul Card and Court Card are drawn from later in this reading. Card and suit are not two separate systems bolted together: the suit is simply the element speaking in the language of the Minor Arcana, the same '+p.sunSign.element+' current that shapes your Sun sign showing up again in a different room of the same house.\n'
+    + buildTrumpCardDepth(tc, p.sunSign);
   // W3BB EVOLUTIONARY GEOMETRY (Codex Logic V07 Part XXX) -- an explicitly
   // original W3BB Codex layer, NOT Golden Dawn, NOT Kabbalah, NOT inherited
   // tradition. Purely additive: it never touches the real Trump Card content
@@ -7919,7 +7996,7 @@ function getFallbackReading(){
     // choice into how today's wildcard field is framed. Purely additive --
     // when no choice was made (window._nodalChoice is null), this adds
     // nothing and the paragraph above renders exactly as it always has.
-    var nodalSentence = getNodalChoiceReaderSentence(window._nodalChoice, p.nodeDecanCards);
+    var nodalSentence = getNodalChoiceReaderSentence(window._nodalChoice, p.nodeDecanCards, tc);
     if (nodalSentence) { fb += '\n' + nodalSentence + '\n'; }
   }
   fb+='===PAGE_7_END===\n\n';
@@ -8030,6 +8107,13 @@ async function doReading() {
   var trump = p.lifePathTrumpCard || tc;
   var trumpCardName = trump.card || tc.card;
   var trumpKeyword = trump.keyword || tc.archetype;
+  // W3BB CODEX V07 -- the Tarot Path card's OWN Golden Dawn keyword, from the
+  // same PATH_TABLE entry (matched by path number) already used elsewhere for
+  // the Life Path Trump Card / Shadow Card. Not previously surfaced for tc
+  // itself; passed into the prompt so the AI can deepen Page 2 using only
+  // data already established in this reading, not new invented content.
+  var tarotPathEntry = pathByNumber(tc.path);
+  var tarotPathKeyword = tarotPathEntry ? tarotPathEntry.keyword : null;
   var chaldeanLine = p.chaldean ? ('Chaldean Name Number (as called, "' + p.usedName + '"): compound ' + p.chaldean.compound + (p.chaldean.archetype ? ' ("' + p.chaldean.archetype + '")' : '') + ', reduces to ' + p.chaldean.reduced + '. ' + (p.harmonic ? p.harmonic.flag + ' \u2014 ' + p.harmonic.detail : '') + '\n') : '';
   var gematriaBatteryLine = p.gematriaBattery ? ('Gematria Battery (used name): Standard ' + p.gematriaBattery.sg + ', Ordinal ' + p.gematriaBattery.og + ', Reduced ' + p.gematriaBattery.rg + '\n') : '';
   var nameHiddenMastersLine = (p.nameHiddenMasters && p.nameHiddenMasters.length) ? ('Name-Field Hidden Masters (independent of Life Path): ' + formatNameHiddenMasters(p.nameHiddenMasters) + '\n') : '';
@@ -8040,7 +8124,7 @@ async function doReading() {
   // Page 7 spec (same conditional wiring as getFallbackReading() above,
   // via the shared window._nodalChoice global). Empty string, and thus no
   // change to the prompt, when no choice was made.
-  var nodalChoiceInstruction = getNodalChoicePromptInstruction(window._nodalChoice, p.nodeDecanCards, p.firstName);
+  var nodalChoiceInstruction = getNodalChoicePromptInstruction(window._nodalChoice, p.nodeDecanCards, p.firstName, tc);
   var personalDayWildcardLine = pdwFmtPrompt ? ('Personal Day Wildcard (narrative-only, an INVITATION not an assignment, distinct from the birth-locked Life Path Trump Card above): today\'s Personal Day ' + p.personalDay + ' pools toward ' + pdwFmtPrompt.majorPhrase + '. ' + pdwFmtPrompt.poolSentences + '\n') : '';
   var ascendantLine = (p.ascendant && p.ascendant.sign) ? ('Ascendant (Rising Sign): ' + p.ascendant.sign + (p.ascendant.degree != null ? ' at ' + p.ascendant.degree + '\u00b0' : '') + '\n') : '';
   var nodeLine = (p.node && p.node.northSign) ? ('Lunar Nodes (lifelong axis): North Node in ' + p.node.northSign + ' (outward-growth direction), South Node in ' + p.node.southSign + ' (karmic comfort zone)' + (p.node.activePole ? ('. Currently active: ' + p.firstName + ' is presently moving through a real activation of the ' + (p.node.activePole === 'north' ? 'North' : 'South') + ' Node \u2014 a season worth naming, not an everyday state.') : '') + '\n') : '';
@@ -8072,7 +8156,7 @@ async function doReading() {
     + nodeLine
     + nodeDecanCardsLine
     + 'Sephirah: ' + p.tree.name + ' \u2014 ' + p.tree.meaning + '\n'
-    + 'Tarot Path ' + tc.path + ': ' + tc.card + ' (' + tc.letter + ') \u2014 ' + tc.archetype + '\n'
+    + 'Tarot Path ' + tc.path + ': ' + tc.card + ' (' + tc.letter + ') \u2014 ' + tc.archetype + (tarotPathKeyword ? ', Golden Dawn keyword ' + tarotPathKeyword : '') + '\n'
     + (p.lifePathTrumpCard ? ('Life Path Trump Card (Major Arcana, Path ' + p.lifePathTrumpCard.num + '): ' + p.lifePathTrumpCard.numeral + ' ' + p.lifePathTrumpCard.card + ', keyword ' + p.lifePathTrumpCard.keyword + '\n') : '')
     + (p.primaryPath && p.primaryPath.viaKetherBridge ? 'Kether Bridge: this Trump Card path connects directly to Kether via the rare Master 11 wiring\n' : '')
     + (p.primaryPath && p.primaryPath.masterCoActive ? 'Dual Trump Card (Master 33): ' + (p.trumpPaths && p.trumpPaths[0] ? p.trumpPaths[0].card : '') + ' and ' + (p.trumpPaths && p.trumpPaths[1] ? p.trumpPaths[1].card : '') + ', co-active as one braided current\n' : '')
@@ -8088,8 +8172,8 @@ async function doReading() {
     + 'Personal Year 2026: ' + p.personalYear2026 + (p.personalMonth != null ? ('  Personal Month (current): ' + p.personalMonth) : '') + (p.personalDay != null ? ('  Personal Day (today): ' + p.personalDay) : '') + '\n'
     + personalDayWildcardLine
     + '\nWrite exactly 9 sections with ===PAGE_N_START=== and ===PAGE_N_END=== delimiters on their own lines (each delimiter on its own line, no other text on that line). Each section: 7\u20139 rich, deeply personal paragraphs (not 5\u20136 \u2014 these pages need to visually fill a full printed page, so write substantially more per page than feels like the minimum). Each paragraph should be 4\u20136 full sentences, not 2\u20133 \u2014 a thin, single-idea paragraph is not acceptable. Every paragraph must reference ' + p.firstName + ' by name at least once and cite the specific numbers or symbols from their profile, and should work in as many of the person\'s actual named numbers, cards, Sephiroth, and archetypes as genuinely fit \u2014 not just one per paragraph. When a paragraph starts to feel thin or abstract, do not move on to the next idea yet: stay with the same point and add a concrete second layer \u2014 what this finding actually looks like in ' + p.firstName + '\'s daily choices, relationships, or work, a specific example of the pattern playing out, or a second data point from the profile that deepens (not repeats) the first. No generic affirmations, no padding with synonyms of a sentence already written \u2014 every added sentence must carry new, specific content. Celestia speaks with warm authority, poetic depth, and precision.\n\n'
-    + 'Page 1 \u2014 IDENTITY ESSENCE: Open with the exact phrase "' + p.firstName + ', you are ' + ca + '." Then paint a full-portrait synthesis: how Life Path ' + p.lifePath + ' (' + lpTitle + ') shapes the core drive, how ' + p.sunSign.sign + ' Sun infuses it with elemental character (' + p.sunSign.element + ', ruled by ' + p.sunSign.planet + ')' + (p.ascendant && p.ascendant.sign ? ', how their ' + p.ascendant.sign + ' Ascendant colors the lens the world first meets them through' : '') + ', and how ' + p.tree.name + ' on the Tree of Life places this soul at a specific energetic address in creation. Explain what the Codex Archetype ' + ca + ' means as a living identity \u2014 not a label but a mandate.' + (p.node && p.node.northSign ? (' If it fits naturally, name their North Node in ' + p.node.northSign + ' as the lifelong outward direction the soul is growing toward and their South Node in ' + p.node.southSign + ' as the inward comfort zone they are moving away from \u2014 this is a lifelong developmental axis, not a daily forecast, so treat it as one more coordinate on the same portrait rather than a separate topic.' + (p.node.activePole ? (' Note also that ' + p.firstName + ' is moving through a real, present-tense activation of their ' + (p.node.activePole === 'north' ? 'North' : 'South') + ' Node right now \u2014 a season worth naming explicitly, since it is not the everyday state of this axis.') : '')) : '') + (p.nodeDecanCards ? (' In the language of the decans, that same Node axis also names one Minor Arcana card apiece: the ' + p.nodeDecanCards.northNodeCard.card + ' for the North Node \u2014 name this as the energy ' + p.firstName + ' is growing TOWARD \u2014 and the ' + p.nodeDecanCards.southNodeCard.card + ' for the South Node \u2014 name this as the shadow/comfort-zone energy ' + p.firstName + ' is moving AWAY from. Frame this as a growth trajectory, not a moral judgment: the South Node card is not "bad," it is simply the familiar gravity the North Node card is inviting ' + p.firstName + ' beyond. Make clear the placement itself is fixed \u2014 only how ' + p.firstName + ' works with it, moment by moment, is a matter of choice. Do not explain decans, degrees, or planetary rulerships to the reader \u2014 simply name the cards and their meaning.') : '') + (quizArchetypeMatched ? (' Also work in, naturally and once, that before this reading was even generated, ' + p.firstName + ' took the fun, personality-based Archetype Quiz in this same browser and it guessed ' + ca + ' \u2014 the same Archetype this real chart just landed on independently; frame this as one more instance of convergence across systems, the way this reading already treats the Life Path/Sun Sign/Sephirah agreement, and be clear the quiz itself is not a calculated system, just an honest personality-based guess that happened to land in the same place as the real math.') : '') + ' End by naming the specific gift this soul arrived with, and name it as a thread the reading will keep picking back up \u2014 the same gift the reader will recognize again in the Tarot archetype, the shadow work, and the closing blessing.\n'
-    + 'Page 2 \u2014 ARCHETYPAL SIGNATURE: Explore the full mythic narrative. ' + tc.card + ' (Path ' + tc.path + ', letter ' + tc.letter + ') is the archetype ' + p.firstName + ' is living' + (p.lifePathTrumpCard ? ', confirmed by the Life Path Trump Card ' + p.lifePathTrumpCard.numeral + ' ' + p.lifePathTrumpCard.card : '') + '. Explain what this card means as a life-force not just a symbol, how the ' + p.sunSign.sign + ' Sun amplifies or challenges this path, and how the Kabbalistic letter ' + tc.letter + ' encodes a specific teaching in their very name. Name the mythic figures, gods, or archetypes associated with this path. Explicitly tie this Tarot archetype back to the Life Path ' + p.lifePath + ' and Codex Archetype ' + ca + ' named on Page 1 — show that the Tarot card is not a second, unrelated topic but the same mandate speaking in a different language, and say so directly. Describe what it feels like to embody ' + tc.card + ' fully vs. when it is suppressed.' + (w3bbGeo ? (' Close this page with one clearly-labeled additional paragraph naming the W3BB Evolutionary Geometry: state plainly, in your own words, that this next piece is W3BB\'s own original addition laid on top of the Tarot tradition just described \u2014 never Golden Dawn, never ancient Kabbalah, never inherited tradition \u2014 then name ' + w3bbGeoCardName + '\'s ' + w3bbGeo.quadrant + ' quadrant and its "' + w3bbGeo.geometry + '" geometry, translated into warm, meaning-first language (' + w3bbGeo.meaning + ') rather than explained mechanically. Do not let this paragraph alter, contradict, or overshadow the real Trump Card content already established earlier on this page.') : '') + '\n'
+    + 'Page 1 \u2014 IDENTITY ESSENCE: Open with the exact phrase "' + p.firstName + ', you are ' + ca + '." Then paint a full-portrait synthesis: how Life Path ' + p.lifePath + ' (' + lpTitle + ') shapes the core drive, how ' + p.sunSign.sign + ' Sun infuses it with elemental character (' + p.sunSign.element + ', ruled by ' + p.sunSign.planet + ')' + (p.ascendant && p.ascendant.sign ? ', how their ' + p.ascendant.sign + ' Ascendant colors the lens the world first meets them through' : '') + ', and how ' + p.tree.name + ' on the Tree of Life places this soul at a specific energetic address in creation. Explain what the Codex Archetype ' + ca + ' means as a living identity \u2014 not a label but a mandate.' + (p.node && p.node.northSign ? (' If it fits naturally, name their North Node in ' + p.node.northSign + ' as the lifelong outward direction the soul is growing toward and their South Node in ' + p.node.southSign + ' as the inward comfort zone they are moving away from \u2014 this is a lifelong developmental axis, not a daily forecast, so treat it as one more coordinate on the same portrait rather than a separate topic.' + (p.node.activePole ? (' Note also that ' + p.firstName + ' is moving through a real, present-tense activation of their ' + (p.node.activePole === 'north' ? 'North' : 'South') + ' Node right now \u2014 a season worth naming explicitly, since it is not the everyday state of this axis.') : '')) : '') + (p.nodeDecanCards ? (' In the language of the decans, that same Node axis also names one Minor Arcana card apiece: the ' + p.nodeDecanCards.northNodeCard.card + ' for the North Node \u2014 name this as the energy ' + p.firstName + ' is growing TOWARD \u2014 and the ' + p.nodeDecanCards.southNodeCard.card + ' for the South Node \u2014 name this as the shadow/comfort-zone energy ' + p.firstName + ' is moving AWAY from. Frame this as a growth trajectory, not a moral judgment: the South Node card is not "bad," it is simply the familiar gravity the North Node card is inviting ' + p.firstName + ' beyond. Make clear the placement itself is fixed \u2014 only how ' + p.firstName + ' works with it, moment by moment, is a matter of choice. Do not explain decans, degrees, or planetary rulerships to the reader \u2014 simply name the cards and their meaning.') : '') + (quizArchetypeMatched ? (' Also work in, naturally and once, that before this reading was even generated, ' + p.firstName + ' took the fun, personality-based Archetype Quiz in this same browser and it guessed ' + ca + ' \u2014 the same Archetype this real chart just landed on independently; frame this as one more instance of convergence across systems, the way this reading already treats the Life Path/Sun Sign/Sephirah agreement, and be clear the quiz itself is not a calculated system, just an honest personality-based guess that happened to land in the same place as the real math.') : '') + (p.axisRole && AXIS_ROLES[p.axisRole] ? (' Also name their role on the Tree\'s own architecture: ' + p.firstName + ' carries ' + AXIS_ROLES[p.axisRole].pillar + ' \u2014 ' + AXIS_ROLES[p.axisRole].title + '. ' + AXIS_ROLES[p.axisRole].description + ' Present this as the shape ' + p.firstName + ' brings into any structure or relationship, not a solitary trait.') : '') + ' End by naming the specific gift this soul arrived with, and name it as a thread the reading will keep picking back up \u2014 the same gift the reader will recognize again in the Tarot archetype, the shadow work, and the closing blessing.\n'
+    + 'Page 2 \u2014 ARCHETYPAL SIGNATURE: Explore the full mythic narrative. ' + tc.card + ' (Path ' + tc.path + ', letter ' + tc.letter + ') is the archetype ' + p.firstName + ' is living' + (p.lifePathTrumpCard ? ', confirmed by the Life Path Trump Card ' + p.lifePathTrumpCard.numeral + ' ' + p.lifePathTrumpCard.card : '') + '. Explain what this card means as a life-force not just a symbol, how the ' + p.sunSign.sign + ' Sun amplifies or challenges this path, and how the Kabbalistic letter ' + tc.letter + ' encodes a specific teaching in their very name. Name the mythic figures, gods, or archetypes associated with this path. Explicitly tie this Tarot archetype back to the Life Path ' + p.lifePath + ' and Codex Archetype ' + ca + ' named on Page 1 — show that the Tarot card is not a second, unrelated topic but the same mandate speaking in a different language, and say so directly. Describe what it feels like to embody ' + tc.card + ' fully vs. when it is suppressed — and make this the deepest, most fully-realized paragraph on the page: explicitly unpack the card\'s own archetype phrase already given above (“' + tc.archetype + '”)' + (tarotPathKeyword ? ' together with its Golden Dawn keyword (' + tarotPathKeyword + ')' : '') + ' into what this energy genuinely feels like from the inside — its root feeling, its concrete outward expression in daily choices and relationships, and what it feels like when that same energy is suppressed instead of lived — using only these existing keyword/archetype sources rather than introducing a new, independent claim about the card.' + (p.primaryPath && p.primaryPath.viaKetherBridge ? ' Because ' + p.firstName + '\'s Life Path carries the Master Number 11, name the Kether Bridge explicitly: the Trump Card path does not follow the standard formula, it connects directly to Kether, the crown Sephirah, a rare direct wiring reserved for the most intuitively-charged Master Number.' : '') + (p.primaryPath && p.primaryPath.masterCoActive ? ' Because ' + p.firstName + '\'s Life Path carries the Master Number 33, name that it does not resolve to a single Trump Card but two, co-active at once (' + (p.trumpPaths && p.trumpPaths[0] ? p.trumpPaths[0].card : 'The World') + ' and ' + (p.trumpPaths && p.trumpPaths[1] ? p.trumpPaths[1].card : 'The Lovers') + '), running as one braided current rather than a sequence to move through \u2014 read both cards as one teaching in stereo.' : '') + ' Also name that on Metatron\'s Cube, ' + p.firstName + '\'s elemental current (' + p.sunSign.element + ') translates into the suit of ' + (p.elementSuit || 'this element\'s suit') + ', the same suit their Soul Card and Court Card are drawn from later in this reading \u2014 the suit is simply the element speaking in the language of the Minor Arcana, not a second, unrelated system.' + (w3bbGeo ? (' Close this page with one clearly-labeled additional paragraph naming the W3BB Evolutionary Geometry: state plainly, in your own words, that this next piece is W3BB\'s own original addition laid on top of the Tarot tradition just described \u2014 never Golden Dawn, never ancient Kabbalah, never inherited tradition \u2014 then name ' + w3bbGeoCardName + '\'s ' + w3bbGeo.quadrant + ' quadrant and its "' + w3bbGeo.geometry + '" geometry, translated into warm, meaning-first language (' + w3bbGeo.meaning + ') rather than explained mechanically. Do not let this paragraph alter, contradict, or overshadow the real Trump Card content already established earlier on this page.') : '') + '\n'
     + 'Page 3 \u2014 FREQUENCY PATTERN: Decode the name. Life Path ' + p.lifePath + ' is the birth frequency. Expression ' + (p.expression||'?') + ' is the gift encoded in every letter of "' + p.firstName + '". Soul Urge ' + (p.soulUrge||'?') + ' is the private longing beneath the surface. Gematria total ' + (p.gematria?p.gematria.total:'?') + ' reducing to ' + (p.gematria?p.gematria.reduced:'?') + ' is the name\'s sacred numerical signature.' + (p.chaldean ? ' The Chaldean compound of the name ' + p.firstName + ' is actually called by resolves to ' + p.chaldean.compound + ' (' + p.chaldean.reduced + '), a living-identity number layered atop the birth frequency.' : '') + ' Explicitly connect the Gematria total ' + (p.gematria?p.gematria.total:'?') + ' back to the Life Path ' + p.lifePath + ' established on Page 1 \u2014 name both numbers together and say plainly why a name-frequency and a birth-frequency landing on the same core tone is not coincidence but confirmation, two instruments playing the same note. Explain what happens when ' + p.firstName + ' aligns with vs. resists this frequency.\n'
     + 'Page 4 \u2014 THE FIELD GEOMETRY: ' + p.firstName + '\'s identity is a living Egg of Life \u2014 eight interlocking circles of force. Map which nodes are most activated: ' + p.tree.name + ' (Kabbalah), ' + tc.card + ' (Tarot), ' + p.sunSign.sign + ' (Astrology), Life Path ' + p.lifePath + ' (Numerology), gematria ' + (p.gematria?p.gematria.reduced:'?') + ' (Gematria), and Sacred Geometry as the container. Explain what it means that these systems converge on a single being — specifically call out at least one node where two systems from earlier pages (e.g. the Life Path from Page 1 and the Gematria reduction from Page 3, or the Tarot path from Page 2 and the Sephirah) sit on the same point of the geometry, not adjacent-but-separate points. Describe the energetic field this soul radiates and how others experience it. Name the specific intersection points where power concentrates.\n'
     + 'Page 5 \u2014 SHADOW & GIFT: Be specific and unflinching. The shadow of ' + tc.card + ' for someone with ' + p.sunSign.sign + ' energy is specific \u2014 name it precisely. Describe the exact pattern that repeats when this shadow is unconscious. Then name the exact gift that emerges when it is integrated. Include what the ' + p.tree.name + ' position on the Tree reveals about the specific initiation ' + p.firstName + ' is moving through. This section should feel like someone finally named something the reader has always felt but never had words for.' + (p.shadowCardPath ? (' Metatron\'s Cube names this shadow even more precisely: the path running from ' + p.firstName + '\'s Soul Sephirah, ' + p.tree.name + ', toward Malkuth is the ' + p.shadowCardPath.card + ' (' + p.shadowCardPath.numeral + ', "' + p.shadowCardPath.keyword + '") \u2014 name this specific card as the exact corridor ' + p.firstName + '\'s unintegrated material travels when avoided rather than faced head-on, not a generic "shadow" in the abstract.') : '') + '\n'
