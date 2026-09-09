@@ -1171,11 +1171,16 @@ window._readingProfile = {};
 window._readingText = '';
 window._allPages = [];
 var selectedTier = null;
-// W3BB CODEX V07 PART XXX -- Nodal Choice: the person's chosen North/South/
+// W3BB CODEX V07 PART XXXI -- Nodal Choice: the person's chosen North/South/
 // Both orientation for the CURRENT reading session only. In-memory only,
 // same pattern as window._readingProfile above -- never persisted, reset on
-// every new reading (see the reset-btn handler below).
+// every new reading (see the reset-btn handler below). This is a separate
+// timestamped reading-state value, NOT a field on window._readingProfile --
+// choosing an orientation never rewrites the person's actual profile (birth
+// data, Life Path, Node placements, etc.), it only changes how today's
+// wildcard field is framed for THIS reading.
 window._nodalChoice = null;
+window._nodalChoiceAt = null;
 
 // ── SPEECH PREPROCESSING (CHANGE 4) ──────────────────────────
 function preprocessForSpeech(text) {
@@ -6165,14 +6170,15 @@ function formatPersonalDayWildcard(pdw) {
 function getNodalChoiceReaderSentence(nodalChoice, nodeDecanCards) {
   if (!nodalChoice || !nodeDecanCards) return '';
   var north = nodeDecanCards.northNodeCard.card, south = nodeDecanCards.southNodeCard.card;
+  var closing = ' This is an expression of the orientation you chose for today, not a prediction of what today will bring.';
   if (nodalChoice === 'north') {
-    return 'Since you are leaning into your North Node for this reading, read today’s wildcard field through that same growth-and-unfamiliar-possibility lens: let whichever companion card feels least familiar be the one worth trying first, the same way your North Node card, the ' + north + ', keeps inviting you past what is merely comfortable.';
+    return 'Since you are leaning into your North Node for this reading, read today’s wildcard field through that same growth-and-unfamiliar-possibility lens: let whichever companion card feels least familiar be the one worth trying first, the same way your North Node card, the ' + north + ', keeps inviting you past what is merely comfortable.' + closing;
   }
   if (nodalChoice === 'south') {
-    return 'Since you are choosing to work with your South Node for this reading, read today’s wildcard field through a restoration-and-existing-strength lens instead: let whichever companion card feels most familiar be the one you lean on, the same steadying gravity your South Node card, the ' + south + ', already knows how to hold.';
+    return 'Since you are choosing to work with your South Node for this reading, read today’s wildcard field through a restoration-and-existing-strength lens instead: let whichever companion card feels most familiar be the one you lean on, the same steadying gravity your South Node card, the ' + south + ', already knows how to hold.' + closing;
   }
   if (nodalChoice === 'both') {
-    return 'Since you are choosing to hold the axis for this reading, read today’s wildcard field with both poles in view at once: notice which companion card pulls you toward growth and which one offers rest, and let the choice between them mirror the same living balance your North Node card (the ' + north + ') and South Node card (the ' + south + ') have been asking you to hold all along.';
+    return 'Since you are choosing to hold the axis for this reading, today’s wildcard field becomes a bridge reading: rather than picking between the two poles, look at how your North Node card (the ' + north + ') and South Node card (the ' + south + ') might actually cooperate today — where the ' + north + '’s outward pull could open a door and the ' + south + '’s steadier familiarity could help you walk through it without losing your footing. The wildcard card is the meeting point between them, not a tie-breaker.' + closing;
   }
   return '';
 }
@@ -6182,9 +6188,10 @@ function getNodalChoiceReaderSentence(nodalChoice, nodeDecanCards) {
 function getNodalChoicePromptInstruction(nodalChoice, nodeDecanCards, firstName) {
   if (!nodalChoice || !nodeDecanCards) return '';
   var north = nodeDecanCards.northNodeCard.card, south = nodeDecanCards.southNodeCard.card;
-  if (nodalChoice === 'north') return ' ' + firstName + ' has chosen to lean toward their North Node for this reading, so frame today’s wildcard field through a growth-and-unfamiliar-possibility lens, explicitly connecting it back to their North Node card, the ' + north + '.';
-  if (nodalChoice === 'south') return ' ' + firstName + ' has chosen to work with their South Node for this reading, so frame today’s wildcard field through a restoration-and-existing-strength lens, explicitly connecting it back to their South Node card, the ' + south + '.';
-  if (nodalChoice === 'both') return ' ' + firstName + ' has chosen to hold the axis for this reading, so frame today’s wildcard field through a balanced, both-directions lens that names both their North Node card (' + north + ') and South Node card (' + south + ') together.';
+  var noPredict = ' Frame this as an expression of the orientation ' + firstName + ' chose for today, not as a prediction of what today will bring.';
+  if (nodalChoice === 'north') return ' ' + firstName + ' has chosen to lean toward their North Node for this reading, so frame today’s wildcard field through a growth-and-unfamiliar-possibility lens, explicitly connecting it back to their North Node card, the ' + north + '.' + noPredict;
+  if (nodalChoice === 'south') return ' ' + firstName + ' has chosen to work with their South Node for this reading, so frame today’s wildcard field through a restoration-and-existing-strength lens, explicitly connecting it back to their South Node card, the ' + south + '.' + noPredict;
+  if (nodalChoice === 'both') return ' ' + firstName + ' has chosen to hold the axis for this reading, so write today’s wildcard field as a bridge reading: examine how their North Node card (' + north + ') and South Node card (' + south + ') might cooperate today rather than compete, naming both by name, and let the wildcard card be the meeting point between them rather than a choice between two options.' + noPredict;
   return '';
 }
 
@@ -6227,7 +6234,7 @@ function buildNodalChoiceSection(p) {
     +       '<div style="font-size:0.82rem;color:rgba(232,224,255,0.85);line-height:1.55;"><strong style="color:#ff9ed2;">Possible imbalance:</strong> ' + southLS.imbalance + '.</div>'
     +     '</div>'
     +   '</div>'
-    +   '<p style="font-size:0.85rem;color:rgba(232,224,255,0.8);line-height:1.7;margin-bottom:1.1rem;">Neither orientation is better than the other. The South Node’s familiar pattern can be exactly right on a day that calls for rest, integration, or recovery; the North Node’s emerging potential can be exactly right on a day that calls for expansion. This is a real choice for how you meet today — not a quiz with a correct answer.</p>'
+    +   '<p style="font-size:0.85rem;color:rgba(232,224,255,0.8);line-height:1.7;margin-bottom:1.1rem;">Neither orientation is better than the other. The South Node’s familiar pattern can be exactly right on a day that calls for rest, integration, or recovery; the North Node’s emerging potential can be exactly right on a day that calls for expansion. This is a real choice for how you meet today — not a quiz with a correct answer. Choosing “Hold the Axis” doesn’t split the difference; it opens a bridge reading that looks at how both cards might cooperate. And whichever you choose, today’s wildcard card is an expression of that choice, not a prediction of what today holds.</p>'
     +   '<div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-bottom:1rem;">'
     +     '<div id="nodal-btn-north" onclick="setNodalChoice(\'north\')" style="' + btnStyle('north') + '">Lean North<div style="font-size:0.7rem;font-weight:400;opacity:0.85;margin-top:0.3rem;font-style:italic;">“I want to move toward growth and unfamiliar possibility.”</div></div>'
     +     '<div id="nodal-btn-south" onclick="setNodalChoice(\'south\')" style="' + btnStyle('south') + '">Work with South<div style="font-size:0.7rem;font-weight:400;opacity:0.85;margin-top:0.3rem;font-style:italic;">“I want to draw upon familiarity, restoration, or existing strengths.”</div></div>'
@@ -6246,6 +6253,12 @@ function buildNodalChoiceSection(p) {
 // prompt the next time either is actually (re)built.
 function setNodalChoice(choice) {
   window._nodalChoice = choice;
+  // Time-stamped separately from window._readingProfile -- this records
+  // WHEN the choice was made for this reading session, it never writes
+  // into the profile object itself. The profile (birth data, Life Path,
+  // Node placements, etc.) stays exactly as computed; only this transient
+  // reading-state value changes when a button is clicked.
+  window._nodalChoiceAt = new Date().toISOString();
   var ids = { north: 'nodal-btn-north', south: 'nodal-btn-south', both: 'nodal-btn-both' };
   Object.keys(ids).forEach(function(key) {
     var el = document.getElementById(ids[key]);
@@ -9809,6 +9822,7 @@ document.getElementById('reset-btn').addEventListener('click', function() {
   window._readingText = '';
   window._allPages = [];
   window._nodalChoice = null;
+  window._nodalChoiceAt = null;
   selectedTier = null;
   isMuted = false;
   _readingReady = false;
