@@ -1171,6 +1171,16 @@ window._readingProfile = {};
 window._readingText = '';
 window._allPages = [];
 var selectedTier = null;
+// W3BB CODEX V07 PART XXXI -- Nodal Choice: the person's chosen North/South/
+// Both orientation for the CURRENT reading session only. In-memory only,
+// same pattern as window._readingProfile above -- never persisted, reset on
+// every new reading (see the reset-btn handler below). This is a separate
+// timestamped reading-state value, NOT a field on window._readingProfile --
+// choosing an orientation never rewrites the person's actual profile (birth
+// data, Life Path, Node placements, etc.), it only changes how today's
+// wildcard field is framed for THIS reading.
+window._nodalChoice = null;
+window._nodalChoiceAt = null;
 
 // ── SPEECH PREPROCESSING (CHANGE 4) ──────────────────────────
 function preprocessForSpeech(text) {
@@ -3556,6 +3566,40 @@ function pipCardName(sephNumber, suit){
 function pipKeyword(sephNumber, suit){
   var idx = Math.max(1, Math.min(10, sephNumber)) - 1;
   return (MINOR_KEYWORDS[suit]||[])[idx] || '';
+}
+
+// W3BB CODEX V07 PART XXX §30.1 -- Minor Arcana constructive/imbalance pairs,
+// each a direct light/shadow reading of the SAME existing Golden Dawn keyword
+// already in MINOR_KEYWORDS above (Section 6.3) -- no new interpretive content
+// is invented independently of that keyword. Keyed by the exact card name
+// pipCardName() already returns, so this joins against real data rather than
+// re-deriving a suit/rank a second time. Built ONLY for the specific cards
+// that came up in this feature's synthetic verification profiles (see the PR
+// body and docs/CODEX_LOGIC_V07.md Part XXX §30.4) -- the remaining cards in
+// the 36-card decan set (Part XXI's ranks 2-10 across all four suits) still
+// need to be filled in the same way, one real card at a time, as future
+// readings actually surface them, rather than all being invented at once.
+var MINOR_LIGHT_SHADOW = {
+  'Five of Swords':  { constructive: 'the clear-eyed honesty to know when a fight is not worth winning, and the grace to walk away with your energy intact', imbalance: 'replaying a loss so often it hardens into bitterness, or picking fights you have already privately conceded' },
+  'Five of Wands':   { constructive: 'the friction that sharpens you — real competition or creative tension that pushes your effort higher', imbalance: 'scattering your fire into competing for its own sake, exhausting yourself on struggles that lead nowhere' },
+  'Nine of Wands':   { constructive: 'the steady, tested resolve to keep going one more round, precisely because you have already proven you can', imbalance: 'gripping so tightly to endurance that you cannot recognize when it is finally safe to rest' },
+  'Nine of Swords':  { constructive: 'naming a hard truth plainly, even when it costs something, because the alternative is a kinder-sounding lie', imbalance: 'the 3 a.m. spiral of self-inflicted worry, rehearsing worst-case thoughts that were never asked to visit' },
+  'Three of Swords': { constructive: 'letting a real grief move all the way through you instead of around you, so it can actually finish', imbalance: 'nursing a hurt on repeat, turning one honest wound into a story you tell yourself forever' },
+  'Three of Wands':  { constructive: 'the patient follow-through of watching something you planted actually take root and grow', imbalance: 'coasting on early momentum and mistaking the first good sign for the whole outcome' }
+};
+// Generic fallback for any card not yet in the hand-built table above: still
+// derived directly and visibly from that card's own existing keyword (per
+// Part XXVI, translated into warm language rather than left as raw jargon),
+// never a fabricated meaning unrelated to it.
+function getMinorCardLightShadow(cardObj) {
+  if (!cardObj || !cardObj.card) return { constructive: '', imbalance: '' };
+  var known = MINOR_LIGHT_SHADOW[cardObj.card];
+  if (known) return known;
+  var kw = cardObj.keyword || 'this card’s own';
+  return {
+    constructive: 'a constructive, intentional expression of its ' + kw + ' energy',
+    imbalance: 'letting its ' + kw + ' energy run unchecked or unexamined'
+  };
 }
 // Court Card rank by pillar of the anchoring Sephirah (Section 6.3: Kings=Chokmah/Right,
 // Queens=Binah/Left, Knights=Tiphareth-Yesod axis/Middle, Pages=Malkuth), generalized
@@ -6106,6 +6150,129 @@ function formatPersonalDayWildcard(pdw) {
 }
 
 // ===========================
+// W3BB CODEX V07 PART XXX -- NODAL CHOICE INTERFACE (solo reading only)
+// ===========================
+// The North/South Node Decan Cards themselves (getNodeDecanCards(), Part
+// XXI above) are completely untouched by this Part -- same real, already-
+// verified Golden Dawn decan mechanism, nothing new there. What IS new here
+// is the INTERACTIVE CHOICE MECHANIC itself: presenting both cards as a
+// genuine either/or/both decision the person makes for this reading, rather
+// than the system silently picking one framing for them. This is a W3BB
+// original interpretive construction -- explicitly not inherited tradition,
+// per the same Part XXII branch (b) standard used in Part XXX's sibling
+// "Evolutionary Geometry" addition on another branch. See docs/
+// CODEX_LOGIC_V07.md Part XXX for the full writeup and honest labeling.
+
+// Reader-facing sentence: how the chosen orientation colors today's
+// Personal Day Wildcard field (Part XXV). Used both inside
+// getFallbackReading() and in the live DOM note under the Nodal Choice
+// buttons -- one function, not two drifting copies of the same idea.
+function getNodalChoiceReaderSentence(nodalChoice, nodeDecanCards) {
+  if (!nodalChoice || !nodeDecanCards) return '';
+  var north = nodeDecanCards.northNodeCard.card, south = nodeDecanCards.southNodeCard.card;
+  var closing = ' This is an expression of the orientation you chose for today, not a prediction of what today will bring.';
+  if (nodalChoice === 'north') {
+    return 'Since you are leaning into your North Node for this reading, read today’s wildcard field through that same growth-and-unfamiliar-possibility lens: let whichever companion card feels least familiar be the one worth trying first, the same way your North Node card, the ' + north + ', keeps inviting you past what is merely comfortable.' + closing;
+  }
+  if (nodalChoice === 'south') {
+    return 'Since you are choosing to work with your South Node for this reading, read today’s wildcard field through a restoration-and-existing-strength lens instead: let whichever companion card feels most familiar be the one you lean on, the same steadying gravity your South Node card, the ' + south + ', already knows how to hold.' + closing;
+  }
+  if (nodalChoice === 'both') {
+    return 'Since you are choosing to hold the axis for this reading, today’s wildcard field becomes a bridge reading: rather than picking between the two poles, look at how your North Node card (the ' + north + ') and South Node card (the ' + south + ') might actually cooperate today — where the ' + north + '’s outward pull could open a door and the ' + south + '’s steadier familiarity could help you walk through it without losing your footing. The wildcard card is the meeting point between them, not a tie-breaker.' + closing;
+  }
+  return '';
+}
+
+// AI-prompt instruction phrasing of the same idea, for doReading()'s Page 7
+// spec -- an instruction TO Celestia, not reader-facing text itself.
+function getNodalChoicePromptInstruction(nodalChoice, nodeDecanCards, firstName) {
+  if (!nodalChoice || !nodeDecanCards) return '';
+  var north = nodeDecanCards.northNodeCard.card, south = nodeDecanCards.southNodeCard.card;
+  var noPredict = ' Frame this as an expression of the orientation ' + firstName + ' chose for today, not as a prediction of what today will bring.';
+  if (nodalChoice === 'north') return ' ' + firstName + ' has chosen to lean toward their North Node for this reading, so frame today’s wildcard field through a growth-and-unfamiliar-possibility lens, explicitly connecting it back to their North Node card, the ' + north + '.' + noPredict;
+  if (nodalChoice === 'south') return ' ' + firstName + ' has chosen to work with their South Node for this reading, so frame today’s wildcard field through a restoration-and-existing-strength lens, explicitly connecting it back to their South Node card, the ' + south + '.' + noPredict;
+  if (nodalChoice === 'both') return ' ' + firstName + ' has chosen to hold the axis for this reading, so write today’s wildcard field as a bridge reading: examine how their North Node card (' + north + ') and South Node card (' + south + ') might cooperate today rather than compete, naming both by name, and let the wildcard card be the meeting point between them rather than a choice between two options.' + noPredict;
+  return '';
+}
+
+// Builds the interactive Nodal Choice section's HTML (solo reading only).
+// Visual pattern matches the existing card-label captions elsewhere in the
+// app (e.g. the Soul Card/Court Card caption in buildSacredGeometryDiagram())
+// -- inline-styled colored text, no separate CSS block, same gold/lavender/
+// purple palette used throughout the reading UI. Returns '' (renders
+// nothing) when there are no Node Decan Cards to choose between, so this is
+// purely additive and never breaks a reading that lacks them.
+function buildNodalChoiceSection(p) {
+  if (!p || !p.nodeDecanCards) return '';
+  var north = p.nodeDecanCards.northNodeCard, south = p.nodeDecanCards.southNodeCard;
+  var northLS = getMinorCardLightShadow(north);
+  var southLS = getMinorCardLightShadow(south);
+  var active = window._nodalChoice;
+  function btnStyle(val) {
+    var isActive = (active === val);
+    return 'flex:1;min-width:150px;padding:0.9rem 0.8rem;border-radius:8px;cursor:pointer;font:600 0.85rem Georgia,serif;text-align:center;transition:all 0.2s;'
+      + (isActive ? 'background:#c9a84c;color:#1a0a30;border:1px solid #c9a84c;' : 'background:rgba(176,138,255,0.12);color:#e8e0ff;border:1px solid rgba(176,138,255,0.3);');
+  }
+  var liveNote = active ? getNodalChoiceReaderSentence(active, p.nodeDecanCards)
+    : 'Choose an orientation above, and see below how it shapes today’s Personal Day possibilities.';
+  return ''
+    + '<div id="nodal-choice-section" style="margin:2rem 0 2.5rem;padding:1.5rem 1.25rem;border:1px solid rgba(176,138,255,0.25);border-radius:14px;background:rgba(18,8,38,0.4);">'
+    +   '<div style="font-family:Courier New,monospace;font-size:0.58rem;letter-spacing:0.35em;color:#c9a84c;text-align:center;margin-bottom:1.1rem;">✦ YOUR NODAL CHOICE ✦</div>'
+    +   '<div style="display:flex;gap:1.25rem;flex-wrap:wrap;margin-bottom:1.25rem;">'
+    +     '<div style="flex:1;min-width:220px;padding:1rem;border-radius:10px;background:rgba(240,208,112,0.06);border:1px solid rgba(240,208,112,0.2);">'
+    +       '<div style="font-size:0.68rem;letter-spacing:0.15em;color:#f0d070;margin-bottom:0.4rem;">NORTH NODE CARD</div>'
+    +       '<div style="font:700 1.05rem Georgia,serif;color:#e8e0ff;margin-bottom:0.5rem;">' + north.card + '</div>'
+    +       '<div style="font-size:0.78rem;color:#c9b8e8;margin-bottom:0.6rem;"><em>Emerging, outward-facing potential</em> — what growth may require.</div>'
+    +       '<div style="font-size:0.82rem;color:rgba(232,224,255,0.92);line-height:1.55;margin-bottom:0.5rem;"><strong style="color:#88dd99;">Constructive expression:</strong> ' + northLS.constructive + '.</div>'
+    +       '<div style="font-size:0.82rem;color:rgba(232,224,255,0.85);line-height:1.55;"><strong style="color:#ff9ed2;">Possible imbalance:</strong> ' + northLS.imbalance + '.</div>'
+    +     '</div>'
+    +     '<div style="flex:1;min-width:220px;padding:1rem;border-radius:10px;background:rgba(176,138,255,0.06);border:1px solid rgba(176,138,255,0.2);">'
+    +       '<div style="font-size:0.68rem;letter-spacing:0.15em;color:#b08aff;margin-bottom:0.4rem;">SOUTH NODE CARD</div>'
+    +       '<div style="font:700 1.05rem Georgia,serif;color:#e8e0ff;margin-bottom:0.5rem;">' + south.card + '</div>'
+    +       '<div style="font-size:0.78rem;color:#c9b8e8;margin-bottom:0.6rem;"><em>Familiar, inward-returning pattern</em> — what already feels natural or practiced.</div>'
+    +       '<div style="font-size:0.82rem;color:rgba(232,224,255,0.92);line-height:1.55;margin-bottom:0.5rem;"><strong style="color:#88dd99;">Constructive expression:</strong> ' + southLS.constructive + '.</div>'
+    +       '<div style="font-size:0.82rem;color:rgba(232,224,255,0.85);line-height:1.55;"><strong style="color:#ff9ed2;">Possible imbalance:</strong> ' + southLS.imbalance + '.</div>'
+    +     '</div>'
+    +   '</div>'
+    +   '<p style="font-size:0.85rem;color:rgba(232,224,255,0.8);line-height:1.7;margin-bottom:1.1rem;">Neither orientation is better than the other. The South Node’s familiar pattern can be exactly right on a day that calls for rest, integration, or recovery; the North Node’s emerging potential can be exactly right on a day that calls for expansion. This is a real choice for how you meet today — not a quiz with a correct answer. Choosing “Hold the Axis” doesn’t split the difference; it opens a bridge reading that looks at how both cards might cooperate. And whichever you choose, today’s wildcard card is an expression of that choice, not a prediction of what today holds.</p>'
+    +   '<div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-bottom:1rem;">'
+    +     '<div id="nodal-btn-north" onclick="setNodalChoice(\'north\')" style="' + btnStyle('north') + '">Lean North<div style="font-size:0.7rem;font-weight:400;opacity:0.85;margin-top:0.3rem;font-style:italic;">“I want to move toward growth and unfamiliar possibility.”</div></div>'
+    +     '<div id="nodal-btn-south" onclick="setNodalChoice(\'south\')" style="' + btnStyle('south') + '">Work with South<div style="font-size:0.7rem;font-weight:400;opacity:0.85;margin-top:0.3rem;font-style:italic;">“I want to draw upon familiarity, restoration, or existing strengths.”</div></div>'
+    +     '<div id="nodal-btn-both" onclick="setNodalChoice(\'both\')" style="' + btnStyle('both') + '">Hold the Axis<div style="font-size:0.7rem;font-weight:400;opacity:0.85;margin-top:0.3rem;font-style:italic;">“I want to understand and balance both energies.”</div></div>'
+    +   '</div>'
+    +   '<div id="nodal-choice-live-note" style="font-size:0.85rem;color:#f0d070;line-height:1.7;min-height:1.2em;">' + liveNote + '</div>'
+    + '</div>';
+}
+
+// Click handler for the three Nodal Choice buttons. Stores the choice in
+// window._nodalChoice (same in-memory, per-session pattern as
+// window._readingProfile) and updates the button highlighting and the live
+// note in place -- it does not regenerate the whole reading, since a full
+// AI re-generation on every button click would be slow and costly; the
+// stored choice is still picked up by getFallbackReading()/doReading()'s
+// prompt the next time either is actually (re)built.
+function setNodalChoice(choice) {
+  window._nodalChoice = choice;
+  // Time-stamped separately from window._readingProfile -- this records
+  // WHEN the choice was made for this reading session, it never writes
+  // into the profile object itself. The profile (birth data, Life Path,
+  // Node placements, etc.) stays exactly as computed; only this transient
+  // reading-state value changes when a button is clicked.
+  window._nodalChoiceAt = new Date().toISOString();
+  var ids = { north: 'nodal-btn-north', south: 'nodal-btn-south', both: 'nodal-btn-both' };
+  Object.keys(ids).forEach(function(key) {
+    var el = document.getElementById(ids[key]);
+    if (!el) return;
+    if (key === choice) { el.style.background = '#c9a84c'; el.style.color = '#1a0a30'; el.style.border = '1px solid #c9a84c'; }
+    else { el.style.background = 'rgba(176,138,255,0.12)'; el.style.color = '#e8e0ff'; el.style.border = '1px solid rgba(176,138,255,0.3)'; }
+  });
+  var noteEl = document.getElementById('nodal-choice-live-note');
+  if (noteEl && window._readingProfile && window._readingProfile.nodeDecanCards) {
+    noteEl.textContent = getNodalChoiceReaderSentence(choice, window._readingProfile.nodeDecanCards);
+  }
+}
+
+// ===========================
 // PERSONAL TONE — Sign -> Musical Note (Paul Foster Case, Musical Qabalah)
 // Verified this session against this app's own zodiac-attributed Tarot
 // paths in PATH_TABLE above. Only the 12 zodiac-attributed Major Arcana
@@ -7746,6 +7913,14 @@ function getFallbackReading(){
   if (pdw && pdw.majors && pdw.majors.length) {
     var pdwFmt = formatPersonalDayWildcard(pdw);
     fb += '\nPersonal Day '+pd+' opens one more door, and it is worth naming as an invitation rather than a verdict: today wildcards toward '+pdwFmt.majorPhrase+' — '+(pdw.majors.length>1?'not as a forced choice between them, but as a field of live possibility you can lean into either direction of today':'as the live possibility available to lean into today')+'. '+pdwFmt.poolSentences+' None of this replaces the '+tc.card+' path named earlier in this reading, and none of it is fixed the way your birth chart is fixed — it simply names what today, specifically, is offering you room to explore, gone again once Personal Day '+pd+' rolls forward into tomorrow\'s number.\n';
+    // W3BB CODEX V07 PART XXX -- Nodal Choice: if this person chose a North/
+    // South/Both orientation via the interactive Nodal Choice section on
+    // Page 1 (see buildNodalChoiceSection()/setNodalChoice()), fold that
+    // choice into how today's wildcard field is framed. Purely additive --
+    // when no choice was made (window._nodalChoice is null), this adds
+    // nothing and the paragraph above renders exactly as it always has.
+    var nodalSentence = getNodalChoiceReaderSentence(window._nodalChoice, p.nodeDecanCards);
+    if (nodalSentence) { fb += '\n' + nodalSentence + '\n'; }
   }
   fb+='===PAGE_7_END===\n\n';
 
@@ -7861,6 +8036,11 @@ async function doReading() {
   var metatronLine = (p.soulCard && p.courtCard) ? ('Metatron\'s Cube \u2014 Soul Card: ' + p.soulCard.name + ' (' + p.soulCard.keyword + '); Court Card: ' + p.courtCard.name + ', anchored to ' + p.courtCard.veil + '\n') : '';
   var zodiacalCourtCardLine = (p.zodiacalCourtCard) ? ('Zodiacal Court Card (Sun placement \u2014 a SEPARATE, independent finding from the Metatron\'s Cube Court Card above, reached through the Sun\'s own placement in the sky, not the Sephirah): ' + p.zodiacalCourtCard.name + '\n') : '';
   var pdwFmtPrompt = (p.personalDayWildcard && p.personalDayWildcard.majors && p.personalDayWildcard.majors.length) ? formatPersonalDayWildcard(p.personalDayWildcard) : null;
+  // W3BB CODEX V07 PART XXX -- Nodal Choice instruction for the AI prompt's
+  // Page 7 spec (same conditional wiring as getFallbackReading() above,
+  // via the shared window._nodalChoice global). Empty string, and thus no
+  // change to the prompt, when no choice was made.
+  var nodalChoiceInstruction = getNodalChoicePromptInstruction(window._nodalChoice, p.nodeDecanCards, p.firstName);
   var personalDayWildcardLine = pdwFmtPrompt ? ('Personal Day Wildcard (narrative-only, an INVITATION not an assignment, distinct from the birth-locked Life Path Trump Card above): today\'s Personal Day ' + p.personalDay + ' pools toward ' + pdwFmtPrompt.majorPhrase + '. ' + pdwFmtPrompt.poolSentences + '\n') : '';
   var ascendantLine = (p.ascendant && p.ascendant.sign) ? ('Ascendant (Rising Sign): ' + p.ascendant.sign + (p.ascendant.degree != null ? ' at ' + p.ascendant.degree + '\u00b0' : '') + '\n') : '';
   var nodeLine = (p.node && p.node.northSign) ? ('Lunar Nodes (lifelong axis): North Node in ' + p.node.northSign + ' (outward-growth direction), South Node in ' + p.node.southSign + ' (karmic comfort zone)' + (p.node.activePole ? ('. Currently active: ' + p.firstName + ' is presently moving through a real activation of the ' + (p.node.activePole === 'north' ? 'North' : 'South') + ' Node \u2014 a season worth naming, not an everyday state.') : '') + '\n') : '';
@@ -7914,7 +8094,7 @@ async function doReading() {
     + 'Page 4 \u2014 THE FIELD GEOMETRY: ' + p.firstName + '\'s identity is a living Egg of Life \u2014 eight interlocking circles of force. Map which nodes are most activated: ' + p.tree.name + ' (Kabbalah), ' + tc.card + ' (Tarot), ' + p.sunSign.sign + ' (Astrology), Life Path ' + p.lifePath + ' (Numerology), gematria ' + (p.gematria?p.gematria.reduced:'?') + ' (Gematria), and Sacred Geometry as the container. Explain what it means that these systems converge on a single being — specifically call out at least one node where two systems from earlier pages (e.g. the Life Path from Page 1 and the Gematria reduction from Page 3, or the Tarot path from Page 2 and the Sephirah) sit on the same point of the geometry, not adjacent-but-separate points. Describe the energetic field this soul radiates and how others experience it. Name the specific intersection points where power concentrates.\n'
     + 'Page 5 \u2014 SHADOW & GIFT: Be specific and unflinching. The shadow of ' + tc.card + ' for someone with ' + p.sunSign.sign + ' energy is specific \u2014 name it precisely. Describe the exact pattern that repeats when this shadow is unconscious. Then name the exact gift that emerges when it is integrated. Include what the ' + p.tree.name + ' position on the Tree reveals about the specific initiation ' + p.firstName + ' is moving through. This section should feel like someone finally named something the reader has always felt but never had words for.' + (p.shadowCardPath ? (' Metatron\'s Cube names this shadow even more precisely: the path running from ' + p.firstName + '\'s Soul Sephirah, ' + p.tree.name + ', toward Malkuth is the ' + p.shadowCardPath.card + ' (' + p.shadowCardPath.numeral + ', "' + p.shadowCardPath.keyword + '") \u2014 name this specific card as the exact corridor ' + p.firstName + '\'s unintegrated material travels when avoided rather than faced head-on, not a generic "shadow" in the abstract.') : '') + '\n'
     + 'Page 6 \u2014 THE HIDDEN ARCHITECTURE: The paths flowing into and out of ' + p.tree.name + ' on the Tree of Life are the hidden curriculum of ' + p.firstName + '\'s spiritual life. Name the specific adjacent Sephiroth and what each corridor of initiation teaches. ' + (p.hiddenMaster ? 'Hidden Master Number ' + p.hiddenMaster + ' layers a second frequency over everything \u2014 explain what this master vibration demands and how it interacts with Life Path ' + p.lifePath + '. ' : '') + (p.nameHiddenMasters && p.nameHiddenMasters.length ? 'A deeper audit of the full birth name also surfaces its own Hidden Master frequencies (' + formatNameHiddenMasters(p.nameHiddenMasters) + ') \u2014 name-field callings distinct from the Life Path itself. ' : '') + 'Discuss the Hebrew letter system encoded in the name and Tarot path.' + (p.hebrewSoulCorrespondence ? ' Weave in the Hebrew Soul Correspondence directly: the birth name transliterated to Hebrew consonants (' + p.hebrewSoulCorrespondence.hebrewConsonants + ') carries a real gematria of ' + p.hebrewSoulCorrespondence.gematriaTotal + (p.hebrewSoulCorrespondence.archangelMatches.length ? ', matching Archangel ' + p.hebrewSoulCorrespondence.archangelMatches[0].name + ' (' + p.hebrewSoulCorrespondence.archangelMatches[0].hebrew + ' = ' + p.hebrewSoulCorrespondence.archangelMatches[0].value + ') — name this connection explicitly, showing the arithmetic.' : ', with no Archangel match at that exact number — state this plainly rather than forcing a connection.') + ' Also name the 72 Names position (' + p.hebrewSoulCorrespondence.nameOf72.position + ': ' + p.hebrewSoulCorrespondence.nameOf72.name + ') as the name\'s corresponding position among the 72 Names.' : '') + ' Explain what the deeper architecture reveals about purpose that the surface numbers only hint at.\n'
-    + 'Page 7 \u2014 TIMING & CYCLES: Personal Year ' + p.personalYear2026 + ' in 2026 has a specific energetic quality \u2014 describe it fully. What is this year asking ' + p.firstName + ' to do, release, begin, or complete? How does Personal Year ' + p.personalYear2026 + ' interact with the Codex Archetype ' + ca + '? Name it as the current chapter of the same Life Path ' + p.lifePath + ' story established on Page 1 — this cycle is that same core thread in motion through time — at most one light sentence acknowledging these numbers nest within each other, not an explanation of the mechanism.' + (p.personalMonth != null && p.personalDay != null ? (' Then narrow the lens twice more: describe what Personal Month ' + p.personalMonth + ' feels like and invites this month, and what Personal Day ' + p.personalDay + ' feels like and invites today specifically — focus on the lived feeling and the invitation, not on how the numbers are derived from one another.') : '') + (pdwFmtPrompt ? (' Close this page by naming the Personal Day Wildcard: today wildcards toward ' + pdwFmtPrompt.majorPhrase + ', with a small pool of companion cards nearby (' + pdwFmtPrompt.poolSentences + '). Frame this with genuinely invitational language — "worth noticing," "a door that is open today," "one possibility among the pool" — never assignment language like "you are" or "this is your card," and never explain how the pool of cards was assembled. Make explicit that this is a live, temporary possibility for today only, gone once tomorrow arrives, and is separate from the fixed, birth-locked ' + tc.card + ' Trump Card named earlier — never conflate the two or imply the wildcard replaces or outranks it.') : '') + ' Name the specific opportunities and risks of this cycle. Describe the 9-year cycle this year sits within and where ' + p.firstName + ' is in that larger arc. What decisions made in 2026 will echo for years to come?\n'
+    + 'Page 7 \u2014 TIMING & CYCLES: Personal Year ' + p.personalYear2026 + ' in 2026 has a specific energetic quality \u2014 describe it fully. What is this year asking ' + p.firstName + ' to do, release, begin, or complete? How does Personal Year ' + p.personalYear2026 + ' interact with the Codex Archetype ' + ca + '? Name it as the current chapter of the same Life Path ' + p.lifePath + ' story established on Page 1 — this cycle is that same core thread in motion through time — at most one light sentence acknowledging these numbers nest within each other, not an explanation of the mechanism.' + (p.personalMonth != null && p.personalDay != null ? (' Then narrow the lens twice more: describe what Personal Month ' + p.personalMonth + ' feels like and invites this month, and what Personal Day ' + p.personalDay + ' feels like and invites today specifically — focus on the lived feeling and the invitation, not on how the numbers are derived from one another.') : '') + (pdwFmtPrompt ? (' Close this page by naming the Personal Day Wildcard: today wildcards toward ' + pdwFmtPrompt.majorPhrase + ', with a small pool of companion cards nearby (' + pdwFmtPrompt.poolSentences + '). Frame this with genuinely invitational language — "worth noticing," "a door that is open today," "one possibility among the pool" — never assignment language like "you are" or "this is your card," and never explain how the pool of cards was assembled. Make explicit that this is a live, temporary possibility for today only, gone once tomorrow arrives, and is separate from the fixed, birth-locked ' + tc.card + ' Trump Card named earlier — never conflate the two or imply the wildcard replaces or outranks it.' + nodalChoiceInstruction) : '') + ' Name the specific opportunities and risks of this cycle. Describe the 9-year cycle this year sits within and where ' + p.firstName + ' is in that larger arc. What decisions made in 2026 will echo for years to come?\n'
     + 'Page 8 \u2014 RELATIONAL GEOMETRY: Describe the full relational field ' + p.firstName + ' emanates. Life Path ' + p.lifePath + ' creates a specific type of partner dynamic \u2014 explain it in depth. The ' + tc.card + ' archetype shapes how ' + p.firstName + ' shows up in love, what they unconsciously seek, and what they need to feel truly met. Describe the element (' + p.sunSign.element + ') in relationship: what it attracts, what it resists. Name the Life Paths and archetypes most naturally resonant with ' + p.firstName + '. Include what sacred partnership looks like for this Codex Archetype.' + (p.node && p.node.northSign ? (' Their North Node in ' + p.node.northSign + ' also names what kind of partnership stretches them toward growth, versus the South Node in ' + p.node.southSign + ' describing the relational comfort zone that feels safest but can become a rut — name both plainly as a lifelong relational axis, not a prediction.') : '') + '\n'
     + 'Page 9 \u2014 CAREER, PURPOSE & AIN SOPH AUR: What is ' + p.firstName + ' building in this lifetime? Use Expression ' + (p.expression||'?') + ' and Life Path ' + p.lifePath + ' to map the specific domains where this soul is meant to contribute. Name the career fields, creative expressions, leadership roles, or service paths aligned with ' + ca + '.' + (p.soulCard && p.courtCard ? ' Weave in the Metatron\'s Cube reading \u2014 Soul Card ' + p.soulCard.name + ' and Court Card ' + p.courtCard.name + ' \u2014 as the geometry beneath this purpose.' : '') + (p.zodiacalCourtCard ? ' Separately, also name the Zodiacal Court Card (Sun placement) \u2014 the ' + p.zodiacalCourtCard.name + ' \u2014 as a second, independent Court Card finding reached through ' + p.firstName + '\'s own Sun placement in the sky rather than the Sephirah, never implying it replaces or outranks the Metatron\'s Cube Court Card named just above.' : '') + ' Describe the legacy this soul is here to leave. Before the blessing, write one real synthesis paragraph \u2014 not a generic "everything is connected" statement, but naming at least two or three SPECIFIC cross-system pairings from earlier in this reading and stating outright why they are not a coincidence (for example: Life Path ' + p.lifePath + ' and the Trump Card ' + trumpCardName + ' arriving at the same core teaching; the Gematria reduction and the Sephirah ' + p.tree.name + ' pointing at the same address; the Personal Year and the Codex Archetype moving in the same direction). Then close with Celestia\'s full personal blessing to ' + p.firstName + ' invoking AIN SOPH AUR \u2014 warm, specific, and sacred. This closing should feel like a blessing received from the oracle herself, one who has been reading all nine pages as one chart, not nine.';
 
@@ -8655,6 +8835,12 @@ function unlockFullReading() {
           return '<p style="margin-bottom:1.3rem;line-height:1.9;font-size:1rem;color:rgba(232,224,255,0.9);">' + para.trim() + '</p>';
         }).join('')
       + '</div>';
+    // W3BB CODEX V07 PART XXX -- Nodal Choice interactive section, solo
+    // reading only, placed right after Page 1 (idx 0) since that is where
+    // the existing North/South Node Decan Cards are already introduced.
+    // buildNodalChoiceSection() returns '' when this profile has no Node
+    // Decan Cards, so this is a silent no-op for any profile missing them.
+    if (idx === 0) { pageHtml += buildNodalChoiceSection(window._readingProfile); }
   });
 
   readingContainer.innerHTML = pageHtml;
@@ -9635,6 +9821,8 @@ document.getElementById('reset-btn').addEventListener('click', function() {
   window._readingProfile = {};
   window._readingText = '';
   window._allPages = [];
+  window._nodalChoice = null;
+  window._nodalChoiceAt = null;
   selectedTier = null;
   isMuted = false;
   _readingReady = false;
