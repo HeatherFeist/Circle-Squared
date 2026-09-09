@@ -1,3 +1,16 @@
+# NOTE (added while building the Square subscription webhook, see
+# functions/api/square-subscription-webhook.js): this repo's real
+# production site runs on CLOUDFLARE PAGES, not Netlify. This file and
+# everything under netlify/functions/ are NOT currently deployed or
+# running anywhere -- confirmed this session: every live checkout path
+# today (every one-time tier and the $20/month subscription alike) is a
+# plain static Square Payment Link needing zero server code. Any new
+# server-side code for this project belongs under /functions (Cloudflare
+# Pages Functions convention) instead. These Netlify-format files are
+# left in place only because cleaning them up is a separate task, not in
+# scope for the change that added this note -- do not assume they are
+# live just because they exist here.
+
 [build]
   publish = "public"
   functions = "netlify/functions"

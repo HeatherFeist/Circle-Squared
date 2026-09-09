@@ -62,7 +62,8 @@ email — no password is ever collected or stored by this app.
 |---|---|---|
 | Supabase project URL + anon key | Already hardcoded in `public/index.html` as `SUPABASE_URL` / `SUPABASE_KEY` (the same two values `redeem_promo_code()` and the lead-capture save already use) | ✅ Already there — nothing new to add |
 | `SQUARE_SUBSCRIPTION_LINK` | `public/index.html`, the `SQUARE_SUBSCRIPTION_LINK` JS variable, right above `startSubscriptionCheckout()` | ✅ **Live** — set to the real Square Payment Link |
-| `SQUARE_SUBSCRIPTION_ACCESS_TOKEN`, `SQUARE_LOCATION_ID`, `SQUARE_SUBSCRIPTION_PLAN_ID` | Would be needed only for the FUTURE fully-automated path (section 5) | Not needed for launch — see section 4 |
+| `SQUARE_SUBSCRIPTION_ACCESS_TOKEN`, `SQUARE_WEBHOOK_SIGNATURE_KEY`, `SUPABASE_SERVICE_ROLE_KEY` | Needed only for the automated-activation webhook (section 5), in **Cloudflare Pages'** environment variables — not Netlify's | Not needed to keep taking payments — see section 4 |
+| `SQUARE_LOCATION_ID`, `SQUARE_SUBSCRIPTION_PLAN_ID` | Only relevant to the older, unused Subscriptions-API-driven checkout stub (`netlify/functions/create-subscription-checkout.js`) | Not used by the live path or by the webhook in section 5 |
 
 Nothing here is a secret that needs to stay out of chat or code — a
 Square **Payment Link** is a public checkout URL, safe to have visible in
@@ -133,76 +134,154 @@ values ('<the-user-id-from-above>', 'active', now(), now() + interval '30 days')
 on conflict (user_id) do update set status = 'active', current_period_start = now(), current_period_end = now() + interval '30 days';
 ```
 
-## 5. OPTIONAL FUTURE UPGRADE — fully automated billing via the Subscriptions API
+## 5. Automated activation via a real Square webhook (built — needs your setup steps)
 
-**Not required to launch — section 4's Payment Link path already takes
-real money today.** This section documents the fully-automated
-alternative: instead of a human running one SQL statement per new
-subscriber, Square's own Subscriptions API and webhooks keep
-`subscribers.status` accurate automatically. Worth building once volume
-makes the manual step from section 4 a real burden, not before. The
-client-side gate, the database schema, and a stub serverless function for
-this path are all in place and tested, but no part of it is wired up to
-actually run yet:
+**Not required to keep taking payments — section 4's Payment Link path
+already takes real money today, and nothing here changes that.** This
+section replaces the old "optional future upgrade" sketch (a
+Subscriptions-API-driven checkout) with what was actually built: a real
+webhook receiver, `functions/api/square-subscription-webhook.js` — a
+**Cloudflare Pages Function** (this site's real production host is
+Cloudflare Pages, not Netlify) — that Square calls automatically on
+billing events for the existing Payment Link, and which updates
+`subscribers.status` itself. Once the steps below are done, the manual
+SQL step in section 4 stops being necessary for new payments; until they
+are done, section 4's manual step remains exactly as necessary as it is
+today, and nothing about this endpoint existing breaks anything —
+Square simply won't be calling it yet.
 
-1. **Create a subscription plan in the Square dashboard.** Go to the
-   Square Dashboard → **Items & Orders → Subscriptions** and create a new
-   subscription plan (name it something like "Daily Readings", $20/month,
-   monthly cadence). Saving it gives you a **Catalog subscription-plan
-   object ID** (and, underneath it, a **plan variation ID** — Square's
-   Subscriptions API creates subscriptions against the *variation* ID,
-   not the top-level plan ID; the dashboard will show you both).
-2. **Generate a Subscriptions-API-scoped access token.** In the Square
-   Developer Dashboard (developer.squareup.com/apps) → your application →
-   **Credentials**, get an access token with the Subscriptions API scope
-   enabled. **This must be a different token from the one-time-checkout
-   `SQUARE_ACCESS_TOKEN`** already used by `create-checkout.js` — do not
-   reuse that value here, even though both live in Netlify's environment
-   variables. Use the **Sandbox** token first and test end-to-end before
-   ever touching the **Production** one, exactly like
-   `docs/SQUARE_DYNAMIC_CHECKOUT_SETUP.md`'s existing "Use Sandbox before
-   Production" guidance for one-time checkout.
-3. **Set three environment variables in Netlify** (Netlify dashboard →
-   your site → Site configuration → Environment variables):
+This does NOT use the Subscriptions API's `CreateSubscription` call or a
+Catalog plan-variation ID the way the old sketch in this section used to
+describe — `netlify/functions/create-subscription-checkout.js` (a stub
+for that different approach) is still in the repo but still unused; this
+Part uses the plain Payment Link that's already live, plus Square's own
+webhook notifications about it.
+
+### 5.1 What events this listens for, and why (verified this session)
+
+Square signs and sends webhook notifications for real billing events tied
+to the existing recurring Payment Link. `functions/api/square-subscription-webhook.js`
+listens for:
+
+- **`invoice.payment_made`** — a payment for a billing cycle succeeded.
+  Primary, high-confidence signal: Square's own Invoices API webhook
+  documentation covers this event, and Square's Subscription Billing
+  documentation describes each subscription billing cycle as itself being
+  invoiced under the hood — this is why a Payment-Link-based subscription
+  still produces invoice events even though it was never created through
+  the `CreateSubscription` API call directly. Marks the subscriber
+  `active` with a fresh 30-day period.
+- **`invoice.payment_failed`** — an automatic renewal charge failed.
+  Marks the subscriber `paused` (not `canceled` — a single failed card
+  isn't the same as someone actively canceling).
+- **`invoice.canceled`** — marks the subscriber `canceled`.
+- **`subscription.created` / `subscription.updated`** — handled as a
+  secondary, defensive signal on the underlying Subscription object's own
+  `status` field (`ACTIVE` / `CANCELED` / `DEACTIVATED` / `PAUSED`),
+  mapped to this app's own status values. This session could not fully
+  confirm from Square's docs whether a dashboard-created recurring
+  Payment Link's subscription reports cancellations through this event
+  family, through the invoice events above, or both — handling both
+  families is the safe choice either way.
+
+**Identifying who paid:** a plain Payment Link never gets a
+`customer_id`/`reference_id` set by this app at creation time, so the
+webhook handler fetches the full Invoice (`GET /v2/invoices/{id}`, using
+the invoice id in the webhook payload) and reads its
+`primary_recipient.email_address` field — Square's own Invoice/
+InvoiceRecipient object reference documents this as a snapshot of the
+buyer's email taken directly onto the invoice, no separate customer
+lookup needed for that path. For the `subscription.*` path, the payload
+gives a `customer_id` instead, so the handler calls
+`GET /v2/customers/{customer_id}` and reads that Customer object's
+`email_address`.
+
+**Signature verification:** every notification carries an
+`x-square-hmacsha256-signature` header — an HMAC-SHA256 of the exact
+notification URL concatenated with the raw request body, signed with the
+webhook subscription's own **signature key** (generated by Square only
+when you create the webhook subscription in the dashboard — a different
+value from the Square API access token). The handler recomputes this and
+rejects (401) anything that doesn't match, or anything at all if
+`SQUARE_WEBHOOK_SIGNATURE_KEY` isn't set — before ever parsing the body.
+
+**A caveat, stated plainly:** this environment's network egress proxy
+blocks `developer.squareup.com` and `squareup.com` directly (the same
+limitation already noted in `netlify/functions/create-subscription-checkout.js`
+and `docs/SQUARE_DYNAMIC_CHECKOUT_SETUP.md`), so everything above was
+verified through web search against Square's documentation and SDK
+source rather than a direct fetch of Square's own pages. Re-check against
+developer.squareup.com directly once you have real access, especially
+the `subscription.*` event behavior for a dashboard-created recurring
+Payment Link specifically (as opposed to a `CreateSubscription`-API-made
+one), before fully trusting it unattended at real volume.
+
+### 5.2 The database side: a new function, not a change to the old one
+
+`upsert_subscriber_status()` (the function the client-side app already
+uses) deliberately writes only to `auth.uid()` — the signed-in caller's
+own row. The webhook is a trusted server-to-server caller with no
+Supabase user session at all, so it needs a different, narrower door:
+`activate_subscriber_by_email()`, added in
+`supabase/square_subscription_webhook_schema.sql` (run this file once in
+the Supabase SQL Editor, after `subscriptions_daily_reads_schema.sql` —
+it only adds one new function, it does not touch `subscribers`,
+`upsert_subscriber_status()`, or `upsert_daily_read()` at all). It looks
+up the `auth.users` row matching the email Square gave us and upserts
+that person's `subscribers` row — and its `EXECUTE` privilege is granted
+**only to the `service_role` Postgres role**, with an explicit
+`revoke ... from public` first (Postgres grants `EXECUTE` on new
+functions to `PUBLIC` by default — this was verified directly against a
+real local Postgres instance this session: without that explicit revoke,
+a normal signed-in `authenticated` caller could call this function and
+activate or cancel *anyone's* subscription just by knowing their email;
+with the revoke in place, both `anon` and `authenticated` callers get a
+clean "permission denied for function" and only a request signed with the
+real service-role key succeeds). See that file's own header comment for
+the full safety reasoning.
+
+### 5.3 Setup steps (what you actually need to do)
+
+1. **Deploy this branch to Cloudflare Pages** (or merge it) so
+   `functions/api/square-subscription-webhook.js` is live at
+   `https://circle.w3bbworldwide.com/api/square-subscription-webhook`.
+2. **Run `supabase/square_subscription_webhook_schema.sql`** once in the
+   Supabase SQL Editor (same place you ran the other schema files).
+3. **Set these in the Cloudflare dashboard** (Cloudflare dashboard → your
+   Pages project → **Settings → Environment variables**, for the
+   Production environment):
 
    | Variable | What it is |
    |---|---|
-   | `SQUARE_SUBSCRIPTION_PLAN_ID` | The plan **variation** ID from step 1 |
-   | `SQUARE_SUBSCRIPTION_ACCESS_TOKEN` | The Subscriptions-API-scoped token from step 2 |
-   | `SQUARE_LOCATION_ID` | Can reuse the same value `create-checkout.js` already uses, if it's the same business location |
+   | `SQUARE_SUBSCRIPTION_ACCESS_TOKEN` | A real Square API access token (the same name already referenced elsewhere in this doc/repo) — needs permission to call the Invoices and Customers APIs (`GET /v2/invoices/{id}`, `GET /v2/customers/{id}`) |
+   | `SQUARE_WEBHOOK_SIGNATURE_KEY` | The signature key Square generates in step 4 below — a secret, never the access token |
+   | `SUPABASE_SERVICE_ROLE_KEY` | Your Supabase project's **service role** key (Supabase dashboard → Project Settings → API → `service_role` secret) — a genuine secret, completely different from the anon `SUPABASE_KEY` already hardcoded client-side in `public/index.html`, and must never be put in any committed file or client-side code |
+   | `SUPABASE_URL` | The same Supabase project URL already used elsewhere (e.g. `https://xyzco.supabase.co`) |
 
-   Trigger a new deploy after setting these.
-4. **Set the client-side `SQUARE_SUBSCRIPTION_PLAN_ID` value** in
-   `public/index.html` (the JS variable, in the "SQUARE SUBSCRIPTIONS
-   billing" section, right next to `startSubscriptionCheckout()`) to the
-   same plan variation ID from step 1. While this is empty (the shipped
-   default), the Subscribe button always shows "Subscriptions Launching
-   Soon" and never attempts a checkout — this is intentional, so nothing
-   silently breaks or mis-charges a customer before steps 1–3 are done.
-5. **Implement the real API call.** `netlify/functions/create-subscription-checkout.js`
-   is a stub: it checks that the three env vars above are set and, if
-   they are, still returns "not implemented yet" — the actual call to
-   Square's `POST /v2/subscriptions` (documented in that file's header
-   comment, alongside the Customer-lookup step that has to happen first)
-   needs to be written and tested against a real Square sandbox account
-   before this goes further. `startSubscriptionCheckout()` in
-   `public/index.html` has a matching `TODO` comment naming exactly where
-   the client-side call to that function belongs once it exists.
-6. **Build a webhook receiver.** Square's subscription lifecycle webhooks
-   (`subscription.created`, `subscription.updated`, `invoice.payment_made`,
-   etc.) are the reliable way to know a subscription actually started,
-   renewed, or failed — not just the initial checkout redirect. That
-   receiver (not yet built) must call the `upsert_subscriber_status()`
-   RPC (see `supabase/subscriptions_daily_reads_schema.sql`) to update the
-   right user's `subscribers` row — it must never write to that table
-   directly, and it must authenticate as that specific user (e.g. via a
-   Supabase service-role key looked up by the Square customer's email/
-   metadata), matching every other write path in this project's Supabase
-   usage.
+   (`SQUARE_ENVIRONMENT=sandbox` is also supported, for testing against
+   Square's sandbox APIs before touching production — omit it, or set it
+   to anything else, for production.)
+4. **Create the webhook subscription in the Square dashboard.** Square
+   Dashboard → Developer/Webhooks settings → create a new webhook
+   subscription, notification URL set to the exact Cloudflare Pages
+   Function URL from step 1, subscribed to these event types:
+   `invoice.payment_made`, `invoice.payment_failed`, `invoice.canceled`,
+   `subscription.created`, `subscription.updated`. Saving it shows you
+   the **signature key** — copy that into `SQUARE_WEBHOOK_SIGNATURE_KEY`
+   from step 3.
+5. **Verify it's working.** Either make one real (or Sandbox) test
+   payment through the existing `SQUARE_SUBSCRIPTION_LINK` and confirm
+   the corresponding `subscribers` row goes `active` without you running
+   any SQL by hand, or — if your Square dashboard's webhook subscription
+   page offers a "Send Test Event" / test-notification feature — use that
+   first to confirm the endpoint returns a `200` and logs correctly
+   before relying on a real payment.
 
-Until these steps are done, subscriber activation stays the manual
-one-SQL-statement step described in section 4 — that's the live,
-intended state today, not a bug or a blocker.
+Until all five steps above are done, subscriber activation stays the
+manual one-SQL-statement step described in section 4 — that's the live,
+intended state today, not a bug or a blocker, and it stays a safe fallback
+even after the webhook is live (nothing stops you from still running the
+manual SQL for an edge case the webhook doesn't catch).
 
 ## 6. Where this data shows up
 

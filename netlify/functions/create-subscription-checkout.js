@@ -1,5 +1,18 @@
 // netlify/functions/create-subscription-checkout.js
 //
+// NOTE (added while building the Square subscription webhook, see
+// functions/api/square-subscription-webhook.js): this repo's real
+// production site runs on CLOUDFLARE PAGES, not Netlify -- confirmed
+// this session. This file is NOT currently deployed or running anywhere,
+// same as netlify/functions/create-checkout.js. It is left in place only
+// because cleaning up the unused Netlify files is a separate task, not
+// in scope here -- do not assume this is live just because it exists in
+// the repo. (Separately: the automated-activation gap this stub used to
+// describe as a future TODO is now actually built, just via a different,
+// simpler mechanism than this file describes -- see
+// functions/api/square-subscription-webhook.js and
+// docs/SUBSCRIPTIONS_SETUP.md section 5.)
+//
 // STUB -- describes the FUTURE fully-automated path only. The $20/month
 // subscription is actually LIVE now via a much simpler route: a plain
 // Square Payment Link (SQUARE_SUBSCRIPTION_LINK in public/index.html),
