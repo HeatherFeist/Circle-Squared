@@ -557,4 +557,49 @@ This Part does not re-derive, re-verify, or re-justify any individual card's Qua
 
 ---
 
-*W3BB Worldwide · Codex Logic V07 · Addendum to V06 · All additions are cross-verified against at least one other system already established in this Codex, with the derivation shown — no assertion stands alone. Part XXX is the sole exception by design: it is explicitly labeled original W3BB construction per the Part XXII branch (b) standard, not cross-verified against a real tradition, because no real tradition exists for it to check out against.*
+*W3BB Worldwide · Codex Logic V07 · Addendum to V06 · All additions are cross-verified against at least one other system already established in this Codex, with the derivation shown — no assertion stands alone. Parts XXX and XXXI are the exceptions by design: each is explicitly labeled original W3BB construction per the Part XXII branch (b) standard, not cross-verified against a real tradition, because no real tradition exists for either to check out against.*
+
+---
+
+## Part XXXI — The Nodal Choice Interface: An Original W3BB Interpretive Framework Layered on the Real Node Decan Cards
+
+### 31.1 — What is, and is not, new here
+
+Nothing about the North/South Node Decan Cards themselves changes in this Part. `getNodeDecanCards()` and the real, already-verified Golden Dawn decan mechanism behind it (Part XXI) are untouched — same table, same rule, same two independent verifications. What is genuinely new is a single, narrow addition: **presenting both cards to the reader as an explicit either/or/both decision, with three literal buttons, instead of the reading silently choosing a growth-trajectory framing on the person's behalf.**
+
+That interactive choice mechanic — not the cards, not the decan math, just the act of making the choice a real, clickable, named decision — is a **W3BB Codex original construction**. It is not Golden Dawn, not Kabbalah, and not inherited tradition of any kind, and it is never presented as such anywhere in code, in reading copy, or in this document. Per Part XXII's second branch (the same branch invoked by this Codex's other original addition, the W3BB Evolutionary Geometry layer, on a sibling branch): a new addition to this Codex is valid either because it checks out mathematically/structurally against a real tradition (branch a), or because it is honestly labeled as an original construction rather than passed off as inherited (branch b). There is no historical tradition of "Tarot decan cards as an interactive either/or/both UI control" to verify against, so this Part satisfies branch (b) exactly the way it is meant to be satisfied: by naming the invention plainly rather than dressing it up as something older than it is.
+
+### 31.2 — Why this strengthens the Codex's own standing free-will framing, rather than adding a new claim
+
+This Codex has said, from Part XXI §21.6 onward, that a person's Node placement is fixed at birth but their day-to-day *relationship* to it is chosen: "the placement itself does not move — it was fixed the moment you were born — only your relationship to it, moment by moment, is yours to choose." That sentence has been sitting in the reading's prose since Part XXI. This Part does not introduce a new claim about free will; it makes a claim the Codex already made **literal and interactive** instead of leaving it as something only implied in narrative language. The person does not read a paragraph asserting they have a choice — they are handed an actual choice, with three named options and honest, neither-is-better framing, and the very next part of their reading (today's Personal Day Minor Arcana field, Part XXV) visibly changes shape in response to what they picked. The mechanism is new; the philosophy behind it is the same one this Codex has held since Part XXI.
+
+### 31.3 — The interface, exactly as specified
+
+For a solo reading whose profile carries Node Decan Cards, a new section appears directly alongside the existing North/South Node Decan Card material (Page 1 of both `getFallbackReading()` and the AI-driven reading), showing:
+
+- Both cards side by side, North Node card and South Node card, using the same visual convention as the existing Soul Card/Court Card captions elsewhere in the app (inline-styled colored text labels, no new visual system introduced).
+- North Node column framed as **"Emerging, outward-facing potential"** / **"What growth may require."**
+- South Node column framed as **"Familiar, inward-returning pattern"** / **"What already feels natural or practiced."**
+- For each card, a **Constructive expression** line and a **Possible imbalance** line — see §31.4 for exactly how these are derived.
+- Explicit, neutral copy stating that neither orientation is inherently better: the South Node's familiar pattern can be exactly right on a day that calls for rest, integration, or recovery, and the North Node's emerging potential can be exactly right on a day that calls for expansion — a real choice for how to meet today, not a quiz with a correct answer.
+- Three buttons, with the project owner's own exact sub-text preserved verbatim: **Lean North** ("I want to move toward growth and unfamiliar possibility."), **Work with South** ("I want to draw upon familiarity, restoration, or existing strengths."), **Hold the Axis** ("I want to understand and balance both energies.").
+
+### 31.4 — Constructive expression / Possible imbalance: derivation rule and honest scope
+
+Per this Codex's standing rule against inventing new Minor Arcana meanings untethered from real data (and per Part XXVI's meaning-first, no-mechanics-dump presentation rule), the Constructive expression and Possible imbalance lines for each card are not freely invented. They are a direct light/shadow reading of that **same card's existing Golden Dawn keyword already in `MINOR_KEYWORDS`** (Section 6.3) — the same keyword table Part XXI itself already draws every card name from (§21.4's note: "no new keyword text was invented for this feature"). A new lookup table, `MINOR_LIGHT_SHADOW`, keyed by the exact card name `pipCardName()` already returns, carries these hand-written pairs — but **only for the specific cards this feature's synthetic verification profiles actually produced** (Five of Swords/Defeat, Five of Wands/Strife, Nine of Wands/Strength, Nine of Swords/Cruelty, Three of Swords/Sorrow, Three of Wands/Virtue — six of the 36 decan-rank cards). For any card not yet in that hand-built table, `getMinorCardLightShadow()` falls back to a generic-but-still-keyword-derived phrasing ("a constructive, intentional expression of its `[keyword]` energy" / "letting its `[keyword]` energy run unchecked or unexamined") rather than inventing unrelated content or throwing an error.
+
+**This is explicitly flagged, not smoothed over:** the full 36-card table implied by Part XXI's own decan-rank set (ranks 2–10, four suits) is not built out in this pass. It should be filled in the same way — one real card at a time, with a genuine light/shadow reading of that card's own existing keyword — as future readings actually surface each remaining card, rather than all 30 remaining entries being written at once, untested, in this PR.
+
+### 31.5 — Wiring: in-memory choice, additive framing, graceful default
+
+The chosen orientation is stored in `window._nodalChoice` (`'north'` | `'south'` | `'both'` | `null`), an in-memory global for the current reading session only — the same pattern already used by `window._readingProfile`, reset alongside it on every new reading (the `reset-btn` handler). No new persistence mechanism was introduced.
+
+Both `getFallbackReading()` (Page 7) and `doReading()`'s AI prompt (Page 7 spec) check this same global via `getNodalChoiceReaderSentence()` / `getNodalChoicePromptInstruction()` respectively, and — **only when a choice has actually been made and the profile carries Node Decan Cards** — append one additional sentence naming which lens (growth/expansion, restoration/familiar-strength, or balanced-both) colors today's Personal Day Wildcard field (Part XXV), explicitly naming the relevant Node Decan Card(s) by name. When no choice has been made, both functions add nothing at all, and the existing neutral Part XXV framing renders byte-for-byte identical to how it rendered before this Part existed — verified directly (see the PR body) by diffing `getFallbackReading()`'s Page 7 output with `window._nodalChoice` unset against the same function on the pre-this-Part codebase.
+
+### 31.6 — What this explicitly does not do
+
+This Part does not touch partnership or group reading code in any way — the Nodal Choice interface is solo-reading-only, matching how other Codex layers have been staged solo-first before adding partnership/group wiring in a later pass (Part XXV §25.6's own history is the precedent). It does not alter, reinterpret, or attach a score to the underlying Node Decan Cards themselves (Part XXI stands exactly as written). It does not claim the interactive choice mechanic is Golden Dawn, Kabbalah, or any inherited tradition — see §31.1. And it does not claim, anywhere in code or copy, that either Node orientation is more correct than the other; the explicit neutral framing in §31.3 exists specifically to guard against that slippage, and was re-read critically for exactly this failure mode before this Part was finalized.
+
+---
+
+*W3BB Worldwide · Codex Logic V07 · Addendum to V06 · All additions are cross-verified against at least one other system already established in this Codex, with the derivation shown — no assertion stands alone. Part XXXI is a labeled exception by design: its interactive choice mechanic is explicitly original W3BB construction per the Part XXII branch (b) standard, not cross-verified against a real tradition, because no real tradition exists for an either/or/both Tarot-card UI control to check out against — while the Node Decan Cards it presents remain the same real, Part XXI-verified mechanism throughout.*
