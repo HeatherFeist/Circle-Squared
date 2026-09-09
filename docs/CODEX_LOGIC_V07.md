@@ -486,4 +486,75 @@ Distinct from the pairwise Standout Pairings above, the Group Energetic Overview
 
 ---
 
-*W3BB Worldwide · Codex Logic V07 · Addendum to V06 · All additions are cross-verified against at least one other system already established in this Codex, with the derivation shown — no assertion stands alone.*
+## Part XXX — The W3BB Evolutionary Geometry Layer: An Original Codex Addition (Not Golden Dawn, Not Traditional)
+
+### 30.1 — Provenance: what was proposed, and what the audit actually found
+
+The project owner was shown an externally-produced document, "22 Major Arcana Official Codex Mapping" — including one version elaborated further by a separate AI tool that read only that same single source, not an independent verification — presenting a full system of Hebrew letters, Kabbalistic paths, "Quadrants" (a compass direction plus an element), and "Geometry" modes (Tesseract Ignition/Recursion/Collapse/Shatter/Expansion, Torus Inward/Outward/Inversion/Reversal/Solar/Full, Egg-Sphere 1–6, Cube Face, Shadow Face, Lunar Recursion, and Relational Braid) for each of the 22 Major Arcana cards, framed as though it were equivalent to established tradition.
+
+Audited against real sources, not assumed:
+
+- **The Hebrew letter / Sephirah-pair / card core is not new.** It matches, card for card, this Codex's own already-verified Golden Dawn attribution already present in `PATH_TABLE` (Section 5) and confirmed again in Part XXV §25.3. Nothing here needed to change or be re-derived.
+- **The Quadrant assignments do not match the real, documented Golden Dawn direction/element convention.** The actual historical assignment, confirmed via the Lesser Ritual of the Pentagram, is **Fire = South, Air = East, Water = West, Earth = North**. The proposed document's compass/element pairings are a different, unexplained permutation and cannot be presented as Golden Dawn.
+- **No real historical or notable esoteric tradition connects the Tarot Major Arcana to tesseracts, tori, or any hyperdimensional "mode."** Real sacred-geometry connections to the Tarot do exist (the lemniscate above the Magician's head; the twin pillars flanking the High Priestess) — but nothing resembling a "Tesseract Collapse" for Death, or any of the other Geometry Mode names, appears in any tradition this audit could locate.
+- **"Relational Braid" specifically is the same unfounded term this Codex already flagged and rejected once before**, in Part XIX, when auditing an earlier fabricated external "Codex V07" draft. Its unexplained reappearance here is a provenance red flag, not a coincidence to build past quietly — which is exactly why it is named here rather than absorbed silently.
+
+### 30.2 — The resolution, in the project owner's own words
+
+The project owner reviewed this audit and made the explicit call to proceed anyway, but only under a very specific label. Quoting her directly:
+
+> "I think the way to go forward here... I do feel there is some relevance in the spirit of the document, I just actually think that what we are attempting to build onto this system, is actually new territory and will be a W3BB Codex original addition, so we will need to correctly label it so... my feeling is that the tesseract symbology is a 4 and 5D concept that transcends traditional systems... It is connected to the next phase of evolution and can act as the bridge between the old ancient systems and the W3BB Codex... the ancient systems we are building on top of are not to be altered, just enhanced and applied in different ways."
+
+Concretely, that means: this Codex adopts the full Quadrant + Geometry + Archetype layer from the proposed document, unmodified, card for card — but **only** as an explicitly labeled **W3BB Codex original construction**. It is never presented, in code, in this document, or in reader-facing copy, as Golden Dawn, Kabbalah, or any inherited tradition. It is framed specifically as a deliberate 4th/5th-dimensional evolutionary layer this Codex is choosing to add **on top of** — never in replacement of, and never altering — the real, existing, verified systems (the real Golden Dawn Tarot/Tree-of-Life attribution, real numerology, real astrology) that this document has verified throughout Parts I–XXIX. Those systems remain completely untouched and exactly as accurate as they were before this Part existed. Per the project owner's own framing, this layer is the bridge the Codex is building between the old, settled systems and whatever comes next — not a revision of the old systems themselves.
+
+### 30.3 — Satisfying the Part XXII standard via its second branch
+
+Part XXII states the Codex standard has always had two valid branches: a new rule either (a) checks out mathematically or structurally against a real system already established in the Codex or an independently verifiable external source, cross-checked at least two ways, **or** (b) is explicitly, honestly labeled as an original construction rather than presented as inherited tradition. Every other addition in this document (Parts XVII–XXIX) satisfies branch (a). **This Part is the first to satisfy branch (b) instead** — there is no real tradition to verify the Quadrant/Geometry assignments against, the audit in §30.1 confirms that directly, and so the only honest path forward is exactly the one Part XXII already names: label it plainly as original, and never claim otherwise. That is what this Part, and the code it describes, does.
+
+### 30.4 — The full 22-card table
+
+Hebrew letter, Sephirah pair, and card name are unchanged — see `PATH_TABLE` (Section 5). The two new fields below join against that same table by card name.
+
+| Path # | Card | Quadrant | Geometry Mode |
+|---|---|---|---|
+| 11 | The Fool | East / Fire | Egg-Sphere 1 (Origin) |
+| 12 | The Magician | North / Air | Tesseract Ignition |
+| 13 | The High Priestess | South / Water | Inward Torus |
+| 14 | The Empress | West / Earth | Egg-Sphere 2 |
+| 15 | The Emperor | East / Fire | Cube Face |
+| 16 | The Hierophant | South / Water | Tesseract Recursion |
+| 17 | The Lovers | South / Water | Relational Braid |
+| 18 | The Chariot | North / Air | Outward Torus |
+| 19 | Strength | East / Fire | Egg-Sphere 3 |
+| 20 | The Hermit | West / Earth | Tesseract Inward Recursion |
+| 21 | Wheel of Fortune | North / Air | Torus Inversion |
+| 22 | Justice | South / Water | Egg-Sphere 4 |
+| 23 | The Hanged Man | West / Earth | Torus Reversal |
+| 24 | Death | East / Fire | Tesseract Collapse |
+| 25 | Temperance | South / Water | Egg-Sphere 5 |
+| 26 | The Devil | West / Earth | Shadow Face Activation |
+| 27 | The Tower | North / Air | Tesseract Shatter |
+| 28 | The Star | South / Water | Egg-Sphere 6 |
+| 29 | The Moon | West / Earth | Lunar Recursion |
+| 30 | The Sun | East / Fire | Solar Torus |
+| 31 | Judgement | North / Air | Tesseract Expansion |
+| 32 | The World | South / Water | Full Torus |
+
+### 30.5 — Implementation
+
+`W3BB_EVOLUTIONARY_GEOMETRY` (a new lookup table, keyed by the exact `card` string `PATH_TABLE`/`primaryPathForLP()` already return — no new numbering scheme introduced) and its accessor `getW3bbEvolutionaryGeometry(cardName)` carry the 22 rows above, plus a short, meaning-first English translation of each Geometry Mode (per Part XXVI — the reader is told what the mode feels like and invites, never the mechanics of how it was assigned). Both are commented, in the code itself, with the same explicit non-traditional labeling this Part uses, and cross-reference this Part by name.
+
+The layer is wired into the **solo reading only**, at the natural attachment point — immediately after the existing, real Trump Card material on Page 2 of both `getFallbackReading()` and the `doReading()` AI prompt, which is already where a person's specific Life Path Trump Card (via `primaryPathForLP()`) is named. In both places:
+
+- The real Trump Card paragraph (Hebrew letter, path number, keyword) is completely untouched — this layer is purely additive, appended after it.
+- The added paragraph plainly states, in the reading copy itself, that this next piece is W3BB's own original addition laid on top of the Tarot tradition just described, and is explicitly not Golden Dawn, not Kabbalah, and not inherited tradition.
+- It names the card's Quadrant and Geometry Mode, translated into warm, meaning-first language rather than left as raw jargon (per Part XXVI).
+- Partnership and group readings are untouched by this Part — that wiring, if wanted, is left for a future pass, matching how other Codex layers have been staged solo-first before.
+
+### 30.6 — What this explicitly does not do
+
+This Part does not re-derive, re-verify, or re-justify any individual card's Quadrant or Geometry assignment — per the project owner's explicit direction, that per-card mapping is this layer's own original creative content, not a claim requiring outside verification, and Part XXII's branch (b) does not require one. It does not alter, remove, or reinterpret any existing `PATH_TABLE` entry, Sephirah, Hebrew letter, or real Golden Dawn attribution anywhere in the codebase. It does not merge this layer into the real Trump Card field, the Soul/Court Card system, the Node Decan Cards, or any other existing Minor/Major Arcana readout — it is its own clearly labeled, separate field. And it carries forward, rather than re-litigates, the standing rejection of "Relational Braid" as anything other than an explicitly original W3BB term — see §30.1 and Part XIX.
+
+---
+
+*W3BB Worldwide · Codex Logic V07 · Addendum to V06 · All additions are cross-verified against at least one other system already established in this Codex, with the derivation shown — no assertion stands alone. Part XXX is the sole exception by design: it is explicitly labeled original W3BB construction per the Part XXII branch (b) standard, not cross-verified against a real tradition, because no real tradition exists for it to check out against.*
