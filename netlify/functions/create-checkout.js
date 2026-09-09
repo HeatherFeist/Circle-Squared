@@ -1,5 +1,14 @@
 // netlify/functions/create-checkout.js
 //
+// NOTE (added while building the Square subscription webhook, see
+// functions/api/square-subscription-webhook.js): this repo's real
+// production site runs on CLOUDFLARE PAGES, not Netlify -- confirmed
+// this session. This file is NOT currently deployed or running anywhere;
+// every live checkout path today is a plain static Square Payment Link
+// needing zero server code. It is left in place only because cleaning up
+// the unused Netlify files is a separate task, not in scope here -- do
+// not assume this is live just because it exists in the repo.
+//
 // Creates a Square "quick pay" Payment Link for an arbitrary dollar amount,
 // server-side, so the client never sees (or needs) a Square access token.
 //
