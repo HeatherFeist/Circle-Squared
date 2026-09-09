@@ -699,6 +699,21 @@ body {
         <button id="open-group-intake-btn" class="cta-btn w-full" style="font-size:0.9rem;padding:0.7rem 1.5rem;background:linear-gradient(135deg,#50dcc8,#2fa898);">🌙 Start a Group Reading →</button>
       </div>
 
+      <!-- Daily Readings subscription entry point -- additive, alongside
+           the existing one-time TIERS grid above (never a replacement for
+           it: one-time reads keep working exactly as they do today, paid
+           for once, kept forever). This is a second, parallel product for
+           people who want a fresh reading every day -- oriented through
+           the Nodal Choice interface (Part XXXI) and saved over time --
+           building toward a Quarterly/Annual Lookback. See
+           docs/SUBSCRIPTIONS_SETUP.md and Codex Logic V07 Part XXXII. -->
+      <div class="cosmic-card" style="width:100%;max-width:480px;margin:0 auto 2rem;padding:1.2rem 1.4rem;text-align:center;border-color:rgba(201,168,76,0.35);">
+        <div style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.35em;color:#c9a84c;margin-bottom:0.4rem;">✦ FOR THE DAILY PRACTICE ✦</div>
+        <div style="font:700 1.1rem Georgia,serif;color:#e8e0ff;margin-bottom:0.4rem;">Daily Readings — $20/month</div>
+        <p style="font-size:0.78rem;color:#8a7aaa;line-height:1.5;margin:0 0 0.8rem;">Your reading above is a one-time purchase — pay once, keep it forever. A subscription is a different, ongoing practice: a fresh reading every day, oriented through the Nodal Choice interface, saved so you can look back on a whole season or year later.</p>
+        <button id="open-subscribe-btn" class="cta-btn w-full" style="font-size:0.9rem;padding:0.7rem 1.5rem;background:linear-gradient(135deg,#c9a84c,#8a6d1f);">✦ Daily Readings &amp; Lookback →</button>
+      </div>
+
       <!-- Sacred Geometry Layered Build — Codex Logic V06 §14/§16: literal
            Cartesian construction (Flower of Life → Fruit of Life → Tree of
            Life + Veils → Metatron's Cube → Tarot capstone), one continuous
@@ -772,6 +787,79 @@ body {
     <div id="group-status" style="font-size:0.75rem;color:#ff9ed2;min-height:1.4em;margin-bottom:0.6rem;text-align:center;"></div>
     <button id="group-continue-btn" class="cta-btn w-full" style="font-size:0.92rem;padding:0.75rem 1.5rem;background:linear-gradient(135deg,#50dcc8,#2fa898);">Continue to Payment →</button>
     <button id="group-back-btn" type="button" style="width:100%;margin-top:0.6rem;padding:0.5rem;background:none;border:none;color:#6a5a9a;cursor:pointer;font-size:0.78rem;">← Back</button>
+  </div>
+</div>
+
+<!-- ===== SCREEN SUBSCRIBE: Daily Readings sign-in + subscription status =====
+     Sign-in gate is ONLY required for this subscription/daily-reads flow --
+     one-time tier purchases above never touch any of this. See
+     docs/SUBSCRIPTIONS_SETUP.md and Codex Logic V07 Part XXXII. -->
+<div id="screen-subscribe" class="screen">
+  <div class="cosmic-card" style="max-width:560px;width:100%;margin:2rem auto;padding:1.6rem 1.4rem;">
+    <div style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.35em;color:#c9a84c;margin-bottom:0.4rem;text-align:center;">✦ DAILY READINGS ✦</div>
+    <h2 style="font:700 1.3rem Georgia,serif;color:#e8e0ff;text-align:center;margin:0 0 0.4rem;">Daily Readings &amp; Lookback — $20/month</h2>
+    <p style="font-size:0.78rem;color:#8a7aaa;text-align:center;line-height:1.5;margin:0 0 1.2rem;">Sign in with just your email (no password — a magic link) to start or manage your subscription.</p>
+
+    <div id="sub-signed-out-panel">
+      <div style="margin-bottom:0.8rem;">
+        <label style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#c9a84c;display:block;margin-bottom:0.4rem;">EMAIL</label>
+        <input id="sub-email-input" type="email" class="cosmic-input" placeholder="you@example.com" style="padding:0.6rem 0.9rem;width:100%;" autocomplete="off" />
+      </div>
+      <button id="sub-send-magic-link-btn" class="cta-btn w-full" style="font-size:0.92rem;padding:0.75rem 1.5rem;background:linear-gradient(135deg,#c9a84c,#8a6d1f);">Send Magic Link →</button>
+      <div id="sub-signin-status" style="font-size:0.75rem;color:#f0d070;min-height:1.4em;margin-top:0.6rem;text-align:center;"></div>
+    </div>
+
+    <div id="sub-signed-in-panel" style="display:none;">
+      <div style="font-size:0.82rem;color:#8a7aaa;text-align:center;margin-bottom:0.9rem;">Signed in as <span id="sub-signed-in-email" style="color:#e8e0ff;"></span> · <a href="#" id="sub-sign-out-link" style="color:#b08aff;">sign out</a></div>
+
+      <div id="sub-status-inactive" style="display:none;text-align:center;">
+        <div id="sub-launch-status" style="font-size:0.85rem;color:#f0d070;line-height:1.6;margin-bottom:1rem;"></div>
+        <button id="sub-subscribe-btn" class="cta-btn w-full" style="font-size:0.92rem;padding:0.75rem 1.5rem;background:linear-gradient(135deg,#c9a84c,#8a6d1f);">Subscribe — $20/month</button>
+      </div>
+
+      <div id="sub-status-active" style="display:none;">
+        <div style="text-align:center;font-size:0.82rem;color:#88dd99;margin-bottom:1rem;">✦ Subscription active</div>
+        <button id="sub-today-reading-btn" class="cta-btn w-full" style="font-size:0.92rem;padding:0.75rem 1.5rem;background:linear-gradient(135deg,#c9a84c,#8a6d1f);margin-bottom:0.7rem;">Today's Reading →</button>
+        <button id="sub-lookback-btn" class="cta-btn w-full" style="font-size:0.92rem;padding:0.75rem 1.5rem;background:linear-gradient(135deg,#b08aff,#7c3aed);">Your Lookback →</button>
+      </div>
+    </div>
+
+    <div id="sub-status" style="font-size:0.75rem;color:#ff9ed2;min-height:1.4em;margin-top:0.8rem;text-align:center;"></div>
+    <button id="sub-back-btn" type="button" style="width:100%;margin-top:0.6rem;padding:0.5rem;background:none;border:none;color:#6a5a9a;cursor:pointer;font-size:0.78rem;">← Back</button>
+  </div>
+</div>
+
+<!-- ===== SCREEN SUBSCRIBER READING: Today's Reading (subscribers only) =====
+     Reuses buildNodalChoiceSection()/doReading()/getFallbackReading() —
+     the exact same solo-reading pipeline the one-time flow uses — against
+     whatever window._readingProfile the person already computed via the
+     normal intake form. Nothing here duplicates that pipeline. -->
+<div id="screen-subscriber-reading" class="screen">
+  <div class="cosmic-card" style="max-width:680px;width:100%;margin:2rem auto;padding:1.6rem 1.4rem;max-height:90vh;overflow-y:auto;">
+    <div style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.35em;color:#c9a84c;margin-bottom:0.4rem;text-align:center;">✦ TODAY'S READING ✦</div>
+    <h2 id="sub-reading-name" style="font:700 1.3rem Georgia,serif;color:#e8e0ff;text-align:center;margin:0 0 0.8rem;"></h2>
+    <div id="sub-reading-status" style="font-size:0.8rem;color:#f0d070;text-align:center;margin-bottom:1rem;min-height:1.2em;"></div>
+    <div id="sub-nodal-choice-mount"></div>
+    <div id="sub-reading-text" style="white-space:pre-wrap;font-size:0.85rem;color:rgba(232,224,255,0.9);line-height:1.7;margin-top:1rem;"></div>
+    <div id="sub-save-status" style="font-size:0.78rem;color:#88dd99;text-align:center;margin-top:1rem;min-height:1.2em;"></div>
+    <button id="sub-reading-back-btn" type="button" style="width:100%;margin-top:1rem;padding:0.5rem;background:none;border:none;color:#6a5a9a;cursor:pointer;font-size:0.78rem;">← Back</button>
+  </div>
+</div>
+
+<!-- ===== SCREEN LOOKBACK: Quarterly/Annual synthesis of stored daily_reads =====
+     Real counts and recurring cards computed from the subscriber's own
+     stored history, per docs/SUBSCRIPTIONS_SETUP.md — never invented. -->
+<div id="screen-lookback" class="screen">
+  <div class="cosmic-card" style="max-width:680px;width:100%;margin:2rem auto;padding:1.6rem 1.4rem;max-height:90vh;overflow-y:auto;">
+    <div style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.35em;color:#b08aff;margin-bottom:0.4rem;text-align:center;">✦ YOUR LOOKBACK ✦</div>
+    <h2 style="font:700 1.3rem Georgia,serif;color:#e8e0ff;text-align:center;margin:0 0 0.8rem;">Quarterly / Annual Lookback</h2>
+    <div style="display:flex;gap:0.6rem;justify-content:center;margin-bottom:1rem;flex-wrap:wrap;">
+      <button id="lookback-quarter-btn" class="skip-btn" style="border:1px solid rgba(176,138,255,0.35);border-radius:8px;padding:0.5rem 1rem;">This Quarter</button>
+      <button id="lookback-year-btn" class="skip-btn" style="border:1px solid rgba(176,138,255,0.35);border-radius:8px;padding:0.5rem 1rem;">This Year</button>
+    </div>
+    <div id="lookback-status" style="font-size:0.8rem;color:#f0d070;text-align:center;margin-bottom:1rem;min-height:1.2em;"></div>
+    <div id="lookback-summary" style="font-size:0.85rem;color:rgba(232,224,255,0.9);line-height:1.7;white-space:pre-wrap;"></div>
+    <button id="lookback-back-btn" type="button" style="width:100%;margin-top:1rem;padding:0.5rem;background:none;border:none;color:#6a5a9a;cursor:pointer;font-size:0.78rem;">← Back</button>
   </div>
 </div>
 
@@ -7809,17 +7897,35 @@ function beginReadingGeneration() {
 // ===========================
 // AI READING GENERATION — 9 PAGE SECTIONS
 // ===========================
+// Low-level AI call helper, factored out of generateReading() below so the
+// SUBSCRIPTIONS: LOOKBACK SYNTHESIS section further down (search
+// "generateLookbackNarrative") can reuse the exact same window.AppSDK.ai.chat
+// call path with its OWN system/user prompt, instead of either duplicating
+// this fetch logic or reusing generateReading() itself (which would silently
+// hand back the unrelated 9-page getFallbackReading() text on any AI
+// failure -- wrong fallback for a Lookback synthesis). This refactor changes
+// no behavior of generateReading() itself: same condition checked
+// (window.AppSDK.ai.chat present), same request shape, same return value in
+// every branch -- verified this session by diffing generateReading()'s
+// output before/after this refactor across synthetic profiles with the AI
+// path both present and absent.
+async function callOracleAI(systemPrompt, userPrompt){
+  if(window.AppSDK&&window.AppSDK.ai&&window.AppSDK.ai.chat){
+    var result=await AppSDK.ai.chat({
+      messages:[
+        {role:'system',content:systemPrompt},
+        {role:'user',content:userPrompt}
+      ]
+    });
+    return result.content||'';
+  }
+  return null;
+}
+
 async function generateReading(prompt){
   try{
-    if(window.AppSDK&&window.AppSDK.ai&&window.AppSDK.ai.chat){
-      var result=await AppSDK.ai.chat({
-        messages:[
-          {role:'system',content:'You are Celestia, a warm, poetic, deeply insightful metaphysical oracle for Circles Squared. Write rich, intimate, second-person readings. Follow the exact page delimiter structure requested. Each page section should contain 3-5 substantial paragraphs. Never use generic affirmations. Always be specific to the exact numbers provided. Always use the exact delimiters ===PAGE_N_START=== and ===PAGE_N_END=== on their own lines.'},
-          {role:'user',content:prompt}
-        ]
-      });
-      return result.content||'';
-    }
+    var content=await callOracleAI('You are Celestia, a warm, poetic, deeply insightful metaphysical oracle for Circles Squared. Write rich, intimate, second-person readings. Follow the exact page delimiter structure requested. Each page section should contain 3-5 substantial paragraphs. Never use generic affirmations. Always be specific to the exact numbers provided. Always use the exact delimiters ===PAGE_N_START=== and ===PAGE_N_END=== on their own lines.', prompt);
+    if(content!==null) return content;
     return getFallbackReading();
   }catch(e){return getFallbackReading();}
 }
@@ -10849,14 +10955,562 @@ if (quizPaywallOrb) {
   });
 }
 
+// ===========================================================
+// SUBSCRIPTIONS: DAILY READINGS + LOOKBACK (Codex Logic V07 Part XXXII)
+// ===========================================================
+// A monthly ($20/mo) subscription that unlocks daily readings through the
+// Nodal Choice interface (Part XXXI, untouched by this section), persists
+// each day's read to Supabase, and lets a subscriber view a Quarterly/
+// Annual Lookback synthesizing their own stored history. This is purely
+// ADDITIVE: the one-time TIERS/GROUP_TIERS/ARCHETYPE_QUIZ_TIER purchase
+// flow above is never touched by anything in this section, and none of
+// this requires sign-in for a one-time reading. See
+// supabase/subscriptions_daily_reads_schema.sql and
+// docs/SUBSCRIPTIONS_SETUP.md for the database side, and Codex Logic V07
+// Part XXXII for the honest-labeling writeup (this is an original W3BB
+// product feature, not inherited tradition, per the Part XXII branch (b)
+// standard -- same as Parts XXX and XXXI).
+
+// -----------------------------------------------------------
+// Supabase Auth (magic-link email sign-in)
+// -----------------------------------------------------------
+// Reuses the EXACT SAME Supabase project/anon key already declared above
+// for redeemPromoCode()/saveLeadToSupabase() (SUPABASE_URL/SUPABASE_KEY) --
+// no second Supabase client or project is introduced anywhere in this
+// file. Sign-in here is ONLY ever required for the subscription/daily-
+// reads flow; one-time tier purchases never call any function in this
+// section and never prompt for sign-in.
+var SUB_SESSION_KEY = 'cs_sub_session';
+
+function subGetSession() {
+  try {
+    var raw = localStorage.getItem(SUB_SESSION_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) { return null; }
+}
+
+function subSetSession(session) {
+  try {
+    if (session) localStorage.setItem(SUB_SESSION_KEY, JSON.stringify(session));
+    else localStorage.removeItem(SUB_SESSION_KEY);
+  } catch (e) {}
+}
+
+// Sends a passwordless magic-link email via Supabase Auth's OTP endpoint
+// (POST /auth/v1/otp -- Supabase's documented email-OTP/magic-link
+// endpoint, using the same anon apikey header every other Supabase call in
+// this file already uses). On clicking the emailed link, Supabase redirects
+// back to this same page with #access_token=...&refresh_token=...&type=
+// magiclink in the URL hash -- handled by handleMagicLinkRedirect() below.
+async function subSendMagicLink(email) {
+  var res = await fetch(SUPABASE_URL + '/auth/v1/otp', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_KEY
+    },
+    body: JSON.stringify({
+      email: email,
+      create_user: true,
+      options: { email_redirect_to: window.location.origin + window.location.pathname }
+    })
+  });
+  if (!res.ok) {
+    var errBody = {};
+    try { errBody = await res.json(); } catch (e2) {}
+    throw new Error((errBody && (errBody.msg || errBody.error_description)) || ('Could not send magic link (status ' + res.status + ').'));
+  }
+  return true;
+}
+
+// Parses #access_token=...&refresh_token=...&type=magiclink out of the URL
+// hash after a magic-link redirect, stores the session in localStorage (per-
+// browser only -- same storage tier this app already uses for other
+// per-viewer convenience state), and looks up the signed-in user's own
+// email/id so the UI can show "Signed in as ...". Returns false (and
+// changes nothing) on any page load that is not itself a magic-link
+// redirect -- this never fires for a normal visit or a one-time purchase.
+async function handleMagicLinkRedirect() {
+  if (!window.location.hash || window.location.hash.indexOf('access_token=') === -1) return false;
+  var params = new URLSearchParams(window.location.hash.slice(1));
+  var accessToken = params.get('access_token');
+  var refreshToken = params.get('refresh_token');
+  if (!accessToken) return false;
+  try {
+    var userRes = await fetch(SUPABASE_URL + '/auth/v1/user', {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + accessToken }
+    });
+    var user = userRes.ok ? await userRes.json() : null;
+    subSetSession({
+      access_token: accessToken,
+      refresh_token: refreshToken || null,
+      user_id: user && user.id,
+      email: user && user.email
+    });
+    // Strip the token hash from the visible URL so it never lingers in
+    // browser history / a shared link.
+    history.replaceState(null, '', window.location.pathname + window.location.search);
+    return true;
+  } catch (e) {
+    console.warn('Magic link sign-in failed:', e);
+    return false;
+  }
+}
+
+function subSignOut() {
+  subSetSession(null);
+}
+
+// -----------------------------------------------------------
+// subscribers table (status only) -- read-only from the client. Every
+// write to this table happens exclusively through a SECURITY DEFINER RPC
+// on the database side (upsert_subscriber_status -- see
+// supabase/subscriptions_daily_reads_schema.sql), mirroring
+// redeem_promo_code()'s race-condition-safe pattern; this file never
+// writes to `subscribers` directly.
+// -----------------------------------------------------------
+async function subFetchSubscriberStatus() {
+  var session = subGetSession();
+  if (!session || !session.access_token || !session.user_id) return null;
+  var res = await fetch(SUPABASE_URL + '/rest/v1/subscribers?select=status,current_period_start,current_period_end&user_id=eq.' + encodeURIComponent(session.user_id), {
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + session.access_token }
+  });
+  if (!res.ok) return null;
+  var rows = await res.json();
+  return (rows && rows[0]) || null;
+}
+
+// -----------------------------------------------------------
+// daily_reads: persist + fetch (Part XXXII). Writes go through the
+// upsert_daily_read() SECURITY DEFINER RPC (upsert on the (user_id,
+// read_date) unique constraint, so re-visiting today's reading updates
+// today's row instead of duplicating it). Reads use a plain RLS-scoped
+// SELECT -- daily_reads' RLS policy only ever lets a signed-in user see
+// their OWN rows (auth.uid() = user_id), so this can never leak another
+// subscriber's history.
+// -----------------------------------------------------------
+
+// Builds the exact payload upsert_daily_read() expects, from whatever
+// window._readingProfile and window._nodalChoice already hold at the
+// moment a subscriber generates today's reading -- no separate profile
+// computation, reusing the same fields the one-time reading pipeline
+// already produced. read_date uses the browser's own local calendar date
+// (not UTC) so "today" matches what the subscriber actually sees on
+// their clock, matching the (user_id, read_date) uniqueness the schema
+// enforces.
+function buildDailyReadPayload(p) {
+  var now = new Date();
+  var todayLocal = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+  var north = (p.nodeDecanCards && p.nodeDecanCards.northNodeCard) ? p.nodeDecanCards.northNodeCard.card : null;
+  var south = (p.nodeDecanCards && p.nodeDecanCards.southNodeCard) ? p.nodeDecanCards.southNodeCard.card : null;
+  var wildcard = (p.personalDayWildcard && p.personalDayWildcard.majors && p.personalDayWildcard.majors.length) ? p.personalDayWildcard.majors[0].card : null;
+  return {
+    p_read_date: todayLocal,
+    p_north_node_card: north,
+    p_south_node_card: south,
+    p_nodal_choice: window._nodalChoice || null,
+    p_nodal_choice_at: window._nodalChoiceAt || null,
+    p_personal_day_wildcard_card: wildcard,
+    // Minimal snapshot -- just enough to redisplay/regenerate this day's
+    // read later without needing the person to re-enter their birth data,
+    // per the schema's raw_profile_snapshot column comment. Never the full
+    // reading text itself (that stays regenerable on demand, not stored).
+    p_raw_profile_snapshot: {
+      firstName: p.firstName || null,
+      usedName: p.usedName || null,
+      month: p.month != null ? p.month : null,
+      day: p.day != null ? p.day : null,
+      year: p.year != null ? p.year : null,
+      lifePath: p.lifePath != null ? p.lifePath : null,
+      sunSign: (p.sunSign && p.sunSign.sign) || null,
+      personalDay: p.personalDay != null ? p.personalDay : null,
+      codexArchetype: p.codexArchetype || null
+    }
+  };
+}
+
+async function subUpsertDailyRead(payload) {
+  var session = subGetSession();
+  if (!session || !session.access_token) throw new Error('Please sign in first.');
+  var res = await fetch(SUPABASE_URL + '/rest/v1/rpc/upsert_daily_read', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + session.access_token
+    },
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) throw new Error('Could not save today’s reading (status ' + res.status + ').');
+  return res.json();
+}
+
+async function subFetchDailyReadsRange(startDate, endDate) {
+  var session = subGetSession();
+  if (!session || !session.access_token) throw new Error('Please sign in first.');
+  var url = SUPABASE_URL + '/rest/v1/daily_reads'
+    + '?select=read_date,north_node_card,south_node_card,nodal_choice,nodal_choice_at,personal_day_wildcard_card,raw_profile_snapshot'
+    + '&read_date=gte.' + encodeURIComponent(startDate)
+    + '&read_date=lte.' + encodeURIComponent(endDate)
+    + '&order=read_date.asc';
+  var res = await fetch(url, {
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + session.access_token }
+  });
+  if (!res.ok) throw new Error('Could not load your saved readings (status ' + res.status + ').');
+  return res.json();
+}
+
+// -----------------------------------------------------------
+// Today's Reading (subscribers only) -- calls doReading()/
+// getFallbackReading() exactly as the one-time flow does, no duplicated
+// pipeline, then persists the result via subUpsertDailyRead() above.
+// -----------------------------------------------------------
+async function generateTodaysSubscriberReading() {
+  var p = window._readingProfile;
+  if (!p || !p.firstName) return;
+  var statusEl = document.getElementById('sub-reading-status');
+  var textEl = document.getElementById('sub-reading-text');
+  var saveEl = document.getElementById('sub-save-status');
+  if (statusEl) statusEl.textContent = 'Generating today’s reading…';
+  if (saveEl) saveEl.textContent = '';
+  try {
+    await doReading(); // the exact same solo reading pipeline the one-time flow uses
+    if (textEl) textEl.textContent = window._readingText || getFallbackReading();
+  } catch (e) {
+    if (textEl) textEl.textContent = getFallbackReading();
+  }
+  if (statusEl) statusEl.textContent = '';
+  try {
+    await subUpsertDailyRead(buildDailyReadPayload(p));
+    if (saveEl) saveEl.textContent = '✦ Saved to your Lookback history.';
+  } catch (e) {
+    if (saveEl) saveEl.textContent = 'Could not save today’s reading: ' + e.message;
+  }
+}
+
+// -----------------------------------------------------------
+// Lookback synthesis: real counts + recurring cards computed from the
+// subscriber's own stored daily_reads rows, never invented. See
+// docs/SUBSCRIPTIONS_SETUP.md and Codex Logic V07 Part XXXII §32.4 for
+// the honesty rationale (this mirrors this Codex's standing rule against
+// synthetic scores/percentages, Part XVIII §18.3).
+// -----------------------------------------------------------
+function computeLookbackRange(rangeKey) {
+  var now = new Date();
+  var end = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+  var start;
+  if (rangeKey === 'year') {
+    start = now.getFullYear() + '-01-01';
+  } else {
+    var q = Math.floor(now.getMonth() / 3);
+    var qMonth = q * 3 + 1;
+    start = now.getFullYear() + '-' + String(qMonth).padStart(2, '0') + '-01';
+  }
+  return { start: start, end: end };
+}
+
+// Pure, non-AI synthesis -- real counts and lists only, no invented
+// percentages or streaks. This is the fallback whenever the AI narrative
+// call is unavailable or fails, per this codebase's established honesty
+// standard (getFallbackReading()'s pattern): a subscriber always gets a
+// real, calculated answer, even with zero AI involvement.
+function buildLookbackSynthesisFallback(rows) {
+  rows = rows || [];
+  var counts = { north: 0, south: 0, both: 0, none: 0 };
+  var cardTally = {};
+  rows.forEach(function(r) {
+    var c = r.nodal_choice;
+    if (c === 'north' || c === 'south' || c === 'both') counts[c]++;
+    else counts.none++;
+    [r.north_node_card, r.south_node_card, r.personal_day_wildcard_card].forEach(function(card) {
+      if (!card) return;
+      cardTally[card] = (cardTally[card] || 0) + 1;
+    });
+  });
+  var recurringCards = Object.keys(cardTally)
+    .map(function(card) { return { card: card, count: cardTally[card] }; })
+    .filter(function(x) { return x.count > 1; })
+    .sort(function(a, b) { return b.count - a.count; });
+
+  var totalDays = rows.length;
+  var totalChoices = counts.north + counts.south + counts.both;
+
+  var summaryLines = [];
+  summaryLines.push('Lookback covering ' + totalDays + ' saved day' + (totalDays === 1 ? '' : 's') + '.');
+  if (totalChoices > 0) {
+    summaryLines.push('Nodal Choice: North chosen ' + counts.north + ' time' + (counts.north === 1 ? '' : 's') + ', South chosen ' + counts.south + ' time' + (counts.south === 1 ? '' : 's') + ', Hold the Axis (Both) chosen ' + counts.both + ' time' + (counts.both === 1 ? '' : 's') + (counts.none ? (', no choice recorded on ' + counts.none + ' day' + (counts.none === 1 ? '' : 's')) : '') + '.');
+  } else if (totalDays > 0) {
+    summaryLines.push('No Nodal Choice was recorded on any saved day in this range.');
+  }
+  if (recurringCards.length) {
+    summaryLines.push('Cards that recurred more than once: ' + recurringCards.map(function(x) { return x.card + ' (' + x.count + 'x)'; }).join(', ') + '.');
+  } else if (totalDays > 0) {
+    summaryLines.push('No single card recurred more than once in this range.');
+  }
+
+  var narrative;
+  if (totalDays === 0) {
+    narrative = 'No daily readings have been saved yet for this range — come back after a few days of practice to see a real pattern take shape.';
+  } else {
+    var leaning = counts.north > counts.south
+      ? 'a lean toward growth and unfamiliar territory (North Node)'
+      : counts.south > counts.north
+      ? 'a lean toward familiarity, rest, and existing strengths (South Node)'
+      : (counts.both > 0 ? 'a repeated choice to hold both poles at once rather than favor either' : 'no single consistent lean yet');
+    narrative = 'Across ' + totalDays + ' saved day' + (totalDays === 1 ? '' : 's') + ', the real pattern in your choices shows ' + leaning + '.'
+      + (recurringCards.length ? (' The ' + recurringCards[0].card + ' came up ' + recurringCards[0].count + ' separate times — more than any other card in this window, worth noticing on its own, not as a prediction.') : '');
+  }
+
+  return { totalDays: totalDays, counts: counts, recurringCards: recurringCards, summaryLines: summaryLines, narrative: narrative };
+}
+
+// New prompt, distinct from doReading()'s daily-reading prompt, built
+// specifically for this synthesis -- reviewing a REAL stored history, not
+// generating a fresh reading. Grounded strictly in the already-computed
+// counts/cards passed in; the AI is explicitly told never to invent a
+// percentage, streak, or card not present in the data.
+function buildLookbackSynthesisPrompt(rows, synthesis, rangeLabel) {
+  var lines = (rows || []).map(function(r) {
+    return r.read_date + ': North card ' + (r.north_node_card || '?') + ', South card ' + (r.south_node_card || '?') + ', chose "' + (r.nodal_choice || 'none') + '", wildcard ' + (r.personal_day_wildcard_card || '?');
+  }).join('\n');
+  return 'Write a Lookback synthesis for ' + rangeLabel + ', reviewing this subscriber’s ACTUAL stored daily readings below — a real personal history, not a fresh reading. '
+    + 'Use ONLY the counts already computed: North chosen ' + synthesis.counts.north + ' time(s), South chosen ' + synthesis.counts.south + ' time(s), Both chosen ' + synthesis.counts.both + ' time(s), out of ' + synthesis.totalDays + ' saved day(s). '
+    + 'Recurring cards: ' + (synthesis.recurringCards.map(function(x) { return x.card + ' (' + x.count + 'x)'; }).join(', ') || 'none') + '. '
+    + 'Write 2–4 warm, plain-language paragraphs reflecting on what this real pattern of choices might mean for this season of their life. Never invent a percentage, streak, or card that is not directly given below.\n\n'
+    + 'RAW DAILY LOG:\n' + lines;
+}
+
+// Calls the SAME AI call path doReading() uses (callOracleAI, factored out
+// of generateReading() above) with this section's OWN system prompt --
+// never doReading()'s daily-reading prompt, and never generateReading()
+// itself (whose hardcoded getFallbackReading() fallback would be the wrong
+// content entirely for a Lookback). Returns null (not a thrown error) on
+// any failure or when no AI path is configured, so the caller always has a
+// real, non-AI synthesis (buildLookbackSynthesisFallback() above) to show
+// instead.
+async function generateLookbackNarrative(prompt) {
+  try {
+    return await callOracleAI(
+      'You are Celestia, the oracle of Circles Squared, now reviewing a subscriber’s own stored history of daily Nodal Choice readings to write a Quarterly/Annual Lookback synthesis — not a fresh daily reading. Stay strictly grounded in the real counts and card names given in the prompt; never invent a percentage, streak, or card that was not stated in the data.',
+      prompt
+    );
+  } catch (e) { return null; }
+}
+
+async function renderLookback(rangeKey) {
+  var statusEl = document.getElementById('lookback-status');
+  var summaryEl = document.getElementById('lookback-summary');
+  if (statusEl) statusEl.textContent = 'Loading your saved readings…';
+  if (summaryEl) summaryEl.textContent = '';
+  try {
+    var range = computeLookbackRange(rangeKey);
+    var rows = await subFetchDailyReadsRange(range.start, range.end);
+    var synthesis = buildLookbackSynthesisFallback(rows);
+    if (statusEl) statusEl.textContent = '';
+    var rangeLabel = rangeKey === 'year' ? 'this year' : 'this quarter';
+    var aiNarrative = null;
+    if (rows.length) {
+      var prompt = buildLookbackSynthesisPrompt(rows, synthesis, rangeLabel);
+      aiNarrative = await generateLookbackNarrative(prompt);
+    }
+    var narrativeText = aiNarrative || synthesis.narrative;
+    if (summaryEl) summaryEl.textContent = synthesis.summaryLines.join('\n') + '\n\n' + narrativeText;
+  } catch (e) {
+    if (statusEl) statusEl.textContent = '';
+    if (summaryEl) summaryEl.textContent = 'Could not load your Lookback: ' + e.message;
+  }
+}
+
+// -----------------------------------------------------------
+// Square Subscriptions billing -- NOT YET LIVE. See "SQUARE SUBSCRIPTIONS
+// -- NOT YET LIVE" in docs/SUBSCRIPTIONS_SETUP.md for the full explanation.
+// Empty by default -- until a real Catalog subscription-plan object is
+// created in the Square dashboard and its plan ID placed here, the
+// Subscribe button shows an honest "launching soon" state rather than
+// attempting a checkout that would fail (or, worse, silently charge the
+// wrong amount). NEVER hardcode a real plan ID, API access token, or
+// webhook secret here or anywhere else in this file -- see the setup doc.
+// -----------------------------------------------------------
+var SQUARE_SUBSCRIPTION_PLAN_ID = '';
+
+function startSubscriptionCheckout(userId, email) {
+  if (!SQUARE_SUBSCRIPTION_PLAN_ID) {
+    return Promise.reject(new Error('Subscriptions are launching soon — billing is not wired up yet. Please check back shortly.'));
+  }
+  // TODO(owner, once SQUARE_SUBSCRIPTION_PLAN_ID above is set to a real
+  // Catalog subscription-plan-variation ID from the Square dashboard):
+  // call a new serverless function here, mirroring
+  // netlify/functions/create-checkout.js's existing pattern exactly --
+  // the client must NEVER hold a Square access token directly.
+  //
+  //   1. Server-side, that function holds SQUARE_ACCESS_TOKEN (a
+  //      SEPARATE, Subscriptions-API-scoped token -- NOT the
+  //      payment-link tokens SQUARE_LINKS/create-checkout.js already use
+  //      for one-time tiers) plus SQUARE_LOCATION_ID and
+  //      SQUARE_SUBSCRIPTION_PLAN_ID.
+  //   2. It looks up or creates a Square Customer for `email`
+  //      (POST https://connect.squareup.com/v2/customers), then calls
+  //      POST https://connect.squareup.com/v2/subscriptions (Square's
+  //      Subscriptions API -- "Create Subscription") with
+  //      { location_id, plan_variation_id: SQUARE_SUBSCRIPTION_PLAN_ID,
+  //        customer_id, start_date }.
+  //   3. On success (or, more reliably, on Square's subscription
+  //      lifecycle webhooks -- a separate webhook endpoint not yet
+  //      built), the resulting Square subscription id/status/period
+  //      dates must be written into this same signed-in user's row in
+  //      `subscribers` via a SECURITY DEFINER RPC
+  //      (upsert_subscriber_status -- see
+  //      supabase/subscriptions_daily_reads_schema.sql), the same
+  //      race-safe, no-direct-anon-write pattern upsert_daily_read()
+  //      already uses. `userId`/`email` above are exactly what that call
+  //      would need.
+  //   4. Until steps 1-3 exist, this function intentionally goes no
+  //      further than the rejected Promise above.
+  return Promise.reject(new Error('Subscription checkout is not wired up yet.'));
+}
+
+// -----------------------------------------------------------
+// UI wiring
+// -----------------------------------------------------------
+async function refreshSubscribeScreen() {
+  var session = subGetSession();
+  var signedOutPanel = document.getElementById('sub-signed-out-panel');
+  var signedInPanel = document.getElementById('sub-signed-in-panel');
+  var statusEl = document.getElementById('sub-status');
+  if (statusEl) statusEl.textContent = '';
+  if (!session || !session.access_token) {
+    if (signedOutPanel) signedOutPanel.style.display = '';
+    if (signedInPanel) signedInPanel.style.display = 'none';
+    return;
+  }
+  if (signedOutPanel) signedOutPanel.style.display = 'none';
+  if (signedInPanel) signedInPanel.style.display = '';
+  var emailEl = document.getElementById('sub-signed-in-email');
+  if (emailEl) emailEl.textContent = session.email || '';
+
+  if (statusEl) statusEl.textContent = 'Checking subscription status…';
+  var sub = null;
+  try { sub = await subFetchSubscriberStatus(); } catch (e) {}
+  if (statusEl) statusEl.textContent = '';
+
+  var inactivePanel = document.getElementById('sub-status-inactive');
+  var activePanel = document.getElementById('sub-status-active');
+  if (sub && sub.status === 'active') {
+    if (inactivePanel) inactivePanel.style.display = 'none';
+    if (activePanel) activePanel.style.display = '';
+  } else {
+    if (activePanel) activePanel.style.display = 'none';
+    if (inactivePanel) inactivePanel.style.display = '';
+    var launchEl = document.getElementById('sub-launch-status');
+    if (launchEl) launchEl.textContent = SQUARE_SUBSCRIPTION_PLAN_ID
+      ? 'You are not currently subscribed.'
+      : 'Subscriptions are launching soon — billing is not yet wired up. Check back shortly.';
+    var subscribeBtn = document.getElementById('sub-subscribe-btn');
+    if (subscribeBtn) {
+      subscribeBtn.disabled = !SQUARE_SUBSCRIPTION_PLAN_ID;
+      subscribeBtn.style.opacity = SQUARE_SUBSCRIPTION_PLAN_ID ? '1' : '0.55';
+      subscribeBtn.style.cursor = SQUARE_SUBSCRIPTION_PLAN_ID ? 'pointer' : 'not-allowed';
+      subscribeBtn.textContent = SQUARE_SUBSCRIPTION_PLAN_ID ? 'Subscribe — $20/month' : 'Subscriptions Launching Soon';
+    }
+  }
+}
+
+document.getElementById('open-subscribe-btn').addEventListener('click', function() {
+  showScreen('subscribe');
+  refreshSubscribeScreen();
+});
+
+document.getElementById('sub-back-btn').addEventListener('click', function() { showScreen('teaser'); });
+
+document.getElementById('sub-send-magic-link-btn').addEventListener('click', function() {
+  var email = document.getElementById('sub-email-input').value.trim();
+  var statusEl = document.getElementById('sub-signin-status');
+  if (!email || email.indexOf('@') === -1) { statusEl.textContent = 'Please enter a valid email address.'; return; }
+  statusEl.textContent = 'Sending magic link…';
+  subSendMagicLink(email).then(function() {
+    statusEl.textContent = 'Check your email for a sign-in link.';
+  }).catch(function(err) {
+    statusEl.textContent = (err && err.message) || 'Could not send magic link.';
+  });
+});
+
+document.getElementById('sub-sign-out-link').addEventListener('click', function(e) {
+  e.preventDefault();
+  subSignOut();
+  refreshSubscribeScreen();
+});
+
+document.getElementById('sub-subscribe-btn').addEventListener('click', function() {
+  var session = subGetSession();
+  var statusEl = document.getElementById('sub-status');
+  startSubscriptionCheckout(session && session.user_id, session && session.email).catch(function(err) {
+    if (statusEl) statusEl.textContent = (err && err.message) || 'Could not start checkout.';
+  });
+});
+
+document.getElementById('sub-today-reading-btn').addEventListener('click', function() {
+  if (!window._readingProfile || !window._readingProfile.firstName) {
+    var statusEl = document.getElementById('sub-status');
+    if (statusEl) statusEl.textContent = 'Please enter your birth details in the reading form first, then come back here for today’s reading.';
+    showScreen('hook');
+    return;
+  }
+  showScreen('subscriber-reading');
+  var nameEl = document.getElementById('sub-reading-name');
+  if (nameEl) nameEl.textContent = window._readingProfile.firstName + '’s Reading for Today';
+  var mount = document.getElementById('sub-nodal-choice-mount');
+  if (mount) mount.innerHTML = buildNodalChoiceSection(window._readingProfile);
+  document.getElementById('sub-reading-text').textContent = '';
+  document.getElementById('sub-save-status').textContent = '';
+  document.getElementById('sub-reading-status').textContent = window._readingProfile.nodeDecanCards
+    ? 'Choose an orientation above to generate and save today’s reading.'
+    : '';
+});
+
+// Delegated click listener on the Nodal Choice mount -- fires AFTER
+// setNodalChoice() (the button's own inline onclick, which runs first on
+// the target element itself; this ancestor listener only sees the event
+// once it bubbles). This never modifies setNodalChoice()/
+// buildNodalChoiceSection() themselves, so the Nodal Choice Interface
+// (Part XXXI) behaves identically everywhere else in the app.
+var subNodalMount = document.getElementById('sub-nodal-choice-mount');
+if (subNodalMount) {
+  subNodalMount.addEventListener('click', function(e) {
+    var btn = e.target.closest('[id^="nodal-btn-"]');
+    if (!btn) return;
+    generateTodaysSubscriberReading();
+  });
+}
+
+document.getElementById('sub-reading-back-btn').addEventListener('click', function() { showScreen('subscribe'); });
+
+document.getElementById('sub-lookback-btn').addEventListener('click', function() {
+  showScreen('lookback');
+  document.getElementById('lookback-summary').textContent = '';
+  document.getElementById('lookback-status').textContent = '';
+});
+
+document.getElementById('lookback-quarter-btn').addEventListener('click', function() { renderLookback('quarter'); });
+document.getElementById('lookback-year-btn').addEventListener('click', function() { renderLookback('year'); });
+document.getElementById('lookback-back-btn').addEventListener('click', function() { showScreen('subscribe'); });
+
 // ===========================
 // INIT
 // ===========================
 (function() {
   var params = new URLSearchParams(window.location.search);
   var paidTier = params.get('paid');
-  if (paidTier) { restoreAfterSquareReturn(paidTier); }
-  else { showScreen('hook'); }
+  handleMagicLinkRedirect().then(function(signedIn) {
+    if (paidTier) { restoreAfterSquareReturn(paidTier); }
+    else { showScreen('hook'); }
+    if (signedIn) {
+      // Land on the subscribe screen after a magic-link sign-in round
+      // trip, reusing the exact same showScreen('subscribe')/
+      // refreshSubscribeScreen() the "Daily Readings & Lookback" CTA uses.
+      showScreen('subscribe');
+      refreshSubscribeScreen();
+    }
+  });
 })();
 </script>
 </body>
