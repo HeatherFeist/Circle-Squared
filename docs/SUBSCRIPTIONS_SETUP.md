@@ -205,6 +205,16 @@ value from the Square API access token). The handler recomputes this and
 rejects (401) anything that doesn't match, or anything at all if
 `SQUARE_WEBHOOK_SIGNATURE_KEY` isn't set — before ever parsing the body.
 
+**If signature verification fails on a real test send, check the URL
+match first.** The handler recomputes the signature using the exact URL
+Cloudflare hands it on the incoming request (`request.url`) — this must
+be byte-for-byte the same string as the "Notification URL" you type into
+the Square dashboard when creating the webhook subscription (matching
+`https://` vs `http://`, no trailing slash if Square's copy doesn't have
+one, same exact path). A mismatch here, not a bug in the HMAC math
+itself, is the most likely cause of every real notification failing
+verification.
+
 **A caveat, stated plainly:** this environment's network egress proxy
 blocks `developer.squareup.com` and `squareup.com` directly (the same
 limitation already noted in `netlify/functions/create-subscription-checkout.js`
