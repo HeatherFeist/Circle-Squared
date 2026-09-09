@@ -1,10 +1,17 @@
 // netlify/functions/create-subscription-checkout.js
 //
-// STUB -- SQUARE SUBSCRIPTIONS ARE NOT YET LIVE. See "SQUARE SUBSCRIPTIONS
-// -- NOT YET LIVE" in docs/SUBSCRIPTIONS_SETUP.md for the full explanation
-// of what still needs to happen (a Catalog subscription-plan object
-// created in the Square dashboard, plus a Subscriptions-API-scoped access
-// token) before this function does anything real.
+// STUB -- describes the FUTURE fully-automated path only. The $20/month
+// subscription is actually LIVE now via a much simpler route: a plain
+// Square Payment Link (SQUARE_SUBSCRIPTION_LINK in public/index.html),
+// created and redirect-configured in the Square dashboard exactly like
+// the one-time tiers' links -- no code in this file, no access token,
+// runs today. This file is not called by anything yet. It remains here
+// as the documented next step for fully automating subscriber activation
+// via Square's Subscriptions API + a webhook, instead of the manual
+// `upsert_subscriber_status()` SQL Editor step the live path uses today
+// (see docs/SUBSCRIPTIONS_SETUP.md). Build it later if volume justifies
+// the extra integration work -- it is not required to take real
+// payments now.
 //
 // This mirrors netlify/functions/create-checkout.js's existing pattern
 // (server holds the Square credential, client never does) but for the

@@ -11110,6 +11110,24 @@ function finalizeReadingPurchase(profile, tier, email, orderId, priceOverride, i
 }
 
 function restoreAfterSquareReturn(tierSlug) {
+  // The $20/month Daily Readings subscription -- own restore path. No
+  // cs_pending_profile to restore (the subscriber's identity already
+  // survived the round trip via the SUB_SESSION_KEY localStorage session,
+  // not sessionStorage), so this just lands back on the subscribe screen
+  // with an honest status message. Activation to `status = 'active'` is
+  // still a manual step for now (see the SQUARE SUBSCRIPTIONS comment
+  // above startSubscriptionCheckout()), so refreshSubscribeScreen() will
+  // keep showing "not currently subscribed" until that manual step
+  // happens -- this message says so rather than implying it's automatic.
+  if (tierSlug === 'subscription-monthly') {
+    showScreen('subscribe');
+    refreshSubscribeScreen().then(function() {
+      var statusEl = document.getElementById('sub-status');
+      if (statusEl) statusEl.textContent = 'Thank you for subscribing! Your account is being activated -- this can take a little while since it is confirmed by hand right now. Refresh this page in a bit, or check back shortly.';
+    });
+    try { window.history.replaceState({}, '', window.location.pathname); } catch(e) {}
+    return;
+  }
   // The $1 archetype-quiz tier reveals a quiz result, not a full computed
   // reading -- hand it off to its own restore path (same sessionStorage
   // keys, different screen) instead of running the full-reading logic below.
@@ -11809,51 +11827,46 @@ async function renderLookback(rangeKey) {
 }
 
 // -----------------------------------------------------------
-// Square Subscriptions billing -- NOT YET LIVE. See "SQUARE SUBSCRIPTIONS
-// -- NOT YET LIVE" in docs/SUBSCRIPTIONS_SETUP.md for the full explanation.
-// Empty by default -- until a real Catalog subscription-plan object is
-// created in the Square dashboard and its plan ID placed here, the
-// Subscribe button shows an honest "launching soon" state rather than
-// attempting a checkout that would fail (or, worse, silently charge the
-// wrong amount). NEVER hardcode a real plan ID, API access token, or
-// webhook secret here or anywhere else in this file -- see the setup doc.
+// Square Subscriptions billing.
+//
+// LIVE PATH (in use now): a plain Square Payment Link, created the exact
+// same way as every one-time tier's link in SQUARE_LINKS above, except its
+// Redirect URL (set in the Square dashboard) points back here with
+// ?paid=subscription-monthly. Square's own hosted checkout handles the
+// recurring charge itself -- no Subscriptions-API access token is needed
+// just to collect the payment. Because a payment link's own webhook isn't
+// wired up yet, activating a subscriber's `subscribers.status` to 'active'
+// after they pay is a manual step for now: run
+// `select public.upsert_subscriber_status('active', ...)` in Supabase's
+// SQL Editor (see docs/SUBSCRIPTIONS_SETUP.md) once you see the payment
+// land in Square. This is the same honest incremental approach the promo
+// code / group reading features started with -- automate the activation
+// step later via a real webhook if volume justifies it (see the FUTURE
+// PATH comment below); it never blocks launching with real payments now.
+//
+// FUTURE PATH (not built): the fully automated Subscriptions API
+// integration originally sketched here -- a server-side function holding
+// a separate Subscriptions-API-scoped access token, calling Square's
+// Create Subscription API directly, and a webhook receiver keeping
+// `subscribers.status` in sync automatically -- remains a real
+// improvement to make later, but is not required to take real money
+// today via the payment-link path above. NEVER hardcode a real API
+// access token or webhook secret here or anywhere else in this file.
 // -----------------------------------------------------------
-var SQUARE_SUBSCRIPTION_PLAN_ID = '';
+var SQUARE_SUBSCRIPTION_LINK = 'https://square.link/u/thy9LGls';
 
 function startSubscriptionCheckout(userId, email) {
-  if (!SQUARE_SUBSCRIPTION_PLAN_ID) {
+  if (!SQUARE_SUBSCRIPTION_LINK) {
     return Promise.reject(new Error('Subscriptions are launching soon — billing is not wired up yet. Please check back shortly.'));
   }
-  // TODO(owner, once SQUARE_SUBSCRIPTION_PLAN_ID above is set to a real
-  // Catalog subscription-plan-variation ID from the Square dashboard):
-  // call a new serverless function here, mirroring
-  // netlify/functions/create-checkout.js's existing pattern exactly --
-  // the client must NEVER hold a Square access token directly.
-  //
-  //   1. Server-side, that function holds SQUARE_ACCESS_TOKEN (a
-  //      SEPARATE, Subscriptions-API-scoped token -- NOT the
-  //      payment-link tokens SQUARE_LINKS/create-checkout.js already use
-  //      for one-time tiers) plus SQUARE_LOCATION_ID and
-  //      SQUARE_SUBSCRIPTION_PLAN_ID.
-  //   2. It looks up or creates a Square Customer for `email`
-  //      (POST https://connect.squareup.com/v2/customers), then calls
-  //      POST https://connect.squareup.com/v2/subscriptions (Square's
-  //      Subscriptions API -- "Create Subscription") with
-  //      { location_id, plan_variation_id: SQUARE_SUBSCRIPTION_PLAN_ID,
-  //        customer_id, start_date }.
-  //   3. On success (or, more reliably, on Square's subscription
-  //      lifecycle webhooks -- a separate webhook endpoint not yet
-  //      built), the resulting Square subscription id/status/period
-  //      dates must be written into this same signed-in user's row in
-  //      `subscribers` via a SECURITY DEFINER RPC
-  //      (upsert_subscriber_status -- see
-  //      supabase/subscriptions_daily_reads_schema.sql), the same
-  //      race-safe, no-direct-anon-write pattern upsert_daily_read()
-  //      already uses. `userId`/`email` above are exactly what that call
-  //      would need.
-  //   4. Until steps 1-3 exist, this function intentionally goes no
-  //      further than the rejected Promise above.
-  return Promise.reject(new Error('Subscription checkout is not wired up yet.'));
+  // Nothing needs to be handed through sessionStorage here the way the
+  // one-time tiers do (cs_pending_profile/cs_pending_tier/cs_pending_email)
+  // -- the signed-in subscriber's identity already survives the Square
+  // redirect round trip via the existing SUB_SESSION_KEY localStorage
+  // session (subGetSession()/subSetSession()), which persists on this
+  // origin regardless of the trip to square.link and back.
+  window.location.href = SQUARE_SUBSCRIPTION_LINK;
+  return Promise.resolve();
 }
 
 // -----------------------------------------------------------
@@ -11889,15 +11902,15 @@ async function refreshSubscribeScreen() {
     if (activePanel) activePanel.style.display = 'none';
     if (inactivePanel) inactivePanel.style.display = '';
     var launchEl = document.getElementById('sub-launch-status');
-    if (launchEl) launchEl.textContent = SQUARE_SUBSCRIPTION_PLAN_ID
+    if (launchEl) launchEl.textContent = SQUARE_SUBSCRIPTION_LINK
       ? 'You are not currently subscribed.'
       : 'Subscriptions are launching soon — billing is not yet wired up. Check back shortly.';
     var subscribeBtn = document.getElementById('sub-subscribe-btn');
     if (subscribeBtn) {
-      subscribeBtn.disabled = !SQUARE_SUBSCRIPTION_PLAN_ID;
-      subscribeBtn.style.opacity = SQUARE_SUBSCRIPTION_PLAN_ID ? '1' : '0.55';
-      subscribeBtn.style.cursor = SQUARE_SUBSCRIPTION_PLAN_ID ? 'pointer' : 'not-allowed';
-      subscribeBtn.textContent = SQUARE_SUBSCRIPTION_PLAN_ID ? 'Subscribe — $20/month' : 'Subscriptions Launching Soon';
+      subscribeBtn.disabled = !SQUARE_SUBSCRIPTION_LINK;
+      subscribeBtn.style.opacity = SQUARE_SUBSCRIPTION_LINK ? '1' : '0.55';
+      subscribeBtn.style.cursor = SQUARE_SUBSCRIPTION_LINK ? 'pointer' : 'not-allowed';
+      subscribeBtn.textContent = SQUARE_SUBSCRIPTION_LINK ? 'Subscribe — $20/month' : 'Subscriptions Launching Soon';
     }
   }
 }

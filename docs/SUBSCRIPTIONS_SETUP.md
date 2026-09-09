@@ -61,35 +61,63 @@ email — no password is ever collected or stored by this app.
 | What | Where it lives | Status |
 |---|---|---|
 | Supabase project URL + anon key | Already hardcoded in `public/index.html` as `SUPABASE_URL` / `SUPABASE_KEY` (the same two values `redeem_promo_code()` and the lead-capture save already use) | ✅ Already there — nothing new to add |
-| `SQUARE_SUBSCRIPTION_PLAN_ID` | `public/index.html`, the `SQUARE_SUBSCRIPTION_PLAN_ID` JS variable in the "SQUARE SUBSCRIPTIONS billing" section | ⛔ Empty by default — see next section |
-| `SQUARE_SUBSCRIPTION_ACCESS_TOKEN`, `SQUARE_LOCATION_ID` | Netlify environment variables, read by `netlify/functions/create-subscription-checkout.js` | ⛔ Not set — see next section |
+| `SQUARE_SUBSCRIPTION_LINK` | `public/index.html`, the `SQUARE_SUBSCRIPTION_LINK` JS variable, right above `startSubscriptionCheckout()` | ✅ **Live** — set to the real Square Payment Link |
+| `SQUARE_SUBSCRIPTION_ACCESS_TOKEN`, `SQUARE_LOCATION_ID`, `SQUARE_SUBSCRIPTION_PLAN_ID` | Would be needed only for the FUTURE fully-automated path (section 5) | Not needed for launch — see section 4 |
 
-**Never put `SQUARE_SUBSCRIPTION_ACCESS_TOKEN` or any other Square
-credential in code, in chat with any AI assistant, or in any file
-committed to git** — the same rule already stated in
-[`docs/SQUARE_DYNAMIC_CHECKOUT_SETUP.md`](./SQUARE_DYNAMIC_CHECKOUT_SETUP.md)
-applies identically here.
+Nothing here is a secret that needs to stay out of chat or code — a
+Square **Payment Link** is a public checkout URL, safe to have visible in
+`public/index.html` exactly like the one-time tiers' links in
+`SQUARE_LINKS` already are. The values that must never appear in code,
+chat, or committed files are a Square **API access token** or a webhook
+signing secret — neither of those is needed for the live path below.
 
-## 4. What works right now, with zero further setup
+## 4. Billing is live — via a plain Square Payment Link, not the Subscriptions API
 
-With just steps 1–2 done, a visitor can already:
+The $20/month subscription actually takes real payments today, the simple
+way: a Payment Link created in the Square dashboard exactly like every
+one-time tier's link (Square Dashboard → the same place you made the
+other checkout links → set it to $20/month recurring → **Redirect URL**
+set to `https://circle.w3bbworldwide.com/?paid=subscription-monthly`).
+Square's own hosted checkout handles the recurring charge — no
+Subscriptions-API access token, no Netlify function, no webhook needed
+just to collect the money.
 
-- Sign in via magic link.
-- See their own `subscribers` row's status (always `pending` until step
-  5 below is actually built and something writes `active` into it).
-- See an honest **"Subscriptions Launching Soon"** button instead of a
-  broken or misleading checkout, because `SQUARE_SUBSCRIPTION_PLAN_ID` is
-  empty by default.
-- If their `subscribers.status` is manually set to `active` (see the
-  testing note below), use **Today's Reading** (the exact same
-  Nodal-Choice-driven solo reading pipeline as the one-time flow, just
-  called against whatever birth data they already entered) and have that
-  day's Node cards, Nodal Choice, wildcard card, and a minimal profile
-  snapshot saved to `daily_reads`, and use **Your Lookback** to see a real,
-  computed synthesis of everything saved so far.
+The one manual step that remains, until the FUTURE path in section 5 is
+built: **activating a subscriber's access after they pay is done by
+hand.** Square doesn't tell this app automatically that someone paid via
+a plain Payment Link, so when you see a new $20/month payment land in
+your Square dashboard, run this once in Supabase's SQL Editor:
 
-**Testing note:** until Square Subscriptions billing exists (section 5),
-you can activate a test subscriber by hand from the SQL Editor:
+```sql
+-- Find the user's id first (Authentication -> Users in the dashboard, or:
+select id, email from auth.users where email = 'someone@example.com';
+
+-- Then activate them for 30 days:
+insert into public.subscribers (user_id, status, current_period_start, current_period_end)
+values ('<the-user-id-from-above>', 'active', now(), now() + interval '30 days')
+on conflict (user_id) do update set status = 'active', current_period_start = now(), current_period_end = now() + interval '30 days';
+```
+
+Once that row is `active`, that person can:
+
+- Sign in via magic link and see their subscription as active.
+- Use **Today's Reading** (the exact same Nodal-Choice-driven solo
+  reading pipeline as the one-time flow, just called against whatever
+  birth data they already entered) and have that day's Node cards, Nodal
+  Choice, wildcard card, and a minimal profile snapshot saved to
+  `daily_reads` — enforced server-side (see `upsert_daily_read()` in
+  `supabase/subscriptions_daily_reads_schema.sql`; a non-active user
+  calling it directly is refused, not just blocked in the UI).
+- Use **Your Lookback** to see a real, computed synthesis of everything
+  saved so far.
+
+Manual activation is fine to launch with at low volume — it's the same
+honest, incremental approach this project has used before (see the promo
+code system). Automate it later (section 5) if volume justifies the extra
+integration work.
+
+**Testing note:** the same SQL above works for a test account too — just
+use a test email you control.
 
 ```sql
 -- Find the user's id first (Authentication -> Users in the dashboard, or:
@@ -105,12 +133,17 @@ values ('<the-user-id-from-above>', 'active', now(), now() + interval '30 days')
 on conflict (user_id) do update set status = 'active', current_period_start = now(), current_period_end = now() + interval '30 days';
 ```
 
-## 5. SQUARE SUBSCRIPTIONS — NOT YET LIVE
+## 5. OPTIONAL FUTURE UPGRADE — fully automated billing via the Subscriptions API
 
-**Real billing for this subscription does not exist yet.** The client-side
-code, the database schema, and a stub serverless function are all in
-place and tested, but no money can move until a human does the following,
-outside of this codebase:
+**Not required to launch — section 4's Payment Link path already takes
+real money today.** This section documents the fully-automated
+alternative: instead of a human running one SQL statement per new
+subscriber, Square's own Subscriptions API and webhooks keep
+`subscribers.status` accurate automatically. Worth building once volume
+makes the manual step from section 4 a real burden, not before. The
+client-side gate, the database schema, and a stub serverless function for
+this path are all in place and tested, but no part of it is wired up to
+actually run yet:
 
 1. **Create a subscription plan in the Square dashboard.** Go to the
    Square Dashboard → **Items & Orders → Subscriptions** and create a new
@@ -167,10 +200,9 @@ outside of this codebase:
    metadata), matching every other write path in this project's Supabase
    usage.
 
-Until all six steps above are done, the Subscribe button on the site will
-always show "Subscriptions Launching Soon," and no real money can be
-charged through this feature — that is the intended, honest state, not a
-bug.
+Until these steps are done, subscriber activation stays the manual
+one-SQL-statement step described in section 4 — that's the live,
+intended state today, not a bug or a blocker.
 
 ## 6. Where this data shows up
 
