@@ -3000,49 +3000,73 @@ function formatGroupCrossReference(p, ref) {
 // distribution -- the same counts formatGroupOverviewSection reports.
 function elementArticle(el) { return /^[aeiou]/i.test(el || '') ? 'an' : 'a'; }
 
+// Short, real "what this Life Path's own quality actually is" phrase --
+// prefers MASTER_NUMBER_DATA's own `quality` text for 11/22/33/44 (it
+// already exists in exactly this shape), falls back to the ordinary
+// LP_DATA `gift` phrase for 1-9 (the closest existing equivalent -- a
+// short, real noun-phrase describing that Life Path's actual gift, not an
+// invented new field). Either way this is real data already computed
+// elsewhere in the Codex, never a new claim.
+function getLifePathQualityText(lp) {
+  var reduced = reduceNum(lp, false);
+  var master = MASTER_NUMBER_DATA[lp] || MASTER_NUMBER_DATA[reduced];
+  var text = (master && master.quality) ? master.quality : (LP_DATA[lp] || LP_DATA[reduced] || LP_DATA[6]).gift;
+  // Strip a trailing period so this reads correctly when embedded mid-sentence
+  // (MASTER_NUMBER_DATA's quality strings are written as standalone sentences).
+  return text.replace(/\.\s*$/, '');
+}
+
 function formatGroupPersonSection(p, idx, priorProfiles, overview) {
-  var lpData = LP_DATA[p.lifePath] || LP_DATA[reduceNum(p.lifePath, false)] || LP_DATA[6];
-  var trump = p.lifePathTrumpCard;
   var n = idx || 0;
   var art = elementArticle(p.sunSign.element);
+  var archetype = getCodexArchetype(p.lifePath, p.sunSign.element);
+  var lpQuality = getLifePathQualityText(p.lifePath);
+  var elementQuality = ELEMENT_QUALITIES[p.sunSign.element] || ELEMENT_QUALITIES.Fire;
+  var axis = AXIS_ROLES[p.axisRole] || AXIS_ROLES.horizontal;
+  var isVertical = p.axisRole === 'vertical';
 
+  // (1) Open by naming the Codex Archetype plainly and grounding it in
+  // real data: what the Life Path's own quality actually is, crossed with
+  // what the Sun element genuinely represents (Part XXXV -- the project
+  // owner's own worked example: "The Master Communicator... what that
+  // means, what air energy represents").
   var openers = [
-    function(){ return p.firstName + ' carries Life Path ' + p.lifePath + ' (' + lpData.title + '), anchored at ' + p.tree.name + ' on the Tree of Life — ' + p.tree.meaning + '.'; },
-    function(){ return 'At the center of ' + p.firstName + '\'s chart sits Life Path ' + p.lifePath + ' — ' + lpData.title + ' — landing them at ' + p.tree.name + ' on the Tree, ' + p.tree.meaning + '.'; },
-    function(){ return p.tree.name + ' is where ' + p.firstName + '\'s Life Path ' + p.lifePath + ' (' + lpData.title + ') comes to rest on the Tree of Life — ' + p.tree.meaning + '.'; },
-    function(){ return 'Life Path ' + p.lifePath + ' makes ' + p.firstName + ' ' + lpData.title + ', and the Tree places that role squarely at ' + p.tree.name + ' — ' + p.tree.meaning + '.'; }
+    function(){ return 'As ' + archetype + ', ' + p.firstName + ' brings ' + lpQuality.toLowerCase() + ' into this group, carried on ' + art + ' ' + p.sunSign.element + ' current that shows up as ' + elementQuality + '.'; },
+    function(){ return p.firstName + ' shows up here as ' + archetype + ' — Life Path ' + p.lifePath + '\'s own gift of ' + lpQuality.toLowerCase() + ', running through ' + art + ' ' + p.sunSign.element + ' Sun that gives them ' + elementQuality + '.'; },
+    function(){ return 'The title ' + archetype + ' is not decoration for ' + p.firstName + ' — it is what happens when Life Path ' + p.lifePath + '\'s ' + lpQuality.toLowerCase() + ' meets ' + art + ' ' + p.sunSign.element + ' Sun\'s real gift of ' + elementQuality + '.'; },
+    function(){ return 'Cross Life Path ' + p.lifePath + '\'s ' + lpQuality.toLowerCase() + ' with the ' + p.sunSign.element + ' current running underneath it — ' + elementQuality + ' — and what you get is exactly what the Codex names ' + p.firstName + ': ' + archetype + '.'; }
   ];
-  var sunClauses = [
-    function(){ return 'Their ' + p.sunSign.sign + ' Sun brings ' + art + ' ' + p.sunSign.element + ' current into everything they do' + (trump ? (', confirmed by their Life Path Trump Card, ' + trump.card + ' — ' + trump.keyword + '.') : '.'); },
-    function(){ return p.firstName + '\'s ' + p.sunSign.sign + ' Sun runs ' + art + ' ' + p.sunSign.element + ' current underneath all of it' + (trump ? (', the same teaching their Life Path Trump Card ' + trump.card + ' — ' + trump.keyword + ' — already confirms.') : '.'); },
-    function(){ return 'Underneath that, ' + elementArticle(p.sunSign.sign) + ' ' + p.sunSign.sign + ' Sun colors everything ' + p.firstName + ' does with ' + p.sunSign.element + (trump ? (', and the Life Path Trump Card ' + trump.card + ' (' + trump.keyword + ') says the same thing in a different language.') : '.'); }
-  ];
-  var soulClauses = [
-    function(){ return 'On Metatron’s Cube, their Soul Card is the ' + p.soulCard.name + ' (' + p.soulCard.keyword + '), carried outward into daily life as the ' + p.courtCard.name + '.'; },
-    function(){ return 'Metatron’s Cube names the inner want beneath that as the ' + p.soulCard.name + ' (' + p.soulCard.keyword + '), showing up outwardly as the ' + p.courtCard.name + '.'; }
-  ];
-  var nodeClauses = [
-    function(){ return 'Their North Node points them toward the ' + p.nodeDecanCards.northNodeCard.card + ' — the energy they are growing into — while their South Node, the ' + p.nodeDecanCards.southNodeCard.card + ', names the familiar comfort zone they are moving beyond.'; },
-    function(){ return p.firstName + ' is growing toward the ' + p.nodeDecanCards.northNodeCard.card + ' by North Node, still shadowed by the more familiar ' + p.nodeDecanCards.southNodeCard.card + ' of the South Node behind them.'; }
-  ];
-  var polarityClauses = [
-    function(){ return p.firstName + ' carries ' + (p.elementalNodePolarity === 'outward' ? 'an outward-pushing' : 'an inward-pulling') + ' Node current, part of what shapes how they move alongside the rest of this group.'; },
-    function(){ return 'That Node current runs ' + (p.elementalNodePolarity === 'outward' ? 'outward' : 'inward') + ' for ' + p.firstName + ' — one more thread in how they sit inside this particular group.'; }
+
+  // (2) Pivot explicitly to structural role -- this is the actual "seat
+  // at the table" finding (AXIS_ROLES is already, structurally, "position
+  // you play best in a group"). Synthesize archetype + axis role into one
+  // concrete statement of their most reliable contribution, not two facts
+  // stapled together with "and" (same standard doReading()'s own synthesis
+  // instruction holds itself to).
+  var roleClauses = [
+    function(){ return 'Structurally, that makes ' + p.firstName + ' ' + axis.title + ' — ' + (isVertical
+      ? 'the one who takes whatever is scattered in a room and gives it one clear, coherent direction'
+      : 'the one who takes whatever direction is already in the air and gives it somewhere real to land') + ', ' + (isVertical
+      ? 'so a group leaning on ' + p.firstName + ' should expect them to be the synthesizer who turns many voices into one thread, not just another voice in the room'
+      : 'so a group leaning on ' + p.firstName + ' should expect them to be the one who makes sure what gets said actually turns into something built, not just another idea in the room') + '.'; },
+    function(){ return 'On the Tree, ' + p.firstName + ' carries ' + axis.pillar + ' as ' + axis.title + ' — meaning their most reliable contribution to any group is ' + (isVertical
+      ? 'holding the coherence other people\'s energy needs in order to actually go somewhere'
+      : 'giving other people\'s energy the stable structure it needs in order to actually land') + ', the specific job their chart consistently hands them.'; },
+    function(){ return 'Put ' + archetype + ' inside ' + axis.title + ' and the pattern is plain: ' + p.firstName + '\'s most dependable role in a group is ' + (isVertical
+      ? 'not generating the group\'s ideas but making sure the group\'s many ideas resolve into one clear, spoken direction'
+      : 'not generating the group\'s direction but making sure that direction actually gets built into something real') + '.'; }
   ];
 
   var parts = [];
   parts.push(openers[n % openers.length]());
-  parts.push(sunClauses[(n + 1) % sunClauses.length]());
-  if (p.soulCard && p.courtCard) parts.push(soulClauses[(n + 2) % soulClauses.length]());
-  if (p.nodeDecanCards) parts.push(nodeClauses[(n + 1) % nodeClauses.length]());
-  if (p.elementalNodePolarity) parts.push(polarityClauses[n % polarityClauses.length]());
+  parts.push(roleClauses[n % roleClauses.length]());
 
   var crossRef = findGroupCrossReference(p, priorProfiles);
   if (crossRef) parts.push(formatGroupCrossReference(p, crossRef));
 
   if (overview && p.elementSuit && overview.suitCounts && overview.suitCounts[p.elementSuit] > 1) {
     var suitLabelMap = {Wands:'Fire', Cups:'Water', Swords:'Air', Pentacles:'Earth'};
-    parts.push(p.firstName + ' is one of ' + overview.suitCounts[p.elementSuit] + ' of you in this room carrying ' + p.elementSuit + ' (' + (suitLabelMap[p.elementSuit] || p.sunSign.element) + ') energy.');
+    parts.push(p.firstName + ' is one of ' + overview.suitCounts[p.elementSuit] + ' of you in this room carrying ' + p.elementSuit + ' (' + (suitLabelMap[p.elementSuit] || p.sunSign.element) + ') energy — one more voice contributing that current to the group\'s overall spectrum.');
   }
 
   return parts.join(' ').trim();
@@ -3055,7 +3079,7 @@ function formatGroupOverviewSection(overview, groupOverviewLabel) {
     var c = overview.suitCounts[key] || 0;
     return c + ' of you carr' + (c === 1 ? 'ies' : 'y') + ' ' + label + ' energy';
   });
-  var out = 'Across all ' + n + ' of you, the group’s elemental spectrum breaks down as follows: ' + suitLines.join('; ') + '.\n\n';
+  var out = 'This is the group’s full roster of roles and contributions — the same real picture each person’s own section below zooms into individually. Across all ' + n + ' of you, the group’s elemental spectrum breaks down as follows: ' + suitLines.join('; ') + '.\n\n';
   out += 'On the Tree of Life’s central architecture, ' + overview.axisCounts.vertical + ' of you carry the Vertical Integrator role (the central channel) and ' + overview.axisCounts.horizontal + ' carry the Horizontal Architect role (the crossbeams) — the real, computed distribution of structural roles across this group.\n\n';
   if (overview.polarityCounts.outward || overview.polarityCounts.inward) {
     out += 'By elemental Node polarity, ' + overview.polarityCounts.outward + ' of you carry an outward-pushing North Node current and ' + overview.polarityCounts.inward + ' carry an inward-pulling one — a real, always-available axis (distinct from the rare day-specific Node activation used elsewhere in solo and partnership readings) that shapes which pairings below read as magnetic versus tension.\n\n';
@@ -3205,27 +3229,30 @@ async function doGroupReading(profiles) {
   var overview = computeGroupOverview(profiles);
   var pairings = computeStandoutPairings(profiles);
   var profileLines = profiles.map(function(p) {
-    var lpData = LP_DATA[p.lifePath] || LP_DATA[reduceNum(p.lifePath, false)] || LP_DATA[6];
-    var axis = p.axisRole && AXIS_ROLES[p.axisRole] ? AXIS_ROLES[p.axisRole].title : null;
-    return p.firstName + ': Life Path ' + p.lifePath + ' (' + lpData.title + ') · ' + p.sunSign.sign + ' Sun (' + p.sunSign.element + ') · ' + p.tree.name
-      + (p.lifePathTrumpCard ? ' · Trump Card ' + p.lifePathTrumpCard.card : '')
-      + (p.soulCard ? ' · Soul Card ' + p.soulCard.name : '')
+    var axis = p.axisRole && AXIS_ROLES[p.axisRole] ? AXIS_ROLES[p.axisRole] : null;
+    var archetype = getCodexArchetype(p.lifePath, p.sunSign.element);
+    var lpQuality = getLifePathQualityText(p.lifePath);
+    return p.firstName + ': Life Path ' + p.lifePath + ' · Codex Archetype ' + archetype + ' (Life Path quality: ' + lpQuality + ') · ' + p.sunSign.sign + ' Sun (' + p.sunSign.element + ' — ' + (ELEMENT_QUALITIES[p.sunSign.element] || '') + ') · ' + p.tree.name
+      + (axis ? ' · Axis Role ' + axis.title + ' (' + axis.description + ')' : '')
       + (p.elementSuit ? ' · Elemental Suit ' + p.elementSuit : '')
-      + (axis ? ' · Axis Role ' + axis : '')
-      + (p.nodeDecanCards ? ' · North Node card ' + p.nodeDecanCards.northNodeCard.card : '')
       + (p.elementalNodePolarity ? ' · Elemental Node polarity: ' + p.elementalNodePolarity : '');
   }).join('\n');
 
   var prompt = 'You are Celestia, oracle of Circles Squared. Generate a group reading for ' + profiles.length + ' people: ' + profiles.map(function(p){return p.firstName;}).join(', ') + '. '
-    + 'This is entertainment for a family or friend group, not a workplace or compatibility-score product. Write in Celestia’s warm, poetic, second-person voice. Never narrate HOW a value was calculated (no degree/decan/mechanism talk) -- only what each finding means. Never invent a numeric score, percentage, or compatibility rating for any pairing -- report only real, computed, binary facts.\n\n'
+    + 'This reading is deliberately NOT a set of personal mini-readings -- personal specifics belong to the individual solo reading product, which these buyers can purchase separately. This product exists to answer one question only: how does each person CONTRIBUTE to this specific group, and what position do they play best within it. This is entertainment for a family or friend group, not a workplace or compatibility-score product. Write in Celestia’s warm, poetic, second-person voice. Never narrate HOW a value was calculated (no degree/decan/mechanism talk) -- only what each finding means. Never invent a numeric score, percentage, or compatibility rating for any pairing -- report only real, computed, binary facts.\n\n'
     + 'PROFILE (people are listed in the same order their sections should appear -- each person after the first can genuinely be compared only to the people listed ABOVE them, since those are the only people "already introduced" in the finished reading):\n' + profileLines + '\n\n'
     + 'GROUP OVERVIEW (real, computed distribution -- report these counts honestly, never invent a composite score): '
     + 'Elemental suits -- ' + JSON.stringify(overview.suitCounts) + '. Axis roles -- ' + JSON.stringify(overview.axisCounts) + '. Elemental Node polarity -- ' + JSON.stringify(overview.polarityCounts) + '.\n\n'
+    + 'FOR EACH PERSON\'S SECTION, the content must be CONTRIBUTION-FRAMED, not a personal-bio recap. Concretely:\n'
+    + '  (a) Name their Codex Archetype plainly (e.g. "As The Master Communicator, Heather brings..."), then explain what that title concretely MEANS by synthesizing their real Life Path quality with what their Sun element genuinely represents (given in the PROFILE above) -- a real synthesis of those two real findings, not two facts stapled side by side with "and."\n'
+    + '  (b) Pivot explicitly to their Axis Role (Vertical Integrator or Horizontal Architect, given in the PROFILE above) as their STRUCTURAL POSITION in a group -- state plainly and specifically how their archetype and their axis role combine into their single most reliable contribution when working with others (e.g. a Vertical Integrator who is also a Communicator-type archetype is the one who takes a group\'s scattered energy and gives it one clear spoken direction; a Horizontal Architect with that same archetype instead keeps everyone\'s communication actually landing somewhere real, not just talk). This must be a genuine synthesis of the two real fields, held to the same "not two facts stapled together" bar the partnership reading\'s own synthesis paragraphs already meet.\n'
+    + '  (c) DO NOT include personal-bio content that has no group-contribution angle -- no Soul Card/Court Card sentence, no raw North/South Node growth-direction narration. Those belong to the solo reading, not this one. If in doubt, ask: does this sentence describe their SEAT AT THIS TABLE, or their personal chart in isolation? Only the former belongs here.\n'
+    + '  (d) Keep, but subordinate, the elemental-suit-count callout and any real cross-reference to a person already introduced above them (rule (2) below) -- these belong in service of the same "how you fit into this specific group" narrative, not bolted on as an afterthought.\n\n'
     + 'CRITICAL -- avoid the flat, isolated-then-bulleted-pairings shape entirely. Do this the way the two-person partnership reading already does it: weave real comparisons INSIDE sentences about a specific person, not only in a separate pairings list. Two structural rules govern the whole output:\n'
     + '(1) PER-PERSON VARIATION: Do not write every PERSON_<name> section from the identical sentence skeleton. Vary how each paragraph opens and closes, and vary the order facts are introduced in, person to person, the way a human writer naturally varies phrasing -- two people\'s paragraphs in this same reading should never read as obviously mad-libbed from one template. Every fact must still be real and drawn only from the PROFILE above -- vary HOW it is said, never invent WHAT is said.\n'
     + '(2) REAL CROSS-REFERENCES INSIDE PARAGRAPHS: For each person after the first, look back at the people already listed above them in the PROFILE and, where a genuine real connection exists (the exact same Sephirah, the exact same Life Path Trump Card, the same Elemental Suit, a complementary or matching Axis Role the way Cornerstone/Twin Pillar/Foundation configurations already work in the two-person reading, or complementary Elemental Node polarity), weave ONE such reference into that person\'s OWN paragraph, in the partnership reading\'s own style -- e.g. "Where Marcus\'s Air current sets the tone for this room\'s Vertical axis, Priya\'s Water brings something the group doesn\'t otherwise have." Do not force a connection where none of those real criteria are actually met for anyone listed above this person -- some people legitimately get no cross-reference -- but this must genuinely happen for a meaningful fraction of the group, not zero. Also have a person\'s own paragraph name their place inside the real Group Overview counts above where it fits naturally (e.g. "one of the X of you carrying Pentacles energy").\n\n'
     + 'For the PAIRINGS section specifically: when several pairs in this group share the exact same qualifying condition with no other distinguishing coincidence (for example, four different people who all simply carry the same outward-pushing Node polarity with nothing else notable between any two of them), do NOT write one nearly-identical bulleted sentence per pair. Either vary the sentence construction meaningfully pair to pair, or -- better, when three or more people share the identical plain condition -- consolidate them into ONE sentence naming the whole cluster together (e.g. "Priya, Dante, Solveig, and Yara all carry the same outward-pushing Node current, which as a cluster suggests...") instead of N separate nearly-identical two-person bullets. Pairs that DO carry a real additional coincidence (same Sephirah, same Trump Card, etc. on top of the polarity) are already distinguished by that fact and may stay as individual bullets.\n\n'
-    + 'Write these sections using ===SECTION_NAME_START=== / ===SECTION_NAME_END=== delimiters: OVERVIEW (2-3 paragraphs naming the real distributions above as a group energetic portrait), then one PERSON_<firstname> section per person, in PROFILE order (1 condensed paragraph each, Life Path/Sun sign/Sephirah/Trump Card/Soul Card/Node in the established voice, following rules (1) and (2) above), then PAIRINGS (name only the standout pairings the data supports -- complementary Node polarity for magnetic pairs, matching polarity for tension pairs, each combined with any other real coincidence -- as plain described facts, never a score, following the clustering/variation rule above), then BLESSING (a short closing blessing invoking AIN SOPH AUR for the whole group).';
+    + 'Write these sections using ===SECTION_NAME_START=== / ===SECTION_NAME_END=== delimiters: OVERVIEW (2-3 paragraphs naming the real distributions above as this group\'s full roster of roles and contributions), then one PERSON_<firstname> section per person, in PROFILE order (1 condensed paragraph each, following the contribution-framing rules (a)-(d) and the structural rules (1) and (2) above), then PAIRINGS (name only the standout pairings the data supports -- complementary Node polarity for magnetic pairs, matching polarity for tension pairs, each combined with any other real coincidence -- as plain described facts, never a score, following the clustering/variation rule above), then BLESSING (a short closing blessing invoking AIN SOPH AUR for the whole group).';
 
   try {
     var text = await generateReading(prompt);
@@ -3733,6 +3760,18 @@ var ELEMENT_TO_SOLID = {
   Earth: {solid:'Cube',        suit:'Pentacles'},
   Air:   {solid:'Octahedron',  suit:'Swords'},
   Water: {solid:'Icosahedron', suit:'Cups'}
+};
+// ── Standard astrological element correspondences (Codex Logic V07 Part
+// XXXV) ── Real, widely-recognized associations, not an invented framework
+// -- used as the fallback (non-AI) path's substance for "what this element
+// represents," the way the AI path can already generate live. Kept short:
+// a handful of words per element, matching this codebase's existing
+// LP_DATA/MASTER_NUMBER_DATA tone.
+var ELEMENT_QUALITIES = {
+  Fire:  'initiating action, momentum, and the courage to move before certainty arrives',
+  Water: 'emotional attunement, intuition, and the ability to feel what a room needs before it is spoken',
+  Air:   'communication, ideas, and the connective thread that carries meaning from one person to the next',
+  Earth: 'grounding, practical follow-through, and the patience to carry a vision the rest of the way into form'
 };
 // W3BB CODEX SECTION 6.3 — Minor Arcana keyword per Sephirah number (1-10) per suit
 var MINOR_KEYWORDS = {
