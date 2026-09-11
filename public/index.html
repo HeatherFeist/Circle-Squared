@@ -970,21 +970,21 @@ body {
     <div data-id="264" id="adminPurchaseList" style="display:flex;flex-direction:column;gap:0.7rem;"></div>
     <div data-id="265" id="adminEmptyState" style="text-align:center;padding:3rem;color:#3a2a5a;font-style:italic;display:none;">No purchases recorded yet.</div>
 
-    <!-- ===== AZURE AI SPEECH VOICE SETTINGS ===== -->
+    <!-- ===== VOICE SETTINGS ===== -->
     <div data-id="266" style="margin-top:2rem;border-top:1px solid rgba(176,138,255,0.15);padding-top:1.5rem;">
-      <div data-id="267" style="font-family:'Courier New',monospace;font-size:0.62rem;letter-spacing:0.4em;color:#c9a84c;margin-bottom:0.3rem;">🎙️ VOICE SETTINGS (OPTIONAL: AZURE AI SPEECH UPGRADE)</div>
-      <div data-id="268" style="font:700 1.1rem Georgia,serif;color:#e8e0ff;margin-bottom:0.6rem;">Voice Settings — Optional Azure AI Speech Upgrade</div>
-      <p data-id="269" style="font-size:0.8rem;color:#8a7aaa;line-height:1.6;margin-bottom:1rem;">By default the reading is narrated for free using the voice already built into your browser (preferring an "Aria" voice when one is available, or you can pick an exact voice yourself below). Entering an Azure Cognitive Services Speech key and region below is entirely optional — it upgrades narration to a paid Azure neural voice instead. Both fields are required only if you want to use this upgrade. Stored only in your browser's local storage — never in any file or server.</p>
+      <div data-id="267" style="font-family:'Courier New',monospace;font-size:0.62rem;letter-spacing:0.4em;color:#c9a84c;margin-bottom:0.3rem;">🎙️ VOICE SETTINGS</div>
+      <div data-id="268" style="font:700 1.1rem Georgia,serif;color:#e8e0ff;margin-bottom:0.6rem;">Voice Settings</div>
+      <p data-id="269" style="font-size:0.8rem;color:#8a7aaa;line-height:1.6;margin-bottom:1rem;">By default the reading is narrated for free using the voice already built into your browser (preferring an "Aria" voice when one is available, or you can pick an exact voice yourself below). Stored only in your browser's local storage — never in any file or server.</p>
 
       <!-- Free Browser Voice picker — lets someone choose exactly which
-           installed browser/OS voice narrates readings when no Azure key is
-           saved, instead of relying on the automatic "Aria" name search
-           (which can't be guaranteed to find the right voice on every
-           browser/OS combination). Populated dynamically from
-           speechSynthesis.getVoices() -- see populateBrowserVoiceSelect(). -->
+           installed browser/OS voice narrates readings, instead of relying
+           on the automatic "Aria" name search (which can't be guaranteed to
+           find the right voice on every browser/OS combination). Populated
+           dynamically from speechSynthesis.getVoices() -- see
+           populateBrowserVoiceSelect(). -->
       <div data-id="290" style="margin-bottom:1.4rem;padding-bottom:1.2rem;border-bottom:1px dashed rgba(176,138,255,0.15);">
         <div data-id="291" style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#c9a84c;display:block;margin-bottom:0.4rem;">FREE BROWSER VOICE</div>
-        <p data-id="292" style="font-size:0.78rem;color:#8a7aaa;line-height:1.6;margin-bottom:0.6rem;">Choose exactly which voice already installed on this device/browser should narrate readings when no Azure key is saved above. This list comes straight from your browser, so pick whichever one actually sounds right when you test it. Leave unset to keep the automatic "Aria" search as the default.</p>
+        <p data-id="292" style="font-size:0.78rem;color:#8a7aaa;line-height:1.6;margin-bottom:0.6rem;">Choose exactly which voice already installed on this device/browser should narrate readings. This list comes straight from your browser, so pick whichever one actually sounds right when you test it. Leave unset to keep the automatic "Aria" search as the default.</p>
         <select data-id="293" id="browser-voice-select" class="cosmic-select" style="width:100%;margin-bottom:0.6rem;">
           <option value="">— Automatic (search for an "Aria" voice) —</option>
         </select>
@@ -996,9 +996,7 @@ body {
 
         <!-- Narration speed -- the fixed 0.95 rate felt too slow on some
              machines/voices, so this exposes it as an adjustable slider
-             instead of a hardcoded constant. Applies to the free browser
-             voice path only (Azure narration keeps its own separate,
-             already-existing pacing, untouched). Saved to localStorage and
+             instead of a hardcoded constant. Saved to localStorage and
              read by browserSpeak() -- see readBrowserVoiceRate(). -->
         <div style="margin-top:1rem;padding-top:1rem;border-top:1px dashed rgba(176,138,255,0.15);">
           <label style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#c9a84c;display:block;margin-bottom:0.4rem;">NARRATION SPEED <span id="browser-voice-rate-display" style="color:#e8e0ff;">1.0×</span></label>
@@ -1010,17 +1008,17 @@ body {
       <!-- Enhanced Free Voice (Beta) — Kokoro-82M, an open-source
            (Apache-2.0) neural TTS model running entirely client-side via
            WASM through the kokoro-js npm package (itself built on
-           Transformers.js/onnxruntime-web). Sits BETWEEN the default free
-           browser voice above and the paid Azure upgrade below as a third,
-           opt-in tier -- noticeably more natural than the robotic default
-           browser voice, still $0 and still nothing sent to any server, at
-           the cost of a one-time ~90MB model download the first time it's
-           enabled (cached by the browser afterward). See
+           Transformers.js/onnxruntime-web). Sits alongside the default free
+           browser voice above as a second, opt-in tier -- noticeably more
+           natural than the robotic default browser voice, still $0 and
+           still nothing sent to any server, at the cost of a one-time
+           ~90MB model download the first time it's enabled (cached by the
+           browser afterward). See
            loadKokoroVoice()/kokoroSpeak()/isKokoroReady() and
            docs/CODEX_LOGIC_V07.md Part XXXII. -->
       <div data-id="298" style="margin-bottom:1.4rem;padding-bottom:1.2rem;border-bottom:1px dashed rgba(176,138,255,0.15);">
         <div data-id="299" style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#c9a84c;display:block;margin-bottom:0.4rem;">🧬 ENHANCED FREE VOICE (BETA) — OPEN-SOURCE NEURAL VOICE</div>
-        <p data-id="300" style="font-size:0.78rem;color:#8a7aaa;line-height:1.6;margin-bottom:0.6rem;">A free, open-source neural voice (Kokoro-82M, Apache-2.0 licensed) that sounds noticeably more natural than the default browser voice above. It still runs entirely in your browser — nothing is ever sent to a server — but the first time you enable it, it has to download a one-time set of model weights (about 90MB, quantized) before it can speak. After that first download your browser caches it and every later reading uses it instantly. This is a completely different, smaller technology than the Azure upgrade below: it does not use Azure's named voices ("Aria," "Natasha," etc.) — Kokoro ships its own small set of named voices, picked below.</p>
+        <p data-id="300" style="font-size:0.78rem;color:#8a7aaa;line-height:1.6;margin-bottom:0.6rem;">A free, open-source neural voice (Kokoro-82M, Apache-2.0 licensed) that sounds noticeably more natural than the default browser voice above. It still runs entirely in your browser — nothing is ever sent to a server — but the first time you enable it, it has to download a one-time set of model weights (about 90MB, quantized) before it can speak. After that first download your browser caches it and every later reading uses it instantly. This is a completely different, smaller technology than the browser voice above: Kokoro ships its own small set of named voices, picked below.</p>
         <select data-id="301" id="kokoro-voice-select" class="cosmic-select" style="width:100%;margin-bottom:0.6rem;">
           <optgroup label="— US ENGLISH: FEMALE —">
             <option value="af_heart">Heart — American ✦ Recommended</option>
@@ -1069,69 +1067,6 @@ body {
           </div>
         </div>
         <div data-id="306" id="kokoro-voice-status" style="font-size:0.75rem;color:#5a4a7a;min-height:1.2em;margin-top:0.3rem;">This device/browser must support WebAssembly (nearly all modern browsers do). If the download or setup ever fails, readings simply keep narrating with the default free browser voice above — this tier never breaks narration.</div>
-      </div>
-
-      <div data-id="270" style="margin-bottom:0.8rem;">
-        <label data-id="271" style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#c9a84c;display:block;margin-bottom:0.4rem;">API KEY</label>
-        <input data-id="272" type="password" id="azure-api-key-input" class="cosmic-input" placeholder="Azure Speech subscription key" style="font-family:'Courier New',monospace;font-size:0.88rem;" />
-      </div>
-
-      <div style="margin-bottom:0.8rem;">
-        <label style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#c9a84c;display:block;margin-bottom:0.4rem;">REGION</label>
-        <input type="text" id="azure-region-input" class="cosmic-input" placeholder="e.g. eastus, westeurope" style="font-family:'Courier New',monospace;font-size:0.88rem;" />
-      </div>
-
-      <div data-id="273" style="margin-bottom:1rem;">
-        <label data-id="274" style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#c9a84c;display:block;margin-bottom:0.4rem;">VOICE</label>
-        <select data-id="275" id="azure-voice-select" class="cosmic-select" style="width:100%;">
-          <optgroup label="— FEMALE VOICES —">
-            <option value="en-US-AriaNeural">Aria — Warm American ✦ Recommended</option>
-            <option value="en-US-JennyNeural">Jenny — Friendly American</option>
-            <option value="en-US-SaraNeural">Sara — Soft American</option>
-            <option value="en-GB-SoniaNeural">Sonia — Crisp British</option>
-            <option value="en-AU-NatashaNeural">Natasha — Warm Australian</option>
-            <option value="en-IE-EmilyNeural">Emily — Irish Mystique</option>
-          </optgroup>
-          <optgroup label="— MALE VOICES —">
-            <option value="en-US-GuyNeural">Guy — Deep American Baritone</option>
-            <option value="en-US-DavisNeural">Davis — Rich &amp; Resonant American</option>
-            <option value="en-GB-RyanNeural">Ryan — Calm British</option>
-            <option value="en-AU-WilliamNeural">William — Australian Warmth</option>
-            <option value="en-IE-ConnorNeural">Connor — Irish Authority</option>
-          </optgroup>
-        </select>
-      </div>
-
-      <div data-id="280" style="display:flex;gap:0.6rem;margin-bottom:0.6rem;flex-wrap:wrap;">
-        <button data-id="281" id="azure-save-btn" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.55rem 1.2rem;background:linear-gradient(135deg,#c9a84c,#f0d070);color:#0a0015;font-weight:700;font-size:0.82rem;border:none;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;">💾 Save Key</button>
-        <button data-id="282" id="azure-test-btn" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.55rem 1.2rem;background:none;border:1px solid rgba(176,138,255,0.3);color:#b08aff;font-size:0.82rem;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;">🔊 Test Voice</button>
-      </div>
-      <div data-id="283" id="azure-status" style="font-size:0.75rem;color:#5a4a7a;min-height:1.2em;margin-top:0.3rem;"></div>
-
-      <!-- Free Intro Voice — separate voice for the free reveal-screen narration, same Azure account/key/region -->
-      <div data-id="284" style="margin-top:1.4rem;padding-top:1.2rem;border-top:1px dashed rgba(176,138,255,0.15);">
-        <div data-id="285" style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#c9a84c;display:block;margin-bottom:0.4rem;">FREE INTRO VOICE</div>
-        <p data-id="286" style="font-size:0.78rem;color:#8a7aaa;line-height:1.6;margin-bottom:0.6rem;">Optional — only applies if you've saved an Azure key and region above. Picks a distinct Azure voice that narrates the free blueprint reveal (before the paywall). Leave unset to fall back to the main Azure narration voice above (or to the free browser voice if no Azure key is saved at all).</p>
-        <select data-id="287" id="azure-intro-voice-select" class="cosmic-select" style="width:100%;margin-bottom:0.6rem;">
-          <option value="">— None (use fallback voice) —</option>
-          <optgroup label="— FEMALE VOICES —">
-            <option value="en-US-AriaNeural">Aria — Warm American ✦ Recommended</option>
-            <option value="en-US-JennyNeural">Jenny — Friendly American</option>
-            <option value="en-US-SaraNeural">Sara — Soft American</option>
-            <option value="en-GB-SoniaNeural">Sonia — Crisp British</option>
-            <option value="en-AU-NatashaNeural">Natasha — Warm Australian</option>
-            <option value="en-IE-EmilyNeural">Emily — Irish Mystique</option>
-          </optgroup>
-          <optgroup label="— MALE VOICES —">
-            <option value="en-US-GuyNeural">Guy — Deep American Baritone</option>
-            <option value="en-US-DavisNeural">Davis — Rich &amp; Resonant American</option>
-            <option value="en-GB-RyanNeural">Ryan — Calm British</option>
-            <option value="en-AU-WilliamNeural">William — Australian Warmth</option>
-            <option value="en-IE-ConnorNeural">Connor — Irish Authority</option>
-          </optgroup>
-        </select>
-        <button data-id="288" id="azure-intro-test-btn" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.55rem 1.2rem;background:none;border:1px solid rgba(176,138,255,0.3);color:#b08aff;font-size:0.82rem;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;">🔊 Test Intro Voice</button>
-        <div data-id="289" id="azure-intro-status" style="font-size:0.75rem;color:#5a4a7a;min-height:1.2em;margin-top:0.4rem;"></div>
       </div>
     </div>
 
@@ -1363,7 +1298,7 @@ function preprocessForSpeech(text) {
   replacements.forEach(function(pair){ text = text.replace(pair[0], pair[1]); });
 
   // ── ALL-CAPS SPELL-OUT FIX ──────────────────────────────────
-  // Most speech engines (Azure and, especially, native browser TTS) read a
+  // Most speech engines (especially native browser TTS) read a
   // fully-uppercase token as an acronym and spell it out letter-by-letter
   // instead of pronouncing it as a word — e.g. a stray "AIN SOPH AUR" that
   // slipped past the specific phonetic replacements above, a Tarot trump's
@@ -1407,30 +1342,6 @@ var isMuted = false;
 var currentAudio = null;
 var _speakCancelled = false;
 
-// XML-escape text before inserting it into an SSML document — Azure's TTS
-// endpoint parses the request body as XML, so unescaped &, <, >, ", ' in
-// user-supplied/generated text (e.g. a name with an ampersand) would break
-// the request or silently mangle the speech. ElevenLabs took plain text and
-// never needed this; it's a new failure mode specific to the SSML approach.
-function escapeXmlForSsml(text) {
-  return String(text == null ? '' : text)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&apos;');
-}
-
-// Core Azure AI Speech (Cognitive Services) TTS function — builds an SSML
-// document, POSTs it to the regional TTS REST endpoint, and plays the
-// returned audio bytes. Mirrors the old elevenLabsSpeak's fetch/blob/Audio
-// playback mechanics — only the request shape changes:
-//   - Auth is a subscription key on the Ocp-Apim-Subscription-Key header
-//     (works directly against the TTS endpoint; no separate bearer-token
-//     exchange call is required for this endpoint).
-//   - Both an API key AND a region are required (ElevenLabs only needed a key).
-//   - The body is SSML/XML, not JSON — text must be XML-escaped first.
-//   - The response is raw audio bytes (not JSON), same as ElevenLabs.
 // Wraps a promise so it rejects after `ms` if it hasn't settled — used below
 // to stop a stuck network request or a stalled audio.play() from hanging the
 // whole narration chain silently forever. Only guards "am I getting a
@@ -1445,86 +1356,12 @@ function _withTimeout(promise, ms, label) {
   return Promise.race([promise, timeoutPromise]).finally(function() { clearTimeout(timeoutId); });
 }
 
-async function azureSpeak(text, apiKey, region, voiceId) {
-  if (!apiKey || !region || !voiceId) {
-    throw new Error('Azure TTS: missing apiKey, region, or voiceId');
-  }
-  var langMatch = /^([a-zA-Z]{2,3}-[a-zA-Z]{2,4})/.exec(voiceId);
-  var lang = langMatch ? langMatch[1] : 'en-US';
-  var ssml = "<speak version='1.0' xml:lang='" + lang + "'>" +
-    "<voice xml:lang='" + lang + "' name='" + voiceId + "'>" +
-    escapeXmlForSsml(text) +
-    "</voice></speak>";
-  var endpoint = 'https://' + region + '.tts.speech.microsoft.com/cognitiveservices/v1';
-
-  // 8s network timeout via AbortController — a stalled fetch() with no
-  // timeout at all was the root cause of the narration sometimes never
-  // starting: no response, no error, no fallback ever triggered.
-  var controller = new AbortController();
-  var abortTimer = setTimeout(function() { controller.abort(); }, 8000);
-  var response;
-  try {
-    response = await fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        'Ocp-Apim-Subscription-Key': apiKey,
-        'Content-Type': 'application/ssml+xml',
-        'X-Microsoft-OutputFormat': 'audio-16khz-128kbitrate-mono-mp3',
-        'User-Agent': 'CirclesSquaredOracle'
-      },
-      body: ssml,
-      signal: controller.signal
-    });
-  } catch (networkErr) {
-    if (networkErr && networkErr.name === 'AbortError') {
-      console.error('[Azure TTS] request timed out after 8s — region unreachable or Azure is slow to respond:', region);
-      throw new Error('Azure TTS timed out contacting region "' + region + '"');
-    }
-    console.error('[Azure TTS] network/fetch error — check region is reachable and correctly spelled:', networkErr);
-    throw new Error('Azure TTS network error: ' + (networkErr && networkErr.message ? networkErr.message : networkErr));
-  } finally {
-    clearTimeout(abortTimer);
-  }
-
-  if (!response.ok) {
-    var errText = '';
-    try { errText = await response.text(); } catch (readErr) { /* ignore */ }
-    // A wrong/missing region typically surfaces as a DNS failure at fetch()
-    // (caught above) or a 401/403 here if the region doesn't match the key's
-    // resource. A malformed SSML body (e.g. unescaped XML) typically surfaces
-    // as a 400 Bad Request with an XML-parsing message in errText.
-    console.error('[Azure TTS] ' + response.status + ' ' + response.statusText + ' — ' + errText);
-    throw new Error('Azure TTS ' + response.status + ': ' + (errText || response.statusText));
-  }
-
-  var blob = await response.blob();
-  var url = URL.createObjectURL(blob);
-  var audio = new Audio(url);
-  currentAudio = audio;
-  // 5s timeout on *starting* playback only (e.g. a stuck autoplay-policy
-  // promise) — once playback genuinely begins, the ended/error listener
-  // below is unbounded, so long narration is never cut short.
-  try {
-    await _withTimeout(audio.play(), 5000, '[Azure TTS] audio.play()');
-  } catch (playErr) {
-    URL.revokeObjectURL(url);
-    console.error('[Azure TTS] playback failed to start:', playErr);
-    throw playErr;
-  }
-  return new Promise(function(resolve, reject) {
-    audio.addEventListener('ended', function() { URL.revokeObjectURL(url); resolve(); });
-    audio.addEventListener('error', function(e) { URL.revokeObjectURL(url); reject(e); });
-  });
-}
-
 // AppSDK.ai.speak fallback — uses built-in TTS
 async function appSdkSpeak(text) {
   if (!window.AppSDK || !window.AppSDK.ai || !window.AppSDK.ai.speak) return false;
   try {
-    // Same reasoning as azureSpeak's timeouts: this is a fallback path that
-    // itself must not be able to hang, or a stuck Azure call falling through
-    // to a stuck AppSDK call just moves the silent-hang bug rather than
-    // fixing it.
+    // This is a fallback path that itself must not be able to hang, or a
+    // stuck AppSDK call just moves the silent-hang bug rather than fixing it.
     var result = await _withTimeout(
       AppSDK.ai.speak({ text: text, voice: 'onyx', audioFormat: 'mp3' }), 8000, 'AppSDK.ai.speak'
     );
@@ -1622,9 +1459,9 @@ function readBrowserVoiceRate() {
 // ===========================
 // Kokoro-82M (hexgrad, Apache-2.0 license) via the "kokoro-js" npm package,
 // itself built on Transformers.js/onnxruntime-web. Runs entirely
-// client-side (WASM) — nothing is ever sent to a server. Sits BETWEEN the
-// default free browser voice (above) and the paid Azure upgrade (below) as
-// a third, opt-in tier. See the admin panel's "Enhanced Free Voice (Beta)"
+// client-side (WASM) — nothing is ever sent to a server. Sits alongside the
+// default free browser voice (above) as a second, opt-in tier. See the
+// admin panel's "Enhanced Free Voice (Beta)"
 // section and docs/CODEX_LOGIC_V07.md Part XXXII for the full write-up.
 //
 // Real, verified facts (checked against the npm registry and the model's
@@ -1644,9 +1481,9 @@ function readBrowserVoiceRate() {
 //     visitor to opt into.
 //   - Kokoro ships a small FIXED set of 28 named English voices (11 US
 //     female, 9 US male, 4 British female, 4 British male) — no custom
-//     voice cloning, no arbitrary named voices the way Azure has "Aria"/
-//     "Natasha"/etc. The full, real list (from kokoro.js/src/voices.js in
-//     the hexgrad/kokoro repo) is what populates the <select> above.
+//     voice cloning, no arbitrary named voices. The full, real list (from
+//     kokoro.js/src/voices.js in the hexgrad/kokoro repo) is what populates
+//     the <select> above.
 //   - generate(text, { voice, speed }) DOES support a numeric speed
 //     multiplier (default 1) — confirmed directly from kokoro.js's own
 //     source (kokoro.js/src/kokoro.js). So the existing "Narration Speed"
@@ -1655,10 +1492,10 @@ function readBrowserVoiceRate() {
 //   - generate() is async and returns a Transformers.js RawAudio object
 //     (24kHz PCM) with a .toBlob() method — there is no direct
 //     SpeechSynthesisUtterance equivalent, so playback goes through a real
-//     <audio> element via the exact same currentAudio/URL.createObjectURL
-//     pattern azureSpeak() (above) already uses, so mute/stop and the rest
-//     of the app's playback-state wiring keep working unmodified regardless
-//     of which voice tier is actually speaking.
+//     <audio> element via the same currentAudio/URL.createObjectURL pattern
+//     used elsewhere in this file, so mute/stop and the rest of the app's
+//     playback-state wiring keep working unmodified regardless of which
+//     voice tier is actually speaking.
 //
 // Loaded lazily via a dynamic import() of the pinned CDN URL below — NOT a
 // <script> tag in <head> — specifically so nothing about this tier is
@@ -1741,9 +1578,8 @@ function loadKokoroVoice(onProgress) {
   return promise;
 }
 
-// Splits text into chunks for Kokoro the same way _trySpeakAzureChunks
-// (above) does for Azure, but shorter (400 chars vs. Azure's 1800): Kokoro
-// runs inference on THIS device's own CPU/WASM runtime rather than a fast
+// Splits text into chunks for Kokoro (400 chars each): Kokoro runs
+// inference on THIS device's own CPU/WASM runtime rather than a fast
 // remote server, so shorter chunks keep the wait before the first sound
 // plays reasonable, and let stopSpeech()/mute actually interrupt between
 // chunks instead of only after an entire multi-paragraph section finishes
@@ -1764,9 +1600,9 @@ function _kokoroChunkText(fullText) {
   return chunks;
 }
 
-// Generates and plays exactly one chunk through Kokoro, using the SAME
-// currentAudio + <audio> + URL.createObjectURL contract azureSpeak() (above)
-// already uses -- so the rest of the app's mute/stop/progress wiring, which
+// Generates and plays exactly one chunk through Kokoro, using the same
+// currentAudio + <audio> + URL.createObjectURL contract used elsewhere in
+// this file -- so the rest of the app's mute/stop/progress wiring, which
 // only ever knows about `currentAudio` and `window.speechSynthesis`, keeps
 // working correctly no matter which voice tier is actually speaking.
 async function _kokoroSpeakChunk(text, voiceName, rate) {
@@ -1789,8 +1625,8 @@ async function _kokoroSpeakChunk(text, voiceName, rate) {
 
 // The enhanced-voice narration path — only ever called from browserSpeak()
 // below, and only when isKokoroReady() is true. Generates and plays
-// chunk-by-chunk (honoring stopSpeech()/mute between chunks exactly like
-// the Azure path does), and on ANY failure mid-reading falls back to the
+// chunk-by-chunk (honoring stopSpeech()/mute between chunks), and on ANY
+// failure mid-reading falls back to the
 // untouched native browser-voice path (_nativeBrowserSpeak, below) for
 // whatever text hadn't played yet — so a Kokoro error never leaves a
 // reading silent, and never breaks the default tier for anyone else.
@@ -1824,10 +1660,9 @@ async function kokoroSpeak(text, onEnd) {
 // Browser TTS — this is now the DEFAULT free voice path (per project owner
 // request: "just connect the free Microsoft voice that is in the browser...
 // keep the australian Aria or whatever voice my browser is using now").
-// Azure AI Speech (above) remains available as an optional paid upgrade for
-// anyone who saves an API key in the admin panel; AppSDK's own voice is kept
-// only as a further fallback (see _fallbackSpeakLong) for environments where
-// speechSynthesis itself isn't available at all.
+// AppSDK's own voice is kept only as a further fallback (see
+// _fallbackSpeakLong) for environments where speechSynthesis itself isn't
+// available at all.
 //
 // This is also the single integration point for the Enhanced Free Voice
 // (Beta) tier: when it's enabled AND has successfully loaded this session
@@ -1906,100 +1741,33 @@ function _nativeBrowserSpeak(text, onEnd) {
   }
 }
 
-// Shared Azure chunking helper — splits text into pieces under 1800 chars
-// (conservative vs. ElevenLabs' 2400: SSML wrapper adds overhead and Azure's
-// per-request practical limits are tighter) and speaks them in order via
-// azureSpeak. Returns true if all chunks played successfully, false if a
-// chunk errored (caller decides whether to fall back).
-async function _trySpeakAzureChunks(fullText, apiKey, region, voiceId) {
-  var sentences = fullText.match(/[^.!?]+[.!?]+/g) || [fullText];
-  var chunks = [];
-  var current = '';
-  for (var i = 0; i < sentences.length; i++) {
-    if ((current + sentences[i]).length > 1800 && current.length > 0) {
-      chunks.push(current.trim());
-      current = sentences[i];
-    } else {
-      current += sentences[i];
-    }
-  }
-  if (current.trim()) chunks.push(current.trim());
-
-  var success = true;
-  for (var j = 0; j < chunks.length; j++) {
-    if (_speakCancelled || isMuted) break;
-    try {
-      await azureSpeak(chunks[j], apiKey, region, voiceId);
-    } catch(e) {
-      console.error('[Azure TTS] chunk error:', e);
-      success = false;
-      break;
-    }
-  }
-  currentAudio = null;
-  return success;
-}
-
-// Main speak function — uses Azure AI Speech if key+region are saved, else AppSDK, else browser fallback
+// Main speak function — narrates via the free-voice chain (Kokoro
+// Enhanced Free Voice if enabled and ready, else the native browser voice,
+// with AppSDK as a last-resort fallback — see _fallbackSpeakLong).
 async function speakLongText(fullText, onFinish) {
   fullText = preprocessForSpeech(fullText);
   if (isMuted) { if (onFinish) onFinish(); return; }
   stopSpeech();
   _speakCancelled = false;
 
-  var apiKey = localStorage.getItem('azure_api_key');
-  var region = localStorage.getItem('azure_region');
-  var voiceId = localStorage.getItem('azure_voice_id') || 'en-US-AriaNeural';
-
-  if (apiKey && region) {
-    var azSuccess = await _trySpeakAzureChunks(fullText, apiKey, region, voiceId);
-    if (!_speakCancelled && azSuccess && onFinish) onFinish();
-    else if (!_speakCancelled && !azSuccess) {
-      // Azure failed — fall through to the default browser voice
-      await _fallbackSpeakLong(fullText, onFinish);
-    }
-  } else {
-    // No Azure key/region configured (the common case) — use the free
-    // browser voice by default, preferring an "Aria" voice if present
-    await _fallbackSpeakLong(fullText, onFinish);
-  }
+  await _fallbackSpeakLong(fullText, onFinish);
 }
 
-// Free-intro speak function — uses the distinct "azure_intro_voice_id" Azure
-// voice when explicitly configured in admin settings. If no separate intro
-// voice was picked but Azure credentials ARE saved, it falls back to the same
-// paid-narration voice (azure_voice_id) rather than skipping Azure entirely —
-// most owners will just save a key without bothering to pick a second voice,
-// and hitting browser TTS (or silence) in that case reads as "no voice at all."
-// Only when there are no Azure credentials at all does it fall through to the
-// AppSDK/browser TTS chain.
+// Free-intro speak function — narrates the free reveal-screen text using
+// the same free-voice chain as speakLongText above.
 async function speakIntroText(fullText, onFinish) {
   fullText = preprocessForSpeech(fullText);
   if (isMuted) { if (onFinish) onFinish(); return; }
   stopSpeech();
   _speakCancelled = false;
 
-  var apiKey = localStorage.getItem('azure_api_key');
-  var region = localStorage.getItem('azure_region');
-  var introVoiceId = localStorage.getItem('azure_intro_voice_id') || localStorage.getItem('azure_voice_id') || 'en-US-AriaNeural';
-
-  if (apiKey && region) {
-    var azSuccess = await _trySpeakAzureChunks(fullText, apiKey, region, introVoiceId);
-    if (!_speakCancelled && azSuccess && onFinish) onFinish();
-    else if (!_speakCancelled && !azSuccess) {
-      await _fallbackSpeakLong(fullText, onFinish);
-    }
-  } else {
-    await _fallbackSpeakLong(fullText, onFinish);
-  }
+  await _fallbackSpeakLong(fullText, onFinish);
 }
 
-// Default free-voice chain: Browser speechSynthesis (default) → AppSDK.ai.speak
-// (further fallback for environments without speechSynthesis at all). Browser
-// TTS is promoted to the primary path here per the project owner's request to
-// default to the free voice already built into the browser rather than
-// depending on any paid/hosted voice; Azure (above, in speakLongText) remains
-// the opt-in paid upgrade when an API key is configured.
+// Default free-voice chain: Browser speechSynthesis (default, or the Kokoro
+// Enhanced Free Voice tier when enabled and ready — see browserSpeak) →
+// AppSDK.ai.speak (further fallback for environments without
+// speechSynthesis at all).
 async function _fallbackSpeakLong(fullText, onFinish) {
   if (_speakCancelled || isMuted) { if (onFinish) onFinish(); return; }
 
@@ -2050,20 +1818,8 @@ async function speakText(text) {
   stopSpeech();
   _speakCancelled = false;
 
-  var apiKey = localStorage.getItem('azure_api_key');
-  var region = localStorage.getItem('azure_region');
-  var voiceId = localStorage.getItem('azure_voice_id') || 'en-US-AriaNeural';
-
-  if (apiKey && region) {
-    try {
-      await azureSpeak(text, apiKey, region, voiceId);
-      return;
-    } catch(e) {
-      console.error('[Azure TTS] short speak error:', e);
-    }
-  }
-
-  // No Azure key configured (or it failed) — default to the free browser voice
+  // Default to the free browser voice (or the Kokoro Enhanced Free Voice
+  // tier when enabled and ready — see browserSpeak).
   if (window.speechSynthesis) {
     browserSpeak(text, null);
     return;
@@ -4268,49 +4024,6 @@ function logPurchase(buyerName, buyerEmail, orderId, tier, priceOverride, isProm
 }
 
 // ===========================
-// AZURE AI SPEECH ADMIN SETTINGS
-// ===========================
-function loadAzureSettings() {
-  var savedKey = localStorage.getItem('azure_api_key');
-  var savedRegion = localStorage.getItem('azure_region') || '';
-  var savedVoice = localStorage.getItem('azure_voice_id') || 'en-US-AriaNeural';
-  var savedIntroVoice = localStorage.getItem('azure_intro_voice_id') || '';
-  var keyInput = document.getElementById('azure-api-key-input');
-  var regionInput = document.getElementById('azure-region-input');
-  var voiceSelect = document.getElementById('azure-voice-select');
-  var introVoiceSelect = document.getElementById('azure-intro-voice-select');
-  if (keyInput && savedKey) keyInput.value = savedKey;
-  if (regionInput) regionInput.value = savedRegion;
-  if (voiceSelect) voiceSelect.value = savedVoice;
-  if (introVoiceSelect) introVoiceSelect.value = savedIntroVoice;
-}
-
-document.getElementById('azure-save-btn').addEventListener('click', function() {
-  var key = document.getElementById('azure-api-key-input').value.trim();
-  var region = document.getElementById('azure-region-input').value.trim();
-  var voice = document.getElementById('azure-voice-select').value;
-  var introVoice = document.getElementById('azure-intro-voice-select').value;
-  var status = document.getElementById('azure-status');
-  if (!key) {
-    status.textContent = '⚠️ Please enter your API key.';
-    status.style.color = '#ff9ed2';
-    return;
-  }
-  if (!region) {
-    status.textContent = '⚠️ Please enter your Azure region (e.g. eastus).';
-    status.style.color = '#ff9ed2';
-    return;
-  }
-  localStorage.setItem('azure_api_key', key);
-  localStorage.setItem('azure_region', region);
-  localStorage.setItem('azure_voice_id', voice);
-  if (introVoice) localStorage.setItem('azure_intro_voice_id', introVoice);
-  else localStorage.removeItem('azure_intro_voice_id');
-  status.textContent = '✅ Key saved successfully! Voice will use the Azure AI Speech upgrade on next reading (instead of the free browser voice).';
-  status.style.color = '#c9a84c';
-});
-
-// ===========================
 // FREE BROWSER VOICE ADMIN SETTINGS
 // ===========================
 // Populates the "Free Browser Voice" <select> from speechSynthesis.getVoices()
@@ -4572,57 +4285,6 @@ document.getElementById('astro-save-btn').addEventListener('click', function() {
   status.style.color = '#c9a84c';
 });
 
-document.getElementById('azure-test-btn').addEventListener('click', async function() {
-  var status = document.getElementById('azure-status');
-  var key = localStorage.getItem('azure_api_key');
-  var region = localStorage.getItem('azure_region');
-  var voice = localStorage.getItem('azure_voice_id') || 'en-US-AriaNeural';
-  if (!key || !region) {
-    status.textContent = '⚠️ Save your API key and region first.';
-    status.style.color = '#ff9ed2';
-    return;
-  }
-  status.textContent = '🎙️ Testing voice...';
-  status.style.color = '#b08aff';
-  try {
-    await azureSpeak('The oracle is ready. Your blueprint awaits.', key, region, voice);
-    status.textContent = '✅ Voice test successful!';
-    status.style.color = '#c9a84c';
-  } catch(e) {
-    console.error('[Azure TTS] test voice error:', e);
-    status.textContent = '❌ Error: ' + (e.message || 'Check your API key/region and try again.');
-    status.style.color = '#ff9ed2';
-  }
-});
-
-document.getElementById('azure-intro-test-btn').addEventListener('click', async function() {
-  var status = document.getElementById('azure-intro-status');
-  var key = localStorage.getItem('azure_api_key');
-  var region = localStorage.getItem('azure_region');
-  var voice = document.getElementById('azure-intro-voice-select').value || localStorage.getItem('azure_intro_voice_id');
-  if (!key || !region) {
-    status.textContent = '⚠️ Save your API key and region first.';
-    status.style.color = '#ff9ed2';
-    return;
-  }
-  if (!voice) {
-    status.textContent = '⚠️ Select a free intro voice first.';
-    status.style.color = '#ff9ed2';
-    return;
-  }
-  status.textContent = '🎙️ Testing intro voice...';
-  status.style.color = '#b08aff';
-  try {
-    await azureSpeak('Your name and your birth date carry a hidden frequency. Let’s see what it reveals.', key, region, voice);
-    status.textContent = '✅ Voice test successful!';
-    status.style.color = '#c9a84c';
-  } catch(e) {
-    console.error('[Azure TTS] test intro voice error:', e);
-    status.textContent = '❌ Error: ' + (e.message || 'Check your API key/region and try again.');
-    status.style.color = '#ff9ed2';
-  }
-});
-
 // ===========================
 // ADMIN PANEL
 // ===========================
@@ -4677,8 +4339,6 @@ function showAdminPanel() {
       }).join('');
     }
   }
-  // Load Azure AI Speech settings when admin panel opens
-  loadAzureSettings();
   // Load Free Browser Voice picker options/selection when admin panel opens
   loadBrowserVoiceSettings();
   // Load Enhanced Free Voice (Beta) picker/enabled-state when admin panel opens
