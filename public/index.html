@@ -11061,97 +11061,65 @@ function buildRevealScript() {
   var trumpNames = trumpPaths.map(function(tp) { return tp.numeral + ' ' + tp.card; }).join(' and ');
   var ca = p.codexArchetype || 'The Integrator';
 
-  // Five segments, one per stage of the real layered sacred-geometry diagram
-  // (buildSacredGeometryDiagram / sgRevealStage — see initRevealScreen).
-  // Blended framing per the repo owner's brief: explain the Codex system
-  // conceptually as each layer builds, but still land the subject's own
-  // numbers within each stage rather than holding them all for the end.
-  // Each segment (2-5) now opens by explicitly naming its geometric
-  // relationship to the layer before it — not just "here's the next system,"
-  // but "here's how it's built from what you just saw" — per the repo
-  // owner's feedback that the interconnection between systems needed to be
-  // spelled out, not just implied by the visual stacking. This mirrors how
-  // the Codex Logic V06 doc itself describes it (§14.4: "the Cube rides the
-  // Tree, which rides the Fruit, which blooms from the Flower").
+  // Rewritten per the project owner's explicit direction: this is a
+  // pre-purchase HOOK, not a geometry lecture. Most people don't care HOW
+  // the Codex works, only THAT it's accurate and specific to them -- so
+  // the geometry build-up (vesica/seed/flower/fruit) is now a handful of
+  // fast, few-word beats carrying the same visual stage reveal
+  // (sgRevealStage -- unchanged, still one call per stage so the diagram
+  // animation stays in sync), not four separate mini-explanations. The
+  // moment this reaches something PERSONAL (the Tree stage), it stays
+  // personal through to the closing purchase prompt. Total spoken word
+  // count across all 7 segments is ~165-180 words (roughly a minute to a
+  // minute and fifteen seconds at a natural narration pace, comfortably
+  // under the 90-second cap), even before counting the firstName/sign/
+  // card names that get interpolated in -- verified by direct word count
+  // during this change (see the PR/commit body).
   return [
-    // 0a. vesica — genesis point: two circles, the seed of every layer to
-    // follow. Per V07 §17.1/17.4, prepended before the Flower of Life.
     {
       stage: 'vesica',
-      mutedPauseMs: 2800,
-      text: p.firstName + ', before any of it, there is this: two circles, each one centered on the other\'s edge. '
-        + 'The Vesica Piscis — the genesis point, two circles overlapping. Every shape you are about to see, '
-        + 'the whole Codex, grows out of this single relationship.'
+      mutedPauseMs: 900,
+      text: p.firstName + ', this starts with two circles.'
     },
-    // 0b. seed — six more circles born around the center, completing the
-    // first full symmetry. Per V07 §17.2/17.4, prepended before the Flower.
     {
       stage: 'seed',
-      mutedPauseMs: 3000,
-      text: 'Now watch that pair multiply around itself, six times over, until the center is surrounded. '
-        + 'This is the Seed of Life — the first complete symmetry, six circles born from the center. '
-        + 'Nothing new has been added; the same relationship you just saw has simply repeated until it closed.'
+      mutedPauseMs: 800,
+      text: 'They multiply into seven.'
     },
-    // 1. flower — whole-system framing, no personal number yet. This is the
-    // "base layer" the owner described: the Codex is made of ancient systems
-    // layered as one structure, starting with the Flower of Life.
     {
       stage: 'flower',
-      mutedPauseMs: 3200,
-      text: 'Let that same seed keep growing, and what you are about to see is the Codex itself — one living structure, '
-        + 'not five separate systems, but five ancient languages describing the same underlying geometry. '
-        + 'They are built by layering on top of one another, each one growing out of the last. '
-        + 'The next layer is the Flower of Life: nineteen interlocking circles, the geometric root every other layer grows from.'
+      mutedPauseMs: 900,
+      text: 'Then nineteen — one structure, five ancient systems living inside it.'
     },
-    // 2. fruit — the inner 13 circles as the foundation the Tree and Cube
-    // stand on. Kept as its own beat (not folded into segment 1) so the
-    // Fruit gets its own moment on screen instead of rushing past it.
     {
       stage: 'fruit',
-      mutedPauseMs: 3200,
-      text: 'Look closer, and thirteen of those circles — the innermost ones — reveal themselves as the Fruit of Life. '
-        + 'This is not a new shape. It is the same Flower, seen at the depth where its real structure lives. '
-        + 'Every Tree, every Cube, every path you will ever read in this Codex is drawn from these exact thirteen points — '
-        + 'nothing that follows is separate from what you are looking at right now.'
+      mutedPauseMs: 1000,
+      text: 'And at its center: the exact points your own chart is about to be read through.'
     },
-    // 3. tree — the Kabbalistic Tree of Life takes shape. First personal
-    // landing: Life Path number + Sephirah placement.
+    // First personal landing — Life Path + Sephirah. Kept short and
+    // specific rather than re-explaining the mechanism.
     {
       stage: 'tree',
-      mutedPauseMs: 4200,
-      text: 'Now watch those same thirteen points organize themselves into the Kabbalistic Tree of Life — '
-        + 'ten Sephiroth, joined by twenty-two paths, using no points but the ones the Fruit already gave us. '
-        + 'This is where Numerology and Kabbalah meet: your birth date reduces to a single Life Path number, '
-        + p.lifePath + ', and that number places you, specifically, at ' + seph.name + ': ' + seph.meaning + '. '
-        + 'This is not symbolic — it is your address on the map you just watched being built.'
+      mutedPauseMs: 2600,
+      text: 'Your birth date lands you, specifically, at ' + seph.name + ' — ' + seph.meaning + ' — and your Life Path is ' + p.lifePath + '.'
     },
-    // 4. cube — Metatron's Cube emerges around the Tree. Second personal
-    // landing: Sun sign. Explicitly names the Tree-paths-are-a-subset-of-
-    // Cube-lines relationship rather than leaving it implicit.
+    // Second personal landing — Sun sign.
     {
       stage: 'cube',
-      mutedPauseMs: 4200,
-      text: 'Around the Tree, Metatron\'s Cube now emerges — and here is the part most people never get shown: '
-        + 'every one of the twenty-two paths you just saw on the Tree is already a line inside this Cube. '
-        + 'The Cube does not sit beside the Tree. It contains it — seventy-eight lines total, connecting those same '
-        + 'thirteen points, the geometry underneath every form in creation. This is where Astrology enters the same '
-        + 'structure: at the moment you were born, the Sun stood in ' + sign.sign + ', a ' + sign.element
-        + ' sign ruled by ' + sign.planet + ' — one more coordinate this Cube was already holding for you.'
+      mutedPauseMs: 2600,
+      text: 'And the moment you were born, your Sun stood in ' + sign.sign + ', a ' + sign.element + ' sign ruled by ' + sign.planet + ' — already waiting inside this same structure.'
     },
-    // 5. capstone — the subject's own chart lands on the map: Tarot path,
-    // Soul Card, Court Card, Codex Archetype. Opens with an explicit
-    // synthesis line tying all four prior layers together before landing
-    // Tarot as the payoff, then closes into the email-gate call-to-action.
+    // Capstone — the real payoff (Tarot/Soul/Court/Archetype) landed fast,
+    // then straight into the purchase prompt. This is the actual hook: not
+    // "here's how it works" but "here's what it already found about you."
     {
       stage: 'capstone',
-      mutedPauseMs: 3800,
-      text: 'So follow it back: the Flower held the Fruit, the Fruit gave the Tree its points, the Tree\'s own paths turned out '
-        + 'to already be inside the Cube, and Astrology named one more coordinate on that same structure. '
-        + 'Five systems, one geometry — and Tarot is where it all becomes a story. Your path lights up'
-        + (trumpNames ? ' — ' + trumpNames : '') + ' — with your Soul Card, ' + (p.soulCard ? p.soulCard.name : '')
-        + ', and your Court Card, ' + (p.courtCard ? p.courtCard.name : '') + ', standing beside it. '
-        + 'Together, everything you\'ve just seen — and everything it was built from — names your Codex Archetype: ' + ca + '. '
-        + 'Your complete reading is ready. I just need your name and email to open it for you.'
+      mutedPauseMs: 2200,
+      text: 'Follow it through, and it names your Tarot path'
+        + (trumpNames ? ' — ' + trumpNames : '') + (p.soulCard ? ', your Soul Card, ' + p.soulCard.name : '')
+        + (p.courtCard ? ', your Court Card, ' + p.courtCard.name : '') + ' — and your Codex Archetype: ' + ca + '. '
+        + 'That is not a guess. That is your exact chart, inside a structure older than any of us. '
+        + 'Your complete reading is ready — I just need your name and email to open it for you.'
     }
   ];
 }
