@@ -2374,7 +2374,7 @@ async function doPartnershipReading(p1, p2) {
     + zodiacalCourtCardLine + '\n'
     + hebrewCoincidenceLine + '\n'
     + 'What a Lunar Node axis actually IS in plain language (real standard astrology — explain this once, before naming either partner\'s own North/South Node placements, anywhere the Node axis comes up): ' + explainNodeAxis() + '\n\n'
-    + 'Write exactly 7 sections with ===PAGE_N_START=== and ===PAGE_N_END=== delimiters. Each section 3–4 substantial paragraphs. For EVERY named card, element, or axis (Sephirah, Tarot archetype, Trump Card, Sun Sign element, Lunar Node axis, Soul Card, Court Card, Node Decan Cards, Zodiacal Court Card, Hebrew Soul Correspondence), follow this exact order: FIRST explain in plain language, assuming the reader has never studied this system, what that specific thing actually represents (use the real explanation given for it in the PROFILE above — never invent a new meaning), THEN apply it specifically to the named person, THEN show explicitly how it blends with whatever other finding was just named for them or their partner — never three disconnected facts stapled together, a real synthesis you describe in prose. Never narrate HOW a value was calculated (no degree/decan/mechanism talk) — only what it means, how it applies, and how it blends.\n\n'
+    + 'Write exactly 7 sections with ===PAGE_N_START=== and ===PAGE_N_END=== delimiters. Each section 3–4 substantial paragraphs. For EVERY named card, element, or axis (Sephirah, Tarot archetype, Trump Card, Sun Sign element, Lunar Node axis, Soul Card, Court Card, Node Decan Cards, Zodiacal Court Card, Hebrew Soul Correspondence), follow this exact order: FIRST explain in plain language, assuming the reader has never studied this system, what that specific thing actually represents (use the real explanation given for it in the PROFILE above — never invent a new meaning), THEN apply it specifically to the named person, THEN show explicitly how it blends with whatever other finding was just named for them or their partner — never three disconnected facts stapled together, a real synthesis you describe in prose. Never narrate HOW a value was calculated (no degree/decan/mechanism talk) — only what it means, how it applies, and how it blends. Vary HOW you phrase each explanation across the reading — never explain the same element, the same Node axis, or the same card with the same or near-identical wording twice; let each explanation flow as part of that page\'s own narrative voice rather than reading like a definition being pasted in. If a symbol you already explained earlier in the reading (for either partner) comes up again, reference back to it briefly in a sentence or two instead of re-explaining it from scratch — the real facts never change, but a reading should feel personalized and naturally flowing, never mechanical or checklist-like in how it repeats itself.\n\n'
     + 'Page 1 — ' + p1.firstName.toUpperCase() + '\'S AXIS ON THE TREE: Describe ' + p1.firstName + '\'s role as ' + axis1.title + '. Their Sephirah (' + p1.tree.name + ' — ' + p1.tree.meaning + '), Life Path ' + p1.lifePath + ', and Tarot archetype (' + p1.tarotCard.card + ' — ' + p1.tarotCard.archetype + ') as expressions of the ' + axis1.pillar + '. Weave in their Trump Card (' + (p1.lifePathTrumpCard ? p1.lifePathTrumpCard.card + ', ' + p1.lifePathTrumpCard.keyword : p1.tarotCard.card) + '), their Chaldean name compound' + (p1.chaldean ? ' (' + p1.chaldean.compound + '→' + p1.chaldean.reduced + ')' : '') + ', and — if present — any Hidden Master frequency surfaced in their name field, as additional texture on who they are, not separate topics. Also unpack their Soul Card and Court Card from the PROFILE above (' + (p1.soulCard ? p1.soulCard.name + ' — ' + p1.soulCard.keyword : '') + (p1.courtCard ? '; Court Card ' + p1.courtCard.name : '') + ') — say what the Soul Card\'s keyword means as the texture of what ' + p1.firstName + ' actually wants in partnership, and how the Court Card carries that same current outward into how they act once they are in one. Name their Hebrew Soul Correspondence from the PROFILE above in the same voice the reader would expect from the solo reading\'s own Hebrew Gematria section — their Hebrew consonants, gematria total and reduction, Archangel match (or the honest absence of one), and 72 Names position — as one more real layer of the same identity, not a separate topic bolted on.' + (p1.ascendant && p1.ascendant.sign ? (' If it fits naturally, also name their ' + p1.ascendant.sign + ' Ascendant as the lens the world first meets them through, distinct from the ' + p1.sunSign.sign + ' Sun underneath it.') : '') + (p1.moonSign && p1.moonSign.sign ? (' Their ' + p1.moonSign.sign + ' Moon names the emotional interior only a partner gets to see once the mask comes off.') : '') + '\n'
     + 'Page 2 — ' + p2.firstName.toUpperCase() + '\'S AXIS ON THE TREE: Same for ' + p2.firstName + ' as ' + axis2.title + ' on the ' + axis2.pillar + ' (Sephirah meaning: ' + p2.tree.meaning + '; Tarot archetype: ' + p2.tarotCard.archetype + '), weaving in their Trump Card' + (p2.lifePathTrumpCard ? ' (' + p2.lifePathTrumpCard.card + ', ' + p2.lifePathTrumpCard.keyword + ')' : '') + ', Chaldean compound, and any Hidden Master frequencies the same way. Also unpack their Soul Card and Court Card (' + (p2.soulCard ? p2.soulCard.name + ' — ' + p2.soulCard.keyword : '') + (p2.courtCard ? '; Court Card ' + p2.courtCard.name : '') + ') the same way as Page 1, and name their Hebrew Soul Correspondence from the PROFILE above (consonants, gematria total/reduction, Archangel match or honest absence, 72 Names position) in the same depth.' + (p2.ascendant && p2.ascendant.sign ? (' If it fits naturally, also name their ' + p2.ascendant.sign + ' Ascendant as the lens the world first meets them through, distinct from the ' + p2.sunSign.sign + ' Sun underneath it.') : '') + (p2.moonSign && p2.moonSign.sign ? (' Their ' + p2.moonSign.sign + ' Moon names the emotional interior only a partner gets to see once the mask comes off.') : '') + '\n'
     + 'Page 3 — THE COMBINED ARCHITECTURE (' + axisConfig.name + '): How their two axes meet. ' + axisConfig.description + ' Explicitly name why ' + p1.firstName + '\'s Life Path ' + p1.lifePath + ' role as ' + axis1.title + ' and ' + p2.firstName + '\'s Life Path ' + p2.lifePath + ' role as ' + axis2.title + ' are not two separate roles that happen to coexist, but two halves of one architecture — say what specifically completes what. Name how ' + p1.firstName + '\'s Soul/Court Card (' + (p1.soulCard ? p1.soulCard.name : '') + ' / ' + (p1.courtCard ? p1.courtCard.name : '') + ') and ' + p2.firstName + '\'s (' + (p2.soulCard ? p2.soulCard.name : '') + ' / ' + (p2.courtCard ? p2.courtCard.name : '') + ') converse with each other structurally — what quality each brings (using their keywords from the PROFILE above) and how those two qualities interact, reinforce, or balance each other in the relationship, not merely that both people happen to have one. Also name both partners\' natal Lunar Node axes (North Node ' + p1.node.northSign + ' / South Node ' + p1.node.southSign + ' for ' + p1.firstName + '; North Node ' + p2.node.northSign + ' / South Node ' + p2.node.southSign + ' for ' + p2.firstName + ') as a lifelong growth-direction axis for each of them individually — and only if the Relational Node Dynamic above says both are currently active, name the resulting magnetic (complementary poles) or tension (matching poles) dynamic as a real, plainly-stated computed fact, never a score; if it is not currently applicable, say so rather than forcing the framing. Also name each partner\'s Node Decan Cards from the PROFILE above — ' + p1.firstName + '\'s North Node card (' + p1.nodeDecanCards.northNodeCard.card + ', ' + p1.nodeDecanCards.northNodeCard.keyword + ') as the energy they are individually growing toward and South Node card (' + p1.nodeDecanCards.southNodeCard.card + ', ' + p1.nodeDecanCards.southNodeCard.keyword + ') as the comfort-zone energy they are individually moving away from, and the same pair for ' + p2.firstName + ' (' + p2.nodeDecanCards.northNodeCard.card + ' / ' + p2.nodeDecanCards.southNodeCard.card + ') — as two more individual lifelong growth trajectories, not a joint compatibility score; if the PROFILE\'s Node Decan Card Coincidence line above is non-empty, state that plain fact exactly as given and nothing more elaborate. Separately, also name each partner\'s Zodiacal Court Card (Sun placement) from the PROFILE above (' + (p1.zodiacalCourtCard ? p1.zodiacalCourtCard.name : '') + ' for ' + p1.firstName + ', ' + (p2.zodiacalCourtCard ? p2.zodiacalCourtCard.name : '') + ' for ' + p2.firstName + ') as individual facts only, explicitly distinct from both the Sephirah-based Court Card and the Node Decan Cards named above — a third, independent Court Card finding, not a more-correct replacement for the others; if the PROFILE\'s Zodiacal Court Card Coincidence line above is non-empty, state that plain fact exactly as given and nothing more elaborate. Finally, if the PROFILE\'s Hebrew Soul Correspondence Coincidence line above is non-empty, state that plain fact exactly as given and nothing more elaborate — never invent a "Hebrew compatibility" concept beyond the real coincidence stated.\n'
@@ -2388,6 +2388,12 @@ async function doPartnershipReading(p1, p2) {
 }
 
 function getPartnershipFallback(p1, p2) {
+  // PART XXXVII: one tracker for this whole partnership reading -- see
+  // createExplainTracker() above -- so a symbol (an element, the Node
+  // axis, a specific card) explained once for either partner gets a brief
+  // callback rather than a second, literal re-explanation if it comes up
+  // again anywhere later in these seven pages.
+  var _ex = createExplainTracker();
   var axisConfig = AXIS_CONFIGS[getAxisConfig(p1.axisRole, p2.axisRole)];
   var axis1 = AXIS_ROLES[p1.axisRole];
   var axis2 = AXIS_ROLES[p2.axisRole];
@@ -2410,9 +2416,9 @@ function getPartnershipFallback(p1, p2) {
     + axis1.description + '\n\n'
     + 'Your Tarot archetype — ' + p1.tarotCard.card + ' — moves through the same corridor of the Tree, encoded in the Hebrew letter ' + p1.tarotCard.letter + '. Its meaning is ' + p1.tarotCard.archetype + ', and that is not decoration — it is the specific quality you carry into any bond you enter.'
     + (p1.lifePathTrumpCard ? ' Your Life Path Trump Card confirms it: ' + p1.lifePathTrumpCard.numeral + ' ' + p1.lifePathTrumpCard.card + ' — ' + p1.lifePathTrumpCard.keyword + '. That is the deep, structural version of who you are underneath the personality — ' + p1.lifePathTrumpCard.keyword + ' is not a mood you occasionally visit, it is the theme your whole Life Path is organized around.' : '') + ' '
-    + 'And your ' + p1.sunSign.sign + ' Sun, governed by ' + p1.sunSign.planet + ', carries the ' + p1.sunSign.element + ' current that flows through this axis with natural ease. ' + explainElement(p1.sunSign.element) + ' — the same current already named through your Life Path and Sephirah above, simply speaking through your Sun this time.\n\n'
+    + 'And your ' + p1.sunSign.sign + ' Sun, governed by ' + p1.sunSign.planet + ', carries the ' + p1.sunSign.element + ' current that flows through this axis with natural ease. ' + trackedExplainElement(_ex, p1.sunSign.element) + ' — the same current already named through your Life Path and Sephirah above, simply speaking through your Sun this time.\n\n'
     + (p1.chaldean ? 'The name you are called by carries its own living vibration — a Chaldean compound of ' + p1.chaldean.compound + (p1.chaldean.archetype ? ', the archetype of "' + p1.chaldean.archetype + '"' : '') + ', reducing to ' + p1.chaldean.reduced + '.' + (p1.harmonic ? ' ' + p1.harmonic.detail : '') + (p1.nameHiddenMasters && p1.nameHiddenMasters.length ? ' A deeper audit of your name field also surfaces a Hidden Master frequency: ' + formatNameHiddenMasters(p1.nameHiddenMasters) + '.' : '') + '\n\n' : '')
-    + ((p1.soulCard && p1.courtCard) ? 'On Metatron\'s Cube, your Soul Card is the ' + p1.soulCard.name + ' — ' + p1.soulCard.keyword + ' — describing the inner texture of what you actually want from intimacy beneath the personality-level wants. ' + explainMinorCard(p1.soulCard) + ' Your Court Card, the ' + p1.courtCard.name + ', carries that same ' + p1.soulCard.keyword + ' current outward as the role you tend to play once you are actually inside a committed bond — the private wish made into a lived, public presence. ' + explainMinorCard(p1.courtCard) + '\n\n' : '')
+    + ((p1.soulCard && p1.courtCard) ? 'On Metatron\'s Cube, your Soul Card is the ' + p1.soulCard.name + ' — ' + p1.soulCard.keyword + ' — describing the inner texture of what you actually want from intimacy beneath the personality-level wants. ' + trackedExplainMinorCard(_ex, p1.soulCard) + ' Your Court Card, the ' + p1.courtCard.name + ', carries that same ' + p1.soulCard.keyword + ' current outward as the role you tend to play once you are actually inside a committed bond — the private wish made into a lived, public presence. ' + trackedExplainMinorCard(_ex, p1.courtCard) + '\n\n' : '')
     + (p1.hebrewSoulCorrespondence ? (function(hsc){
         return 'Your birth name also has a deeper, older layer: rendered in Hebrew consonants, it reads ' + hsc.hebrewConsonants + ', carrying a real Mispar Hechrachi gematria of ' + hsc.gematriaTotal + ' (' + hsc.gematriaReduced + ' reduced). '
           + (hsc.archangelMatches && hsc.archangelMatches.length
@@ -2431,9 +2437,9 @@ function getPartnershipFallback(p1, p2) {
     + axis2.description + '\n\n'
     + 'Your Tarot path — ' + p2.tarotCard.card + ', through the letter ' + p2.tarotCard.letter + ' — reflects the same architecture. Its meaning is ' + p2.tarotCard.archetype + ', the specific quality you carry into any bond you enter.'
     + (p2.lifePathTrumpCard ? ' Your Life Path Trump Card, ' + p2.lifePathTrumpCard.numeral + ' ' + p2.lifePathTrumpCard.card + ', confirms it — ' + p2.lifePathTrumpCard.keyword + '. That is the deep, structural version of who you are underneath the personality — the theme your whole Life Path is organized around, not an occasional mood.' : '') + ' '
-    + 'Your ' + p2.sunSign.sign + ' Sun brings the ' + p2.sunSign.element + ' element into the structural field you inhabit. ' + explainElement(p2.sunSign.element) + ' — the same current already named through your Life Path and Sephirah above, now speaking through your Sun.\n\n'
+    + 'Your ' + p2.sunSign.sign + ' Sun brings the ' + p2.sunSign.element + ' element into the structural field you inhabit. ' + trackedExplainElement(_ex, p2.sunSign.element) + ' — the same current already named through your Life Path and Sephirah above, now speaking through your Sun.\n\n'
     + (p2.chaldean ? 'Your living name resolves to a Chaldean compound of ' + p2.chaldean.compound + (p2.chaldean.archetype ? ', the archetype of "' + p2.chaldean.archetype + '"' : '') + ', reducing to ' + p2.chaldean.reduced + '.' + (p2.harmonic ? ' ' + p2.harmonic.detail : '') + (p2.nameHiddenMasters && p2.nameHiddenMasters.length ? ' Your name field also carries a Hidden Master frequency: ' + formatNameHiddenMasters(p2.nameHiddenMasters) + '.' : '') + '\n\n' : '')
-    + ((p2.soulCard && p2.courtCard) ? 'On Metatron\'s Cube, your Soul Card is the ' + p2.soulCard.name + ' — ' + p2.soulCard.keyword + ' — the inner texture of what you actually want from intimacy beneath the personality-level wants. ' + explainMinorCard(p2.soulCard) + ' Your Court Card, the ' + p2.courtCard.name + ', carries that same ' + p2.soulCard.keyword + ' current outward as the role you tend to play once you are actually inside a committed bond. ' + explainMinorCard(p2.courtCard) + '\n\n' : '')
+    + ((p2.soulCard && p2.courtCard) ? 'On Metatron\'s Cube, your Soul Card is the ' + p2.soulCard.name + ' — ' + p2.soulCard.keyword + ' — the inner texture of what you actually want from intimacy beneath the personality-level wants. ' + trackedExplainMinorCard(_ex, p2.soulCard) + ' Your Court Card, the ' + p2.courtCard.name + ', carries that same ' + p2.soulCard.keyword + ' current outward as the role you tend to play once you are actually inside a committed bond. ' + trackedExplainMinorCard(_ex, p2.courtCard) + '\n\n' : '')
     + (p2.hebrewSoulCorrespondence ? (function(hsc){
         return 'Your birth name also has a deeper, older layer: rendered in Hebrew consonants, it reads ' + hsc.hebrewConsonants + ', carrying a real Mispar Hechrachi gematria of ' + hsc.gematriaTotal + ' (' + hsc.gematriaReduced + ' reduced). '
           + (hsc.archangelMatches && hsc.archangelMatches.length
@@ -2454,7 +2460,7 @@ function getPartnershipFallback(p1, p2) {
     + 'When these two meet, the Tree becomes whole — not as a diagram, but as a living architecture.\n\n'
     + ((p1.soulCard && p2.soulCard) ? 'On Metatron\'s Cube, ' + p1.firstName + '\'s Soul Card — the ' + p1.soulCard.name + ' (' + p1.soulCard.keyword + ') — and ' + p2.firstName + '\'s Soul Card — the ' + p2.soulCard.name + ' (' + p2.soulCard.keyword + ') — anchor two different lines back to the same field of Ain Soph Aur. ' + p1.firstName + '\'s ' + p1.soulCard.keyword + ' names what they are actually seeking beneath the surface of this bond, while ' + p2.firstName + '\'s ' + p2.soulCard.keyword + ' names theirs — two different underlying wants, not competing but running in parallel, each one carried outward into daily life by its own Court Card (' + p1.courtCard.name + ' and ' + p2.courtCard.name + ') as a distinct, complementary current.\n\n' : '')
     + 'The architects of ancient temples understood this configuration. The central pillar and the crossbeams do not compete. They make each other possible. What you two are building together — whether you call it a relationship, a home, a business, a legacy — is built on the most structurally sound foundation the Tree of Life has to offer.\n\n'
-    + 'One more axis belongs alongside this architecture, and it is worth naming what it actually is first: ' + explainNodeAxis() + ' ' + p1.firstName + ' carries a North Node in ' + p1.node.northSign + ' and a South Node in ' + p1.node.southSign + '; ' + p2.firstName + ' carries a North Node in ' + p2.node.northSign + ' and a South Node in ' + p2.node.southSign + '. These are lifelong growth axes, each of you moving from your own South Node comfort zone toward your own North Node direction, independent of this partnership and of each other.'
+    + 'One more axis belongs alongside this architecture, and it is worth naming what it actually is first: ' + trackedExplainNodeAxis(_ex) + ' ' + p1.firstName + ' carries a North Node in ' + p1.node.northSign + ' and a South Node in ' + p1.node.southSign + '; ' + p2.firstName + ' carries a North Node in ' + p2.node.northSign + ' and a South Node in ' + p2.node.southSign + '. These are lifelong growth axes, each of you moving from your own South Node comfort zone toward your own North Node direction, independent of this partnership and of each other.'
     + (nodeReadout.bothActive
         ? (nodeReadout.dynamic === 'magnetic'
             ? (' Right now, both of your Node axes are actively engaged, and on opposite poles \u2014 one of you presently pulled outward while the other is presently pulled inward. That is a real, complementary "magnetic" pairing: your two directions of pull can circulate rather than compete, at least for as long as this season lasts.')
@@ -2464,9 +2470,9 @@ function getPartnershipFallback(p1, p2) {
     + ((p1.nodeDecanCards && p2.nodeDecanCards)
         ? ('In the language of the decans, that same Node axis also names one Minor Arcana card apiece: '
             + p1.firstName + '\'s North Node card is the ' + p1.nodeDecanCards.northNodeCard.card + ' \u2014 ' + p1.nodeDecanCards.northNodeCard.keyword + ' \u2014 the energy ' + p1.firstName + ' is individually growing toward \u2014 while their South Node card is the ' + p1.nodeDecanCards.southNodeCard.card + ', ' + p1.nodeDecanCards.southNodeCard.keyword + ', the comfort-zone energy they are individually moving away from. '
-            + explainMinorCard(p1.nodeDecanCards.northNodeCard) + ' ' + explainMinorCard(p1.nodeDecanCards.southNodeCard) + ' '
+            + trackedExplainMinorCard(_ex, p1.nodeDecanCards.northNodeCard) + ' ' + trackedExplainMinorCard(_ex, p1.nodeDecanCards.southNodeCard) + ' '
             + p2.firstName + '\'s North Node card is the ' + p2.nodeDecanCards.northNodeCard.card + ' \u2014 ' + p2.nodeDecanCards.northNodeCard.keyword + ' \u2014 and their South Node card is the ' + p2.nodeDecanCards.southNodeCard.card + ', ' + p2.nodeDecanCards.southNodeCard.keyword + '. '
-            + explainMinorCard(p2.nodeDecanCards.northNodeCard) + ' ' + explainMinorCard(p2.nodeDecanCards.southNodeCard) + ' '
+            + trackedExplainMinorCard(_ex, p2.nodeDecanCards.northNodeCard) + ' ' + trackedExplainMinorCard(_ex, p2.nodeDecanCards.southNodeCard) + ' '
             + 'These are two individual growth trajectories, not a joint compatibility score \u2014 the placement itself is fixed for each of you; only your relationship to it is a matter of choice.'
             + (function(){
                 var c = getNodeDecanCoincidences(p1, p2);
@@ -2480,8 +2486,8 @@ function getPartnershipFallback(p1, p2) {
     + '\n\n'
     + ((p1.zodiacalCourtCard && p2.zodiacalCourtCard)
         ? ('Each of your Suns also points to a Court Card of its own \u2014 a separate, independent finding from the Metatron\'s Cube Court Cards named above, reached through the sky rather than the Sephirah. A Court Card is always the mature, outward-facing personification of its suit\'s element \u2014 '
-            + p1.firstName + '\'s is the ' + p1.zodiacalCourtCard.name + ', carrying a ' + SUIT_TO_ELEMENT[p1.zodiacalCourtCard.suit] + ' current' + (SUIT_TO_ELEMENT[p1.zodiacalCourtCard.suit] === p1.sunSign.element ? (' \u2014 the same ' + p1.sunSign.element + ' current already named through their ' + p1.sunSign.sign + ' Sun on Page 1, now expressed as an active, embodied presence rather than a background temperament') : (' \u2014 distinct from the ' + p1.sunSign.element + ' current of their ' + p1.sunSign.sign + ' Sun itself, since this card sits on the cusp span the wheel assigns their exact degree, not their sign alone')) + '. ' + explainMinorCard(p1.zodiacalCourtCard) + ' '
-            + p2.firstName + '\'s is the ' + p2.zodiacalCourtCard.name + ', carrying a ' + SUIT_TO_ELEMENT[p2.zodiacalCourtCard.suit] + ' current' + (SUIT_TO_ELEMENT[p2.zodiacalCourtCard.suit] === p2.sunSign.element ? (' \u2014 the same ' + p2.sunSign.element + ' current already named through their ' + p2.sunSign.sign + ' Sun on Page 1') : (' \u2014 distinct from the ' + p2.sunSign.element + ' current of their ' + p2.sunSign.sign + ' Sun itself, since this card sits on the cusp span the wheel assigns their exact degree, not their sign alone')) + '. ' + explainMinorCard(p2.zodiacalCourtCard) + ' Hold each alongside the Court Card already named above rather than in place of it \u2014 a second real facet of who each of you is, not a more correct version.'
+            + p1.firstName + '\'s is the ' + p1.zodiacalCourtCard.name + ', carrying a ' + SUIT_TO_ELEMENT[p1.zodiacalCourtCard.suit] + ' current' + (SUIT_TO_ELEMENT[p1.zodiacalCourtCard.suit] === p1.sunSign.element ? (' \u2014 the same ' + p1.sunSign.element + ' current already named through their ' + p1.sunSign.sign + ' Sun on Page 1, now expressed as an active, embodied presence rather than a background temperament') : (' \u2014 distinct from the ' + p1.sunSign.element + ' current of their ' + p1.sunSign.sign + ' Sun itself, since this card sits on the cusp span the wheel assigns their exact degree, not their sign alone')) + '. ' + trackedExplainMinorCard(_ex, p1.zodiacalCourtCard) + ' '
+            + p2.firstName + '\'s is the ' + p2.zodiacalCourtCard.name + ', carrying a ' + SUIT_TO_ELEMENT[p2.zodiacalCourtCard.suit] + ' current' + (SUIT_TO_ELEMENT[p2.zodiacalCourtCard.suit] === p2.sunSign.element ? (' \u2014 the same ' + p2.sunSign.element + ' current already named through their ' + p2.sunSign.sign + ' Sun on Page 1') : (' \u2014 distinct from the ' + p2.sunSign.element + ' current of their ' + p2.sunSign.sign + ' Sun itself, since this card sits on the cusp span the wheel assigns their exact degree, not their sign alone')) + '. ' + trackedExplainMinorCard(_ex, p2.zodiacalCourtCard) + ' Hold each alongside the Court Card already named above rather than in place of it \u2014 a second real facet of who each of you is, not a more correct version.'
             + (getZodiacalCourtCardCoincidence(p1, p2) ? (' As a plain, direct fact \u2014 not a special destiny \u2014 you both land on the very same Zodiacal Court Card, the ' + p1.zodiacalCourtCard.name + '.') : ''))
         : '')
     + '\n\n'
@@ -2518,8 +2524,8 @@ function getPartnershipFallback(p1, p2) {
   fb += 'Every architecture has a shadow — not a flaw, but an edge that reveals itself when the structure comes under stress.\n\n'
     + 'The shadow of this partnership emerges when the axes lose their integrity: when ' + p1.firstName + ' abandons the central channel — grasping for horizontal busyness, losing the thread of synthesis — and when ' + p2.firstName + ' abandons the structural role — reaching for transcendence before the foundation is built. When both drift from their axis, the field collapses into noise.\n\n'
     + ((p1.shadowCardPath || p2.shadowCardPath) ? 'The Tree itself names this edge with more precision than a metaphor can. '
-        + (p1.shadowCardPath ? p1.firstName + '\'s own shadow path runs through ' + p1.shadowCardPath.card + ' — ' + p1.shadowCardPath.keyword + ' — the specific lesson waiting for them the moment they slip off their axis. ' + explainMajorArcanaCard(p1.shadowCardPath.card) + ' ' : '')
-        + (p2.shadowCardPath ? p2.firstName + '\'s runs through ' + p2.shadowCardPath.card + ' — ' + p2.shadowCardPath.keyword + '. ' + explainMajorArcanaCard(p2.shadowCardPath.card) + ' ' : '')
+        + (p1.shadowCardPath ? p1.firstName + '\'s own shadow path runs through ' + p1.shadowCardPath.card + ' — ' + p1.shadowCardPath.keyword + ' — the specific lesson waiting for them the moment they slip off their axis. ' + trackedExplainMajorArcanaCard(_ex, p1.shadowCardPath.card) + ' ' : '')
+        + (p2.shadowCardPath ? p2.firstName + '\'s runs through ' + p2.shadowCardPath.card + ' — ' + p2.shadowCardPath.keyword + '. ' + trackedExplainMajorArcanaCard(_ex, p2.shadowCardPath.card) + ' ' : '')
         + 'Neither of these is a prediction of failure — they are simply the two most likely doors each of you walks through on a bad day, worth recognizing by name rather than meeting as a formless mood.\n\n'
       : '')
     + 'The gift emerges when both return. When ' + p1.firstName + ' holds the center and ' + p2.firstName + ' holds the form, they create the architectural condition for something real to be built — not just felt.\n\n'
@@ -3835,6 +3841,8 @@ function getMinorCardLightShadow(cardObj) {
   };
 }
 // ── W3BB CODEX V07 PART XXXVI — "Explain Before Applying" helpers ──
+// ── (phrasing-variation + first-mention/callback layer added in PART
+//    XXXVII, see docs/CODEX_LOGIC_V07.md) ──
 // This Part codifies a standing rule (see docs/CODEX_LOGIC_V07.md Part
 // XXXVI): every time a reading names a symbol or system, it must first
 // explain what that thing actually represents in plain language (assuming
@@ -3846,6 +3854,98 @@ function getMinorCardLightShadow(cardObj) {
 // ONLY on real, already-established data sources already in this file
 // (ELEMENT_QUALITIES, TAROT_PATHS/PATH_TABLE, MINOR_KEYWORDS), never
 // inventing a new meaning for any card, element, or axis.
+//
+// PART XXXVII adds two things on top of that real content, in direct
+// response to the project owner's own critique (quoted in full in the docs
+// Part below): the *presentation* of these real facts should not be
+// mechanical or checklist-like, even though the underlying calculation
+// stays exactly as uniform and rule-based as it already was.
+//   1. Each of the four functions below now picks from several real,
+//      differently-constructed sentences for the SAME real fact (same
+//      idiom already proven in this file by formatGroupPersonSection()'s
+//      openers/roleClauses arrays and the Group Reading's
+//      MAGNETIC_PAIR_TEMPLATES/FRICTION_PAIR_TEMPLATES) -- selected by an
+//      index parameter, never inventing a new fact, only varying HOW the
+//      same real fact is said.
+//   2. A lightweight per-reading tracker (createExplainTracker() below)
+//      remembers which element / Node axis / specific card has already
+//      been explained once in THIS reading. The first mention still gets
+//      the full real explanation; every subsequent mention of that exact
+//      same symbol gets a short callback sentence referencing the earlier
+//      explanation instead of silently repeating it -- the identical
+//      "already named on Page N" idiom this file already uses by hand in
+//      several places (e.g. "the same current already named through your
+//      Life Path and Sephirah above"), now applied consistently and
+//      automatically everywhere the four explain functions are called.
+// getFallbackReading() and getPartnershipFallback() each create their own
+// tracker at the top of the function and thread it through every call site
+// below (trackedExplainElement/trackedExplainNodeAxis/
+// trackedExplainMajorArcanaCard/trackedExplainMinorCard) so a literal
+// duplicate sentence, like the Sun element being explained in identical
+// words on both Page 1 and Page 8 of the old solo fallback, can no longer
+// happen. doReading() and doPartnershipReading() name each symbol exactly
+// once per PROFILE line already, so they call the four base functions
+// directly (still variant-aware, just with no tracker needed) and instead
+// carry a new prompt instruction telling the AI to hold this same standard
+// in its own free-form prose (see the "vary how each explanation is
+// phrased" instruction added to both prompts).
+
+// Small helper shared by every variant-picker below: rotate through a
+// list by a supplied index rather than a fixed [0], the same
+// `arr[n % arr.length]` idiom formatGroupPersonSection()/formatPairFact()
+// already use for the identical purpose.
+function pickVariant(list, idx){
+  var i = (idx == null) ? 0 : ((idx % list.length) + list.length) % list.length;
+  return list[i];
+}
+
+// Per-reading tracker: remembers which element / the Node axis / which
+// specific named card has already received its full explanation once in
+// THIS reading, so a second mention can read as a brief callback instead
+// of a second, word-for-word definition. Each call below draws its own
+// independent random variant index (rather than one seed advanced
+// call-by-call) precisely so two different readings for the same profile
+// -- or two different people who happen to share a symbol -- are very
+// unlikely to land on the identical sentence sequence; a single shared
+// seed would make an entire reading's phrasing pattern repeat in lockstep
+// every few generations, which is exactly the mechanical feel this Part
+// exists to remove.
+function createExplainTracker(){
+  return { element: {}, axis: false, major: {}, minor: {} };
+}
+function nextVariantIdx(tracker){
+  return Math.floor(Math.random() * 1000);
+}
+function trackedExplainElement(tracker, element){
+  if (!element) return '';
+  var idx = nextVariantIdx(tracker);
+  if (tracker.element[element]) return explainElementCallback(element, idx);
+  tracker.element[element] = true;
+  return explainElement(element, idx);
+}
+function trackedExplainNodeAxis(tracker){
+  var idx = nextVariantIdx(tracker);
+  if (tracker.axis) return explainNodeAxisCallback(idx);
+  tracker.axis = true;
+  return explainNodeAxis(idx);
+}
+function trackedExplainMajorArcanaCard(tracker, cardNameOrObj){
+  var cardName = (typeof cardNameOrObj === 'string') ? cardNameOrObj : (cardNameOrObj && cardNameOrObj.card);
+  if (!cardName) return '';
+  var idx = nextVariantIdx(tracker);
+  if (tracker.major[cardName]) return explainMajorArcanaCardCallback(cardName, idx);
+  tracker.major[cardName] = true;
+  return explainMajorArcanaCard(cardNameOrObj, idx);
+}
+function trackedExplainMinorCard(tracker, cardObj){
+  if (!cardObj) return '';
+  var name = cardObj.name || cardObj.card;
+  if (!name) return '';
+  var idx = nextVariantIdx(tracker);
+  if (tracker.minor[name]) return explainMinorCardCallback(name, idx);
+  tracker.minor[name] = true;
+  return explainMinorCard(cardObj, idx);
+}
 
 // What a Lunar Node axis actually IS, in plain astrological language --
 // verified this session against cafeastrology.com, astrostyle.com, and
@@ -3856,18 +3956,56 @@ function getMinorCardLightShadow(cardObj) {
 // is meant to run BEFORE this Codex's own established "growing toward /
 // moving away from" functional framing (Part XXI and elsewhere), not to
 // replace it -- Part XXVI's meaning-first standard still governs how it is
-// phrased (no degrees, no ephemeris talk).
-function explainNodeAxis(){
-  return 'Your Lunar Nodes are not planets or physical bodies in the sky — they are the two points, on exactly opposite sides of the sky from each other, where the Moon’s own orbital path crosses the Sun’s apparent path (the ecliptic) at the moment you were born. Because those two points always sit directly across from one another, they form a single axis running through your chart, with your North Node anchoring one end and your South Node anchoring the other.';
+// phrased (no degrees, no ephemeris talk). PART XXXVII: four real
+// phrasings of that exact same astronomical fact, never a different fact.
+function explainNodeAxis(variantIdx){
+  var variants = [
+    'Your Lunar Nodes are not planets or physical bodies in the sky — they are the two points, on exactly opposite sides of the sky from each other, where the Moon’s own orbital path crosses the Sun’s apparent path (the ecliptic) at the moment you were born. Because those two points always sit directly across from one another, they form a single axis running through your chart, with your North Node anchoring one end and your South Node anchoring the other.',
+    'Your Lunar Nodes aren’t planets at all — they’re the two exact points where the Moon’s orbit crosses the ecliptic, the Sun’s own apparent path across the sky, at the moment of your birth. Those two points always sit directly opposite each other, so together they form one single axis, your North Node on one end and your South Node on the other.',
+    'Start with what the Lunar Nodes actually are: not bodies or planets, but two points in the sky, always exactly opposite one another, marking where the Moon’s orbital path crosses the Sun’s apparent path (the ecliptic) at the moment you were born. That single line between them — North Node at one end, South Node at the other — is your Node axis.',
+    'The Lunar Nodes are a real astronomical fact before they are anything symbolic: the two points, directly across the sky from each other, where the Moon’s own orbit crosses the ecliptic (the Sun’s apparent path) at the moment of your birth. One axis, two ends — your North Node and your South Node.'
+  ];
+  return pickVariant(variants, variantIdx);
+}
+// PART XXXVII: a short callback for the second-or-later time the Node axis
+// comes up in the same reading -- points back to the full explanation
+// above rather than repeating it.
+function explainNodeAxisCallback(variantIdx){
+  var variants = [
+    'As already explained above, your Lunar Nodes are the two points where the Moon’s orbit crosses the Sun’s apparent path, forming one axis.',
+    'This is the same Node axis this reading already walked through earlier.',
+    'That is the same North/South Node axis already unpacked above.',
+    'This is the Lunar Node axis already named earlier in this reading, simply applied again here.'
+  ];
+  return pickVariant(variants, variantIdx);
 }
 
 // What an element represents, in plain language, reusing the exact
 // ELEMENT_QUALITIES text this Codex already established (Part XXXV) rather
-// than a second, competing table.
-function explainElement(element){
+// than a second, competing table. PART XXXVII: four real phrasings of that
+// exact same real quality text -- the substance never changes, only the
+// sentence construction around it.
+function explainElement(element, variantIdx){
   var q = ELEMENT_QUALITIES[element];
   if (!q) return '';
-  return 'In astrology, ' + element + ' is one of the four classical elements, and it represents ' + q + '.';
+  var variants = [
+    'In astrology, ' + element + ' is one of the four classical elements, and it represents ' + q + '.',
+    element + ' belongs to astrology’s four classical elements, and what it represents is ' + lowerFirst(q) + '.',
+    'Astrology groups its energy into four classical elements, and ' + element + ' is one of them — its real quality is ' + lowerFirst(q) + '.',
+    'One of the four classical elements at the root of astrology is ' + element + ', carrying ' + lowerFirst(q) + '.'
+  ];
+  return pickVariant(variants, variantIdx);
+}
+// PART XXXVII: a short callback for the second-or-later time this exact
+// element is named in the same reading.
+function explainElementCallback(element, variantIdx){
+  var variants = [
+    'That is the same ' + element + ' current already explained earlier in this reading, simply showing up again here.',
+    'That same ' + element + ' quality was already named above — the identical current, no need to unpack it twice.',
+    'This is the ' + element + ' current this reading already unpacked earlier, now in a new setting.',
+    'That is the same real ' + element + ' quality already on the page above, just speaking through a different part of the chart this time.'
+  ];
+  return pickVariant(variants, variantIdx);
 }
 
 // What a Major Arcana card represents, for every place one is named OUTSIDE
@@ -3880,7 +4018,10 @@ function explainElement(element){
 // other Major Arcana mention. Accepts either the card's name (a string) or
 // an object carrying a `.card` field (e.g. a PATH_TABLE/shadowCardPath
 // entry); returns '' when the card cannot be matched to real data.
-function explainMajorArcanaCard(cardNameOrObj){
+// PART XXXVII: four real phrasings per case (both core+keyword known, core
+// only, keyword only) -- the same card, archetype, and keyword every time,
+// only the sentence construction rotates.
+function explainMajorArcanaCard(cardNameOrObj, variantIdx){
   var cardName = (typeof cardNameOrObj === 'string') ? cardNameOrObj : (cardNameOrObj && cardNameOrObj.card);
   if (!cardName) return '';
   var tp = TAROT_PATHS.find(function(t){ return t.card === cardName; });
@@ -3889,10 +4030,41 @@ function explainMajorArcanaCard(cardNameOrObj){
   var core = tp ? (tp.archetype.split(',')[0] || tp.archetype).trim() : '';
   var keyword = pe ? pe.keyword : '';
   if (core && keyword) {
-    return cardName + ' is the Major Arcana card of ' + lowerFirst(core) + ' — the Golden Dawn tradition’s own keyword for this exact path is "' + keyword + '," one more word for that same current.';
+    var both = [
+      cardName + ' is the Major Arcana card of ' + lowerFirst(core) + ' — the Golden Dawn tradition’s own keyword for this exact path is "' + keyword + '," one more word for that same current.',
+      'The Major Arcana card ' + cardName + ' carries the archetype of ' + lowerFirst(core) + '; Golden Dawn tradition names that same path with the keyword "' + keyword + '."',
+      'In the Major Arcana, ' + cardName + ' represents ' + lowerFirst(core) + ' — the Golden Dawn keyword "' + keyword + '" is simply another word for that same current.',
+      cardName + ', a Major Arcana card, is built around ' + lowerFirst(core) + ', and the Golden Dawn tradition backs that reading with its own keyword: "' + keyword + '."'
+    ];
+    return pickVariant(both, variantIdx);
   }
-  if (core) return cardName + ' is the Major Arcana card of ' + lowerFirst(core) + '.';
-  return cardName + ' carries the Golden Dawn keyword "' + keyword + '."';
+  if (core) {
+    var coreOnly = [
+      cardName + ' is the Major Arcana card of ' + lowerFirst(core) + '.',
+      cardName + ', in the Major Arcana, carries the archetype of ' + lowerFirst(core) + '.',
+      'The Major Arcana names ' + cardName + ' as ' + lowerFirst(core) + '.',
+      cardName + ' is one of the Major Arcana, and its archetype is ' + lowerFirst(core) + '.'
+    ];
+    return pickVariant(coreOnly, variantIdx);
+  }
+  var keywordOnly = [
+    cardName + ' carries the Golden Dawn keyword "' + keyword + '."',
+    'The Golden Dawn tradition’s keyword for ' + cardName + ' is "' + keyword + '."',
+    cardName + ' is known, in Golden Dawn tradition, by the keyword "' + keyword + '."',
+    'Golden Dawn tradition names ' + cardName + ' with the keyword "' + keyword + '."'
+  ];
+  return pickVariant(keywordOnly, variantIdx);
+}
+// PART XXXVII: a short callback for the second-or-later time this exact
+// Major Arcana card is named in the same reading.
+function explainMajorArcanaCardCallback(cardName, variantIdx){
+  var variants = [
+    'This is the same ' + cardName + ' already explained earlier in this reading.',
+    'That is the same ' + cardName + ' current named above — no need to unpack it twice.',
+    'This is ' + cardName + ', already walked through earlier, here again in a new context.',
+    'That is the same real ' + cardName + ' meaning already on the page above.'
+  ];
+  return pickVariant(variants, variantIdx);
 }
 
 // Standard Tarot-tradition rank meanings, Ace/1 through 10, verified this
@@ -3939,7 +4111,10 @@ var SUIT_TO_ELEMENT = {Wands:'Fire', Cups:'Water', Swords:'Air', Pentacles:'Eart
 // ({name,keyword,suit,sephId}), courtCardFor() output ({name,rank,suit}),
 // decanCardForLongitude()/getNodeDecanCards() output ({card,suit,rank,
 // keyword}), or a pipPool entry ({card,suit,rank,keyword}).
-function explainMinorCard(cardObj){
+// PART XXXVII: four real phrasings of the same suit+rank(+keyword) facts --
+// the substance (which suit, which element, which rank meaning, which
+// Golden Dawn keyword) never changes, only the sentence construction.
+function explainMinorCard(cardObj, variantIdx){
   if (!cardObj) return '';
   var name = cardObj.name || cardObj.card;
   var suit = cardObj.suit;
@@ -3951,9 +4126,26 @@ function explainMinorCard(cardObj){
   var rankMeaning = isCourt ? (COURT_RANK_MEANINGS[rankVal] || '') : (MINOR_RANK_MEANINGS[Math.max(1, Math.min(10, rankVal || 1))] || '');
   if (!elementQuality || !rankMeaning) return '';
   var keyword = cardObj.keyword || (!isCourt ? pipKeyword(rankVal, suit) : '');
-  var out = name + ' is built from two real, standard Tarot layers. Its suit, ' + suit + ', is traditionally the suit of ' + element + ' — ' + lowerFirst(elementQuality) + '. Its ' + (isCourt ? 'rank, ' + rankVal + ',' : 'number, ' + rankVal + ',') + ' represents ' + rankMeaning + '.';
-  if (keyword) out += ' The Golden Dawn tradition’s own keyword for this exact card — "' + keyword + '" — names that same suit-and-rank current in a single word.';
-  return out;
+  var rankLabel = isCourt ? 'rank' : 'number';
+  var keywordSentence = keyword ? ' The Golden Dawn tradition’s own keyword for this exact card — "' + keyword + '" — names that same suit-and-rank current in a single word.' : '';
+  var variants = [
+    name + ' is built from two real, standard Tarot layers. Its suit, ' + suit + ', is traditionally the suit of ' + element + ' — ' + lowerFirst(elementQuality) + '. Its ' + rankLabel + ', ' + rankVal + ', represents ' + rankMeaning + '.' + keywordSentence,
+    name + ' combines two standard Tarot layers: the suit ' + suit + ' carries a ' + element + ' current — ' + lowerFirst(elementQuality) + ' — while its ' + rankLabel + ' (' + rankVal + ') adds ' + rankMeaning + '.' + keywordSentence,
+    'Read as suit and ' + rankLabel + ', ' + name + '’s suit, ' + suit + ', is the ' + element + ' suit — ' + lowerFirst(elementQuality) + ' — and its ' + rankLabel + ', ' + rankVal + ', means ' + rankMeaning + '.' + keywordSentence,
+    'Two layers build ' + name + ': the ' + element + ' quality of its ' + suit + ' suit (' + lowerFirst(elementQuality) + '), and the meaning of its ' + rankLabel + ' ' + rankVal + ' (' + rankMeaning + ').' + keywordSentence
+  ];
+  return pickVariant(variants, variantIdx);
+}
+// PART XXXVII: a short callback for the second-or-later time this exact
+// Minor Arcana card is named in the same reading.
+function explainMinorCardCallback(name, variantIdx){
+  var variants = [
+    'This is the same ' + name + ' already unpacked earlier in this reading.',
+    'That is the same ' + name + ' meaning named above.',
+    'This is the ' + name + ' already explained earlier, here again in a different role.',
+    'That is the same real ' + name + ' current already on the page above.'
+  ];
+  return pickVariant(variants, variantIdx);
 }
 
 // Court Card rank by pillar of the anchoring Sephirah (Section 6.3: Kings=Chokmah/Right,
@@ -8244,6 +8436,12 @@ async function generateReading(prompt){
 
 function getFallbackReading(){
   var p=window._readingProfile;
+  // PART XXXVII: one tracker for this whole reading -- see
+  // createExplainTracker() above -- so the first time an element, the
+  // Node axis, or a specific card is explained gets the real explanation,
+  // and every later mention of that exact same symbol later in these nine
+  // pages gets a brief callback instead of a literal repeat.
+  var _ex = createExplainTracker();
   var lpData=LP_DATA[p.lifePath]||LP_DATA[reduceNum(p.lifePath,false)]||LP_DATA[6];
   var expData=LP_DATA[p.expression]||LP_DATA[reduceNum(p.expression||0,false)]||LP_DATA[6];
   var py=p.personalYear2026||calcPersonalYear(p.month,p.day,2026);
@@ -8267,7 +8465,7 @@ function getFallbackReading(){
   var fb='';
 
   fb+='===PAGE_1_START===\n';
-  fb+=p.firstName+', you are '+ca+'. This is not a title \u2014 it is a recognition. '+explainElement(p.sunSign.element)+' Your Life Path '+p.lifePath+', as '+lpData.title+', meets that '+p.sunSign.element+' current in your '+p.sunSign.sign+' Sun, and together they land you at '+p.tree.name+' on the Kabbalistic Tree of Life \u2014 '+p.tree.meaning+'. This is not three separate facts sitting side by side: your Life Path\u2019s drive, your Sun\u2019s '+p.sunSign.element+' temperament, and your Sephirah\u2019s address on the Tree are one current, described three ways \u2014 the same '+p.sunSign.element+' quality named above is exactly what gives '+lpData.title+' its particular flavor in you, rather than someone else\u2019s. Three coordinates. One being. The center of your mandala is not above you or ahead of you. It is you.\n\n'+(quizArchetypeMatched ? ('Before this reading even began, your own Archetype Quiz guessed '+ca+' \u2014 and here it is again, confirmed by your actual birth chart. Your instincts were right.\n\n') : '')+lpData.teaser+'\n\nYour gift \u2014 '+lpData.gift+' \u2014 is not something you earned. It is what you arrived with. When Numerology, Astrology, and Kabbalah all converge on the same essential truth about a soul, that truth becomes impossible to dismiss.\n';
+  fb+=p.firstName+', you are '+ca+'. This is not a title \u2014 it is a recognition. '+trackedExplainElement(_ex, p.sunSign.element)+' Your Life Path '+p.lifePath+', as '+lpData.title+', meets that '+p.sunSign.element+' current in your '+p.sunSign.sign+' Sun, and together they land you at '+p.tree.name+' on the Kabbalistic Tree of Life \u2014 '+p.tree.meaning+'. This is not three separate facts sitting side by side: your Life Path\u2019s drive, your Sun\u2019s '+p.sunSign.element+' temperament, and your Sephirah\u2019s address on the Tree are one current, described three ways \u2014 the same '+p.sunSign.element+' quality named above is exactly what gives '+lpData.title+' its particular flavor in you, rather than someone else\u2019s. Three coordinates. One being. The center of your mandala is not above you or ahead of you. It is you.\n\n'+(quizArchetypeMatched ? ('Before this reading even began, your own Archetype Quiz guessed '+ca+' \u2014 and here it is again, confirmed by your actual birth chart. Your instincts were right.\n\n') : '')+lpData.teaser+'\n\nYour gift \u2014 '+lpData.gift+' \u2014 is not something you earned. It is what you arrived with. When Numerology, Astrology, and Kabbalah all converge on the same essential truth about a soul, that truth becomes impossible to dismiss.\n';
   if (p.ascendant && p.ascendant.sign) {
     fb+='\nYour Ascendant \u2014 the sign that was rising on the eastern horizon at the exact moment you were born \u2014 is '+p.ascendant.sign+(p.ascendant.degree!=null?' at '+p.ascendant.degree+'\u00b0':'')+'. Where your Sun sign is who you are at your core, your Ascendant is the lens the world first meets you through \u2014 the face you show before anyone has earned the deeper layers underneath.\n';
   }
@@ -8275,10 +8473,10 @@ function getFallbackReading(){
     fb+='\nYour Moon Sign \u2014 the placement that governs your emotional interior, the self that only shows itself once the mask comes off \u2014 is '+p.moonSign.sign+(p.moonSign.viaNoonDefault?' (estimated, since your exact birth time was not given \u2014 the Moon moves slowly enough that this is still a trustworthy directional read)':'')+'. Where your Sun is the engine driving you forward and your Ascendant is the face the world meets first, your Moon is what you actually feel underneath both, in the moments no one else is watching.\n';
   }
   if (p.node && p.node.northSign) {
-    fb+='\n'+explainNodeAxis()+' In the language of this Codex, your North Node in '+p.node.northSign+' is the outward-expanding direction your soul is growing toward, and your South Node in '+p.node.southSign+' is the inward, karmic comfort zone that feels familiar but is not where the growth is. This is a lifelong theme sitting quietly in the background of your chart most of the time.'+(p.node.activePole?(' Right now, though, it is not quiet \u2014 you are moving through a genuine activation of this axis, and the pull toward your '+(p.node.activePole==='north'?'North Node\u2019s outward growth':'South Node\u2019s familiar comfort zone')+' is stronger than usual, a season worth paying real attention to.'):' No such activation is currently heightened for you \u2014 which simply means this axis is doing its quiet, background work rather than asking for urgent attention.')+'\n';
+    fb+='\n'+trackedExplainNodeAxis(_ex)+' In the language of this Codex, your North Node in '+p.node.northSign+' is the outward-expanding direction your soul is growing toward, and your South Node in '+p.node.southSign+' is the inward, karmic comfort zone that feels familiar but is not where the growth is. This is a lifelong theme sitting quietly in the background of your chart most of the time.'+(p.node.activePole?(' Right now, though, it is not quiet \u2014 you are moving through a genuine activation of this axis, and the pull toward your '+(p.node.activePole==='north'?'North Node\u2019s outward growth':'South Node\u2019s familiar comfort zone')+' is stronger than usual, a season worth paying real attention to.'):' No such activation is currently heightened for you \u2014 which simply means this axis is doing its quiet, background work rather than asking for urgent attention.')+'\n';
     if (p.nodeDecanCards) {
-      var northExplain = explainMinorCard(p.nodeDecanCards.northNodeCard);
-      var southExplain = explainMinorCard(p.nodeDecanCards.southNodeCard);
+      var northExplain = trackedExplainMinorCard(_ex, p.nodeDecanCards.northNodeCard);
+      var southExplain = trackedExplainMinorCard(_ex, p.nodeDecanCards.southNodeCard);
       fb+='\nThe ancient art of decans \u2014 a system that assigns each stretch of the zodiac its own Tarot card \u2014 names this same axis even more precisely, in the language of the Minor Arcana. Your North Node card is the '+p.nodeDecanCards.northNodeCard.card+'.'+(northExplain?(' '+northExplain):'')+' Your South Node card is the '+p.nodeDecanCards.southNodeCard.card+'.'+(southExplain?(' '+southExplain):'')+' Applied to you specifically: the '+p.nodeDecanCards.northNodeCard.card+' names '+p.nodeDecanCards.northNodeCard.keyword+' as the specific texture of what you are growing toward, while the '+p.nodeDecanCards.southNodeCard.card+' names '+p.nodeDecanCards.southNodeCard.keyword+' as the texture of the comfort-zone energy you are moving away from \u2014 and this is the exact same North/South growth-axis already named above, simply speaking in the Tarot\u2019s vocabulary instead of the zodiac\u2019s. Neither card is a verdict: the '+p.nodeDecanCards.southNodeCard.card+' is not something wrong with you, it is simply the gravity that is easiest to fall back into, and the '+p.nodeDecanCards.northNodeCard.card+' is not a finish line, it is the direction the growth keeps pointing. The placement itself does not move \u2014 it was fixed the moment you were born \u2014 only your relationship to it, moment by moment, is yours to choose.\n';
     }
   }
@@ -8291,8 +8489,8 @@ function getFallbackReading(){
 
   fb+='===PAGE_2_START===\n';
   fb+='In the ancient language of the Tarot, you walk the path of '+tc.card+'. This is Path '+tc.path+' on the Tree of Life, encoded through the Hebrew letter '+tc.letter+' \u2014 '+tc.archetype+'.'+(p.lifePathTrumpCard ? ' Your Life Path Trump Card confirms it: '+p.lifePathTrumpCard.numeral+' '+p.lifePathTrumpCard.card+' \u2014 '+p.lifePathTrumpCard.keyword+'.' : '')+'\n\nThe '+tc.card+' does not describe what you do. It describes what you ARE in the world \u2014 the mythic role your soul agreed to play before incarnation. And it is no coincidence that your '+p.sunSign.sign+' Sun and this Tarot archetype vibrate in the same frequency. They confirm each other.\n\nThis path between Sephiroth is not merely symbolic. It is the precise corridor of consciousness your soul travels. The Hebrew letter '+tc.letter+' carries a specific vibrational teaching, and that teaching is written in your very name.\n'
-    +(p.primaryPath && p.primaryPath.viaKetherBridge ? '\nBecause your Life Path carries the Master Number 11, your Trump Card path does not follow the standard formula \u2014 it connects directly to Kether, the crown Sephirah, via what the Codex calls the Kether Bridge. '+explainMajorArcanaCard(tc)+' This is a rare, direct wiring reserved for the most intuitively-charged Master Number, and it means your hidden architecture skips a rung most charts have to climb one Sephirah at a time \u2014 the same '+tc.card+' current named just above arrives in you by a shorter, more direct road than it does for almost anyone else.\n' : '')
-    +(p.primaryPath && p.primaryPath.masterCoActive ? '\nBecause your Life Path carries the Master Number 33, it does not resolve to a single Trump Card but two, co-active at once \u2014 '+(p.trumpPaths&&p.trumpPaths[0]?p.trumpPaths[0].card:'The World')+' and '+(p.trumpPaths&&p.trumpPaths[1]?p.trumpPaths[1].card:'The Lovers')+'. '+(p.trumpPaths&&p.trumpPaths[0]?explainMajorArcanaCard(p.trumpPaths[0].card):'')+' '+(p.trumpPaths&&p.trumpPaths[1]?explainMajorArcanaCard(p.trumpPaths[1].card):'')+' Running as one braided current rather than a sequence you move through, these two cards blend rather than compete: very few charts carry this double signal, so read both together as one teaching in stereo, each one coloring how the other actually shows up in you.\n' : '')
+    +(p.primaryPath && p.primaryPath.viaKetherBridge ? '\nBecause your Life Path carries the Master Number 11, your Trump Card path does not follow the standard formula \u2014 it connects directly to Kether, the crown Sephirah, via what the Codex calls the Kether Bridge. '+trackedExplainMajorArcanaCard(_ex, tc)+' This is a rare, direct wiring reserved for the most intuitively-charged Master Number, and it means your hidden architecture skips a rung most charts have to climb one Sephirah at a time \u2014 the same '+tc.card+' current named just above arrives in you by a shorter, more direct road than it does for almost anyone else.\n' : '')
+    +(p.primaryPath && p.primaryPath.masterCoActive ? '\nBecause your Life Path carries the Master Number 33, it does not resolve to a single Trump Card but two, co-active at once \u2014 '+(p.trumpPaths&&p.trumpPaths[0]?p.trumpPaths[0].card:'The World')+' and '+(p.trumpPaths&&p.trumpPaths[1]?p.trumpPaths[1].card:'The Lovers')+'. '+(p.trumpPaths&&p.trumpPaths[0]?trackedExplainMajorArcanaCard(_ex, p.trumpPaths[0].card):'')+' '+(p.trumpPaths&&p.trumpPaths[1]?trackedExplainMajorArcanaCard(_ex, p.trumpPaths[1].card):'')+' Running as one braided current rather than a sequence you move through, these two cards blend rather than compete: very few charts carry this double signal, so read both together as one teaching in stereo, each one coloring how the other actually shows up in you.\n' : '')
     +'\nOn Metatron\'s Cube, your elemental current \u2014 '+p.sunSign.element+' \u2014 translates into the suit of '+(p.elementSuit||'this element\'s suit')+', the same suit your Soul Card and Court Card are drawn from later in this reading. Card and suit are not two separate systems bolted together: the suit is simply the element speaking in the language of the Minor Arcana, the same '+p.sunSign.element+' current that shapes your Sun sign showing up again in a different room of the same house.\n'
     + buildTrumpCardDepth(tc, p.sunSign);
   // W3BB EVOLUTIONARY GEOMETRY (Codex Logic V07 Part XXX) -- an explicitly
@@ -8316,7 +8514,7 @@ function getFallbackReading(){
   fb+='===PAGE_4_END===\n\n';
 
   fb+='===PAGE_5_START===\n';
-  fb+='Every archetype carries a shadow. '+tc.card+' \u2014 with all its power \u2014 has a specific blind spot. And your '+p.sunSign.sign+' Sun, for all its elemental brilliance, carries a specific recurring pattern that will repeat until integrated.\n\nThe shadow of '+tc.card+' is not weakness. It is unclaimed power. '+(tc.archetype)+' \u2014 when met with avoidance rather than presence \u2014 becomes its own inverse. But when walked consciously, it becomes the most transformative force available to you.\n\nYour '+p.sunSign.sign+' shadow and your Tarot shadow share a root. Naming both of them, in the same breath, is how you begin to integrate them. You were not given this archetype because it would be easy. You were given it because it is exactly what your soul came here to master.\n\nMetatron\'s Cube names this shadow work even more specifically. '+(p.shadowCardPath?('The path running from your Soul Sephirah, '+p.tree.name+', down toward the next Sephirah in the direction of Malkuth is '+p.shadowCardPath.card+' ('+p.shadowCardPath.numeral+', "'+p.shadowCardPath.keyword+'"). '+explainMajorArcanaCard(p.shadowCardPath.card)+' This is the exact corridor your unintegrated material travels when it is avoided rather than faced head-on \u2014 and it is not a second, unrelated shadow sitting next to your '+tc.card+' shadow named above; it is the same underlying pattern, described this time by the specific Tree-of-Life corridor it actually travels through in you. '):'')+'Naming a shadow this precisely \u2014 not as "negativity" in the abstract but as this specific card, this specific pattern, this specific corridor \u2014 is what turns it from something that simply happens to you into something you can actually work with on purpose.\n\nIn practice, integration rarely announces itself with a single dramatic breakthrough. It shows up as a slightly longer pause before the old reaction fires \u2014 a moment where you notice the '+tc.card+' shadow pattern starting and choose differently than you did the last ten times it appeared. Do that enough times and the shadow does not vanish; it converts. The same raw material that used to leak out sideways, unclaimed, becomes the '+lpData.gift+' named on Page 1, now available to you on purpose instead of by accident.\n';
+  fb+='Every archetype carries a shadow. '+tc.card+' \u2014 with all its power \u2014 has a specific blind spot. And your '+p.sunSign.sign+' Sun, for all its elemental brilliance, carries a specific recurring pattern that will repeat until integrated.\n\nThe shadow of '+tc.card+' is not weakness. It is unclaimed power. '+(tc.archetype)+' \u2014 when met with avoidance rather than presence \u2014 becomes its own inverse. But when walked consciously, it becomes the most transformative force available to you.\n\nYour '+p.sunSign.sign+' shadow and your Tarot shadow share a root. Naming both of them, in the same breath, is how you begin to integrate them. You were not given this archetype because it would be easy. You were given it because it is exactly what your soul came here to master.\n\nMetatron\'s Cube names this shadow work even more specifically. '+(p.shadowCardPath?('The path running from your Soul Sephirah, '+p.tree.name+', down toward the next Sephirah in the direction of Malkuth is '+p.shadowCardPath.card+' ('+p.shadowCardPath.numeral+', "'+p.shadowCardPath.keyword+'"). '+trackedExplainMajorArcanaCard(_ex, p.shadowCardPath.card)+' This is the exact corridor your unintegrated material travels when it is avoided rather than faced head-on \u2014 and it is not a second, unrelated shadow sitting next to your '+tc.card+' shadow named above; it is the same underlying pattern, described this time by the specific Tree-of-Life corridor it actually travels through in you. '):'')+'Naming a shadow this precisely \u2014 not as "negativity" in the abstract but as this specific card, this specific pattern, this specific corridor \u2014 is what turns it from something that simply happens to you into something you can actually work with on purpose.\n\nIn practice, integration rarely announces itself with a single dramatic breakthrough. It shows up as a slightly longer pause before the old reaction fires \u2014 a moment where you notice the '+tc.card+' shadow pattern starting and choose differently than you did the last ten times it appeared. Do that enough times and the shadow does not vanish; it converts. The same raw material that used to leak out sideways, unclaimed, becomes the '+lpData.gift+' named on Page 1, now available to you on purpose instead of by accident.\n';
   fb+='===PAGE_5_END===\n\n';
 
   fb+='===PAGE_6_START===\n';
@@ -8333,9 +8531,9 @@ function getFallbackReading(){
   fb+='Your Personality Number is '+(p.personality||'unknown')+' \u2014 the impression you make before you speak a single word. You are in Personal Year '+py+' in 2026. This cycle has a specific quality \u2014 a tone that colors every decision, relationship, and opportunity of this year.\n\n'+(py<=3?'This is a year of planting. The seeds you put down now \u2014 in projects, relationships, identity \u2014 will define the harvest of the next cycle. As '+ca+', the key is to act from vision, not from fear.':py<=6?'This is a year of deepening. Connections forged now carry long-term significance. Your field is stabilizing around its true form.':'This is a year of revelation and completion. Old structures that no longer serve are falling away. As '+ca+', this is not loss \u2014 it is liberation. What remains will be exactly what is meant to carry forward.')+'\n\nPersonal Year '+py+' is not a separate forecast bolted onto your chart \u2014 it is Life Path '+p.lifePath+' in motion through time, the same core number counted forward year by year until it comes back around to itself. For '+ca+', this Personal Year '+py+' activates the part of your field that governs '+p.sunSign.sign+' energy. The timing is not accidental.\n\nPractically, this looks less like a mood and more like a series of small forks in the road. '+(py<=3?'Say yes to the invitation, the idea, or the collaboration that feels slightly too soon \u2014 Personal Year '+py+' rewards those who move before they feel fully ready, because the readiness only ever arrives after the first step, not before it.':py<=6?'Say yes to the relationship, agreement, or commitment that asks you to stay rather than start something new \u2014 Personal Year '+py+' rewards depth over breadth, and the temptation to scatter your energy across something newer and shinier is exactly what this year asks you to resist.':'Say yes to the ending you have been putting off \u2014 Personal Year '+py+' rewards honest closure over quiet avoidance, and what looks like loss from inside the year will look like liberation from outside it.')+' Say no to whatever would keep you circling the same lesson a second time; your Birthday Number '+(p.birthdayNumber||'?')+' has already given you the tool to recognize when that is happening.\n\nZoom in closer and the picture sharpens further. This month, you are living Personal Month '+pm+' — the chapter of this year you are actually inside right now. And today specifically carries Personal Day '+pd+', the most immediate, up-close read on what today is asking of you (these numbers nest inside one another, each one a closer lens on the same underlying year). '+(pm<=3?'This month favors starting something and following the spark before it cools.':pm<=6?'This month favors steadying what you have already begun and choosing depth over novelty.':'This month favors finishing honestly and letting go of what has already run its course.')+' '+(pd<=3?'Today itself asks for a small, decisive first move.':pd<=6?'Today itself asks you to tend something you already care about rather than start anew.':'Today itself asks for honest closure on something you have been circling.')+'\n';
   if (pdw && pdw.majors && pdw.majors.length) {
     var pdwFmt = formatPersonalDayWildcard(pdw);
-    var pdwMajorExplain = explainMajorArcanaCard(pdw.majors[0].card);
+    var pdwMajorExplain = trackedExplainMajorArcanaCard(_ex, pdw.majors[0].card);
     var pdwFirstPip = (pdw.majors[0].pipPool && pdw.majors[0].pipPool[0]) ? pdw.majors[0].pipPool[0] : null;
-    var pdwPipExplain = pdwFirstPip ? explainMinorCard(pdwFirstPip) : '';
+    var pdwPipExplain = pdwFirstPip ? trackedExplainMinorCard(_ex, pdwFirstPip) : '';
     fb += '\nPersonal Day '+pd+' opens one more door, and it is worth naming as an invitation rather than a verdict: today wildcards toward '+pdwFmt.majorPhrase+' — '+(pdw.majors.length>1?'not as a forced choice between them, but as a field of live possibility you can lean into either direction of today':'as the live possibility available to lean into today')+'. '+(pdwMajorExplain?(pdwMajorExplain+' '):'')+pdwFmt.poolSentences+(pdwPipExplain?(' Take the '+pdwFirstPip.card+' as one example from that companion hand: '+pdwPipExplain):'')+' None of this replaces the '+tc.card+' path named earlier in this reading, and none of it is fixed the way your birth chart is fixed — it simply names what today, specifically, is offering you room to explore, gone again once Personal Day '+pd+' rolls forward into tomorrow\'s number.\n';
     // W3BB CODEX V07 PART XXX -- Nodal Choice: if this person chose a North/
     // South/Both orientation via the interactive Nodal Choice section on
@@ -8349,13 +8547,13 @@ function getFallbackReading(){
   fb+='===PAGE_7_END===\n\n';
 
   fb+='===PAGE_8_START===\n';
-  fb+='Your relational field \u2014 the energetic signature you bring into love and partnership \u2014 is shaped by Life Path '+p.lifePath+' meeting the '+tc.card+' archetype. You do not simply enter relationships. You field them.\n\nAs a '+p.sunSign.sign+' Sun with a '+p.sunSign.element+' nature, you are naturally drawn to '+(p.sunSign.element==='Fire'?'partners who can match your heat without being consumed by it':p.sunSign.element==='Water'?'those who offer emotional depth and can swim in the same currents':p.sunSign.element==='Air'?'minds that can keep pace and meet you in the realm of ideas':' souls who are grounded enough to hold the space your expansiveness requires')+'. '+explainElement(p.sunSign.element)+' That same current is exactly what is drawing you toward this kind of partner \u2014 not because they complete you \u2014 but because they reflect the parts of you that are still in conversation with themselves.\n\nIn matters of love and partnership, your Life Path '+p.lifePath+' is most naturally aligned with Life Paths '+(p.lifePath<=3?'3, 5, and 7':p.lifePath<=6?'2, 4, and 8':'1, 6, and 9')+'. The highest expression of your relational geometry is partnership that expands the field \u2014 not one that contracts it. You thrive when love feels like co-creation.\n\n'+(p.moonSign&&p.moonSign.sign?('Emotionally, your '+p.moonSign.sign+' Moon governs what you actually need from a partner day to day \u2014 not what impresses you on a first date, but what keeps you regulated on an ordinary Tuesday when nothing is happening at all. '):'')+(p.ascendant&&p.ascendant.sign?('And your '+p.ascendant.sign+' Ascendant is the version of you a new partner meets before they ever get to the Life Path '+p.lifePath+' underneath \u2014 worth remembering when the first impression and the deeper pattern do not immediately line up. '):'')+'The healthiest partnerships for you are the ones where a partner eventually meets all three layers \u2014 the Ascendant face, the Moon interior, and the '+p.sunSign.sign+'-and-Life-Path core \u2014 and chooses to stay for all three, not just the one that was easiest to fall for first.\n'+(p.soulCard&&p.courtCard?('\nMetatron\'s Cube offers one more layer here: your Soul Card, the '+p.soulCard.name+', describes what your soul is actually seeking in intimacy beneath the personality-level wants, while your Court Card, the '+p.courtCard.name+', describes the role you tend to play once you are inside a committed bond. '+explainMinorCard(p.soulCard)+' '+explainMinorCard(p.courtCard)+' The two are not always identical, and noticing where they diverge \u2014 the suit-and-rank current your Soul Card wants versus the one your Court Card habitually plays out \u2014 is often the fastest way to understand a recurring pattern in your relationships.\n'):'')+(p.node&&p.node.northSign?('\nOne more axis belongs in this picture, and it is worth naming what it actually is before applying it here: '+explainNodeAxis()+' Your North Node in '+p.node.northSign+' names the kind of relational stretch that grows you, while your South Node in '+p.node.southSign+' names the relational comfort zone that is easy to default into but does not, by itself, expand you. Neither is "better" — the South Node is simply where you already know how to stand, and the North Node is the direction a partnership can invite you toward when you let it \u2014 the same lifelong growth axis named on Page 1, now specifically applied to how you love.\n'):'');
+  fb+='Your relational field \u2014 the energetic signature you bring into love and partnership \u2014 is shaped by Life Path '+p.lifePath+' meeting the '+tc.card+' archetype. You do not simply enter relationships. You field them.\n\nAs a '+p.sunSign.sign+' Sun with a '+p.sunSign.element+' nature, you are naturally drawn to '+(p.sunSign.element==='Fire'?'partners who can match your heat without being consumed by it':p.sunSign.element==='Water'?'those who offer emotional depth and can swim in the same currents':p.sunSign.element==='Air'?'minds that can keep pace and meet you in the realm of ideas':' souls who are grounded enough to hold the space your expansiveness requires')+'. '+trackedExplainElement(_ex, p.sunSign.element)+' That same current is exactly what is drawing you toward this kind of partner \u2014 not because they complete you \u2014 but because they reflect the parts of you that are still in conversation with themselves.\n\nIn matters of love and partnership, your Life Path '+p.lifePath+' is most naturally aligned with Life Paths '+(p.lifePath<=3?'3, 5, and 7':p.lifePath<=6?'2, 4, and 8':'1, 6, and 9')+'. The highest expression of your relational geometry is partnership that expands the field \u2014 not one that contracts it. You thrive when love feels like co-creation.\n\n'+(p.moonSign&&p.moonSign.sign?('Emotionally, your '+p.moonSign.sign+' Moon governs what you actually need from a partner day to day \u2014 not what impresses you on a first date, but what keeps you regulated on an ordinary Tuesday when nothing is happening at all. '):'')+(p.ascendant&&p.ascendant.sign?('And your '+p.ascendant.sign+' Ascendant is the version of you a new partner meets before they ever get to the Life Path '+p.lifePath+' underneath \u2014 worth remembering when the first impression and the deeper pattern do not immediately line up. '):'')+'The healthiest partnerships for you are the ones where a partner eventually meets all three layers \u2014 the Ascendant face, the Moon interior, and the '+p.sunSign.sign+'-and-Life-Path core \u2014 and chooses to stay for all three, not just the one that was easiest to fall for first.\n'+(p.soulCard&&p.courtCard?('\nMetatron\'s Cube offers one more layer here: your Soul Card, the '+p.soulCard.name+', describes what your soul is actually seeking in intimacy beneath the personality-level wants, while your Court Card, the '+p.courtCard.name+', describes the role you tend to play once you are inside a committed bond. '+trackedExplainMinorCard(_ex, p.soulCard)+' '+trackedExplainMinorCard(_ex, p.courtCard)+' The two are not always identical, and noticing where they diverge \u2014 the suit-and-rank current your Soul Card wants versus the one your Court Card habitually plays out \u2014 is often the fastest way to understand a recurring pattern in your relationships.\n'):'')+(p.node&&p.node.northSign?('\nOne more axis belongs in this picture, and it is worth naming what it actually is before applying it here: '+trackedExplainNodeAxis(_ex)+' Your North Node in '+p.node.northSign+' names the kind of relational stretch that grows you, while your South Node in '+p.node.southSign+' names the relational comfort zone that is easy to default into but does not, by itself, expand you. Neither is "better" — the South Node is simply where you already know how to stand, and the North Node is the direction a partnership can invite you toward when you let it \u2014 the same lifelong growth axis named on Page 1, now specifically applied to how you love.\n'):'');
   fb+='===PAGE_8_END===\n\n';
 
   fb+='===PAGE_9_START===\n';
   fb+='Before the Tree of Life, before the first Sephirah, before even the possibility of form \u2014 there is AIN SOPH AUR: the limitless light from which all creation perpetually springs. Above the Tree itself radiate the Three Veils \u2014 AIN, AIN SOPH, and AIN SOPH AUR \u2014 the outermost points of Metatron\'s Cube, the geometry of thirteen nodes and seventy-eight lines the Tree stands upon.\n\n';
-  if (p.soulCard && p.courtCard) {fb+='On that Cube, your Soul Card is the '+p.soulCard.name+' \u2014 '+p.soulCard.keyword+' \u2014 describing the inner texture of your soul\'s desire. '+explainMinorCard(p.soulCard)+' Your Court Card, the '+p.courtCard.name+', anchors on the line running from your own soul center all the way to '+p.courtCard.veil+', the outermost Veil of Limitless Light. '+explainMinorCard(p.courtCard)+' Applied together: the suit each card shares is the same '+(p.elementSuit?SUIT_TO_ELEMENT[p.elementSuit]:p.sunSign.element)+' current already named on Page 1 through your '+p.sunSign.sign+' Sun, now showing up a second time in the language of the Minor Arcana \u2014 what changes between the two cards is only the rank, the soul\'s private desire versus the role actually lived out.\n\n';}
-  if (p.zodiacalCourtCard) {fb+='Your Sun\'s own placement in the sky also points to a Court Card of its own, '+p.firstName+' \u2014 the '+p.zodiacalCourtCard.name+'. '+explainMinorCard(p.zodiacalCourtCard)+' Hold it alongside the '+p.courtCard.name+' named just above rather than in place of it \u2014 not a more correct version, not a contradiction, simply a second real facet of the same royal presence, met through the sky rather than the Sephirah.\n\n';}
+  if (p.soulCard && p.courtCard) {fb+='On that Cube, your Soul Card is the '+p.soulCard.name+' \u2014 '+p.soulCard.keyword+' \u2014 describing the inner texture of your soul\'s desire. '+trackedExplainMinorCard(_ex, p.soulCard)+' Your Court Card, the '+p.courtCard.name+', anchors on the line running from your own soul center all the way to '+p.courtCard.veil+', the outermost Veil of Limitless Light. '+trackedExplainMinorCard(_ex, p.courtCard)+' Applied together: the suit each card shares is the same '+(p.elementSuit?SUIT_TO_ELEMENT[p.elementSuit]:p.sunSign.element)+' current already named on Page 1 through your '+p.sunSign.sign+' Sun, now showing up a second time in the language of the Minor Arcana \u2014 what changes between the two cards is only the rank, the soul\'s private desire versus the role actually lived out.\n\n';}
+  if (p.zodiacalCourtCard) {fb+='Your Sun\'s own placement in the sky also points to a Court Card of its own, '+p.firstName+' \u2014 the '+p.zodiacalCourtCard.name+'. '+trackedExplainMinorCard(_ex, p.zodiacalCourtCard)+' Hold it alongside the '+p.courtCard.name+' named just above rather than in place of it \u2014 not a more correct version, not a contradiction, simply a second real facet of the same royal presence, met through the sky rather than the Sephirah.\n\n';}
   fb+='Your chart, '+p.firstName+' \u2014 Life Path '+p.lifePath+', Expression '+(p.expression||'?')+', Soul Urge '+(p.soulUrge||'?')+', '+p.sunSign.sign+' Sun, '+p.tree.name+', '+tc.card+', and the sacred geometry of your Egg of Life \u2014 all of it traces back to that source. You are a specific, irreplaceable emanation of that limitless light.\n\n'
     + 'Count everything this reading has actually named, '+p.firstName+': Life Path '+p.lifePath+', Expression '+(p.expression||'?')+', Soul Urge '+(p.soulUrge||'?')+', Personality '+(p.personality||'?')+', Birthday Number '+(p.birthdayNumber||'?')+', Gematria '+(p.gematria?p.gematria.reduced:'?')+(p.chaldean?(', Chaldean '+p.chaldean.reduced):'')+', Personal Year '+py+(p.hiddenMaster?(', Hidden Master '+p.hiddenMaster):'')+(p.ascendant&&p.ascendant.sign?(', Ascendant '+p.ascendant.sign):'')+(p.moonSign&&p.moonSign.sign?(', Moon '+p.moonSign.sign):'')+(p.node&&p.node.northSign?(', North Node '+p.node.northSign):'')+'. That is not a scattering of trivia collected for its own sake. That is one soul, measured nine different ways, describing the exact same shape from nine different angles every single time.\n\n'
     + 'Look at what has actually happened across these nine pages, '+p.firstName+'. Your Life Path '+p.lifePath+' and your Gematria reduction of '+(p.gematria?p.gematria.reduced:'your core tone')+' are not a coincidence \u2014 a birth frequency and a name frequency do not land on the same note by accident. Your '+tc.card+' Tarot path and your '+p.sunSign.sign+' Sun are not a coincidence \u2014 a mythic archetype and a solar current do not reinforce each other unless something real is being described.'+(p.hiddenMaster?' And your Hidden Master Number '+p.hiddenMaster+' sitting directly over Life Path '+p.lifePath+' is not a coincidence either \u2014 it is the same signal, turned up.':'')+' Five systems, one chart, one person.\n\n'
@@ -8492,7 +8690,7 @@ async function doReading() {
   var w3bbGeo = getW3bbEvolutionaryGeometry(w3bbGeoCardName);
   var w3bbGeoLine = w3bbGeo ? ('W3BB Evolutionary Geometry (an ORIGINAL W3BB Codex addition \u2014 explicitly NOT Golden Dawn, NOT Kabbalah, NOT inherited tradition \u2014 laid on top of the real Trump Card above, not a replacement for it): ' + w3bbGeoCardName + ' carries a ' + w3bbGeo.quadrant + ' quadrant and the geometry \u201c' + w3bbGeo.geometry + '\u201d, meaning ' + w3bbGeo.meaning + '.\n') : '';
 
-  var prompt ='You are Celestia, the oracle of Circles Squared \u2014 Taurus Codex Geometry. Generate a complete 9-section reading for ' + p.firstName + ' using the unified narrative approach: weave all systems (Astrology, Pythagorean & Chaldean Numerology, Gematria/Kabbalah, Tarot, Metatron\'s Cube, Sacred Geometry) into ONE seamless identity story. Never isolate systems in their own paragraph and move on \u2014 every time you introduce a new system\'s finding, explicitly say how it reinforces, explains, or adds a new angle on what has already been established earlier in the reading, by name (cite the specific earlier number, card, or Sephirah you are connecting it to). Rich, warm, poetic, second-person prose. Be specific to the exact data.\n\n'
+  var prompt ='You are Celestia, the oracle of Circles Squared \u2014 Taurus Codex Geometry. Generate a complete 9-section reading for ' + p.firstName + ' using the unified narrative approach: weave all systems (Astrology, Pythagorean & Chaldean Numerology, Gematria/Kabbalah, Tarot, Metatron\'s Cube, Sacred Geometry) into ONE seamless identity story. Never isolate systems in their own paragraph and move on \u2014 every time you introduce a new system\'s finding, explicitly say how it reinforces, explains, or adds a new angle on what has already been established earlier in the reading, by name (cite the specific earlier number, card, or Sephirah you are connecting it to). Rich, warm, poetic, second-person prose. Be specific to the exact data. Every page below asks you to explain a symbol before applying it \u2014 when you do, vary HOW you phrase that explanation from page to page; never explain the same element, the same Node axis, or the same card with the same or near-identical wording twice across these nine pages, and let each explanation read as part of that page\'s own natural voice rather than a definition being dropped in. If a symbol already explained earlier in the reading comes up again later, reference back to it briefly instead of re-explaining it from scratch \u2014 the real facts stay exactly the same every time, only the telling of them should feel personalized and naturally flowing rather than mechanical or checklist-like.\n\n'
     + 'PROFILE:\n'
     + 'Codex Archetype: ' + ca + '\n'
     + quizArchetypeLine
