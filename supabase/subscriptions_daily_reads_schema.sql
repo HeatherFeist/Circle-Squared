@@ -210,6 +210,20 @@ begin
     return jsonb_build_object('ok', false, 'reason', 'not_authenticated');
   end if;
 
+  -- Server-side enforcement of the paywall this feature exists to have:
+  -- being signed in (a magic-link session) is not the same as being an
+  -- active subscriber. Without this check, any authenticated user could
+  -- call this RPC directly -- bypassing the client-side UI gate entirely
+  -- -- and store daily reads for free. This matches the discipline
+  -- already used elsewhere in this project (redeem_promo_code() checks
+  -- real conditions server-side, never trusting the client's own gate).
+  if not exists (
+    select 1 from public.subscribers
+    where user_id = v_uid and status = 'active'
+  ) then
+    return jsonb_build_object('ok', false, 'reason', 'not_an_active_subscriber');
+  end if;
+
   if p_read_date is null then
     return jsonb_build_object('ok', false, 'reason', 'missing_read_date');
   end if;

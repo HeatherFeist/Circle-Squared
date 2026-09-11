@@ -970,21 +970,21 @@ body {
     <div data-id="264" id="adminPurchaseList" style="display:flex;flex-direction:column;gap:0.7rem;"></div>
     <div data-id="265" id="adminEmptyState" style="text-align:center;padding:3rem;color:#3a2a5a;font-style:italic;display:none;">No purchases recorded yet.</div>
 
-    <!-- ===== AZURE AI SPEECH VOICE SETTINGS ===== -->
+    <!-- ===== VOICE SETTINGS ===== -->
     <div data-id="266" style="margin-top:2rem;border-top:1px solid rgba(176,138,255,0.15);padding-top:1.5rem;">
-      <div data-id="267" style="font-family:'Courier New',monospace;font-size:0.62rem;letter-spacing:0.4em;color:#c9a84c;margin-bottom:0.3rem;">🎙️ VOICE SETTINGS (OPTIONAL: AZURE AI SPEECH UPGRADE)</div>
-      <div data-id="268" style="font:700 1.1rem Georgia,serif;color:#e8e0ff;margin-bottom:0.6rem;">Voice Settings — Optional Azure AI Speech Upgrade</div>
-      <p data-id="269" style="font-size:0.8rem;color:#8a7aaa;line-height:1.6;margin-bottom:1rem;">By default the reading is narrated for free using the voice already built into your browser (preferring an "Aria" voice when one is available, or you can pick an exact voice yourself below). Entering an Azure Cognitive Services Speech key and region below is entirely optional — it upgrades narration to a paid Azure neural voice instead. Both fields are required only if you want to use this upgrade. Stored only in your browser's local storage — never in any file or server.</p>
+      <div data-id="267" style="font-family:'Courier New',monospace;font-size:0.62rem;letter-spacing:0.4em;color:#c9a84c;margin-bottom:0.3rem;">🎙️ VOICE SETTINGS</div>
+      <div data-id="268" style="font:700 1.1rem Georgia,serif;color:#e8e0ff;margin-bottom:0.6rem;">Voice Settings</div>
+      <p data-id="269" style="font-size:0.8rem;color:#8a7aaa;line-height:1.6;margin-bottom:1rem;">By default the reading is narrated for free using the voice already built into your browser (preferring an "Aria" voice when one is available, or you can pick an exact voice yourself below). Stored only in your browser's local storage — never in any file or server.</p>
 
       <!-- Free Browser Voice picker — lets someone choose exactly which
-           installed browser/OS voice narrates readings when no Azure key is
-           saved, instead of relying on the automatic "Aria" name search
-           (which can't be guaranteed to find the right voice on every
-           browser/OS combination). Populated dynamically from
-           speechSynthesis.getVoices() -- see populateBrowserVoiceSelect(). -->
+           installed browser/OS voice narrates readings, instead of relying
+           on the automatic "Aria" name search (which can't be guaranteed to
+           find the right voice on every browser/OS combination). Populated
+           dynamically from speechSynthesis.getVoices() -- see
+           populateBrowserVoiceSelect(). -->
       <div data-id="290" style="margin-bottom:1.4rem;padding-bottom:1.2rem;border-bottom:1px dashed rgba(176,138,255,0.15);">
         <div data-id="291" style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#c9a84c;display:block;margin-bottom:0.4rem;">FREE BROWSER VOICE</div>
-        <p data-id="292" style="font-size:0.78rem;color:#8a7aaa;line-height:1.6;margin-bottom:0.6rem;">Choose exactly which voice already installed on this device/browser should narrate readings when no Azure key is saved above. This list comes straight from your browser, so pick whichever one actually sounds right when you test it. Leave unset to keep the automatic "Aria" search as the default.</p>
+        <p data-id="292" style="font-size:0.78rem;color:#8a7aaa;line-height:1.6;margin-bottom:0.6rem;">Choose exactly which voice already installed on this device/browser should narrate readings. This list comes straight from your browser, so pick whichever one actually sounds right when you test it. Leave unset to keep the automatic "Aria" search as the default.</p>
         <select data-id="293" id="browser-voice-select" class="cosmic-select" style="width:100%;margin-bottom:0.6rem;">
           <option value="">— Automatic (search for an "Aria" voice) —</option>
         </select>
@@ -996,9 +996,7 @@ body {
 
         <!-- Narration speed -- the fixed 0.95 rate felt too slow on some
              machines/voices, so this exposes it as an adjustable slider
-             instead of a hardcoded constant. Applies to the free browser
-             voice path only (Azure narration keeps its own separate,
-             already-existing pacing, untouched). Saved to localStorage and
+             instead of a hardcoded constant. Saved to localStorage and
              read by browserSpeak() -- see readBrowserVoiceRate(). -->
         <div style="margin-top:1rem;padding-top:1rem;border-top:1px dashed rgba(176,138,255,0.15);">
           <label style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#c9a84c;display:block;margin-bottom:0.4rem;">NARRATION SPEED <span id="browser-voice-rate-display" style="color:#e8e0ff;">1.0×</span></label>
@@ -1007,67 +1005,68 @@ body {
         </div>
       </div>
 
-      <div data-id="270" style="margin-bottom:0.8rem;">
-        <label data-id="271" style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#c9a84c;display:block;margin-bottom:0.4rem;">API KEY</label>
-        <input data-id="272" type="password" id="azure-api-key-input" class="cosmic-input" placeholder="Azure Speech subscription key" style="font-family:'Courier New',monospace;font-size:0.88rem;" />
-      </div>
-
-      <div style="margin-bottom:0.8rem;">
-        <label style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#c9a84c;display:block;margin-bottom:0.4rem;">REGION</label>
-        <input type="text" id="azure-region-input" class="cosmic-input" placeholder="e.g. eastus, westeurope" style="font-family:'Courier New',monospace;font-size:0.88rem;" />
-      </div>
-
-      <div data-id="273" style="margin-bottom:1rem;">
-        <label data-id="274" style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#c9a84c;display:block;margin-bottom:0.4rem;">VOICE</label>
-        <select data-id="275" id="azure-voice-select" class="cosmic-select" style="width:100%;">
-          <optgroup label="— FEMALE VOICES —">
-            <option value="en-US-AriaNeural">Aria — Warm American ✦ Recommended</option>
-            <option value="en-US-JennyNeural">Jenny — Friendly American</option>
-            <option value="en-US-SaraNeural">Sara — Soft American</option>
-            <option value="en-GB-SoniaNeural">Sonia — Crisp British</option>
-            <option value="en-AU-NatashaNeural">Natasha — Warm Australian</option>
-            <option value="en-IE-EmilyNeural">Emily — Irish Mystique</option>
+      <!-- Enhanced Free Voice (Beta) — Kokoro-82M, an open-source
+           (Apache-2.0) neural TTS model running entirely client-side via
+           WASM through the kokoro-js npm package (itself built on
+           Transformers.js/onnxruntime-web). Sits alongside the default free
+           browser voice above as a second, opt-in tier -- noticeably more
+           natural than the robotic default browser voice, still $0 and
+           still nothing sent to any server, at the cost of a one-time
+           ~90MB model download the first time it's enabled (cached by the
+           browser afterward). See
+           loadKokoroVoice()/kokoroSpeak()/isKokoroReady() and
+           docs/CODEX_LOGIC_V07.md Part XXXII. -->
+      <div data-id="298" style="margin-bottom:1.4rem;padding-bottom:1.2rem;border-bottom:1px dashed rgba(176,138,255,0.15);">
+        <div data-id="299" style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#c9a84c;display:block;margin-bottom:0.4rem;">🧬 ENHANCED FREE VOICE (BETA) — OPEN-SOURCE NEURAL VOICE</div>
+        <p data-id="300" style="font-size:0.78rem;color:#8a7aaa;line-height:1.6;margin-bottom:0.6rem;">A free, open-source neural voice (Kokoro-82M, Apache-2.0 licensed) that sounds noticeably more natural than the default browser voice above. It still runs entirely in your browser — nothing is ever sent to a server — but the first time you enable it, it has to download a one-time set of model weights (about 90MB, quantized) before it can speak. After that first download your browser caches it and every later reading uses it instantly. This is a completely different, smaller technology than the browser voice above: Kokoro ships its own small set of named voices, picked below.</p>
+        <select data-id="301" id="kokoro-voice-select" class="cosmic-select" style="width:100%;margin-bottom:0.6rem;">
+          <optgroup label="— US ENGLISH: FEMALE —">
+            <option value="af_heart">Heart — American ✦ Recommended</option>
+            <option value="af_bella">Bella — American</option>
+            <option value="af_nicole">Nicole — American</option>
+            <option value="af_sarah">Sarah — American</option>
+            <option value="af_nova">Nova — American</option>
+            <option value="af_sky">Sky — American</option>
+            <option value="af_alloy">Alloy — American</option>
+            <option value="af_aoede">Aoede — American</option>
+            <option value="af_jessica">Jessica — American</option>
+            <option value="af_kore">Kore — American</option>
+            <option value="af_river">River — American</option>
           </optgroup>
-          <optgroup label="— MALE VOICES —">
-            <option value="en-US-GuyNeural">Guy — Deep American Baritone</option>
-            <option value="en-US-DavisNeural">Davis — Rich &amp; Resonant American</option>
-            <option value="en-GB-RyanNeural">Ryan — Calm British</option>
-            <option value="en-AU-WilliamNeural">William — Australian Warmth</option>
-            <option value="en-IE-ConnorNeural">Connor — Irish Authority</option>
+          <optgroup label="— US ENGLISH: MALE —">
+            <option value="am_michael">Michael — American</option>
+            <option value="am_adam">Adam — American</option>
+            <option value="am_echo">Echo — American</option>
+            <option value="am_eric">Eric — American</option>
+            <option value="am_fenrir">Fenrir — American</option>
+            <option value="am_liam">Liam — American</option>
+            <option value="am_onyx">Onyx — American</option>
+            <option value="am_puck">Puck — American</option>
+            <option value="am_santa">Santa — American</option>
           </optgroup>
-        </select>
-      </div>
-
-      <div data-id="280" style="display:flex;gap:0.6rem;margin-bottom:0.6rem;flex-wrap:wrap;">
-        <button data-id="281" id="azure-save-btn" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.55rem 1.2rem;background:linear-gradient(135deg,#c9a84c,#f0d070);color:#0a0015;font-weight:700;font-size:0.82rem;border:none;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;">💾 Save Key</button>
-        <button data-id="282" id="azure-test-btn" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.55rem 1.2rem;background:none;border:1px solid rgba(176,138,255,0.3);color:#b08aff;font-size:0.82rem;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;">🔊 Test Voice</button>
-      </div>
-      <div data-id="283" id="azure-status" style="font-size:0.75rem;color:#5a4a7a;min-height:1.2em;margin-top:0.3rem;"></div>
-
-      <!-- Free Intro Voice — separate voice for the free reveal-screen narration, same Azure account/key/region -->
-      <div data-id="284" style="margin-top:1.4rem;padding-top:1.2rem;border-top:1px dashed rgba(176,138,255,0.15);">
-        <div data-id="285" style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#c9a84c;display:block;margin-bottom:0.4rem;">FREE INTRO VOICE</div>
-        <p data-id="286" style="font-size:0.78rem;color:#8a7aaa;line-height:1.6;margin-bottom:0.6rem;">Optional — only applies if you've saved an Azure key and region above. Picks a distinct Azure voice that narrates the free blueprint reveal (before the paywall). Leave unset to fall back to the main Azure narration voice above (or to the free browser voice if no Azure key is saved at all).</p>
-        <select data-id="287" id="azure-intro-voice-select" class="cosmic-select" style="width:100%;margin-bottom:0.6rem;">
-          <option value="">— None (use fallback voice) —</option>
-          <optgroup label="— FEMALE VOICES —">
-            <option value="en-US-AriaNeural">Aria — Warm American ✦ Recommended</option>
-            <option value="en-US-JennyNeural">Jenny — Friendly American</option>
-            <option value="en-US-SaraNeural">Sara — Soft American</option>
-            <option value="en-GB-SoniaNeural">Sonia — Crisp British</option>
-            <option value="en-AU-NatashaNeural">Natasha — Warm Australian</option>
-            <option value="en-IE-EmilyNeural">Emily — Irish Mystique</option>
+          <optgroup label="— BRITISH ENGLISH: FEMALE —">
+            <option value="bf_emma">Emma — British</option>
+            <option value="bf_isabella">Isabella — British</option>
+            <option value="bf_alice">Alice — British</option>
+            <option value="bf_lily">Lily — British</option>
           </optgroup>
-          <optgroup label="— MALE VOICES —">
-            <option value="en-US-GuyNeural">Guy — Deep American Baritone</option>
-            <option value="en-US-DavisNeural">Davis — Rich &amp; Resonant American</option>
-            <option value="en-GB-RyanNeural">Ryan — Calm British</option>
-            <option value="en-AU-WilliamNeural">William — Australian Warmth</option>
-            <option value="en-IE-ConnorNeural">Connor — Irish Authority</option>
+          <optgroup label="— BRITISH ENGLISH: MALE —">
+            <option value="bm_george">George — British</option>
+            <option value="bm_fable">Fable — British</option>
+            <option value="bm_lewis">Lewis — British</option>
+            <option value="bm_daniel">Daniel — British</option>
           </optgroup>
         </select>
-        <button data-id="288" id="azure-intro-test-btn" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.55rem 1.2rem;background:none;border:1px solid rgba(176,138,255,0.3);color:#b08aff;font-size:0.82rem;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;">🔊 Test Intro Voice</button>
-        <div data-id="289" id="azure-intro-status" style="font-size:0.75rem;color:#5a4a7a;min-height:1.2em;margin-top:0.4rem;"></div>
+        <div data-id="302" style="display:flex;gap:0.6rem;margin-bottom:0.6rem;flex-wrap:wrap;">
+          <button data-id="303" id="kokoro-enable-btn" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.55rem 1.2rem;background:linear-gradient(135deg,#c9a84c,#f0d070);color:#0a0015;font-weight:700;font-size:0.82rem;border:none;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;">⬇ Enable &amp; Download Voice</button>
+          <button data-id="304" id="kokoro-test-btn" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.55rem 1.2rem;background:none;border:1px solid rgba(176,138,255,0.3);color:#b08aff;font-size:0.82rem;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;">🔊 Test Voice</button>
+        </div>
+        <div data-id="305" id="kokoro-progress-wrap" style="display:none;margin-bottom:0.6rem;">
+          <div style="background:rgba(176,138,255,0.1);border-radius:20px;height:8px;overflow:hidden;">
+            <div id="kokoro-progress-bar" style="background:linear-gradient(135deg,#c9a84c,#f0d070);height:100%;width:0%;transition:width 0.2s;"></div>
+          </div>
+        </div>
+        <div data-id="306" id="kokoro-voice-status" style="font-size:0.75rem;color:#5a4a7a;min-height:1.2em;margin-top:0.3rem;">This device/browser must support WebAssembly (nearly all modern browsers do). If the download or setup ever fails, readings simply keep narrating with the default free browser voice above — this tier never breaks narration.</div>
       </div>
     </div>
 
@@ -1299,7 +1298,7 @@ function preprocessForSpeech(text) {
   replacements.forEach(function(pair){ text = text.replace(pair[0], pair[1]); });
 
   // ── ALL-CAPS SPELL-OUT FIX ──────────────────────────────────
-  // Most speech engines (Azure and, especially, native browser TTS) read a
+  // Most speech engines (especially native browser TTS) read a
   // fully-uppercase token as an acronym and spell it out letter-by-letter
   // instead of pronouncing it as a word — e.g. a stray "AIN SOPH AUR" that
   // slipped past the specific phonetic replacements above, a Tarot trump's
@@ -1343,30 +1342,6 @@ var isMuted = false;
 var currentAudio = null;
 var _speakCancelled = false;
 
-// XML-escape text before inserting it into an SSML document — Azure's TTS
-// endpoint parses the request body as XML, so unescaped &, <, >, ", ' in
-// user-supplied/generated text (e.g. a name with an ampersand) would break
-// the request or silently mangle the speech. ElevenLabs took plain text and
-// never needed this; it's a new failure mode specific to the SSML approach.
-function escapeXmlForSsml(text) {
-  return String(text == null ? '' : text)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&apos;');
-}
-
-// Core Azure AI Speech (Cognitive Services) TTS function — builds an SSML
-// document, POSTs it to the regional TTS REST endpoint, and plays the
-// returned audio bytes. Mirrors the old elevenLabsSpeak's fetch/blob/Audio
-// playback mechanics — only the request shape changes:
-//   - Auth is a subscription key on the Ocp-Apim-Subscription-Key header
-//     (works directly against the TTS endpoint; no separate bearer-token
-//     exchange call is required for this endpoint).
-//   - Both an API key AND a region are required (ElevenLabs only needed a key).
-//   - The body is SSML/XML, not JSON — text must be XML-escaped first.
-//   - The response is raw audio bytes (not JSON), same as ElevenLabs.
 // Wraps a promise so it rejects after `ms` if it hasn't settled — used below
 // to stop a stuck network request or a stalled audio.play() from hanging the
 // whole narration chain silently forever. Only guards "am I getting a
@@ -1381,86 +1356,12 @@ function _withTimeout(promise, ms, label) {
   return Promise.race([promise, timeoutPromise]).finally(function() { clearTimeout(timeoutId); });
 }
 
-async function azureSpeak(text, apiKey, region, voiceId) {
-  if (!apiKey || !region || !voiceId) {
-    throw new Error('Azure TTS: missing apiKey, region, or voiceId');
-  }
-  var langMatch = /^([a-zA-Z]{2,3}-[a-zA-Z]{2,4})/.exec(voiceId);
-  var lang = langMatch ? langMatch[1] : 'en-US';
-  var ssml = "<speak version='1.0' xml:lang='" + lang + "'>" +
-    "<voice xml:lang='" + lang + "' name='" + voiceId + "'>" +
-    escapeXmlForSsml(text) +
-    "</voice></speak>";
-  var endpoint = 'https://' + region + '.tts.speech.microsoft.com/cognitiveservices/v1';
-
-  // 8s network timeout via AbortController — a stalled fetch() with no
-  // timeout at all was the root cause of the narration sometimes never
-  // starting: no response, no error, no fallback ever triggered.
-  var controller = new AbortController();
-  var abortTimer = setTimeout(function() { controller.abort(); }, 8000);
-  var response;
-  try {
-    response = await fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        'Ocp-Apim-Subscription-Key': apiKey,
-        'Content-Type': 'application/ssml+xml',
-        'X-Microsoft-OutputFormat': 'audio-16khz-128kbitrate-mono-mp3',
-        'User-Agent': 'CirclesSquaredOracle'
-      },
-      body: ssml,
-      signal: controller.signal
-    });
-  } catch (networkErr) {
-    if (networkErr && networkErr.name === 'AbortError') {
-      console.error('[Azure TTS] request timed out after 8s — region unreachable or Azure is slow to respond:', region);
-      throw new Error('Azure TTS timed out contacting region "' + region + '"');
-    }
-    console.error('[Azure TTS] network/fetch error — check region is reachable and correctly spelled:', networkErr);
-    throw new Error('Azure TTS network error: ' + (networkErr && networkErr.message ? networkErr.message : networkErr));
-  } finally {
-    clearTimeout(abortTimer);
-  }
-
-  if (!response.ok) {
-    var errText = '';
-    try { errText = await response.text(); } catch (readErr) { /* ignore */ }
-    // A wrong/missing region typically surfaces as a DNS failure at fetch()
-    // (caught above) or a 401/403 here if the region doesn't match the key's
-    // resource. A malformed SSML body (e.g. unescaped XML) typically surfaces
-    // as a 400 Bad Request with an XML-parsing message in errText.
-    console.error('[Azure TTS] ' + response.status + ' ' + response.statusText + ' — ' + errText);
-    throw new Error('Azure TTS ' + response.status + ': ' + (errText || response.statusText));
-  }
-
-  var blob = await response.blob();
-  var url = URL.createObjectURL(blob);
-  var audio = new Audio(url);
-  currentAudio = audio;
-  // 5s timeout on *starting* playback only (e.g. a stuck autoplay-policy
-  // promise) — once playback genuinely begins, the ended/error listener
-  // below is unbounded, so long narration is never cut short.
-  try {
-    await _withTimeout(audio.play(), 5000, '[Azure TTS] audio.play()');
-  } catch (playErr) {
-    URL.revokeObjectURL(url);
-    console.error('[Azure TTS] playback failed to start:', playErr);
-    throw playErr;
-  }
-  return new Promise(function(resolve, reject) {
-    audio.addEventListener('ended', function() { URL.revokeObjectURL(url); resolve(); });
-    audio.addEventListener('error', function(e) { URL.revokeObjectURL(url); reject(e); });
-  });
-}
-
 // AppSDK.ai.speak fallback — uses built-in TTS
 async function appSdkSpeak(text) {
   if (!window.AppSDK || !window.AppSDK.ai || !window.AppSDK.ai.speak) return false;
   try {
-    // Same reasoning as azureSpeak's timeouts: this is a fallback path that
-    // itself must not be able to hang, or a stuck Azure call falling through
-    // to a stuck AppSDK call just moves the silent-hang bug rather than
-    // fixing it.
+    // This is a fallback path that itself must not be able to hang, or a
+    // stuck AppSDK call just moves the silent-hang bug rather than fixing it.
     var result = await _withTimeout(
       AppSDK.ai.speak({ text: text, voice: 'onyx', audioFormat: 'mp3' }), 8000, 'AppSDK.ai.speak'
     );
@@ -1553,14 +1454,226 @@ function readBrowserVoiceRate() {
   return 0.95;
 }
 
+// ===========================
+// ENHANCED FREE VOICE (BETA) — Kokoro-82M open-source neural voice
+// ===========================
+// Kokoro-82M (hexgrad, Apache-2.0 license) via the "kokoro-js" npm package,
+// itself built on Transformers.js/onnxruntime-web. Runs entirely
+// client-side (WASM) — nothing is ever sent to a server. Sits alongside the
+// default free browser voice (above) as a second, opt-in tier. See the
+// admin panel's "Enhanced Free Voice (Beta)"
+// section and docs/CODEX_LOGIC_V07.md Part XXXII for the full write-up.
+//
+// Real, verified facts (checked against the npm registry and the model's
+// own GitHub repo/README before writing this, not guessed):
+//   - Package: kokoro-js, Apache-2.0, currently published at version 1.2.1.
+//     Its package.json declares both an "unpkg" and "jsdelivr" field
+//     pointing at "./dist/kokoro.web.js" — an ESM bundle built specifically
+//     for the browser (rollup.config.js in the hexgrad/kokoro repo builds
+//     three separate targets; kokoro.web.js is the browser one, with
+//     @huggingface/transformers bundled in rather than left external).
+//   - Model: "onnx-community/Kokoro-82M-v1.0-ONNX" on Hugging Face — the
+//     exact model id kokoro-js's own README example uses. The ONNX export
+//     comes in several quantizations; "q8" (8-bit quantized) is roughly
+//     90MB, vs. ~326MB for the unquantized fp32 export. "q8" + device
+//     "wasm" is deliberately used below (not WebGPU/fp32) to keep the
+//     one-time download in a range that's reasonable to ask a free-tier
+//     visitor to opt into.
+//   - Kokoro ships a small FIXED set of 28 named English voices (11 US
+//     female, 9 US male, 4 British female, 4 British male) — no custom
+//     voice cloning, no arbitrary named voices. The full, real list (from
+//     kokoro.js/src/voices.js in the hexgrad/kokoro repo) is what populates
+//     the <select> above.
+//   - generate(text, { voice, speed }) DOES support a numeric speed
+//     multiplier (default 1) — confirmed directly from kokoro.js's own
+//     source (kokoro.js/src/kokoro.js). So the existing "Narration Speed"
+//     slider (readBrowserVoiceRate()) applies to this tier too, unlike a
+//     library that turned out not to support rate control at all.
+//   - generate() is async and returns a Transformers.js RawAudio object
+//     (24kHz PCM) with a .toBlob() method — there is no direct
+//     SpeechSynthesisUtterance equivalent, so playback goes through a real
+//     <audio> element via the same currentAudio/URL.createObjectURL pattern
+//     used elsewhere in this file, so mute/stop and the rest of the app's
+//     playback-state wiring keep working unmodified regardless of which
+//     voice tier is actually speaking.
+//
+// Loaded lazily via a dynamic import() of the pinned CDN URL below — NOT a
+// <script> tag in <head> — specifically so nothing about this tier is
+// fetched, parsed, or downloaded until the admin panel's "Enable & Download
+// Voice" button is actually clicked. Normal page load, and every reading
+// for the ~99% of people who never open this setting, is completely
+// unaffected by this feature's mere existence in the codebase.
+var KOKORO_CDN_URL = 'https://cdn.jsdelivr.net/npm/kokoro-js@1.2.1/dist/kokoro.web.js';
+var KOKORO_MODEL_ID = 'onnx-community/Kokoro-82M-v1.0-ONNX';
+
+var _kokoroTTS = null;          // the loaded KokoroTTS instance, for THIS page session only -- never persisted, never auto-restored on a fresh page load
+var _kokoroLoadPromise = null;  // in-flight load, so an overlapping Test-Voice click while Enable is still downloading shares the same download rather than starting a second one
+var _kokoroInitFailed = false;  // sticky per-session flag: once a load OR a generate() call has failed, stop retrying Kokoro on our own for the rest of this session and just use the default browser voice
+
+// The gate every narration call site checks (via browserSpeak() below).
+// Deliberately requires BOTH the saved admin preference AND a successful
+// load THIS session -- a stale "enabled" flag left over from a previous
+// visit never silently re-triggers a ~90MB download in the middle of a
+// reading. After a page refresh, re-opening Voice Settings and clicking
+// "Enable & Download Voice" again is what actually starts using it again.
+function isKokoroReady() {
+  return !_kokoroInitFailed && localStorage.getItem('enhanced_voice_enabled') === 'true' && !!_kokoroTTS;
+}
+
+function getKokoroVoiceName() {
+  return localStorage.getItem('enhanced_voice_name') || 'af_heart';
+}
+
+// Loads (lazily, once per session, de-duped) the kokoro-js library and the
+// Kokoro-82M ONNX weights. onProgress(pct, label), if given, is called
+// repeatedly: pct is a 0-100 integer once real loaded/total byte counts are
+// available, or null for status-only updates (still worth showing a label
+// for) before byte counts are known. Resolves with the ready KokoroTTS
+// instance; rejects (never hangs, never silently swallows) on any failure
+// so callers can show a real error and fall back to the default voice.
+function loadKokoroVoice(onProgress) {
+  if (_kokoroTTS) return Promise.resolve(_kokoroTTS);
+  if (_kokoroLoadPromise) return _kokoroLoadPromise;
+
+  if (typeof WebAssembly === 'undefined') {
+    return Promise.reject(new Error('This browser does not support WebAssembly, which the enhanced voice requires.'));
+  }
+
+  var promise = (async function() {
+    var mod = await import(KOKORO_CDN_URL);
+    var KokoroTTS = mod.KokoroTTS;
+    if (!KokoroTTS) throw new Error('kokoro-js loaded but did not export KokoroTTS as expected.');
+    var tts = await KokoroTTS.from_pretrained(KOKORO_MODEL_ID, {
+      dtype: 'q8',    // ~90MB quantized weights -- see the size note in the block comment above
+      device: 'wasm', // works in every modern browser; WebGPU is not attempted automatically (see note above on why)
+      progress_callback: function(info) {
+        if (!onProgress || !info) return;
+        // Transformers.js progress events vary by `status` -- only
+        // 'progress' reliably carries loaded/total byte counts to compute
+        // a real percentage from. Other statuses just update the label so
+        // the person sees *something* moving before byte counts exist yet.
+        if (info.status === 'progress' && typeof info.loaded === 'number' && typeof info.total === 'number' && info.total > 0) {
+          onProgress(Math.round((info.loaded / info.total) * 100), info.file || 'model weights');
+        } else if (info.status === 'initiate') {
+          onProgress(null, 'Starting download: ' + (info.file || 'model files') + '…');
+        } else if (info.status === 'done') {
+          onProgress(null, 'Finished: ' + (info.file || 'a file') + '.');
+        } else if (info.status === 'ready') {
+          onProgress(100, 'Ready.');
+        }
+      }
+    });
+    _kokoroTTS = tts;
+    return tts;
+  })();
+
+  _kokoroLoadPromise = promise;
+  promise.catch(function(err) {
+    console.error('[Kokoro] failed to load the enhanced voice:', err);
+    _kokoroInitFailed = true;
+  }).finally(function() {
+    _kokoroLoadPromise = null;
+  });
+
+  return promise;
+}
+
+// Splits text into chunks for Kokoro (400 chars each): Kokoro runs
+// inference on THIS device's own CPU/WASM runtime rather than a fast
+// remote server, so shorter chunks keep the wait before the first sound
+// plays reasonable, and let stopSpeech()/mute actually interrupt between
+// chunks instead of only after an entire multi-paragraph section finishes
+// generating.
+function _kokoroChunkText(fullText) {
+  var sentences = fullText.match(/[^.!?]+[.!?]+/g) || [fullText];
+  var chunks = [];
+  var current = '';
+  for (var i = 0; i < sentences.length; i++) {
+    if ((current + sentences[i]).length > 400 && current.length > 0) {
+      chunks.push(current.trim());
+      current = sentences[i];
+    } else {
+      current += sentences[i];
+    }
+  }
+  if (current.trim()) chunks.push(current.trim());
+  return chunks;
+}
+
+// Generates and plays exactly one chunk through Kokoro, using the same
+// currentAudio + <audio> + URL.createObjectURL contract used elsewhere in
+// this file -- so the rest of the app's mute/stop/progress wiring, which
+// only ever knows about `currentAudio` and `window.speechSynthesis`, keeps
+// working correctly no matter which voice tier is actually speaking.
+async function _kokoroSpeakChunk(text, voiceName, rate) {
+  var rawAudio = await _kokoroTTS.generate(text, { voice: voiceName, speed: rate });
+  var blob = rawAudio.toBlob();
+  var url = URL.createObjectURL(blob);
+  var audio = new Audio(url);
+  currentAudio = audio;
+  try {
+    await _withTimeout(audio.play(), 5000, '[Kokoro] audio.play()');
+  } catch (playErr) {
+    URL.revokeObjectURL(url);
+    throw playErr;
+  }
+  return new Promise(function(resolve, reject) {
+    audio.addEventListener('ended', function() { URL.revokeObjectURL(url); resolve(); });
+    audio.addEventListener('error', function(e) { URL.revokeObjectURL(url); reject(e); });
+  });
+}
+
+// The enhanced-voice narration path — only ever called from browserSpeak()
+// below, and only when isKokoroReady() is true. Generates and plays
+// chunk-by-chunk (honoring stopSpeech()/mute between chunks), and on ANY
+// failure mid-reading falls back to the
+// untouched native browser-voice path (_nativeBrowserSpeak, below) for
+// whatever text hadn't played yet — so a Kokoro error never leaves a
+// reading silent, and never breaks the default tier for anyone else.
+async function kokoroSpeak(text, onEnd) {
+  var voiceName = getKokoroVoiceName();
+  // Kokoro's generate() takes a literal speed multiplier (1 = normal) --
+  // see the block comment above confirming this is real, not assumed --
+  // so the same admin "Narration Speed" slider value used for the native
+  // browser voice applies here too.
+  var rate = readBrowserVoiceRate();
+  var chunks = _kokoroChunkText(text);
+  var finished = false;
+  function finish() { if (finished) return; finished = true; if (onEnd) onEnd(); }
+
+  for (var i = 0; i < chunks.length; i++) {
+    if (_speakCancelled || isMuted) { finish(); return; }
+    try {
+      await _kokoroSpeakChunk(chunks[i], voiceName, rate);
+    } catch (e) {
+      console.error('[Kokoro] generation/playback error mid-reading -- falling back to the default browser voice for the remainder of this narration:', e);
+      _kokoroInitFailed = true;
+      currentAudio = null;
+      _nativeBrowserSpeak(chunks.slice(i).join(' '), finish);
+      return;
+    }
+  }
+  currentAudio = null;
+  finish();
+}
+
 // Browser TTS — this is now the DEFAULT free voice path (per project owner
 // request: "just connect the free Microsoft voice that is in the browser...
 // keep the australian Aria or whatever voice my browser is using now").
-// Azure AI Speech (above) remains available as an optional paid upgrade for
-// anyone who saves an API key in the admin panel; AppSDK's own voice is kept
-// only as a further fallback (see _fallbackSpeakLong) for environments where
-// speechSynthesis itself isn't available at all.
+// AppSDK's own voice is kept only as a further fallback (see
+// _fallbackSpeakLong) for environments where speechSynthesis itself isn't
+// available at all.
+//
+// This is also the single integration point for the Enhanced Free Voice
+// (Beta) tier: when it's enabled AND has successfully loaded this session
+// (isKokoroReady()), Kokoro speaks instead -- otherwise every line below is
+// completely unchanged from before this feature existed.
 function browserSpeak(text, onEnd) {
+  if (isKokoroReady()) { kokoroSpeak(text, onEnd); return; }
+  _nativeBrowserSpeak(text, onEnd);
+}
+
+function _nativeBrowserSpeak(text, onEnd) {
   if (!window.speechSynthesis) { if (onEnd) onEnd(); return; }
   window.speechSynthesis.cancel();
   var utter = new SpeechSynthesisUtterance(text);
@@ -1628,100 +1741,33 @@ function browserSpeak(text, onEnd) {
   }
 }
 
-// Shared Azure chunking helper — splits text into pieces under 1800 chars
-// (conservative vs. ElevenLabs' 2400: SSML wrapper adds overhead and Azure's
-// per-request practical limits are tighter) and speaks them in order via
-// azureSpeak. Returns true if all chunks played successfully, false if a
-// chunk errored (caller decides whether to fall back).
-async function _trySpeakAzureChunks(fullText, apiKey, region, voiceId) {
-  var sentences = fullText.match(/[^.!?]+[.!?]+/g) || [fullText];
-  var chunks = [];
-  var current = '';
-  for (var i = 0; i < sentences.length; i++) {
-    if ((current + sentences[i]).length > 1800 && current.length > 0) {
-      chunks.push(current.trim());
-      current = sentences[i];
-    } else {
-      current += sentences[i];
-    }
-  }
-  if (current.trim()) chunks.push(current.trim());
-
-  var success = true;
-  for (var j = 0; j < chunks.length; j++) {
-    if (_speakCancelled || isMuted) break;
-    try {
-      await azureSpeak(chunks[j], apiKey, region, voiceId);
-    } catch(e) {
-      console.error('[Azure TTS] chunk error:', e);
-      success = false;
-      break;
-    }
-  }
-  currentAudio = null;
-  return success;
-}
-
-// Main speak function — uses Azure AI Speech if key+region are saved, else AppSDK, else browser fallback
+// Main speak function — narrates via the free-voice chain (Kokoro
+// Enhanced Free Voice if enabled and ready, else the native browser voice,
+// with AppSDK as a last-resort fallback — see _fallbackSpeakLong).
 async function speakLongText(fullText, onFinish) {
   fullText = preprocessForSpeech(fullText);
   if (isMuted) { if (onFinish) onFinish(); return; }
   stopSpeech();
   _speakCancelled = false;
 
-  var apiKey = localStorage.getItem('azure_api_key');
-  var region = localStorage.getItem('azure_region');
-  var voiceId = localStorage.getItem('azure_voice_id') || 'en-US-AriaNeural';
-
-  if (apiKey && region) {
-    var azSuccess = await _trySpeakAzureChunks(fullText, apiKey, region, voiceId);
-    if (!_speakCancelled && azSuccess && onFinish) onFinish();
-    else if (!_speakCancelled && !azSuccess) {
-      // Azure failed — fall through to the default browser voice
-      await _fallbackSpeakLong(fullText, onFinish);
-    }
-  } else {
-    // No Azure key/region configured (the common case) — use the free
-    // browser voice by default, preferring an "Aria" voice if present
-    await _fallbackSpeakLong(fullText, onFinish);
-  }
+  await _fallbackSpeakLong(fullText, onFinish);
 }
 
-// Free-intro speak function — uses the distinct "azure_intro_voice_id" Azure
-// voice when explicitly configured in admin settings. If no separate intro
-// voice was picked but Azure credentials ARE saved, it falls back to the same
-// paid-narration voice (azure_voice_id) rather than skipping Azure entirely —
-// most owners will just save a key without bothering to pick a second voice,
-// and hitting browser TTS (or silence) in that case reads as "no voice at all."
-// Only when there are no Azure credentials at all does it fall through to the
-// AppSDK/browser TTS chain.
+// Free-intro speak function — narrates the free reveal-screen text using
+// the same free-voice chain as speakLongText above.
 async function speakIntroText(fullText, onFinish) {
   fullText = preprocessForSpeech(fullText);
   if (isMuted) { if (onFinish) onFinish(); return; }
   stopSpeech();
   _speakCancelled = false;
 
-  var apiKey = localStorage.getItem('azure_api_key');
-  var region = localStorage.getItem('azure_region');
-  var introVoiceId = localStorage.getItem('azure_intro_voice_id') || localStorage.getItem('azure_voice_id') || 'en-US-AriaNeural';
-
-  if (apiKey && region) {
-    var azSuccess = await _trySpeakAzureChunks(fullText, apiKey, region, introVoiceId);
-    if (!_speakCancelled && azSuccess && onFinish) onFinish();
-    else if (!_speakCancelled && !azSuccess) {
-      await _fallbackSpeakLong(fullText, onFinish);
-    }
-  } else {
-    await _fallbackSpeakLong(fullText, onFinish);
-  }
+  await _fallbackSpeakLong(fullText, onFinish);
 }
 
-// Default free-voice chain: Browser speechSynthesis (default) → AppSDK.ai.speak
-// (further fallback for environments without speechSynthesis at all). Browser
-// TTS is promoted to the primary path here per the project owner's request to
-// default to the free voice already built into the browser rather than
-// depending on any paid/hosted voice; Azure (above, in speakLongText) remains
-// the opt-in paid upgrade when an API key is configured.
+// Default free-voice chain: Browser speechSynthesis (default, or the Kokoro
+// Enhanced Free Voice tier when enabled and ready — see browserSpeak) →
+// AppSDK.ai.speak (further fallback for environments without
+// speechSynthesis at all).
 async function _fallbackSpeakLong(fullText, onFinish) {
   if (_speakCancelled || isMuted) { if (onFinish) onFinish(); return; }
 
@@ -1772,20 +1818,8 @@ async function speakText(text) {
   stopSpeech();
   _speakCancelled = false;
 
-  var apiKey = localStorage.getItem('azure_api_key');
-  var region = localStorage.getItem('azure_region');
-  var voiceId = localStorage.getItem('azure_voice_id') || 'en-US-AriaNeural';
-
-  if (apiKey && region) {
-    try {
-      await azureSpeak(text, apiKey, region, voiceId);
-      return;
-    } catch(e) {
-      console.error('[Azure TTS] short speak error:', e);
-    }
-  }
-
-  // No Azure key configured (or it failed) — default to the free browser voice
+  // Default to the free browser voice (or the Kokoro Enhanced Free Voice
+  // tier when enabled and ready — see browserSpeak).
   if (window.speechSynthesis) {
     browserSpeak(text, null);
     return;
@@ -3503,6 +3537,67 @@ var PATH_TABLE = [
 function pathByNumber(n){ return PATH_TABLE.find(function(p){ return p.num===n; }); }
 function pathBetween(sephA,sephB){ return PATH_TABLE.find(function(p){ return (p.a===sephA&&p.b===sephB)||(p.a===sephB&&p.b===sephA); }); }
 
+// W3BB CODEX V07 -- Deepened Trump Card treatment, no invented card meanings.
+// Every phrase used here already exists in the codebase: TAROT_PATHS.archetype
+// (the same comma-separated descriptive phrase already printed on Page 2) and
+// PATH_TABLE's own Golden Dawn keyword for that same path number (already used
+// elsewhere for the Life Path Trump Card / Shadow Card, just not yet surfaced
+// for the person's own Tarot Path card on Page 2). This function only unpacks
+// and recombines that existing data -- it never adds a claim about a specific
+// card that is not already traceable to one of those two sources.
+function lowerFirst(s){ return (s && typeof s === 'string') ? s.charAt(0).toLowerCase() + s.slice(1) : s; }
+function trumpCardArchetypeParts(tarotCard){
+  var parts = ((tarotCard && tarotCard.archetype) || '').split(',').map(function(s){ return s.trim(); }).filter(Boolean);
+  var core = parts[0] || (tarotCard && tarotCard.archetype) || '';
+  var second = parts[1] || core;
+  // Only a genuinely distinct third phrase counts as "third" -- most of the
+  // 22 archetype strings carry three comma-separated phrases, but a couple
+  // (e.g. The Fool's "Pure potential, the breath before the first step")
+  // carry only two. Falling back to `second` there would repeat the same
+  // phrase twice in the deepened prose below, so `hasThird` lets that prose
+  // adapt honestly instead of manufacturing a false third layer.
+  var hasThird = !!parts[2];
+  return { core: core, second: second, third: hasThird ? parts[2] : second, hasThird: hasThird };
+}
+// Reader-facing deepening of the existing Page 2 Trump Card treatment: what
+// this card's own already-established archetype phrase and Golden Dawn
+// keyword actually feel like from the inside, in embodied/suppressed form.
+function buildTrumpCardDepth(tarotCard, sunSign){
+  if (!tarotCard || !tarotCard.card) return '';
+  var parts = trumpCardArchetypeParts(tarotCard);
+  var pe = pathByNumber(tarotCard.path);
+  var kw = pe ? pe.keyword : null;
+  var out = '\nAt its root, ' + tarotCard.card + ' is about ' + lowerFirst(parts.core) + '.' + (kw ? ' The Golden Dawn tradition names this exact path’s own keyword as ' + kw + ' — one more word for the same current already named above.' : '') + ' This energy does not stay abstract or symbolic in your life: it shows up, concretely, as ' + lowerFirst(parts.second) + (parts.hasThird ? ', and at its deepest layer, as ' + lowerFirst(parts.third) : '') + '. That layered structure — root' + (parts.hasThird ? ', expression, depth' : ' and expression') + ' — is what ' + tarotCard.card + ' actually feels like from the inside, not merely a picture on a card.\n';
+  out += '\nWhen you are embodying ' + tarotCard.card + ' fully, ' + lowerFirst(parts.second) + ' is not effort — it becomes the shape your days take by default' + (sunSign && sunSign.element && sunSign.sign ? ', the same way the ' + sunSign.element + ' current in your ' + sunSign.sign + ' Sun does not have to be summoned; it is simply how you already move' : '') + '. When it is suppressed instead, that same current does not vanish; it changes address, turning inward until it surfaces as restlessness, a low static hum of ' + lowerFirst(parts.third) + ' with nowhere honest to go. The difference between the two states is rarely about capacity — you already carry ' + tarotCard.card + '’s full charge either way — it is almost always about permission.\n';
+  return out;
+}
+// W3BB CODEX V07 PART XXX -- New connective sentence between the person's
+// PERMANENT Trump Card (fixed at birth, TAROT_PATHS/PATH_TABLE data already
+// established earlier in the reading) and whichever Nodal Choice orientation
+// they picked for TODAY. Draws only on that same card's own archetype phrase
+// and Golden Dawn keyword (see buildTrumpCardDepth above) plus the orientation
+// framing already established in buildNodalChoiceSection() -- no new claim
+// about any specific card is introduced independently of that existing data.
+// Returns '' when there is no orientation chosen or no Trump Card to name, so
+// callers that already guard on nodalChoice/nodeDecanCards stay unaffected.
+function getTrumpCardNodalConnection(nodalChoice, tarotCard){
+  if (!nodalChoice || !tarotCard || !tarotCard.card) return '';
+  var parts = trumpCardArchetypeParts(tarotCard);
+  var pe = pathByNumber(tarotCard.path);
+  var label = pe && pe.keyword ? (parts.core + ', or what the Golden Dawn tradition simply calls ' + pe.keyword) : parts.core;
+  var lead = 'Your ' + tarotCard.card + ' energy does not change day to day — but today, ';
+  if (nodalChoice === 'north') {
+    return lead + 'having leaned toward your North Node’s growth, here is how that permanent current is finding a specific outlet: the same ' + lowerFirst(label) + ' that ' + tarotCard.card + ' has always carried in you is exactly what makes reaching for something unfamiliar today feel less like risk and more like your own nature simply getting room to move forward.';
+  }
+  if (nodalChoice === 'south') {
+    return lead + 'having chosen to work with your South Node’s familiar strength, here is how that permanent current is finding a specific outlet: the same ' + lowerFirst(label) + ' that ' + tarotCard.card + ' has always carried in you is exactly the steady ground that makes resting in what you already know, today, feel like restoration rather than retreat.';
+  }
+  if (nodalChoice === 'both') {
+    return lead + 'having chosen to hold both poles of the axis at once, here is how that permanent current is finding a specific outlet: the same ' + lowerFirst(label) + ' that ' + tarotCard.card + ' has always carried in you is exactly what lets you move toward the unfamiliar and rest in the familiar in the same day, without either one canceling the other out.';
+  }
+  return '';
+}
+
 // W3BB CODEX SECTION 5.5 — Primary Path / Life Path Trump Card
 // Standard rule: mapped = (base mod 22) + 11, clamped [11,32].
 // Life Path 33 (Codex Logic V05, Sections 7.1-7.2): 33 is explicitly "Beyond
@@ -3929,49 +4024,6 @@ function logPurchase(buyerName, buyerEmail, orderId, tier, priceOverride, isProm
 }
 
 // ===========================
-// AZURE AI SPEECH ADMIN SETTINGS
-// ===========================
-function loadAzureSettings() {
-  var savedKey = localStorage.getItem('azure_api_key');
-  var savedRegion = localStorage.getItem('azure_region') || '';
-  var savedVoice = localStorage.getItem('azure_voice_id') || 'en-US-AriaNeural';
-  var savedIntroVoice = localStorage.getItem('azure_intro_voice_id') || '';
-  var keyInput = document.getElementById('azure-api-key-input');
-  var regionInput = document.getElementById('azure-region-input');
-  var voiceSelect = document.getElementById('azure-voice-select');
-  var introVoiceSelect = document.getElementById('azure-intro-voice-select');
-  if (keyInput && savedKey) keyInput.value = savedKey;
-  if (regionInput) regionInput.value = savedRegion;
-  if (voiceSelect) voiceSelect.value = savedVoice;
-  if (introVoiceSelect) introVoiceSelect.value = savedIntroVoice;
-}
-
-document.getElementById('azure-save-btn').addEventListener('click', function() {
-  var key = document.getElementById('azure-api-key-input').value.trim();
-  var region = document.getElementById('azure-region-input').value.trim();
-  var voice = document.getElementById('azure-voice-select').value;
-  var introVoice = document.getElementById('azure-intro-voice-select').value;
-  var status = document.getElementById('azure-status');
-  if (!key) {
-    status.textContent = '⚠️ Please enter your API key.';
-    status.style.color = '#ff9ed2';
-    return;
-  }
-  if (!region) {
-    status.textContent = '⚠️ Please enter your Azure region (e.g. eastus).';
-    status.style.color = '#ff9ed2';
-    return;
-  }
-  localStorage.setItem('azure_api_key', key);
-  localStorage.setItem('azure_region', region);
-  localStorage.setItem('azure_voice_id', voice);
-  if (introVoice) localStorage.setItem('azure_intro_voice_id', introVoice);
-  else localStorage.removeItem('azure_intro_voice_id');
-  status.textContent = '✅ Key saved successfully! Voice will use the Azure AI Speech upgrade on next reading (instead of the free browser voice).';
-  status.style.color = '#c9a84c';
-});
-
-// ===========================
 // FREE BROWSER VOICE ADMIN SETTINGS
 // ===========================
 // Populates the "Free Browser Voice" <select> from speechSynthesis.getVoices()
@@ -4089,6 +4141,129 @@ document.getElementById('browser-voice-test-btn').addEventListener('click', func
 });
 
 // ===========================
+// ENHANCED FREE VOICE (BETA) ADMIN SETTINGS — Kokoro-82M
+// ===========================
+// Restores the saved voice pick and reflects current enabled/loaded state
+// into the button label + status text whenever the admin panel opens.
+// Never touches _kokoroTTS/isKokoroReady() itself — opening the panel must
+// never trigger a download on its own, only the Enable button does that.
+function loadKokoroVoiceSettings() {
+  var select = document.getElementById('kokoro-voice-select');
+  var savedVoice = localStorage.getItem('enhanced_voice_name');
+  if (select && savedVoice) select.value = savedVoice;
+  updateKokoroEnableButton();
+}
+
+function updateKokoroEnableButton() {
+  var btn = document.getElementById('kokoro-enable-btn');
+  var status = document.getElementById('kokoro-voice-status');
+  if (!btn) return;
+  var enabledFlag = localStorage.getItem('enhanced_voice_enabled') === 'true';
+  if (_kokoroTTS && enabledFlag) {
+    btn.textContent = '✅ Enabled — Click to Disable';
+    if (status) { status.textContent = '✅ Enhanced voice is loaded and active for narration this session.'; status.style.color = '#c9a84c'; }
+  } else if (enabledFlag && !_kokoroTTS) {
+    btn.textContent = '⬇ Enable & Download Voice';
+    if (status) { status.textContent = 'Enabled previously, but not loaded this session yet — click to download and activate it again (a page refresh clears the in-memory model, per the note above).'; status.style.color = '#8a7aaa'; }
+  } else {
+    btn.textContent = '⬇ Enable & Download Voice';
+  }
+}
+
+document.getElementById('kokoro-voice-select').addEventListener('change', function() {
+  localStorage.setItem('enhanced_voice_name', this.value);
+});
+
+document.getElementById('kokoro-enable-btn').addEventListener('click', function() {
+  var status = document.getElementById('kokoro-voice-status');
+  var progressWrap = document.getElementById('kokoro-progress-wrap');
+  var progressBar = document.getElementById('kokoro-progress-bar');
+
+  // Already enabled+loaded -- this click means "disable" (no unload of the
+  // in-memory model needed; isKokoroReady() simply stops returning true).
+  if (isKokoroReady()) {
+    localStorage.setItem('enhanced_voice_enabled', 'false');
+    updateKokoroEnableButton();
+    status.textContent = 'Enhanced voice disabled. Readings will use the default free browser voice above again.';
+    status.style.color = '#8a7aaa';
+    return;
+  }
+
+  var select = document.getElementById('kokoro-voice-select');
+  localStorage.setItem('enhanced_voice_name', select.value);
+
+  if (typeof WebAssembly === 'undefined') {
+    status.textContent = '⚠️ This browser does not support WebAssembly, so the enhanced voice cannot run here. The default free browser voice above is completely unaffected.';
+    status.style.color = '#ff9ed2';
+    return;
+  }
+
+  _kokoroInitFailed = false; // an explicit click means "try again", even if a previous attempt this session failed
+  progressWrap.style.display = 'block';
+  progressBar.style.width = '0%';
+  status.textContent = '⬇️ Downloading enhanced voice model (about 90MB, one time only)…';
+  status.style.color = '#b08aff';
+
+  loadKokoroVoice(function(pct, label) {
+    if (typeof pct === 'number') progressBar.style.width = pct + '%';
+    status.textContent = '⬇️ ' + (typeof pct === 'number' ? pct + '% — ' : '') + (label || 'Downloading…');
+    status.style.color = '#b08aff';
+  }).then(function() {
+    localStorage.setItem('enhanced_voice_enabled', 'true');
+    progressBar.style.width = '100%';
+    status.textContent = '✅ Enhanced voice downloaded and ready! Readings will use it for the rest of this session.';
+    status.style.color = '#c9a84c';
+    updateKokoroEnableButton();
+  }).catch(function(err) {
+    console.error('[Kokoro] enable/download failed:', err);
+    localStorage.setItem('enhanced_voice_enabled', 'false');
+    progressWrap.style.display = 'none';
+    status.textContent = '❌ Could not load the enhanced voice (' + (err && err.message ? err.message : 'unknown error') + '). The default free browser voice above still works normally.';
+    status.style.color = '#ff9ed2';
+    updateKokoroEnableButton();
+  });
+});
+
+document.getElementById('kokoro-test-btn').addEventListener('click', function() {
+  var status = document.getElementById('kokoro-voice-status');
+  var progressWrap = document.getElementById('kokoro-progress-wrap');
+  var progressBar = document.getElementById('kokoro-progress-bar');
+  var select = document.getElementById('kokoro-voice-select');
+  var voiceName = select.value;
+  localStorage.setItem('enhanced_voice_name', voiceName);
+
+  if (typeof WebAssembly === 'undefined') {
+    status.textContent = '⚠️ This browser does not support WebAssembly, so the enhanced voice cannot run here.';
+    status.style.color = '#ff9ed2';
+    return;
+  }
+
+  status.textContent = _kokoroTTS ? '🎙️ Testing voice...' : '⬇️ Downloading enhanced voice model (about 90MB, one time only)…';
+  status.style.color = '#b08aff';
+  if (!_kokoroTTS) progressWrap.style.display = 'block';
+
+  loadKokoroVoice(function(pct, label) {
+    if (_kokoroTTS) return; // already loaded -- no need to keep updating the progress bar
+    if (typeof pct === 'number') progressBar.style.width = pct + '%';
+    status.textContent = '⬇️ ' + (typeof pct === 'number' ? pct + '% — ' : '') + (label || 'Downloading…');
+    status.style.color = '#b08aff';
+  }).then(function(tts) {
+    progressWrap.style.display = 'none';
+    status.textContent = '🎙️ Testing voice...';
+    status.style.color = '#b08aff';
+    return _kokoroSpeakChunk('The oracle is ready. Your blueprint awaits.', voiceName, readBrowserVoiceRate());
+  }).then(function() {
+    status.textContent = '✅ Voice test finished.';
+    status.style.color = '#c9a84c';
+  }).catch(function(err) {
+    console.error('[Kokoro] test voice failed:', err);
+    progressWrap.style.display = 'none';
+    status.textContent = '❌ Voice test failed (' + (err && err.message ? err.message : 'unknown error') + '). The default free browser voice above still works normally.';
+    status.style.color = '#ff9ed2';
+  });
+});
+
+// ===========================
 // FREEASTROAPI ADMIN SETTINGS (ASCENDANT)
 // ===========================
 function loadAstroSettings() {
@@ -4108,57 +4283,6 @@ document.getElementById('astro-save-btn').addEventListener('click', function() {
   localStorage.setItem('astro_api_key', key);
   status.textContent = '✅ Key saved successfully! Ascendant lookups will use FreeAstroAPI on the next reading with a birth time and place.';
   status.style.color = '#c9a84c';
-});
-
-document.getElementById('azure-test-btn').addEventListener('click', async function() {
-  var status = document.getElementById('azure-status');
-  var key = localStorage.getItem('azure_api_key');
-  var region = localStorage.getItem('azure_region');
-  var voice = localStorage.getItem('azure_voice_id') || 'en-US-AriaNeural';
-  if (!key || !region) {
-    status.textContent = '⚠️ Save your API key and region first.';
-    status.style.color = '#ff9ed2';
-    return;
-  }
-  status.textContent = '🎙️ Testing voice...';
-  status.style.color = '#b08aff';
-  try {
-    await azureSpeak('The oracle is ready. Your blueprint awaits.', key, region, voice);
-    status.textContent = '✅ Voice test successful!';
-    status.style.color = '#c9a84c';
-  } catch(e) {
-    console.error('[Azure TTS] test voice error:', e);
-    status.textContent = '❌ Error: ' + (e.message || 'Check your API key/region and try again.');
-    status.style.color = '#ff9ed2';
-  }
-});
-
-document.getElementById('azure-intro-test-btn').addEventListener('click', async function() {
-  var status = document.getElementById('azure-intro-status');
-  var key = localStorage.getItem('azure_api_key');
-  var region = localStorage.getItem('azure_region');
-  var voice = document.getElementById('azure-intro-voice-select').value || localStorage.getItem('azure_intro_voice_id');
-  if (!key || !region) {
-    status.textContent = '⚠️ Save your API key and region first.';
-    status.style.color = '#ff9ed2';
-    return;
-  }
-  if (!voice) {
-    status.textContent = '⚠️ Select a free intro voice first.';
-    status.style.color = '#ff9ed2';
-    return;
-  }
-  status.textContent = '🎙️ Testing intro voice...';
-  status.style.color = '#b08aff';
-  try {
-    await azureSpeak('Your name and your birth date carry a hidden frequency. Let’s see what it reveals.', key, region, voice);
-    status.textContent = '✅ Voice test successful!';
-    status.style.color = '#c9a84c';
-  } catch(e) {
-    console.error('[Azure TTS] test intro voice error:', e);
-    status.textContent = '❌ Error: ' + (e.message || 'Check your API key/region and try again.');
-    status.style.color = '#ff9ed2';
-  }
 });
 
 // ===========================
@@ -4215,10 +4339,10 @@ function showAdminPanel() {
       }).join('');
     }
   }
-  // Load Azure AI Speech settings when admin panel opens
-  loadAzureSettings();
   // Load Free Browser Voice picker options/selection when admin panel opens
   loadBrowserVoiceSettings();
+  // Load Enhanced Free Voice (Beta) picker/enabled-state when admin panel opens
+  loadKokoroVoiceSettings();
   // Load FreeAstroAPI (Ascendant) settings when admin panel opens
   loadAstroSettings();
   panel.style.display = 'block';
@@ -6255,32 +6379,47 @@ function formatPersonalDayWildcard(pdw) {
 // Personal Day Wildcard field (Part XXV). Used both inside
 // getFallbackReading() and in the live DOM note under the Nodal Choice
 // buttons -- one function, not two drifting copies of the same idea.
-function getNodalChoiceReaderSentence(nodalChoice, nodeDecanCards) {
+function getNodalChoiceReaderSentence(nodalChoice, nodeDecanCards, tarotCard) {
   if (!nodalChoice || !nodeDecanCards) return '';
   var north = nodeDecanCards.northNodeCard.card, south = nodeDecanCards.southNodeCard.card;
   var closing = ' This is an expression of the orientation you chose for today, not a prediction of what today will bring.';
+  var sentence = '';
   if (nodalChoice === 'north') {
-    return 'Since you are leaning into your North Node for this reading, read today’s wildcard field through that same growth-and-unfamiliar-possibility lens: let whichever companion card feels least familiar be the one worth trying first, the same way your North Node card, the ' + north + ', keeps inviting you past what is merely comfortable.' + closing;
+    sentence = 'Since you are leaning into your North Node for this reading, read today’s wildcard field through that same growth-and-unfamiliar-possibility lens: let whichever companion card feels least familiar be the one worth trying first, the same way your North Node card, the ' + north + ', keeps inviting you past what is merely comfortable.';
+  } else if (nodalChoice === 'south') {
+    sentence = 'Since you are choosing to work with your South Node for this reading, read today’s wildcard field through a restoration-and-existing-strength lens instead: let whichever companion card feels most familiar be the one you lean on, the same steadying gravity your South Node card, the ' + south + ', already knows how to hold.';
+  } else if (nodalChoice === 'both') {
+    sentence = 'Since you are choosing to hold the axis for this reading, today’s wildcard field becomes a bridge reading: rather than picking between the two poles, look at how your North Node card (the ' + north + ') and South Node card (the ' + south + ') might actually cooperate today — where the ' + north + '’s outward pull could open a door and the ' + south + '’s steadier familiarity could help you walk through it without losing your footing. The wildcard card is the meeting point between them, not a tie-breaker.';
+  } else {
+    return '';
   }
-  if (nodalChoice === 'south') {
-    return 'Since you are choosing to work with your South Node for this reading, read today’s wildcard field through a restoration-and-existing-strength lens instead: let whichever companion card feels most familiar be the one you lean on, the same steadying gravity your South Node card, the ' + south + ', already knows how to hold.' + closing;
-  }
-  if (nodalChoice === 'both') {
-    return 'Since you are choosing to hold the axis for this reading, today’s wildcard field becomes a bridge reading: rather than picking between the two poles, look at how your North Node card (the ' + north + ') and South Node card (the ' + south + ') might actually cooperate today — where the ' + north + '’s outward pull could open a door and the ' + south + '’s steadier familiarity could help you walk through it without losing your footing. The wildcard card is the meeting point between them, not a tie-breaker.' + closing;
-  }
-  return '';
+  // W3BB CODEX V07 -- Part XXX extension: connect the person's PERMANENT
+  // Trump Card (fixed at birth) to whichever Node orientation they chose for
+  // today. Additive to the existing sentence above, never a replacement --
+  // see getTrumpCardNodalConnection()'s comment for the derivation rule.
+  var trumpConnection = getTrumpCardNodalConnection(nodalChoice, tarotCard);
+  return (trumpConnection ? (sentence + ' ' + trumpConnection) : sentence) + closing;
 }
 
 // AI-prompt instruction phrasing of the same idea, for doReading()'s Page 7
 // spec -- an instruction TO Celestia, not reader-facing text itself.
-function getNodalChoicePromptInstruction(nodalChoice, nodeDecanCards, firstName) {
+function getNodalChoicePromptInstruction(nodalChoice, nodeDecanCards, firstName, tarotCard) {
   if (!nodalChoice || !nodeDecanCards) return '';
   var north = nodeDecanCards.northNodeCard.card, south = nodeDecanCards.southNodeCard.card;
   var noPredict = ' Frame this as an expression of the orientation ' + firstName + ' chose for today, not as a prediction of what today will bring.';
-  if (nodalChoice === 'north') return ' ' + firstName + ' has chosen to lean toward their North Node for this reading, so frame today’s wildcard field through a growth-and-unfamiliar-possibility lens, explicitly connecting it back to their North Node card, the ' + north + '.' + noPredict;
-  if (nodalChoice === 'south') return ' ' + firstName + ' has chosen to work with their South Node for this reading, so frame today’s wildcard field through a restoration-and-existing-strength lens, explicitly connecting it back to their South Node card, the ' + south + '.' + noPredict;
-  if (nodalChoice === 'both') return ' ' + firstName + ' has chosen to hold the axis for this reading, so write today’s wildcard field as a bridge reading: examine how their North Node card (' + north + ') and South Node card (' + south + ') might cooperate today rather than compete, naming both by name, and let the wildcard card be the meeting point between them rather than a choice between two options.' + noPredict;
-  return '';
+  var instr = '';
+  if (nodalChoice === 'north') instr = ' ' + firstName + ' has chosen to lean toward their North Node for this reading, so frame today’s wildcard field through a growth-and-unfamiliar-possibility lens, explicitly connecting it back to their North Node card, the ' + north + '.';
+  else if (nodalChoice === 'south') instr = ' ' + firstName + ' has chosen to work with their South Node for this reading, so frame today’s wildcard field through a restoration-and-existing-strength lens, explicitly connecting it back to their South Node card, the ' + south + '.';
+  else if (nodalChoice === 'both') instr = ' ' + firstName + ' has chosen to hold the axis for this reading, so write today’s wildcard field as a bridge reading: examine how their North Node card (' + north + ') and South Node card (' + south + ') might cooperate today rather than compete, naming both by name, and let the wildcard card be the meeting point between them rather than a choice between two options.';
+  else return '';
+  // W3BB CODEX V07 -- Part XXX extension: ask the AI for the same permanent-
+  // Trump-Card-to-chosen-orientation synthesis the fallback reading builds
+  // deterministically via getTrumpCardNodalConnection() -- same idea, phrased
+  // as an instruction to Celestia rather than pre-written reader-facing text.
+  if (tarotCard && tarotCard.card) {
+    instr += ' Also add one more connecting sentence naming that ' + firstName + '’s permanent Trump Card, the ' + tarotCard.card + ' (' + tarotCard.archetype + '), does not change day to day, but explain concretely how that fixed archetype’s own established energy is finding a specific outlet today through this chosen Node orientation — a real synthesis of the fixed card meeting the day’s chosen direction, naming an actual connection between the card’s own keyword/energy and the orientation’s own framing, not two facts stapled together.';
+  }
+  return instr + noPredict;
 }
 
 // Builds the interactive Nodal Choice section's HTML (solo reading only).
@@ -6301,7 +6440,7 @@ function buildNodalChoiceSection(p) {
     return 'flex:1;min-width:150px;padding:0.9rem 0.8rem;border-radius:8px;cursor:pointer;font:600 0.85rem Georgia,serif;text-align:center;transition:all 0.2s;'
       + (isActive ? 'background:#c9a84c;color:#1a0a30;border:1px solid #c9a84c;' : 'background:rgba(176,138,255,0.12);color:#e8e0ff;border:1px solid rgba(176,138,255,0.3);');
   }
-  var liveNote = active ? getNodalChoiceReaderSentence(active, p.nodeDecanCards)
+  var liveNote = active ? getNodalChoiceReaderSentence(active, p.nodeDecanCards, p.tarotCard)
     : 'Choose an orientation above, and see below how it shapes today’s Personal Day possibilities.';
   return ''
     + '<div id="nodal-choice-section" style="margin:2rem 0 2.5rem;padding:1.5rem 1.25rem;border:1px solid rgba(176,138,255,0.25);border-radius:14px;background:rgba(18,8,38,0.4);">'
@@ -6356,7 +6495,7 @@ function setNodalChoice(choice) {
   });
   var noteEl = document.getElementById('nodal-choice-live-note');
   if (noteEl && window._readingProfile && window._readingProfile.nodeDecanCards) {
-    noteEl.textContent = getNodalChoiceReaderSentence(choice, window._readingProfile.nodeDecanCards);
+    noteEl.textContent = getNodalChoiceReaderSentence(choice, window._readingProfile.nodeDecanCards, window._readingProfile.tarotCard);
   }
 }
 
@@ -7979,7 +8118,8 @@ function getFallbackReading(){
   fb+='In the ancient language of the Tarot, you walk the path of '+tc.card+'. This is Path '+tc.path+' on the Tree of Life, encoded through the Hebrew letter '+tc.letter+' \u2014 '+tc.archetype+'.'+(p.lifePathTrumpCard ? ' Your Life Path Trump Card confirms it: '+p.lifePathTrumpCard.numeral+' '+p.lifePathTrumpCard.card+' \u2014 '+p.lifePathTrumpCard.keyword+'.' : '')+'\n\nThe '+tc.card+' does not describe what you do. It describes what you ARE in the world \u2014 the mythic role your soul agreed to play before incarnation. And it is no coincidence that your '+p.sunSign.sign+' Sun and this Tarot archetype vibrate in the same frequency. They confirm each other.\n\nThis path between Sephiroth is not merely symbolic. It is the precise corridor of consciousness your soul travels. The Hebrew letter '+tc.letter+' carries a specific vibrational teaching, and that teaching is written in your very name.\n'
     +(p.primaryPath && p.primaryPath.viaKetherBridge ? '\nBecause your Life Path carries the Master Number 11, your Trump Card path does not follow the standard formula \u2014 it connects directly to Kether, the crown Sephirah, via what the Codex calls the Kether Bridge. This is a rare, direct wiring reserved for the most intuitively-charged Master Number, and it means your hidden architecture skips a rung most charts have to climb one Sephirah at a time.\n' : '')
     +(p.primaryPath && p.primaryPath.masterCoActive ? '\nBecause your Life Path carries the Master Number 33, it does not resolve to a single Trump Card but two, co-active at once \u2014 '+(p.trumpPaths&&p.trumpPaths[0]?p.trumpPaths[0].card:'The World')+' and '+(p.trumpPaths&&p.trumpPaths[1]?p.trumpPaths[1].card:'The Lovers')+', running as one braided current rather than a sequence you move through. Very few charts carry this double signal; read both cards as one teaching in stereo, not two options competing for your attention.\n' : '')
-    +'\nOn Metatron\'s Cube, your elemental current \u2014 '+p.sunSign.element+' \u2014 translates into the suit of '+(p.elementSuit||'this element\'s suit')+', the same suit your Soul Card and Court Card are drawn from later in this reading. Card and suit are not two separate systems bolted together: the suit is simply the element speaking in the language of the Minor Arcana, the same '+p.sunSign.element+' current that shapes your Sun sign showing up again in a different room of the same house.\n\nWhen you are embodying '+tc.card+' fully, it tends to look like decisive follow-through on the very impulse most people talk themselves out of \u2014 you say the thing, you make the move, you close the loop others leave open. When it is suppressed, that same energy does not vanish; it turns inward and shows up as restlessness, a nagging sense of watching your own life from just outside it. The difference is rarely about capacity. It is almost always about permission.\n';
+    +'\nOn Metatron\'s Cube, your elemental current \u2014 '+p.sunSign.element+' \u2014 translates into the suit of '+(p.elementSuit||'this element\'s suit')+', the same suit your Soul Card and Court Card are drawn from later in this reading. Card and suit are not two separate systems bolted together: the suit is simply the element speaking in the language of the Minor Arcana, the same '+p.sunSign.element+' current that shapes your Sun sign showing up again in a different room of the same house.\n'
+    + buildTrumpCardDepth(tc, p.sunSign);
   // W3BB EVOLUTIONARY GEOMETRY (Codex Logic V07 Part XXX) -- an explicitly
   // original W3BB Codex layer, NOT Golden Dawn, NOT Kabbalah, NOT inherited
   // tradition. Purely additive: it never touches the real Trump Card content
@@ -8025,7 +8165,7 @@ function getFallbackReading(){
     // choice into how today's wildcard field is framed. Purely additive --
     // when no choice was made (window._nodalChoice is null), this adds
     // nothing and the paragraph above renders exactly as it always has.
-    var nodalSentence = getNodalChoiceReaderSentence(window._nodalChoice, p.nodeDecanCards);
+    var nodalSentence = getNodalChoiceReaderSentence(window._nodalChoice, p.nodeDecanCards, tc);
     if (nodalSentence) { fb += '\n' + nodalSentence + '\n'; }
   }
   fb+='===PAGE_7_END===\n\n';
@@ -8136,6 +8276,13 @@ async function doReading() {
   var trump = p.lifePathTrumpCard || tc;
   var trumpCardName = trump.card || tc.card;
   var trumpKeyword = trump.keyword || tc.archetype;
+  // W3BB CODEX V07 -- the Tarot Path card's OWN Golden Dawn keyword, from the
+  // same PATH_TABLE entry (matched by path number) already used elsewhere for
+  // the Life Path Trump Card / Shadow Card. Not previously surfaced for tc
+  // itself; passed into the prompt so the AI can deepen Page 2 using only
+  // data already established in this reading, not new invented content.
+  var tarotPathEntry = pathByNumber(tc.path);
+  var tarotPathKeyword = tarotPathEntry ? tarotPathEntry.keyword : null;
   var chaldeanLine = p.chaldean ? ('Chaldean Name Number (as called, "' + p.usedName + '"): compound ' + p.chaldean.compound + (p.chaldean.archetype ? ' ("' + p.chaldean.archetype + '")' : '') + ', reduces to ' + p.chaldean.reduced + '. ' + (p.harmonic ? p.harmonic.flag + ' \u2014 ' + p.harmonic.detail : '') + '\n') : '';
   var gematriaBatteryLine = p.gematriaBattery ? ('Gematria Battery (used name): Standard ' + p.gematriaBattery.sg + ', Ordinal ' + p.gematriaBattery.og + ', Reduced ' + p.gematriaBattery.rg + '\n') : '';
   var nameHiddenMastersLine = (p.nameHiddenMasters && p.nameHiddenMasters.length) ? ('Name-Field Hidden Masters (independent of Life Path): ' + formatNameHiddenMasters(p.nameHiddenMasters) + '\n') : '';
@@ -8146,7 +8293,7 @@ async function doReading() {
   // Page 7 spec (same conditional wiring as getFallbackReading() above,
   // via the shared window._nodalChoice global). Empty string, and thus no
   // change to the prompt, when no choice was made.
-  var nodalChoiceInstruction = getNodalChoicePromptInstruction(window._nodalChoice, p.nodeDecanCards, p.firstName);
+  var nodalChoiceInstruction = getNodalChoicePromptInstruction(window._nodalChoice, p.nodeDecanCards, p.firstName, tc);
   var personalDayWildcardLine = pdwFmtPrompt ? ('Personal Day Wildcard (narrative-only, an INVITATION not an assignment, distinct from the birth-locked Life Path Trump Card above): today\'s Personal Day ' + p.personalDay + ' pools toward ' + pdwFmtPrompt.majorPhrase + '. ' + pdwFmtPrompt.poolSentences + '\n') : '';
   var ascendantLine = (p.ascendant && p.ascendant.sign) ? ('Ascendant (Rising Sign): ' + p.ascendant.sign + (p.ascendant.degree != null ? ' at ' + p.ascendant.degree + '\u00b0' : '') + '\n') : '';
   var nodeLine = (p.node && p.node.northSign) ? ('Lunar Nodes (lifelong axis): North Node in ' + p.node.northSign + ' (outward-growth direction), South Node in ' + p.node.southSign + ' (karmic comfort zone)' + (p.node.activePole ? ('. Currently active: ' + p.firstName + ' is presently moving through a real activation of the ' + (p.node.activePole === 'north' ? 'North' : 'South') + ' Node \u2014 a season worth naming, not an everyday state.') : '') + '\n') : '';
@@ -8178,7 +8325,7 @@ async function doReading() {
     + nodeLine
     + nodeDecanCardsLine
     + 'Sephirah: ' + p.tree.name + ' \u2014 ' + p.tree.meaning + '\n'
-    + 'Tarot Path ' + tc.path + ': ' + tc.card + ' (' + tc.letter + ') \u2014 ' + tc.archetype + '\n'
+    + 'Tarot Path ' + tc.path + ': ' + tc.card + ' (' + tc.letter + ') \u2014 ' + tc.archetype + (tarotPathKeyword ? ', Golden Dawn keyword ' + tarotPathKeyword : '') + '\n'
     + (p.lifePathTrumpCard ? ('Life Path Trump Card (Major Arcana, Path ' + p.lifePathTrumpCard.num + '): ' + p.lifePathTrumpCard.numeral + ' ' + p.lifePathTrumpCard.card + ', keyword ' + p.lifePathTrumpCard.keyword + '\n') : '')
     + (p.primaryPath && p.primaryPath.viaKetherBridge ? 'Kether Bridge: this Trump Card path connects directly to Kether via the rare Master 11 wiring\n' : '')
     + (p.primaryPath && p.primaryPath.masterCoActive ? 'Dual Trump Card (Master 33): ' + (p.trumpPaths && p.trumpPaths[0] ? p.trumpPaths[0].card : '') + ' and ' + (p.trumpPaths && p.trumpPaths[1] ? p.trumpPaths[1].card : '') + ', co-active as one braided current\n' : '')
@@ -8194,8 +8341,8 @@ async function doReading() {
     + 'Personal Year 2026: ' + p.personalYear2026 + (p.personalMonth != null ? ('  Personal Month (current): ' + p.personalMonth) : '') + (p.personalDay != null ? ('  Personal Day (today): ' + p.personalDay) : '') + '\n'
     + personalDayWildcardLine
     + '\nWrite exactly 9 sections with ===PAGE_N_START=== and ===PAGE_N_END=== delimiters on their own lines (each delimiter on its own line, no other text on that line). Each section: 7\u20139 rich, deeply personal paragraphs (not 5\u20136 \u2014 these pages need to visually fill a full printed page, so write substantially more per page than feels like the minimum). Each paragraph should be 4\u20136 full sentences, not 2\u20133 \u2014 a thin, single-idea paragraph is not acceptable. Every paragraph must reference ' + p.firstName + ' by name at least once and cite the specific numbers or symbols from their profile, and should work in as many of the person\'s actual named numbers, cards, Sephiroth, and archetypes as genuinely fit \u2014 not just one per paragraph. When a paragraph starts to feel thin or abstract, do not move on to the next idea yet: stay with the same point and add a concrete second layer \u2014 what this finding actually looks like in ' + p.firstName + '\'s daily choices, relationships, or work, a specific example of the pattern playing out, or a second data point from the profile that deepens (not repeats) the first. No generic affirmations, no padding with synonyms of a sentence already written \u2014 every added sentence must carry new, specific content. Celestia speaks with warm authority, poetic depth, and precision.\n\n'
-    + 'Page 1 \u2014 IDENTITY ESSENCE: Open with the exact phrase "' + p.firstName + ', you are ' + ca + '." Then paint a full-portrait synthesis: how Life Path ' + p.lifePath + ' (' + lpTitle + ') shapes the core drive, how ' + p.sunSign.sign + ' Sun infuses it with elemental character (' + p.sunSign.element + ', ruled by ' + p.sunSign.planet + ')' + (p.ascendant && p.ascendant.sign ? ', how their ' + p.ascendant.sign + ' Ascendant colors the lens the world first meets them through' : '') + ', and how ' + p.tree.name + ' on the Tree of Life places this soul at a specific energetic address in creation. Explain what the Codex Archetype ' + ca + ' means as a living identity \u2014 not a label but a mandate.' + (p.node && p.node.northSign ? (' If it fits naturally, name their North Node in ' + p.node.northSign + ' as the lifelong outward direction the soul is growing toward and their South Node in ' + p.node.southSign + ' as the inward comfort zone they are moving away from \u2014 this is a lifelong developmental axis, not a daily forecast, so treat it as one more coordinate on the same portrait rather than a separate topic.' + (p.node.activePole ? (' Note also that ' + p.firstName + ' is moving through a real, present-tense activation of their ' + (p.node.activePole === 'north' ? 'North' : 'South') + ' Node right now \u2014 a season worth naming explicitly, since it is not the everyday state of this axis.') : '')) : '') + (p.nodeDecanCards ? (' In the language of the decans, that same Node axis also names one Minor Arcana card apiece: the ' + p.nodeDecanCards.northNodeCard.card + ' for the North Node \u2014 name this as the energy ' + p.firstName + ' is growing TOWARD \u2014 and the ' + p.nodeDecanCards.southNodeCard.card + ' for the South Node \u2014 name this as the shadow/comfort-zone energy ' + p.firstName + ' is moving AWAY from. Frame this as a growth trajectory, not a moral judgment: the South Node card is not "bad," it is simply the familiar gravity the North Node card is inviting ' + p.firstName + ' beyond. Make clear the placement itself is fixed \u2014 only how ' + p.firstName + ' works with it, moment by moment, is a matter of choice. Do not explain decans, degrees, or planetary rulerships to the reader \u2014 simply name the cards and their meaning.') : '') + (quizArchetypeMatched ? (' Also work in, naturally and once, that before this reading was even generated, ' + p.firstName + ' took the fun, personality-based Archetype Quiz in this same browser and it guessed ' + ca + ' \u2014 the same Archetype this real chart just landed on independently; frame this as one more instance of convergence across systems, the way this reading already treats the Life Path/Sun Sign/Sephirah agreement, and be clear the quiz itself is not a calculated system, just an honest personality-based guess that happened to land in the same place as the real math.') : '') + ' End by naming the specific gift this soul arrived with, and name it as a thread the reading will keep picking back up \u2014 the same gift the reader will recognize again in the Tarot archetype, the shadow work, and the closing blessing.\n'
-    + 'Page 2 \u2014 ARCHETYPAL SIGNATURE: Explore the full mythic narrative. ' + tc.card + ' (Path ' + tc.path + ', letter ' + tc.letter + ') is the archetype ' + p.firstName + ' is living' + (p.lifePathTrumpCard ? ', confirmed by the Life Path Trump Card ' + p.lifePathTrumpCard.numeral + ' ' + p.lifePathTrumpCard.card : '') + '. Explain what this card means as a life-force not just a symbol, how the ' + p.sunSign.sign + ' Sun amplifies or challenges this path, and how the Kabbalistic letter ' + tc.letter + ' encodes a specific teaching in their very name. Name the mythic figures, gods, or archetypes associated with this path. Explicitly tie this Tarot archetype back to the Life Path ' + p.lifePath + ' and Codex Archetype ' + ca + ' named on Page 1 — show that the Tarot card is not a second, unrelated topic but the same mandate speaking in a different language, and say so directly. Describe what it feels like to embody ' + tc.card + ' fully vs. when it is suppressed.' + (w3bbGeo ? (' Close this page with one clearly-labeled additional paragraph naming the W3BB Evolutionary Geometry: state plainly, in your own words, that this next piece is W3BB\'s own original addition laid on top of the Tarot tradition just described \u2014 never Golden Dawn, never ancient Kabbalah, never inherited tradition \u2014 then name ' + w3bbGeoCardName + '\'s ' + w3bbGeo.quadrant + ' quadrant and its "' + w3bbGeo.geometry + '" geometry, translated into warm, meaning-first language (' + w3bbGeo.meaning + ') rather than explained mechanically. Do not let this paragraph alter, contradict, or overshadow the real Trump Card content already established earlier on this page.') : '') + '\n'
+    + 'Page 1 \u2014 IDENTITY ESSENCE: Open with the exact phrase "' + p.firstName + ', you are ' + ca + '." Then paint a full-portrait synthesis: how Life Path ' + p.lifePath + ' (' + lpTitle + ') shapes the core drive, how ' + p.sunSign.sign + ' Sun infuses it with elemental character (' + p.sunSign.element + ', ruled by ' + p.sunSign.planet + ')' + (p.ascendant && p.ascendant.sign ? ', how their ' + p.ascendant.sign + ' Ascendant colors the lens the world first meets them through' : '') + ', and how ' + p.tree.name + ' on the Tree of Life places this soul at a specific energetic address in creation. Explain what the Codex Archetype ' + ca + ' means as a living identity \u2014 not a label but a mandate.' + (p.node && p.node.northSign ? (' If it fits naturally, name their North Node in ' + p.node.northSign + ' as the lifelong outward direction the soul is growing toward and their South Node in ' + p.node.southSign + ' as the inward comfort zone they are moving away from \u2014 this is a lifelong developmental axis, not a daily forecast, so treat it as one more coordinate on the same portrait rather than a separate topic.' + (p.node.activePole ? (' Note also that ' + p.firstName + ' is moving through a real, present-tense activation of their ' + (p.node.activePole === 'north' ? 'North' : 'South') + ' Node right now \u2014 a season worth naming explicitly, since it is not the everyday state of this axis.') : '')) : '') + (p.nodeDecanCards ? (' In the language of the decans, that same Node axis also names one Minor Arcana card apiece: the ' + p.nodeDecanCards.northNodeCard.card + ' for the North Node \u2014 name this as the energy ' + p.firstName + ' is growing TOWARD \u2014 and the ' + p.nodeDecanCards.southNodeCard.card + ' for the South Node \u2014 name this as the shadow/comfort-zone energy ' + p.firstName + ' is moving AWAY from. Frame this as a growth trajectory, not a moral judgment: the South Node card is not "bad," it is simply the familiar gravity the North Node card is inviting ' + p.firstName + ' beyond. Make clear the placement itself is fixed \u2014 only how ' + p.firstName + ' works with it, moment by moment, is a matter of choice. Do not explain decans, degrees, or planetary rulerships to the reader \u2014 simply name the cards and their meaning.') : '') + (quizArchetypeMatched ? (' Also work in, naturally and once, that before this reading was even generated, ' + p.firstName + ' took the fun, personality-based Archetype Quiz in this same browser and it guessed ' + ca + ' \u2014 the same Archetype this real chart just landed on independently; frame this as one more instance of convergence across systems, the way this reading already treats the Life Path/Sun Sign/Sephirah agreement, and be clear the quiz itself is not a calculated system, just an honest personality-based guess that happened to land in the same place as the real math.') : '') + (p.axisRole && AXIS_ROLES[p.axisRole] ? (' Also name their role on the Tree\'s own architecture: ' + p.firstName + ' carries ' + AXIS_ROLES[p.axisRole].pillar + ' \u2014 ' + AXIS_ROLES[p.axisRole].title + '. ' + AXIS_ROLES[p.axisRole].description + ' Present this as the shape ' + p.firstName + ' brings into any structure or relationship, not a solitary trait.') : '') + ' End by naming the specific gift this soul arrived with, and name it as a thread the reading will keep picking back up \u2014 the same gift the reader will recognize again in the Tarot archetype, the shadow work, and the closing blessing.\n'
+    + 'Page 2 \u2014 ARCHETYPAL SIGNATURE: Explore the full mythic narrative. ' + tc.card + ' (Path ' + tc.path + ', letter ' + tc.letter + ') is the archetype ' + p.firstName + ' is living' + (p.lifePathTrumpCard ? ', confirmed by the Life Path Trump Card ' + p.lifePathTrumpCard.numeral + ' ' + p.lifePathTrumpCard.card : '') + '. Explain what this card means as a life-force not just a symbol, how the ' + p.sunSign.sign + ' Sun amplifies or challenges this path, and how the Kabbalistic letter ' + tc.letter + ' encodes a specific teaching in their very name. Name the mythic figures, gods, or archetypes associated with this path. Explicitly tie this Tarot archetype back to the Life Path ' + p.lifePath + ' and Codex Archetype ' + ca + ' named on Page 1 — show that the Tarot card is not a second, unrelated topic but the same mandate speaking in a different language, and say so directly. Describe what it feels like to embody ' + tc.card + ' fully vs. when it is suppressed — and make this the deepest, most fully-realized paragraph on the page: explicitly unpack the card\'s own archetype phrase already given above (“' + tc.archetype + '”)' + (tarotPathKeyword ? ' together with its Golden Dawn keyword (' + tarotPathKeyword + ')' : '') + ' into what this energy genuinely feels like from the inside — its root feeling, its concrete outward expression in daily choices and relationships, and what it feels like when that same energy is suppressed instead of lived — using only these existing keyword/archetype sources rather than introducing a new, independent claim about the card.' + (p.primaryPath && p.primaryPath.viaKetherBridge ? ' Because ' + p.firstName + '\'s Life Path carries the Master Number 11, name the Kether Bridge explicitly: the Trump Card path does not follow the standard formula, it connects directly to Kether, the crown Sephirah, a rare direct wiring reserved for the most intuitively-charged Master Number.' : '') + (p.primaryPath && p.primaryPath.masterCoActive ? ' Because ' + p.firstName + '\'s Life Path carries the Master Number 33, name that it does not resolve to a single Trump Card but two, co-active at once (' + (p.trumpPaths && p.trumpPaths[0] ? p.trumpPaths[0].card : 'The World') + ' and ' + (p.trumpPaths && p.trumpPaths[1] ? p.trumpPaths[1].card : 'The Lovers') + '), running as one braided current rather than a sequence to move through \u2014 read both cards as one teaching in stereo.' : '') + ' Also name that on Metatron\'s Cube, ' + p.firstName + '\'s elemental current (' + p.sunSign.element + ') translates into the suit of ' + (p.elementSuit || 'this element\'s suit') + ', the same suit their Soul Card and Court Card are drawn from later in this reading \u2014 the suit is simply the element speaking in the language of the Minor Arcana, not a second, unrelated system.' + (w3bbGeo ? (' Close this page with one clearly-labeled additional paragraph naming the W3BB Evolutionary Geometry: state plainly, in your own words, that this next piece is W3BB\'s own original addition laid on top of the Tarot tradition just described \u2014 never Golden Dawn, never ancient Kabbalah, never inherited tradition \u2014 then name ' + w3bbGeoCardName + '\'s ' + w3bbGeo.quadrant + ' quadrant and its "' + w3bbGeo.geometry + '" geometry, translated into warm, meaning-first language (' + w3bbGeo.meaning + ') rather than explained mechanically. Do not let this paragraph alter, contradict, or overshadow the real Trump Card content already established earlier on this page.') : '') + '\n'
     + 'Page 3 \u2014 FREQUENCY PATTERN: Decode the name. Life Path ' + p.lifePath + ' is the birth frequency. Expression ' + (p.expression||'?') + ' is the gift encoded in every letter of "' + p.firstName + '". Soul Urge ' + (p.soulUrge||'?') + ' is the private longing beneath the surface. Gematria total ' + (p.gematria?p.gematria.total:'?') + ' reducing to ' + (p.gematria?p.gematria.reduced:'?') + ' is the name\'s sacred numerical signature.' + (p.chaldean ? ' The Chaldean compound of the name ' + p.firstName + ' is actually called by resolves to ' + p.chaldean.compound + ' (' + p.chaldean.reduced + '), a living-identity number layered atop the birth frequency.' : '') + ' Explicitly connect the Gematria total ' + (p.gematria?p.gematria.total:'?') + ' back to the Life Path ' + p.lifePath + ' established on Page 1 \u2014 name both numbers together and say plainly why a name-frequency and a birth-frequency landing on the same core tone is not coincidence but confirmation, two instruments playing the same note. Explain what happens when ' + p.firstName + ' aligns with vs. resists this frequency.\n'
     + 'Page 4 \u2014 THE FIELD GEOMETRY: ' + p.firstName + '\'s identity is a living Egg of Life \u2014 eight interlocking circles of force. Map which nodes are most activated: ' + p.tree.name + ' (Kabbalah), ' + tc.card + ' (Tarot), ' + p.sunSign.sign + ' (Astrology), Life Path ' + p.lifePath + ' (Numerology), gematria ' + (p.gematria?p.gematria.reduced:'?') + ' (Gematria), and Sacred Geometry as the container. Explain what it means that these systems converge on a single being — specifically call out at least one node where two systems from earlier pages (e.g. the Life Path from Page 1 and the Gematria reduction from Page 3, or the Tarot path from Page 2 and the Sephirah) sit on the same point of the geometry, not adjacent-but-separate points. Describe the energetic field this soul radiates and how others experience it. Name the specific intersection points where power concentrates.\n'
     + 'Page 5 \u2014 SHADOW & GIFT: Be specific and unflinching. The shadow of ' + tc.card + ' for someone with ' + p.sunSign.sign + ' energy is specific \u2014 name it precisely. Describe the exact pattern that repeats when this shadow is unconscious. Then name the exact gift that emerges when it is integrated. Include what the ' + p.tree.name + ' position on the Tree reveals about the specific initiation ' + p.firstName + ' is moving through. This section should feel like someone finally named something the reader has always felt but never had words for.' + (p.shadowCardPath ? (' Metatron\'s Cube names this shadow even more precisely: the path running from ' + p.firstName + '\'s Soul Sephirah, ' + p.tree.name + ', toward Malkuth is the ' + p.shadowCardPath.card + ' (' + p.shadowCardPath.numeral + ', "' + p.shadowCardPath.keyword + '") \u2014 name this specific card as the exact corridor ' + p.firstName + '\'s unintegrated material travels when avoided rather than faced head-on, not a generic "shadow" in the abstract.') : '') + '\n'
@@ -8763,7 +8910,12 @@ function showGroupSuccessScreen(buyerEmail, orderId, tier, profiles, priceOverri
 document.getElementById('close-success-overlay').addEventListener('click', function() {
   document.getElementById('payment-success').classList.remove('show');
   if (selectedTier && selectedTier.slug && selectedTier.slug.indexOf('group') === 0) {
-    showScreen('hook');
+    // Fixed a real dead-end here: this used to call showScreen('hook'),
+    // sending a Group Reading purchaser back to the landing page with no
+    // visible reading and no way back to the Download PDF button (which
+    // lives inside the overlay this handler just closed). See
+    // unlockFullGroupReading()'s own comment for the full story.
+    unlockFullGroupReading();
   } else {
     unlockFullReading();
   }
@@ -8972,6 +9124,98 @@ function unlockFullReading() {
   if (offerSubtext) offerSubtext.style.display = 'none';
 
   window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+// Group Reading equivalent of unlockFullReading() above -- renders the
+// generated group content (getGroupFallback()/doGroupReading()'s shared
+// { intro, overviewText, people, pairingsText, blessing } shape) in place
+// on screen-group, the same screen the group intake form lives on.
+//
+// This exists to fix a real navigation dead-end: the "View My Full
+// Reading" button on the payment-success overlay used to call
+// showScreen('hook') for a Group Reading purchase, since no in-app group
+// reading view existed yet -- that sent a person back to the landing page
+// with no visible reading and no way back to the Download PDF button
+// (which lives INSIDE that same overlay, so closing it hid that button
+// too). This function gives that button something real to show instead.
+function unlockFullGroupReading() {
+  var profiles = window._groupProfiles;
+  if (!profiles || !profiles.length) { showScreen('hook'); return; }
+
+  showScreen('group');
+
+  // Hide the intake form fields -- the group is already purchased at this
+  // point, there is nothing left to fill in or submit.
+  ['group-people-list', 'group-add-person-btn', 'group-price-display',
+   'group-contact-email', 'group-status', 'group-continue-btn', 'group-back-btn'
+  ].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) {
+      // group-contact-email's own label sits in a wrapper div right above
+      // it in the markup -- hide that wrapper, not just the input itself,
+      // so an empty "DELIVERY EMAIL" label doesn't linger.
+      var target = (id === 'group-contact-email' && el.parentElement) ? el.parentElement : el;
+      target.style.display = 'none';
+    }
+  });
+
+  var heading = document.querySelector('#screen-group h2');
+  if (heading) heading.textContent = 'Your Group Reading';
+  var subtext = document.querySelector('#screen-group p');
+  if (subtext) subtext.textContent = 'Every person’s own page, plus the real patterns computed across the whole group.';
+
+  function render(content) {
+    window._groupContent = content;
+    var container = document.getElementById('group-reading-view');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'group-reading-view';
+      var card = document.querySelector('#screen-group .cosmic-card');
+      if (card) card.appendChild(container);
+    }
+    var html = '<p style="font-size:0.95rem;line-height:1.8;color:rgba(232,224,255,0.9);margin-bottom:1.5rem;">' + content.intro + '</p>';
+    html += '<div style="font-family:Courier New,monospace;font-size:0.6rem;letter-spacing:0.3em;color:#50dcc8;margin-bottom:0.6rem;">✦ GROUP OVERVIEW ✦</div>';
+    html += content.overviewText.split(/\n\n+/).filter(function(pp){ return pp.trim(); }).map(function(para) {
+      return '<p style="margin-bottom:1.1rem;line-height:1.8;font-size:0.92rem;color:rgba(232,224,255,0.88);">' + para.trim() + '</p>';
+    }).join('');
+    content.people.forEach(function(person) {
+      html += '<div style="margin:1.8rem 0 1.2rem;padding-top:1.2rem;border-top:1px solid rgba(80,220,200,0.15);">'
+        + '<div style="font-family:Courier New,monospace;font-size:0.62rem;letter-spacing:0.2em;color:#c9a84c;margin-bottom:0.5rem;">' + person.firstName.toUpperCase() + '</div>'
+        + '<p style="line-height:1.8;font-size:0.92rem;color:rgba(232,224,255,0.88);">' + person.text + '</p>'
+        + '</div>';
+    });
+    html += '<div style="font-family:Courier New,monospace;font-size:0.6rem;letter-spacing:0.3em;color:#50dcc8;margin:1.8rem 0 0.6rem;">✦ STANDOUT PAIRINGS ✦</div>';
+    html += content.pairingsText.split(/\n\n+/).filter(function(pp){ return pp.trim(); }).map(function(para) {
+      return '<p style="margin-bottom:1.1rem;line-height:1.8;font-size:0.92rem;color:rgba(232,224,255,0.88);">' + para.trim() + '</p>';
+    }).join('');
+    html += '<p style="margin-top:1.8rem;padding-top:1.2rem;border-top:1px solid rgba(80,220,200,0.15);font-style:italic;line-height:1.8;font-size:0.92rem;color:rgba(232,224,255,0.82);">' + content.blessing + '</p>';
+    html += '<button id="group-view-download-pdf-btn" class="cta-btn w-full" style="margin-top:1.6rem;">📄 Download Your Group PDF</button>';
+    container.innerHTML = html;
+
+    var dlBtn = document.getElementById('group-view-download-pdf-btn');
+    if (dlBtn) {
+      dlBtn.addEventListener('click', function() { generateGroupPDF(profiles, window._groupContent); });
+    }
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  }
+
+  if (window._groupContent) {
+    render(window._groupContent);
+  } else if (window._groupReadingPromise) {
+    var container = document.getElementById('group-reading-view') || (function() {
+      var c = document.createElement('div');
+      c.id = 'group-reading-view';
+      var card = document.querySelector('#screen-group .cosmic-card');
+      if (card) card.appendChild(c);
+      return c;
+    })();
+    container.innerHTML = '<p style="text-align:center;color:#8a7aaa;font-size:0.85rem;">⏳ Weaving your group’s reading together…</p>';
+    window._groupReadingPromise.then(render).catch(function() {
+      render(getGroupFallback(profiles));
+    });
+  } else {
+    render(getGroupFallback(profiles));
+  }
 }
 
 // ===========================
@@ -10623,6 +10867,24 @@ function finalizeReadingPurchase(profile, tier, email, orderId, priceOverride, i
 }
 
 function restoreAfterSquareReturn(tierSlug) {
+  // The $20/month Daily Readings subscription -- own restore path. No
+  // cs_pending_profile to restore (the subscriber's identity already
+  // survived the round trip via the SUB_SESSION_KEY localStorage session,
+  // not sessionStorage), so this just lands back on the subscribe screen
+  // with an honest status message. Activation to `status = 'active'` is
+  // still a manual step for now (see the SQUARE SUBSCRIPTIONS comment
+  // above startSubscriptionCheckout()), so refreshSubscribeScreen() will
+  // keep showing "not currently subscribed" until that manual step
+  // happens -- this message says so rather than implying it's automatic.
+  if (tierSlug === 'subscription-monthly') {
+    showScreen('subscribe');
+    refreshSubscribeScreen().then(function() {
+      var statusEl = document.getElementById('sub-status');
+      if (statusEl) statusEl.textContent = 'Thank you for subscribing! Your account is being activated -- this can take a little while since it is confirmed by hand right now. Refresh this page in a bit, or check back shortly.';
+    });
+    try { window.history.replaceState({}, '', window.location.pathname); } catch(e) {}
+    return;
+  }
   // The $1 archetype-quiz tier reveals a quiz result, not a full computed
   // reading -- hand it off to its own restore path (same sessionStorage
   // keys, different screen) instead of running the full-reading logic below.
@@ -11322,51 +11584,46 @@ async function renderLookback(rangeKey) {
 }
 
 // -----------------------------------------------------------
-// Square Subscriptions billing -- NOT YET LIVE. See "SQUARE SUBSCRIPTIONS
-// -- NOT YET LIVE" in docs/SUBSCRIPTIONS_SETUP.md for the full explanation.
-// Empty by default -- until a real Catalog subscription-plan object is
-// created in the Square dashboard and its plan ID placed here, the
-// Subscribe button shows an honest "launching soon" state rather than
-// attempting a checkout that would fail (or, worse, silently charge the
-// wrong amount). NEVER hardcode a real plan ID, API access token, or
-// webhook secret here or anywhere else in this file -- see the setup doc.
+// Square Subscriptions billing.
+//
+// LIVE PATH (in use now): a plain Square Payment Link, created the exact
+// same way as every one-time tier's link in SQUARE_LINKS above, except its
+// Redirect URL (set in the Square dashboard) points back here with
+// ?paid=subscription-monthly. Square's own hosted checkout handles the
+// recurring charge itself -- no Subscriptions-API access token is needed
+// just to collect the payment. Because a payment link's own webhook isn't
+// wired up yet, activating a subscriber's `subscribers.status` to 'active'
+// after they pay is a manual step for now: run
+// `select public.upsert_subscriber_status('active', ...)` in Supabase's
+// SQL Editor (see docs/SUBSCRIPTIONS_SETUP.md) once you see the payment
+// land in Square. This is the same honest incremental approach the promo
+// code / group reading features started with -- automate the activation
+// step later via a real webhook if volume justifies it (see the FUTURE
+// PATH comment below); it never blocks launching with real payments now.
+//
+// FUTURE PATH (not built): the fully automated Subscriptions API
+// integration originally sketched here -- a server-side function holding
+// a separate Subscriptions-API-scoped access token, calling Square's
+// Create Subscription API directly, and a webhook receiver keeping
+// `subscribers.status` in sync automatically -- remains a real
+// improvement to make later, but is not required to take real money
+// today via the payment-link path above. NEVER hardcode a real API
+// access token or webhook secret here or anywhere else in this file.
 // -----------------------------------------------------------
-var SQUARE_SUBSCRIPTION_PLAN_ID = '';
+var SQUARE_SUBSCRIPTION_LINK = 'https://square.link/u/thy9LGls';
 
 function startSubscriptionCheckout(userId, email) {
-  if (!SQUARE_SUBSCRIPTION_PLAN_ID) {
+  if (!SQUARE_SUBSCRIPTION_LINK) {
     return Promise.reject(new Error('Subscriptions are launching soon — billing is not wired up yet. Please check back shortly.'));
   }
-  // TODO(owner, once SQUARE_SUBSCRIPTION_PLAN_ID above is set to a real
-  // Catalog subscription-plan-variation ID from the Square dashboard):
-  // call a new serverless function here, mirroring
-  // netlify/functions/create-checkout.js's existing pattern exactly --
-  // the client must NEVER hold a Square access token directly.
-  //
-  //   1. Server-side, that function holds SQUARE_ACCESS_TOKEN (a
-  //      SEPARATE, Subscriptions-API-scoped token -- NOT the
-  //      payment-link tokens SQUARE_LINKS/create-checkout.js already use
-  //      for one-time tiers) plus SQUARE_LOCATION_ID and
-  //      SQUARE_SUBSCRIPTION_PLAN_ID.
-  //   2. It looks up or creates a Square Customer for `email`
-  //      (POST https://connect.squareup.com/v2/customers), then calls
-  //      POST https://connect.squareup.com/v2/subscriptions (Square's
-  //      Subscriptions API -- "Create Subscription") with
-  //      { location_id, plan_variation_id: SQUARE_SUBSCRIPTION_PLAN_ID,
-  //        customer_id, start_date }.
-  //   3. On success (or, more reliably, on Square's subscription
-  //      lifecycle webhooks -- a separate webhook endpoint not yet
-  //      built), the resulting Square subscription id/status/period
-  //      dates must be written into this same signed-in user's row in
-  //      `subscribers` via a SECURITY DEFINER RPC
-  //      (upsert_subscriber_status -- see
-  //      supabase/subscriptions_daily_reads_schema.sql), the same
-  //      race-safe, no-direct-anon-write pattern upsert_daily_read()
-  //      already uses. `userId`/`email` above are exactly what that call
-  //      would need.
-  //   4. Until steps 1-3 exist, this function intentionally goes no
-  //      further than the rejected Promise above.
-  return Promise.reject(new Error('Subscription checkout is not wired up yet.'));
+  // Nothing needs to be handed through sessionStorage here the way the
+  // one-time tiers do (cs_pending_profile/cs_pending_tier/cs_pending_email)
+  // -- the signed-in subscriber's identity already survives the Square
+  // redirect round trip via the existing SUB_SESSION_KEY localStorage
+  // session (subGetSession()/subSetSession()), which persists on this
+  // origin regardless of the trip to square.link and back.
+  window.location.href = SQUARE_SUBSCRIPTION_LINK;
+  return Promise.resolve();
 }
 
 // -----------------------------------------------------------
@@ -11402,15 +11659,15 @@ async function refreshSubscribeScreen() {
     if (activePanel) activePanel.style.display = 'none';
     if (inactivePanel) inactivePanel.style.display = '';
     var launchEl = document.getElementById('sub-launch-status');
-    if (launchEl) launchEl.textContent = SQUARE_SUBSCRIPTION_PLAN_ID
+    if (launchEl) launchEl.textContent = SQUARE_SUBSCRIPTION_LINK
       ? 'You are not currently subscribed.'
       : 'Subscriptions are launching soon — billing is not yet wired up. Check back shortly.';
     var subscribeBtn = document.getElementById('sub-subscribe-btn');
     if (subscribeBtn) {
-      subscribeBtn.disabled = !SQUARE_SUBSCRIPTION_PLAN_ID;
-      subscribeBtn.style.opacity = SQUARE_SUBSCRIPTION_PLAN_ID ? '1' : '0.55';
-      subscribeBtn.style.cursor = SQUARE_SUBSCRIPTION_PLAN_ID ? 'pointer' : 'not-allowed';
-      subscribeBtn.textContent = SQUARE_SUBSCRIPTION_PLAN_ID ? 'Subscribe — $20/month' : 'Subscriptions Launching Soon';
+      subscribeBtn.disabled = !SQUARE_SUBSCRIPTION_LINK;
+      subscribeBtn.style.opacity = SQUARE_SUBSCRIPTION_LINK ? '1' : '0.55';
+      subscribeBtn.style.cursor = SQUARE_SUBSCRIPTION_LINK ? 'pointer' : 'not-allowed';
+      subscribeBtn.textContent = SQUARE_SUBSCRIPTION_LINK ? 'Subscribe — $20/month' : 'Subscriptions Launching Soon';
     }
   }
 }
