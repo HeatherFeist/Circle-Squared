@@ -8910,7 +8910,12 @@ function showGroupSuccessScreen(buyerEmail, orderId, tier, profiles, priceOverri
 document.getElementById('close-success-overlay').addEventListener('click', function() {
   document.getElementById('payment-success').classList.remove('show');
   if (selectedTier && selectedTier.slug && selectedTier.slug.indexOf('group') === 0) {
-    showScreen('hook');
+    // Fixed a real dead-end here: this used to call showScreen('hook'),
+    // sending a Group Reading purchaser back to the landing page with no
+    // visible reading and no way back to the Download PDF button (which
+    // lives inside the overlay this handler just closed). See
+    // unlockFullGroupReading()'s own comment for the full story.
+    unlockFullGroupReading();
   } else {
     unlockFullReading();
   }
@@ -9119,6 +9124,98 @@ function unlockFullReading() {
   if (offerSubtext) offerSubtext.style.display = 'none';
 
   window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+// Group Reading equivalent of unlockFullReading() above -- renders the
+// generated group content (getGroupFallback()/doGroupReading()'s shared
+// { intro, overviewText, people, pairingsText, blessing } shape) in place
+// on screen-group, the same screen the group intake form lives on.
+//
+// This exists to fix a real navigation dead-end: the "View My Full
+// Reading" button on the payment-success overlay used to call
+// showScreen('hook') for a Group Reading purchase, since no in-app group
+// reading view existed yet -- that sent a person back to the landing page
+// with no visible reading and no way back to the Download PDF button
+// (which lives INSIDE that same overlay, so closing it hid that button
+// too). This function gives that button something real to show instead.
+function unlockFullGroupReading() {
+  var profiles = window._groupProfiles;
+  if (!profiles || !profiles.length) { showScreen('hook'); return; }
+
+  showScreen('group');
+
+  // Hide the intake form fields -- the group is already purchased at this
+  // point, there is nothing left to fill in or submit.
+  ['group-people-list', 'group-add-person-btn', 'group-price-display',
+   'group-contact-email', 'group-status', 'group-continue-btn', 'group-back-btn'
+  ].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) {
+      // group-contact-email's own label sits in a wrapper div right above
+      // it in the markup -- hide that wrapper, not just the input itself,
+      // so an empty "DELIVERY EMAIL" label doesn't linger.
+      var target = (id === 'group-contact-email' && el.parentElement) ? el.parentElement : el;
+      target.style.display = 'none';
+    }
+  });
+
+  var heading = document.querySelector('#screen-group h2');
+  if (heading) heading.textContent = 'Your Group Reading';
+  var subtext = document.querySelector('#screen-group p');
+  if (subtext) subtext.textContent = 'Every person’s own page, plus the real patterns computed across the whole group.';
+
+  function render(content) {
+    window._groupContent = content;
+    var container = document.getElementById('group-reading-view');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'group-reading-view';
+      var card = document.querySelector('#screen-group .cosmic-card');
+      if (card) card.appendChild(container);
+    }
+    var html = '<p style="font-size:0.95rem;line-height:1.8;color:rgba(232,224,255,0.9);margin-bottom:1.5rem;">' + content.intro + '</p>';
+    html += '<div style="font-family:Courier New,monospace;font-size:0.6rem;letter-spacing:0.3em;color:#50dcc8;margin-bottom:0.6rem;">✦ GROUP OVERVIEW ✦</div>';
+    html += content.overviewText.split(/\n\n+/).filter(function(pp){ return pp.trim(); }).map(function(para) {
+      return '<p style="margin-bottom:1.1rem;line-height:1.8;font-size:0.92rem;color:rgba(232,224,255,0.88);">' + para.trim() + '</p>';
+    }).join('');
+    content.people.forEach(function(person) {
+      html += '<div style="margin:1.8rem 0 1.2rem;padding-top:1.2rem;border-top:1px solid rgba(80,220,200,0.15);">'
+        + '<div style="font-family:Courier New,monospace;font-size:0.62rem;letter-spacing:0.2em;color:#c9a84c;margin-bottom:0.5rem;">' + person.firstName.toUpperCase() + '</div>'
+        + '<p style="line-height:1.8;font-size:0.92rem;color:rgba(232,224,255,0.88);">' + person.text + '</p>'
+        + '</div>';
+    });
+    html += '<div style="font-family:Courier New,monospace;font-size:0.6rem;letter-spacing:0.3em;color:#50dcc8;margin:1.8rem 0 0.6rem;">✦ STANDOUT PAIRINGS ✦</div>';
+    html += content.pairingsText.split(/\n\n+/).filter(function(pp){ return pp.trim(); }).map(function(para) {
+      return '<p style="margin-bottom:1.1rem;line-height:1.8;font-size:0.92rem;color:rgba(232,224,255,0.88);">' + para.trim() + '</p>';
+    }).join('');
+    html += '<p style="margin-top:1.8rem;padding-top:1.2rem;border-top:1px solid rgba(80,220,200,0.15);font-style:italic;line-height:1.8;font-size:0.92rem;color:rgba(232,224,255,0.82);">' + content.blessing + '</p>';
+    html += '<button id="group-view-download-pdf-btn" class="cta-btn w-full" style="margin-top:1.6rem;">📄 Download Your Group PDF</button>';
+    container.innerHTML = html;
+
+    var dlBtn = document.getElementById('group-view-download-pdf-btn');
+    if (dlBtn) {
+      dlBtn.addEventListener('click', function() { generateGroupPDF(profiles, window._groupContent); });
+    }
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  }
+
+  if (window._groupContent) {
+    render(window._groupContent);
+  } else if (window._groupReadingPromise) {
+    var container = document.getElementById('group-reading-view') || (function() {
+      var c = document.createElement('div');
+      c.id = 'group-reading-view';
+      var card = document.querySelector('#screen-group .cosmic-card');
+      if (card) card.appendChild(c);
+      return c;
+    })();
+    container.innerHTML = '<p style="text-align:center;color:#8a7aaa;font-size:0.85rem;">⏳ Weaving your group’s reading together…</p>';
+    window._groupReadingPromise.then(render).catch(function() {
+      render(getGroupFallback(profiles));
+    });
+  } else {
+    render(getGroupFallback(profiles));
+  }
 }
 
 // ===========================
