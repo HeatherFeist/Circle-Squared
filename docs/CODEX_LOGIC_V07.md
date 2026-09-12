@@ -981,4 +981,70 @@ This Part touches only the Group Reading: `formatGroupPersonSection()`, `getGrou
 
 ---
 
+## Part XL — Group Reading Fixed: Full Name Once, First Name Ever After
+
+### 40.1 — The bug
+
+The Group Reading's per-person intake field (`.group-person-name`, in `groupPersonRowHtml()`) carried the placeholder "Full name" and asked the buyer to type each group member's full name — first, middle, and last. But `computeGroupPersonProfile()` passed that raw full-name string straight into `computePartnerProfile(person.firstName, ...)` as the `firstName` parameter, and `computePartnerProfile()` stored it back verbatim as `firstName: firstName` in the returned profile, with no splitting anywhere in between. Every place in the Group Reading that reads `p.firstName` — `formatGroupPersonSection()`, `computeStandoutPairings()`/`formatPairFact()`, `computeGroupOverview()`'s shared-Sephirah and shared-Trump-Card member lists, `computeStandoutRoles()`/`formatStandoutRolesSection()`, the `doGroupReading()` AI prompt and its PROFILE lines, `showGroupSuccessScreen()`, `unlockFullGroupReading()`, and `generateGroupPDF()`'s per-person page headers — was therefore printing each person's entire typed name, every single time, never just their first name.
+
+The solo reading's own intake (`hook-fullname`) already solves this correctly: it explicitly runs `var firstName = fullBirthName.split(' ')[0];` before building the narrative profile, while still passing the full `fullBirthName` string into every name-derived calculation (`calcExpression`, `calcSoulUrge`, `calcGematria`, `calcPersonality`, `hiddenMasterAudit`, `calcChaldeanName`, `calcGematriaBattery`) so those stay accurate. The Group Reading never had this split — it is the one narrative surface in the whole app that skipped a step the solo reading had already solved.
+
+### 40.2 — The project owner's own words
+
+> "It should just say their full name one time and then anytime past the first time, it should just say their first name when referring to them after that."
+
+### 40.3 — The fix
+
+`computeGroupPersonProfile()` now does the split itself, mirroring the solo reading's exact pattern:
+
+```js
+function computeGroupPersonProfile(person) {
+  var fullName = person.firstName;
+  var p = computePartnerProfile(fullName, person.month, person.day, person.year);
+  p.fullName = fullName;
+  p.firstName = fullName.split(' ')[0];
+  p.elementalNodePolarity = (p.node && p.node.northSign) ? getElementalNodePolarity(p.node.northSign) : null;
+  return p;
+}
+```
+
+The real, full entered name is still fed into `computePartnerProfile()` — every name-derived calculation inside it (Expression, Soul Urge, Personality, Gematria, Chaldean compound, Hidden Master name-audit, Gematria Battery, Hebrew Soul Correspondence) still computes off the true full name, exactly as before. Only the profile object's own `firstName` field is narrowed afterward, to the first token, and a new `fullName` field carries the untouched original. Because every existing narrative call site already referenced `p.firstName`, this one change alone fixed every downstream call site automatically — no other function's internal logic changed.
+
+The one legitimate full-name mention happens at each person's true first appearance in the whole reading — the opening "Welcome, X, Y, Z" line — which now reads `p.fullName` instead of `p.firstName`, in both `getGroupFallback()`'s `intro` field and `parseGroupReadingSections()`'s equivalent (the intro is synthesized by the app itself in both the fallback and the AI-success path, never by the AI's own delimited output). Every other place — each person's own `PERSON_<name>` section, cross-references to them from other people's sections, the Standout Roles section, the Standout Pairings section, the on-screen per-person headers in `unlockFullGroupReading()`, and `generateGroupPDF()`'s per-person page headers (`pageHeader(p.firstName.toUpperCase(), p.firstName, PURPLE)`) — now uses `p.firstName`, confirmed correct by reading each call site individually after the fix, not assumed.
+
+`doGroupReading()`'s AI-prompt path was updated to match: each PROFILE line now reads `p.firstName + ' (full name: ' + p.fullName + ')'` instead of bare `p.firstName`, and a new explicit "NAME RULE" instruction was added to the prompt, telling the model to use each person's full name exactly once, at the opening welcome line only, and first name everywhere else — matching the fallback's own behavior exactly, in case the AI path is ever used for the group reading in the future.
+
+Two small clarity additions, made after checking whether they were needed rather than skipping the question: the group intake field's placeholder now reads "Full name (for accurate numerology — only their first name appears in the reading)" instead of a bare "Full name," so the buyer understands why a full name is being asked for even though the reading itself will only ever say a first name after the opening line; and `showGroupSuccessScreen()`'s "notify owner" email now lists each person's real full name (an internal fulfillment record, not part of the reading's own narrative convention, so it correctly keeps the full name rather than adopting the reading's first-name-only rule).
+
+### 40.4 — Verification (this session)
+
+All five inline `<script>` blocks in `public/index.html` were extracted and run through `node --check` — all pass.
+
+A synthetic 4-person group with real multi-word names (Heather Nicole Feist, Marcus James Delgado, Priya Anjali Sharma, Dante Alejandro Cruz) was run through the real, unmodified `computeGroupProfiles()` and `getGroupFallback()` inside a Node `vm` context loading the app's actual combined script with a generous DOM/timer/canvas stub (no real browser). The real generated intro read:
+
+> "Welcome, Heather Nicole Feist, Marcus James Delgado, Priya Anjali Sharma, Dante Alejandro Cruz. What follows is not 4 separate readings sitting side by side — it is one real, computed picture of how this group's numbers, signs, and paths actually distribute, plus the handful of pairings between you that are genuinely worth naming."
+
+Programmatically counting occurrences of each person's exact full-name string across the intro, the Group Overview text, the Standout Roles text, every person's section, the Standout Pairings text, and the blessing confirmed every one of the four full names appears **exactly once**, and that occurrence is in the intro — never inside any person's own `PERSON_<name>` section body, a cross-reference from someone else's section, Standout Roles, or Standout Pairings. Two real per-person sections, quoted in full, confirmed only first-name usage throughout, including cross-references ("Where Heather's Water current already set a tone for this room through the suit of Cups, Marcus's own Water Sun runs that exact same suit...").
+
+The `doGroupReading()` AI-prompt path was exercised directly (with `generateReading()` forced to reject, so it fell through to the fallback as designed) and the real captured prompt text was inspected: the PROFILE line for the first person read `Heather (full name: Heather Nicole Feist): Life Path 9 — ...`, and the new NAME RULE instruction was present verbatim ahead of the existing "This reading is deliberately NOT a set of personal mini-readings" instruction.
+
+Numerology accuracy was verified by calling the real calculation functions directly, both ways, for the same person:
+
+| Function | Full name ("Heather Nicole Feist") | First name only ("Heather") |
+|---|---|---|
+| `calcExpression` | 11 | 11 |
+| `calcSoulUrge` | 9 | 11 |
+| `calcGematria` | total 182, reduced 11 | total 65, reduced 11 |
+| `calcChaldeanName` | compound 72, reduced 9 | compound 27, reduced 9, archetype "The Wand of Power" |
+
+The profile object's own stored `expression`, `soulUrge`, `gematria`, and `chaldean` fields were then confirmed to match the **full-name** column exactly (not the first-name column) — proving `computeGroupPersonProfile()` still feeds the true full name into every calculation, and that only the narrative `firstName` field was narrowed, never the numerology itself.
+
+Diffing this session's changes against `origin/master` confirms every changed hunk falls inside `computeGroupPersonProfile()`, `getGroupFallback()`'s intro line, `doGroupReading()`'s PROFILE-line construction and prompt text, `parseGroupReadingSections()`'s intro line, `groupPersonRowHtml()`'s placeholder text, and `showGroupSuccessScreen()`'s owner-email name list — the solo reading, the partnership reading, the promo code system, the Daily Readings subscription / Nodal Choice interactive mechanic, and the Kokoro voice narration feature are all byte-for-byte unchanged.
+
+### 40.5 — Scope
+
+This Part touches only the Group Reading, and specifically only which name string is substituted into templates that were already correct: `computeGroupPersonProfile()`, `getGroupFallback()`'s intro, `doGroupReading()`'s PROFILE lines and prompt instructions, `parseGroupReadingSections()`'s intro, `groupPersonRowHtml()`'s placeholder, and `showGroupSuccessScreen()`'s owner-notification name list. `computePartnerProfile()`'s own internal calculation logic was not touched — only how `computeGroupPersonProfile()` calls it and what it does with the returned profile's name fields afterward. Every existing synthesis, phrasing-variation mechanism, and `createExplainTracker()`-based first-mention/callback behavior from Parts XXXV and XXXIX keeps working exactly as before — this fix changes nothing about those templates or that logic, only which name string fills them in. The solo reading and the partnership reading are unaffected: the solo reading already had this exact split (`fullBirthName.split(' ')[0]`) before this session began, and the partnership reading never had this bug in the first place, since its own intake only ever asks for a first name.
+
+---
+
 *W3BB Worldwide · Codex Logic V07 · Addendum to V06 · All additions are cross-verified against at least one other system already established in this Codex, with the derivation shown — no assertion stands alone. Parts XXX, XXXI, and XXXII remain labeled exceptions by design (original W3BB construction per the Part XXII branch (b) standard). Parts XXXIII and XXXIV are a different kind of exception each: both are technology/infrastructure additions that make no claim about any reading's content at all, so Part XXII's two branches simply do not apply to either — what IS independently verified for Part XXXIV is the real signature-verification scheme, event payload shapes, and API endpoints described in its own file's header comment and in `docs/SUBSCRIPTIONS_SETUP.md` section 5, checked against Square's own documentation and SDK source as surfaced through web search (this sandbox's network egress proxy blocks direct access to developer.squareup.com and squareup.com, a limitation already noted elsewhere in this repo), plus a real local-Postgres verification of the new function's access-control boundary. Part XXXV is a presentation/synthesis change over data already cross-verified in earlier Parts (Codex Archetype, Life Path quality, Axis Role, Elemental Suit) — it introduces no new content claim, so it falls squarely within the standard Part XXII branch (a) covers, requiring no new cross-verification of its own. Part XXXVI is likewise a presentation change, not a new content claim, over data this Codex either already established (`ELEMENT_QUALITIES` from Part XXXV, `TAROT_PATHS`/`PATH_TABLE` from Part XXI's own foundational Trump Card mechanism) or newly, independently verified this session against real reference sources named in §36.4 above (standard astrology for the Lunar Node axis; standard Tarot tradition for Minor Arcana rank and court-card meanings) — it falls within Part XXII branch (a) as well, on the same "cross-verified derivation" footing every other content-bearing Part in this Codex stands on. Part XXXVII is, in turn, a refinement of Part XXXVI's own presentation standard, not a new content claim of its own and not a reversal of anything Part XXXVI established — it introduces zero new facts about any element, card, or axis, only additional real phrasings of facts this Codex had already verified, so it falls within the same Part XXII branch (a) footing as Part XXXVI itself. Part XXXVIII is a structural reorganization of the solo reading's 9 pages, not a new content claim about any individual number, card, or Sephirah — every real fact it relocates was already independently verified by the Part that first introduced it; what IS newly asserted in Part XXXVIII is (1) the real geometric nesting relationships among the Flower/Vesica/Seed/Egg/Fruit/Cube/Tree, cited in §38.1 against In2Infinity's construction sequence and this Codex's own sacred-geometry reference, which is standard Part XXII branch (a) footing, and (2) the SPECIFIC symbolic assignment of those shapes to "a whole person," "the infinite field," and "ending/rebirth," which is a labeled Part XXII branch (b) exception alongside Parts XXX-XXXII, disclosed plainly to the reader on the new Page 1. Part XXXIX is, like Part XXXV before it, primarily a presentation/synthesis extension over data already cross-verified in earlier Parts (`ELEMENT_QUALITIES`, `TAROT_PATHS`/`PATH_TABLE`, `CODEX_ARCHETYPES`, `LP_DATA`/`MASTER_NUMBER_DATA`, `AXIS_ROLES`) — it introduces no new numerological, astrological, or Tarot claim, so it falls within Part XXII branch (a). The one genuinely new construction this Part adds is the five-category Standout Roles functional grouping (§39.7) and the `ARCHETYPE_PRACTICAL_ROLE` practical-language table (§39.6) — both are explicitly labeled, per Part XXII branch (b), as this Codex's own original organizing/interpretive layer on top of already-real archetype titles, not an inherited system and not a new claim about what any individual title means on its own.*

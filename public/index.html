@@ -2960,9 +2960,28 @@ function generatePartnershipPDF(p1, p2, pages) {
 // Pairings list -- never exhaustive pairwise prose, never a numeric score.
 
 // Compute one person's full profile plus the additive elemental Node
-// polarity finding. `person` is {firstName, month, day, year}.
+// polarity finding. `person` is {firstName, month, day, year} where
+// person.firstName actually holds the FULL name typed into the group
+// intake field (see .group-person-name below -- the field name is a
+// historical holdover from before this fix, not a promise of its content).
+//
+// The real full name is still passed straight into computePartnerProfile()
+// so every name-derived calculation (Expression, Soul Urge, Personality,
+// Gematria, Chaldean compound, Hidden Master audit, Gematria Battery,
+// Hebrew Soul Correspondence) keeps computing off the true full birth
+// name, exactly as accurate as it always has been -- only the returned
+// profile's own `firstName` field is then narrowed to first-token-only,
+// mirroring the solo reading's own `fullBirthName.split(' ')[0]` pattern,
+// so every existing narrative call site downstream (which already reads
+// p.firstName) automatically switches to first-name-only with no further
+// changes needed. A new `fullName` field carries the untouched full name
+// for the one legitimate full-name mention: each person's true first
+// appearance in the whole reading (the opening welcome line).
 function computeGroupPersonProfile(person) {
-  var p = computePartnerProfile(person.firstName, person.month, person.day, person.year);
+  var fullName = person.firstName;
+  var p = computePartnerProfile(fullName, person.month, person.day, person.year);
+  p.fullName = fullName;
+  p.firstName = fullName.split(' ')[0];
   p.elementalNodePolarity = (p.node && p.node.northSign) ? getElementalNodePolarity(p.node.northSign) : null;
   return p;
 }
@@ -3467,8 +3486,12 @@ function getGroupFallback(profiles) {
   // getFallbackReading()/getPartnershipFallback() already use per Part
   // XXXVII, now threaded through the Group Reading for the first time.
   var tracker = createExplainTracker();
-  var names = profiles.map(function(p){return p.firstName;});
-  var intro = 'Welcome, ' + names.join(', ') + '. What follows is not ' + profiles.length + ' separate readings sitting side by side — it is one real, computed picture of how this group’s numbers, signs, and paths actually distribute, plus the handful of pairings between you that are genuinely worth naming.';
+  // Full names appear exactly once, here, at each person's true first
+  // appearance in the whole reading -- every other mention throughout the
+  // reading (their own section, cross-references, Standout Roles, Standout
+  // Pairings, PDF headers) uses p.firstName only. See computeGroupPersonProfile().
+  var fullNames = profiles.map(function(p){return p.fullName || p.firstName;});
+  var intro = 'Welcome, ' + fullNames.join(', ') + '. What follows is not ' + profiles.length + ' separate readings sitting side by side — it is one real, computed picture of how this group’s numbers, signs, and paths actually distribute, plus the handful of pairings between you that are genuinely worth naming.';
   return {
     intro: intro,
     overviewText: formatGroupOverviewSection(overview),
@@ -3502,7 +3525,7 @@ async function doGroupReading(profiles) {
     var trumpPaths = (p.trumpPaths || []).filter(Boolean);
     var trumpDesc = trumpPaths.map(function(tp){ return tp.card + (tp.keyword ? ' (archetype: ' + (TAROT_PATHS.find(function(t){return t.card===tp.card;})||{}).archetype + '; Golden Dawn keyword: ' + tp.keyword + ')' : ''); }).join(' + ');
     var practical = getArchetypePracticalRole(p.lifePath, p.sunSign.element);
-    return p.firstName + ': Life Path ' + p.lifePath + ' — ' + lpTitle + ' (quality: ' + lpQuality + ') · Codex Archetype ' + archetype + ' · ' + p.sunSign.sign + ' Sun (' + p.sunSign.element + ' — ' + (ELEMENT_QUALITIES[p.sunSign.element] || '') + ') · ' + p.tree.name
+    return p.firstName + ' (full name: ' + (p.fullName || p.firstName) + '): Life Path ' + p.lifePath + ' — ' + lpTitle + ' (quality: ' + lpQuality + ') · Codex Archetype ' + archetype + ' · ' + p.sunSign.sign + ' Sun (' + p.sunSign.element + ' — ' + (ELEMENT_QUALITIES[p.sunSign.element] || '') + ') · ' + p.tree.name
       + (trumpDesc ? ' · Life Path Trump Card ' + trumpDesc : '')
       + (axis ? ' · Axis Role ' + axis.title + ' (' + axis.description + ')' : '')
       + (p.elementSuit ? ' · Elemental Suit ' + p.elementSuit : '')
@@ -3515,6 +3538,7 @@ async function doGroupReading(profiles) {
   }).join('\n');
 
   var prompt = 'You are Celestia, oracle of Circles Squared. Generate a group reading for ' + profiles.length + ' people: ' + profiles.map(function(p){return p.firstName;}).join(', ') + '. '
+    + 'NAME RULE (follow exactly): each person\'s PROFILE line above gives both their first name and, in parentheses, their real full name. Use each person\'s FULL name exactly ONCE in the entire reading, at their true first appearance -- which is the opening welcome/introduction line only. Every other mention of that person anywhere else in the reading -- their own PERSON_<name> section, any cross-reference to them from someone else\'s section, the STANDOUT_ROLES section, the PAIRINGS section -- must use their first name only, never their full name again. Write the opening welcome line as: "Welcome, " followed by every person\'s full name, comma-separated.\n\n'
     + 'This reading is deliberately NOT a set of personal mini-readings -- personal specifics belong to the individual solo reading product, which these buyers can purchase separately. This product exists to answer one question only: how does each person CONTRIBUTE to this specific group, and what position do they play best within it. This is entertainment for a family or friend group, not a workplace or compatibility-score product. Write in Celestia’s warm, poetic, second-person voice. Never narrate HOW a value was calculated (no degree/decan/mechanism talk) -- only what each finding means. Never invent a numeric score, percentage, or compatibility rating for any pairing -- report only real, computed, binary facts.\n\n'
     + 'PROFILE (people are listed in the same order their sections should appear -- each person after the first can genuinely be compared only to the people listed ABOVE them, since those are the only people "already introduced" in the finished reading):\n' + profileLines + '\n\n'
     + 'GROUP OVERVIEW (real, computed distribution -- report these counts honestly, never invent a composite score): '
@@ -3565,7 +3589,10 @@ function parseGroupReadingSections(fullText, profiles) {
     people.push({ firstName: profiles[i].firstName, text: t });
   }
   return {
-    intro: 'Welcome, ' + profiles.map(function(p){return p.firstName;}).join(', ') + '.',
+    // Intro is synthesized here (not part of the AI's delimited output) --
+    // full names appear exactly once, here, matching the fallback's own
+    // getGroupFallback() intro. See computeGroupPersonProfile().
+    intro: 'Welcome, ' + profiles.map(function(p){return p.fullName || p.firstName;}).join(', ') + '.',
     overviewText: overviewText,
     standoutRolesText: standoutRolesText,
     people: people,
@@ -3722,7 +3749,7 @@ function groupPersonRowHtml(idx) {
     + '<span style="font-family:Courier New,monospace;font-size:0.58rem;letter-spacing:0.2em;color:#50dcc8;">PERSON ' + (idx + 1) + '</span>'
     + '<button type="button" class="group-remove-person-btn" data-idx="' + idx + '" style="background:none;border:none;color:#8a7aaa;cursor:pointer;font-size:0.72rem;">Remove</button>'
     + '</div>'
-    + '<input class="cosmic-input group-person-name" type="text" placeholder="Full name" style="padding:0.5rem 0.8rem;width:100%;margin-bottom:0.4rem;" />'
+    + '<input class="cosmic-input group-person-name" type="text" placeholder="Full name (for accurate numerology — only their first name appears in the reading)" style="padding:0.5rem 0.8rem;width:100%;margin-bottom:0.4rem;" />'
     + '<div style="display:flex;gap:0.4rem;">'
     + '<input class="cosmic-input group-person-month" type="number" min="1" max="12" placeholder="M" style="padding:0.5rem;text-align:center;flex:1;" />'
     + '<input class="cosmic-input group-person-day" type="number" min="1" max="31" placeholder="D" style="padding:0.5rem;text-align:center;flex:1;" />'
@@ -9586,7 +9613,10 @@ function showGroupSuccessScreen(buyerEmail, orderId, tier, profiles, priceOverri
   document.getElementById('success-email-display').textContent = 'Delivery: ' + (buyerEmail || 'Not provided');
   document.getElementById('success-order-id').textContent = 'Order: ' + orderId;
 
-  var names = profiles.map(function(p){ return p.firstName; }).join(', ');
+  // Owner-facing order email: use each person's real full name (not the
+  // reading's own first-name-only narrative convention) since this is an
+  // internal fulfillment record, not part of the reading itself.
+  var names = profiles.map(function(p){ return p.fullName || p.firstName; }).join(', ');
   var subject = encodeURIComponent('🌙 New Circles Squared Purchase — ' + tier.name);
   var body = encodeURIComponent(
     'NEW PURCHASE RECEIVED\n\nOrder ID: ' + orderId + '\nDate: ' + new Date().toLocaleString() + '\n\nBUYER\nEmail: ' + (buyerEmail||'N/A') + '\n\nPURCHASE\nTier: ' + tier.name + '\nPages: ' + tier.pages + '\nPrice: $' + tier.price + '\n\nGROUP\nPeople (' + profiles.length + '): ' + names + '\n\nSend PDF to: ' + (buyerEmail||'ask buyer')
