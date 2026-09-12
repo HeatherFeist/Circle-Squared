@@ -2027,6 +2027,171 @@ function getAxisConfig(role1, role2) {
   return 'foundation';
 }
 
+// W3BB CODEX V07 PART XXXIX — Archetype Practical-Role Table (Group Reading
+// only; see docs/CODEX_LOGIC_V07.md Part XXXIX). This mirrors CODEX_ARCHETYPES'
+// own [lifePath][element] shape exactly rather than keying by title string,
+// because two cells in that table share the literal same title text (e.g.
+// "The Illuminator" appears at both Life Path 3/Fire and Life Path 11/Fire;
+// "The Visionary" appears at both Life Path 5/Air and Life Path 11/Air) --
+// keying by title alone would silently collapse those two real, distinct
+// rows into one. Every one of the 11 Life Path rows x 4 elements = 44 real
+// cells this Codex can actually produce is filled in below (unlike
+// MINOR_LIGHT_SHADOW's intentionally partial table elsewhere in this file --
+// there are only 44 of these, and every one is reachable by a real chart).
+// `text` is a verb-phrase fragment ("the one who...") meant to complete the
+// sentence "In practice, that means <name> is usually <text>." -- grounded
+// directly in that cell's own real archetype title and the plain-English
+// meaning it already carries, never a new claim about what the title means.
+// `category` sorts each real title into one of five plain functional-role
+// buckets (see ROLE_CATEGORIES below) purely by that title's own ordinary
+// English meaning -- this Codex's own organizing scheme for grouping
+// already-real titles, not a separate inherited system (Part XXXIX §39.4).
+var ARCHETYPE_PRACTICAL_ROLE = {
+  1: {
+    Fire:  { category: 'leadership', text: 'the one who is already three steps into a new idea before anyone else in the room has finished deciding whether it is worth trying' },
+    Water: { category: 'leadership', text: 'the one whose gut instinct gets a stalled plan moving again, often before they have fully explained why' },
+    Air:   { category: 'leadership', text: 'the one who says the untested idea nobody else has voiced yet, and simply starts talking through how it could work' },
+    Earth: { category: 'leadership', text: 'the one who takes ownership of a decision and holds it steady once it is made, so the group has somewhere solid to stand' }
+  },
+  2: {
+    Fire:  { category: 'connective', text: 'the one who notices when two people are actually arguing about the same thing from different angles, and says so' },
+    Water: { category: 'connective', text: 'the one who senses what someone else in the room is feeling before that person has said a word about it' },
+    Air:   { category: 'connective', text: 'the one who takes several people\'s half-formed points and threads them into one conversation everyone can actually follow' },
+    Earth: { category: 'anchoring', text: 'the steady presence everyone else quietly checks in with when the room\'s energy gets scattered' }
+  },
+  3: {
+    Fire:  { category: 'creative', text: 'the one who reframes a flat idea into something the whole group suddenly gets excited about' },
+    Water: { category: 'creative', text: 'the one who turns a dry fact or plan into something the group actually remembers and repeats later' },
+    Air:   { category: 'creative', text: 'the one who says the thing that reframes the whole conversation, often before they have fully worked out why it is true' },
+    Earth: { category: 'creative', text: 'the one who takes a rough idea and actually makes it — turns talk into something tangible the group can look at' }
+  },
+  4: {
+    Fire:  { category: 'anchoring', text: 'the one who takes a vague plan and forces it into a workable shape through sheer sustained effort' },
+    Water: { category: 'anchoring', text: 'the one who quietly keeps track of what the group actually needs and makes sure it does not get dropped' },
+    Air:   { category: 'analytical', text: 'the one who sketches the actual structure — steps, order, dependencies — while everyone else is still talking in generalities' },
+    Earth: { category: 'anchoring', text: 'the dependable base the rest of the group builds on without ever having to think about it' }
+  },
+  5: {
+    Fire:  { category: 'creative', text: 'the one whose energy makes something that has been stuck suddenly start moving again' },
+    Water: { category: 'creative', text: 'the one who is first to try the untested option and actually reports back what is there' },
+    Air:   { category: 'creative', text: 'the one who names where this could all go, several steps past where the conversation currently is' },
+    Earth: { category: 'leadership', text: 'the one who finds the practical next step forward while everyone else is still debating direction' }
+  },
+  6: {
+    Fire:  { category: 'connective', text: 'the one who steps into a tense moment and finds the version of the plan everyone can actually live with' },
+    Water: { category: 'connective', text: 'the one people quietly go to when something in the group actually hurts, because they know it will be held with care' },
+    Air:   { category: 'connective', text: 'the one who explains a confusing idea in a way that makes it click for everyone, on the first try' },
+    Earth: { category: 'anchoring', text: 'the one who quietly protects the group\'s wellbeing, noticing when someone is being overlooked before anyone else does' }
+  },
+  7: {
+    Fire:  { category: 'analytical', text: 'the one who names the thing everyone else can feel but has not yet put into words' },
+    Water: { category: 'analytical', text: 'the one whose read on a situation, however hard to explain out loud, keeps turning out to be right' },
+    Air:   { category: 'analytical', text: 'the one who asks the one question that reveals what the group is actually deciding about' },
+    Earth: { category: 'analytical', text: 'the one whose calm, seen-this-before perspective the group leans on when a decision actually matters' }
+  },
+  8: {
+    Fire:  { category: 'leadership', text: 'the one whose sheer drive carries a flagging effort the rest of the way to done' },
+    Water: { category: 'creative', text: 'the one who takes a messy, difficult situation and finds a way to turn it into something genuinely useful' },
+    Air:   { category: 'analytical', text: 'the one who sees three moves ahead and quietly steers the group away from a mistake before it happens' },
+    Earth: { category: 'leadership', text: 'the one whose long practice and steady authority the group defers to when the stakes are real' }
+  },
+  9: {
+    Fire:  { category: 'anchoring', text: 'the one who cuts through clutter and names what is no longer serving the group, even when that is uncomfortable' },
+    Water: { category: 'connective', text: 'the one who takes everyone\'s separate contributions at the end and shows how they actually fit together into one whole' },
+    Air:   { category: 'connective', text: 'the one who keeps asking whether the plan actually serves everyone in the room, not just the loudest voice' },
+    Earth: { category: 'anchoring', text: 'the one whose accumulated experience the group quietly treats as the final word when something needs settling' }
+  },
+  11: {
+    Fire:  { category: 'creative', text: 'the one whose sudden insight reframes what the whole group is looking at, with an intensity that is hard to ignore' },
+    Water: { category: 'creative', text: 'the one who seems to receive the right words at the right moment, almost before they have consciously worked them out' },
+    Air:   { category: 'creative', text: 'the one who articulates a genuinely new direction with a clarity that makes the rest of the group stop and reconsider' },
+    Earth: { category: 'leadership', text: 'the one who has already quietly walked the path the group is hesitating to take, and simply goes first' }
+  },
+  22: {
+    Fire:  { category: 'leadership', text: 'the one who designs the whole structure a project needs, at a scale most of the room has not thought to imagine yet' },
+    Water: { category: 'anchoring', text: 'the one whose patient, practical follow-through actually gets a large, ambitious plan built brick by brick' },
+    Air:   { category: 'creative', text: 'the one who can hold a genuinely large vision and still explain it in terms the rest of the group can act on' },
+    Earth: { category: 'leadership', text: 'the one who takes an enormous idea and simply makes it real, over time, through sustained and disciplined effort' }
+  },
+  33: {
+    Fire:  { category: 'connective', text: 'the one whose way of explaining things changes how the whole group understands the situation, not just this once' },
+    Water: { category: 'connective', text: 'the one whose presence alone tends to settle a group that has been carrying real tension' },
+    Air:   { category: 'connective', text: 'the one who says the thing everyone else in the room was thinking but had not yet found the words for, or who translates one person\'s idea into language the rest of the group can actually act on' },
+    Earth: { category: 'connective', text: 'the one who holds all of the group\'s different needs and personalities together into one coherent whole, without flattening any of them' }
+  }
+};
+// Five plain functional-role categories, each one a bucket of already-real
+// CODEX_ARCHETYPES titles grouped by their own ordinary English meaning --
+// see docs/CODEX_LOGIC_V07.md Part XXXIX §39.4 for the honest-labeling
+// statement this table is held to (this Codex's own organizing scheme, not
+// a separate inherited system, not a personality test).
+var ROLE_CATEGORIES = [
+  { key: 'leadership', label: 'Leadership / Initiation', desc: 'the drive to start things and set a direction before anyone else has committed to one' },
+  { key: 'creative',   label: 'Creative / Visionary',    desc: 'the drive to imagine something new and give it a shape the group had not yet seen' },
+  { key: 'anchoring',  label: 'Steady / Anchoring',      desc: 'the drive to hold structure, stability, and follow-through the rest of the group can lean on' },
+  { key: 'connective', label: 'Connective / Communicative', desc: 'the drive to link people together and carry meaning from one person to the next' },
+  { key: 'analytical', label: 'Analytical / Strategic',  desc: 'the drive to see the pattern underneath a situation and plan the path through it' }
+];
+function getArchetypePracticalRole(lp, element) {
+  var row = ARCHETYPE_PRACTICAL_ROLE[lp] || ARCHETYPE_PRACTICAL_ROLE[reduceNum(lp, false)] || ARCHETYPE_PRACTICAL_ROLE[9];
+  return (row && row[element]) || ARCHETYPE_PRACTICAL_ROLE[9].Air;
+}
+
+// W3BB CODEX V07 PART XXXIX — Standout Roles: honest, ungamed categorization
+// of who in a group leans toward each of the five ROLE_CATEGORIES above,
+// built to the exact same honesty standard Part XXIX already holds Standout
+// Pairings to and Part XVIII §18.3 holds every relational finding to: no
+// invented scoring, no forced single "winner" per category, a real tie
+// stays a real tie and is named as such, and a category nobody in the group
+// leans toward is named plainly as an honest, ordinary outcome rather than
+// silently omitted or filled with a stretch pick. See
+// docs/CODEX_LOGIC_V07.md Part XXXIX for the full rule.
+function computeStandoutRoles(profiles) {
+  var byCategory = {};
+  ROLE_CATEGORIES.forEach(function(c) { byCategory[c.key] = []; });
+  profiles.forEach(function(p) {
+    var role = getArchetypePracticalRole(p.lifePath, p.sunSign.element);
+    if (role && role.category && byCategory[role.category]) {
+      byCategory[role.category].push({
+        firstName: p.firstName,
+        archetype: getCodexArchetype(p.lifePath, p.sunSign.element),
+        axisRole: p.axisRole
+      });
+    }
+  });
+  return ROLE_CATEGORIES.map(function(c) {
+    return { key: c.key, label: c.label, desc: c.desc, members: byCategory[c.key] };
+  });
+}
+function formatStandoutRolesSection(standoutRoles) {
+  var lines = standoutRoles.map(function(cat) {
+    var members = cat.members;
+    if (!members.length) {
+      return cat.label.toUpperCase() + ': No one in this group leans strongly toward ' + cat.desc + ' — an honest, ordinary outcome, not a gap; not every real group has someone carrying every one of these five roles.';
+    }
+    if (members.length === 1) {
+      var m = members[0];
+      return cat.label.toUpperCase() + ': ' + m.firstName + ' — as ' + m.archetype + ' — is the one real match here, the one member of this group whose chart leans toward ' + cat.desc + '.';
+    }
+    // More than one real match -- a genuine tie, per Part XVIII §18.3 / Part
+    // XXIX's own standing rule against forcing a single winner where the
+    // data doesn't support one. Only reach for the Axis Role as a real
+    // distinguishing angle when the group actually splits on it -- naming a
+    // difference that isn't there would be exactly the kind of invented
+    // tiebreaker this rule forbids.
+    var verticals = members.filter(function(m){ return m.axisRole === 'vertical'; });
+    var horizontals = members.filter(function(m){ return m.axisRole === 'horizontal'; });
+    if (verticals.length && horizontals.length) {
+      var vNames = verticals.map(function(m){ return m.firstName + ' (' + m.archetype + ')'; }).join(', ');
+      var hNames = horizontals.map(function(m){ return m.firstName + ' (' + m.archetype + ')'; }).join(', ');
+      return cat.label.toUpperCase() + ': More than one real match here, and they split into two genuinely different flavors of it — ' + vNames + ' carrying it as ' + AXIS_ROLES.vertical.title + ' (' + (verticals.length > 1 ? 'giving many scattered threads one clear direction' : 'giving a scattered thread one clear direction') + '), and ' + hNames + ' carrying that same drive as ' + AXIS_ROLES.horizontal.title + ' (making sure it actually lands in something built). Both are real; this is not a tie to be broken, just two honest shapes of the same category.';
+    }
+    var names = members.map(function(m){ return m.firstName + ' (' + m.archetype + ')'; }).join(', ');
+    return cat.label.toUpperCase() + ': A real tie — ' + names + ' — all lean toward ' + cat.desc + '. No single "winner" is forced here; more than one of you genuinely carries this.';
+  });
+  return lines.join('\n\n');
+}
+
 function computePartnerProfile(firstName, month, day, year) {
   month = parseInt(month); day = parseInt(day); year = parseInt(year);
   var lp = calcLifePath(month, day, year);
@@ -3033,7 +3198,22 @@ function getLifePathQualityText(lp) {
   return text.replace(/\.\s*$/, '');
 }
 
-function formatGroupPersonSection(p, idx, priorProfiles, overview) {
+// W3BB CODEX V07 PART XXXIX — Companion to getLifePathQualityText() above:
+// same real lookup precedence (MASTER_NUMBER_DATA's own title for 11/22/33/
+// 44, LP_DATA's title otherwise), applied to the TITLE field instead of the
+// quality field, so a Master Number's Life Path gets explicitly labeled
+// with its own real title ("The Master Communicator", etc.) rather than the
+// reduced single-digit LP_DATA title p.lpTitle already (incorrectly, for
+// Master Numbers) carries. Reuses the exact same real data sources, does
+// not duplicate getLifePathQualityText()'s own logic beyond that shared
+// precedence rule.
+function getLifePathTitleText(lp) {
+  var reduced = reduceNum(lp, false);
+  var master = MASTER_NUMBER_DATA[lp] || MASTER_NUMBER_DATA[reduced];
+  return (master && master.title) ? master.title : (LP_DATA[lp] || LP_DATA[reduced] || LP_DATA[6]).title;
+}
+
+function formatGroupPersonSection(p, idx, priorProfiles, overview, tracker) {
   var n = idx || 0;
   var art = elementArticle(p.sunSign.element);
   var archetype = getCodexArchetype(p.lifePath, p.sunSign.element);
@@ -3074,16 +3254,74 @@ function formatGroupPersonSection(p, idx, priorProfiles, overview) {
       : 'not generating the group\'s direction but making sure that direction actually gets built into something real') + '.'; }
   ];
 
+  // (3) W3BB CODEX V07 PART XXXIX -- Explicitly label the Life Path number
+  // and its real meaning (the project owner's own words: "It doesn't really
+  // mention the numerology of each person which I think would be good, to
+  // label and identify"). Reuses getLifePathTitleText()/getLifePathQualityText(),
+  // never a new field.
+  var lifePathLabelClauses = [
+    function(){ return 'Life Path ' + p.lifePath + ' — ' + getLifePathTitleText(p.lifePath) + ' — is the numerology underneath that title, carrying ' + lowerFirst(lpQuality) + '.'; },
+    function(){ return 'Underneath the title sits the actual number: Life Path ' + p.lifePath + ', ' + getLifePathTitleText(p.lifePath) + ', whose real gift is ' + lowerFirst(lpQuality) + '.'; },
+    function(){ return 'Named plainly, that is Life Path ' + p.lifePath + ' — ' + getLifePathTitleText(p.lifePath) + ' — the specific number carrying ' + lowerFirst(lpQuality) + ' into everything ' + p.firstName + ' brings to a group.'; }
+  ];
+
+  // (4) PART XXXIX -- Explain the element, don't just name it. Reuses the
+  // same tracked, phrasing-varied, first-mention/callback machinery Part
+  // XXXVI/XXXVII already built for solo/partnership (trackedExplainElement),
+  // wired into the Group Reading for the first time. This directly answers
+  // the project owner's complaint that naming an elemental suit-count with
+  // no explanation ("is one of 4 of you... carrying Pentacles (Earth)
+  // energy") is "very vague."
+  var elementExplainText = trackedExplainElement(tracker, p.sunSign.element);
+
+  // (5) PART XXXIX -- Bring back the Tarot archetype (Trump Card), explained,
+  // tied explicitly to how that archetypal energy shows up as a contribution
+  // -- NOT a return to the Soul/Court Card personal-bio content Part XXXV
+  // correctly dropped (see docs Part XXXIX §39.3 for why these are different).
+  // Uses p.trumpPaths (real single-path entries, already the correct shape
+  // even for the Master Number 33 dual-card case) rather than
+  // p.lifePathTrumpCard.card directly, since that field is a concatenated
+  // "Card A + Card B" string for Life Path 33 that would not match any real
+  // TAROT_PATHS/PATH_TABLE entry on its own.
+  var trumpPaths = (p.trumpPaths || []).filter(Boolean);
+  var trumpText = '';
+  if (trumpPaths.length) {
+    var trumpNames = trumpPaths.map(function(tp){ return tp.card; }).join(' and ');
+    var trumpExplain = trumpPaths.map(function(tp){ return trackedExplainMajorArcanaCard(tracker, tp.card); }).filter(Boolean).join(' ');
+    var trumpClauses = [
+      function(){ return p.firstName + '\'s Life Path Trump Card is ' + trumpNames + ' — the mythic archetype underneath the title above. ' + trumpExplain; },
+      function(){ return 'Underneath the numerology sits a real Tarot archetype too: ' + trumpNames + ' is ' + p.firstName + '\'s Life Path Trump Card. ' + trumpExplain; },
+      function(){ return trumpNames + ' is the Major Arcana card riding underneath ' + p.firstName + '\'s Life Path — the same mandate, spoken in the language of myth. ' + trumpExplain; }
+    ];
+    trumpText = trumpClauses[n % trumpClauses.length]().trim();
+  }
+
+  // (6) PART XXXIX -- Concretely unpack what the archetype title actually
+  // means as a role ("I know it says I am the communicator, but what
+  // exactly does that mean?"). Draws on ARCHETYPE_PRACTICAL_ROLE, a real
+  // per-[lifePath][element] lookup grounded in that cell's own archetype
+  // title, never invented independently of it.
+  var practical = getArchetypePracticalRole(p.lifePath, p.sunSign.element);
+  var practicalClauses = [
+    function(){ return 'In practice, that means ' + p.firstName + ' is usually ' + practical.text + '.'; },
+    function(){ return 'Concretely, in a group, that tends to look like ' + p.firstName + ' being ' + practical.text + '.'; },
+    function(){ return 'What that actually looks like day to day: ' + p.firstName + ' is often ' + practical.text + '.'; }
+  ];
+
   var parts = [];
   parts.push(openers[n % openers.length]());
   parts.push(roleClauses[n % roleClauses.length]());
+  parts.push(lifePathLabelClauses[n % lifePathLabelClauses.length]());
+  parts.push(elementExplainText);
+  if (trumpText) parts.push(trumpText);
+  parts.push(practicalClauses[n % practicalClauses.length]());
 
   var crossRef = findGroupCrossReference(p, priorProfiles);
   if (crossRef) parts.push(formatGroupCrossReference(p, crossRef));
 
   if (overview && p.elementSuit && overview.suitCounts && overview.suitCounts[p.elementSuit] > 1) {
     var suitLabelMap = {Wands:'Fire', Cups:'Water', Swords:'Air', Pentacles:'Earth'};
-    parts.push(p.firstName + ' is one of ' + overview.suitCounts[p.elementSuit] + ' of you in this room carrying ' + p.elementSuit + ' (' + (suitLabelMap[p.elementSuit] || p.sunSign.element) + ') energy — one more voice contributing that current to the group\'s overall spectrum.');
+    parts.push(p.firstName + ' is one of ' + overview.suitCounts[p.elementSuit] + ' of you in this room carrying that same ' + p.elementSuit + ' (' + (suitLabelMap[p.elementSuit] || p.sunSign.element) + ') current — real company in this specific energy, not a stray reading.');
   }
 
   return parts.join(' ').trim();
@@ -3221,18 +3459,28 @@ function formatStandoutPairingsSection(pairings) {
 function getGroupFallback(profiles) {
   var overview = computeGroupOverview(profiles);
   var pairings = computeStandoutPairings(profiles);
+  var standoutRoles = computeStandoutRoles(profiles);
+  // PART XXXIX -- one explain-tracker for the whole group reading, so the
+  // same element or Trump Card explained for one person reads as a real
+  // callback (not a duplicate explanation) the next time it comes up for a
+  // different person later in the same reading -- the identical mechanism
+  // getFallbackReading()/getPartnershipFallback() already use per Part
+  // XXXVII, now threaded through the Group Reading for the first time.
+  var tracker = createExplainTracker();
   var names = profiles.map(function(p){return p.firstName;});
   var intro = 'Welcome, ' + names.join(', ') + '. What follows is not ' + profiles.length + ' separate readings sitting side by side — it is one real, computed picture of how this group’s numbers, signs, and paths actually distribute, plus the handful of pairings between you that are genuinely worth naming.';
   return {
     intro: intro,
     overviewText: formatGroupOverviewSection(overview),
+    standoutRolesText: formatStandoutRolesSection(standoutRoles),
     people: profiles.map(function(p, idx) {
-      return { firstName: p.firstName, text: formatGroupPersonSection(p, idx, profiles.slice(0, idx), overview) };
+      return { firstName: p.firstName, text: formatGroupPersonSection(p, idx, profiles.slice(0, idx), overview, tracker) };
     }),
     pairingsText: formatStandoutPairingsSection(pairings),
     blessing: 'AIN SOPH AUR — the limitless light this whole reading traces back to — holds all ' + profiles.length + ' of you, individually and together. I am Celestia, and it has been an honor to read this group’s geometry.',
     overview: overview,
-    pairings: pairings
+    pairings: pairings,
+    standoutRoles: standoutRoles
   };
 }
 
@@ -3245,14 +3493,25 @@ function getGroupFallback(profiles) {
 async function doGroupReading(profiles) {
   var overview = computeGroupOverview(profiles);
   var pairings = computeStandoutPairings(profiles);
+  var standoutRoles = computeStandoutRoles(profiles);
   var profileLines = profiles.map(function(p) {
     var axis = p.axisRole && AXIS_ROLES[p.axisRole] ? AXIS_ROLES[p.axisRole] : null;
     var archetype = getCodexArchetype(p.lifePath, p.sunSign.element);
     var lpQuality = getLifePathQualityText(p.lifePath);
-    return p.firstName + ': Life Path ' + p.lifePath + ' · Codex Archetype ' + archetype + ' (Life Path quality: ' + lpQuality + ') · ' + p.sunSign.sign + ' Sun (' + p.sunSign.element + ' — ' + (ELEMENT_QUALITIES[p.sunSign.element] || '') + ') · ' + p.tree.name
+    var lpTitle = getLifePathTitleText(p.lifePath);
+    var trumpPaths = (p.trumpPaths || []).filter(Boolean);
+    var trumpDesc = trumpPaths.map(function(tp){ return tp.card + (tp.keyword ? ' (archetype: ' + (TAROT_PATHS.find(function(t){return t.card===tp.card;})||{}).archetype + '; Golden Dawn keyword: ' + tp.keyword + ')' : ''); }).join(' + ');
+    var practical = getArchetypePracticalRole(p.lifePath, p.sunSign.element);
+    return p.firstName + ': Life Path ' + p.lifePath + ' — ' + lpTitle + ' (quality: ' + lpQuality + ') · Codex Archetype ' + archetype + ' · ' + p.sunSign.sign + ' Sun (' + p.sunSign.element + ' — ' + (ELEMENT_QUALITIES[p.sunSign.element] || '') + ') · ' + p.tree.name
+      + (trumpDesc ? ' · Life Path Trump Card ' + trumpDesc : '')
       + (axis ? ' · Axis Role ' + axis.title + ' (' + axis.description + ')' : '')
       + (p.elementSuit ? ' · Elemental Suit ' + p.elementSuit : '')
-      + (p.elementalNodePolarity ? ' · Elemental Node polarity: ' + p.elementalNodePolarity : '');
+      + (p.elementalNodePolarity ? ' · Elemental Node polarity: ' + p.elementalNodePolarity : '')
+      + ' · Practical-role category: ' + practical.category + ' (' + practical.text + ')';
+  }).join('\n');
+
+  var standoutRolesData = standoutRoles.map(function(c) {
+    return c.label + ': ' + (c.members.length ? c.members.map(function(m){return m.firstName + ' (' + m.archetype + ', ' + m.axisRole + ')';}).join(', ') : 'no one in this group');
   }).join('\n');
 
   var prompt = 'You are Celestia, oracle of Circles Squared. Generate a group reading for ' + profiles.length + ' people: ' + profiles.map(function(p){return p.firstName;}).join(', ') + '. '
@@ -3260,16 +3519,21 @@ async function doGroupReading(profiles) {
     + 'PROFILE (people are listed in the same order their sections should appear -- each person after the first can genuinely be compared only to the people listed ABOVE them, since those are the only people "already introduced" in the finished reading):\n' + profileLines + '\n\n'
     + 'GROUP OVERVIEW (real, computed distribution -- report these counts honestly, never invent a composite score): '
     + 'Elemental suits -- ' + JSON.stringify(overview.suitCounts) + '. Axis roles -- ' + JSON.stringify(overview.axisCounts) + '. Elemental Node polarity -- ' + JSON.stringify(overview.polarityCounts) + '.\n\n'
+    + 'STANDOUT ROLES DATA (real, already-computed: which real member(s), if any, fall into each of these five functional-role categories, themselves just this Codex\'s own plain-English grouping of the real Codex Archetype titles -- see PROFILE above for each person\'s own category):\n' + standoutRolesData + '\n\n'
     + 'FOR EACH PERSON\'S SECTION, the content must be CONTRIBUTION-FRAMED, not a personal-bio recap. Concretely:\n'
     + '  (a) Name their Codex Archetype plainly (e.g. "As The Master Communicator, Heather brings..."), then explain what that title concretely MEANS by synthesizing their real Life Path quality with what their Sun element genuinely represents (given in the PROFILE above) -- a real synthesis of those two real findings, not two facts stapled side by side with "and."\n'
     + '  (b) Pivot explicitly to their Axis Role (Vertical Integrator or Horizontal Architect, given in the PROFILE above) as their STRUCTURAL POSITION in a group -- state plainly and specifically how their archetype and their axis role combine into their single most reliable contribution when working with others (e.g. a Vertical Integrator who is also a Communicator-type archetype is the one who takes a group\'s scattered energy and gives it one clear spoken direction; a Horizontal Architect with that same archetype instead keeps everyone\'s communication actually landing somewhere real, not just talk). This must be a genuine synthesis of the two real fields, held to the same "not two facts stapled together" bar the partnership reading\'s own synthesis paragraphs already meet.\n'
-    + '  (c) DO NOT include personal-bio content that has no group-contribution angle -- no Soul Card/Court Card sentence, no raw North/South Node growth-direction narration. Those belong to the solo reading, not this one. If in doubt, ask: does this sentence describe their SEAT AT THIS TABLE, or their personal chart in isolation? Only the former belongs here.\n'
-    + '  (d) Keep, but subordinate, the elemental-suit-count callout and any real cross-reference to a person already introduced above them (rule (2) below) -- these belong in service of the same "how you fit into this specific group" narrative, not bolted on as an afterthought.\n\n'
+    + '  (c) EXPLAIN, don\'t just name, every symbol: explicitly explain what their Sun element genuinely represents (using the real correspondence given in the PROFILE above) before applying it -- never just name a suit-count ("one of 4 of you carrying Pentacles energy") with no explanation of what that element actually means; that is exactly the vague phrasing this reading must avoid. Also EXPLICITLY, plainly label their Life Path number and its own real title and quality (e.g. "Life Path 33 — The Master Teacher — carries...") rather than only weaving it invisibly into the archetype synthesis in (a).\n'
+    + '  (d) Bring back their Life Path Trump Card (the Major Arcana / Tarot archetype given in the PROFILE above), EXPLAINED using its real archetype phrase and Golden Dawn keyword, and tie it explicitly to how that mythic energy shows up as their contribution to this specific group -- this is different from Soul Card/Court Card content (still excluded, see (e) below): the Trump Card is the same core mythic identity the Codex Archetype title already synthesizes from, made concrete and explained rather than left as an invisible ingredient.\n'
+    + '  (e) Then add one further CONCRETE sentence translating the archetype into what it actually LOOKS LIKE in practice within this group (the PROFILE above gives a real, grounded "practical-role" phrase for exactly this purpose) -- e.g. for a Communicator-flavored archetype, something like "in practice, that means X is usually the one who says the thing everyone else is thinking but hasn\'t voiced yet." Use the given practical-role phrase as your grounding, in your own natural words.\n'
+    + '  (f) DO NOT include personal-bio content that has no group-contribution angle -- no Soul Card/Court Card sentence, no raw North/South Node growth-direction narration. Those belong to the solo reading, not this one. If in doubt, ask: does this sentence describe their SEAT AT THIS TABLE, or their personal chart in isolation? Only the former belongs here.\n'
+    + '  (g) Keep, but subordinate, the elemental-suit-count callout and any real cross-reference to a person already introduced above them (rule (2) below) -- these belong in service of the same "how you fit into this specific group" narrative, not bolted on as an afterthought.\n\n'
     + 'CRITICAL -- avoid the flat, isolated-then-bulleted-pairings shape entirely. Do this the way the two-person partnership reading already does it: weave real comparisons INSIDE sentences about a specific person, not only in a separate pairings list. Two structural rules govern the whole output:\n'
-    + '(1) PER-PERSON VARIATION: Do not write every PERSON_<name> section from the identical sentence skeleton. Vary how each paragraph opens and closes, and vary the order facts are introduced in, person to person, the way a human writer naturally varies phrasing -- two people\'s paragraphs in this same reading should never read as obviously mad-libbed from one template. Every fact must still be real and drawn only from the PROFILE above -- vary HOW it is said, never invent WHAT is said.\n'
+    + '(1) PER-PERSON VARIATION: Do not write every PERSON_<name> section from the identical sentence skeleton. Vary how each paragraph opens and closes, and vary the order facts are introduced in, person to person, the way a human writer naturally varies phrasing -- two people\'s paragraphs in this same reading should never read as obviously mad-libbed from one template. This applies just as much to how you explain a shared element or a Trump Card as to the rest of the paragraph: if two different people in this group share the same Sun element, explain it in genuinely different wording each time (a brief callback to the earlier explanation is preferred for the second mention, e.g. "that same Air current already named for Marcus above"), never the identical explanation sentence twice. Every fact must still be real and drawn only from the PROFILE above -- vary HOW it is said, never invent WHAT is said.\n'
     + '(2) REAL CROSS-REFERENCES INSIDE PARAGRAPHS: For each person after the first, look back at the people already listed above them in the PROFILE and, where a genuine real connection exists (the exact same Sephirah, the exact same Life Path Trump Card, the same Elemental Suit, a complementary or matching Axis Role the way Cornerstone/Twin Pillar/Foundation configurations already work in the two-person reading, or complementary Elemental Node polarity), weave ONE such reference into that person\'s OWN paragraph, in the partnership reading\'s own style -- e.g. "Where Marcus\'s Air current sets the tone for this room\'s Vertical axis, Priya\'s Water brings something the group doesn\'t otherwise have." Do not force a connection where none of those real criteria are actually met for anyone listed above this person -- some people legitimately get no cross-reference -- but this must genuinely happen for a meaningful fraction of the group, not zero. Also have a person\'s own paragraph name their place inside the real Group Overview counts above where it fits naturally (e.g. "one of the X of you carrying Pentacles energy").\n\n'
     + 'For the PAIRINGS section specifically: when several pairs in this group share the exact same qualifying condition with no other distinguishing coincidence (for example, four different people who all simply carry the same outward-pushing Node polarity with nothing else notable between any two of them), do NOT write one nearly-identical bulleted sentence per pair. Either vary the sentence construction meaningfully pair to pair, or -- better, when three or more people share the identical plain condition -- consolidate them into ONE sentence naming the whole cluster together (e.g. "Priya, Dante, Solveig, and Yara all carry the same outward-pushing Node current, which as a cluster suggests...") instead of N separate nearly-identical two-person bullets. Pairs that DO carry a real additional coincidence (same Sephirah, same Trump Card, etc. on top of the polarity) are already distinguished by that fact and may stay as individual bullets.\n\n'
-    + 'Write these sections using ===SECTION_NAME_START=== / ===SECTION_NAME_END=== delimiters: OVERVIEW (2-3 paragraphs naming the real distributions above as this group\'s full roster of roles and contributions), then one PERSON_<firstname> section per person, in PROFILE order (1 condensed paragraph each, following the contribution-framing rules (a)-(d) and the structural rules (1) and (2) above), then PAIRINGS (name only the standout pairings the data supports -- complementary Node polarity for magnetic pairs, matching polarity for tension pairs, each combined with any other real coincidence -- as plain described facts, never a score, following the clustering/variation rule above), then BLESSING (a short closing blessing invoking AIN SOPH AUR for the whole group).';
+    + 'For the STANDOUT_ROLES section specifically: using the STANDOUT ROLES DATA given above, name, for each of the five categories, exactly what the real data shows -- who (if anyone) leans toward Leadership/Initiation, Creative/Visionary, Steady/Anchoring, Connective/Communicative, and Analytical/Strategic. Do NOT invent a scoring system and do NOT force a single "winner" when the real data names more than one person or no one at all for a category -- if two or more people share a category, name all of them plainly as a real tie (using their Axis Role as a genuine distinguishing angle only where the data actually splits that way, e.g. a Vertical-Integrator-flavored leader vs. a Horizontal-Architect-flavored leader are two real, different flavors of the same category, worth naming as such); if no one in the group falls into a category, say so plainly and honestly (e.g. "No one in this group leans strongly toward the Analytical/Strategic role -- an honest, ordinary outcome") rather than omitting that category or stretching a weak match to fill it.\n\n'
+    + 'Write these sections using ===SECTION_NAME_START=== / ===SECTION_NAME_END=== delimiters: OVERVIEW (2-3 paragraphs naming the real distributions above as this group\'s full roster of roles and contributions), then STANDOUT_ROLES (following the rule directly above -- one short paragraph or a labeled line per category, all five categories addressed), then one PERSON_<firstname> section per person, in PROFILE order (1 condensed paragraph each, following the contribution-framing rules (a)-(g) and the structural rules (1) and (2) above), then PAIRINGS (name only the standout pairings the data supports -- complementary Node polarity for magnetic pairs, matching polarity for tension pairs, each combined with any other real coincidence -- as plain described facts, never a score, following the clustering/variation rule above), then BLESSING (a short closing blessing invoking AIN SOPH AUR for the whole group).';
 
   try {
     var text = await generateReading(prompt);
@@ -3290,9 +3554,10 @@ function parseGroupReadingSections(fullText, profiles) {
     return fullText.slice(si + s.length, ei).trim();
   }
   var overviewText = extract('OVERVIEW');
+  var standoutRolesText = extract('STANDOUT_ROLES');
   var pairingsText = extract('PAIRINGS');
   var blessing = extract('BLESSING');
-  if (!overviewText || !pairingsText || !blessing) return null;
+  if (!overviewText || !standoutRolesText || !pairingsText || !blessing) return null;
   var people = [];
   for (var i = 0; i < profiles.length; i++) {
     var t = extract('PERSON_' + profiles[i].firstName.toUpperCase());
@@ -3302,11 +3567,13 @@ function parseGroupReadingSections(fullText, profiles) {
   return {
     intro: 'Welcome, ' + profiles.map(function(p){return p.firstName;}).join(', ') + '.',
     overviewText: overviewText,
+    standoutRolesText: standoutRolesText,
     people: people,
     pairingsText: pairingsText,
     blessing: blessing,
     overview: computeGroupOverview(profiles),
-    pairings: computeStandoutPairings(profiles)
+    pairings: computeStandoutPairings(profiles),
+    standoutRoles: computeStandoutRoles(profiles)
   };
 }
 
@@ -3373,6 +3640,7 @@ function generateGroupPDF(profiles, content) {
 
   var totalPages = 2 + profiles.length; // cover + overview + one per person + pairings(+blessing folded in)
   totalPages = 3 + profiles.length; // cover + overview + N person pages + pairings/blessing
+  if (content.standoutRolesText) totalPages += 1; // + Standout Roles page (Part XXXIX)
 
   // ===== COVER =====
   pdfBg(); pdfStars(91, 150);
@@ -3396,12 +3664,22 @@ function generateGroupPDF(profiles, content) {
   bodyText(content.overviewText, 42, WHITE, 9.5);
   pdfFooter(2, totalPages);
 
+  // ===== STANDOUT ROLES (Part XXXIX) =====
+  var pageAfterOverview = 3;
+  if (content.standoutRolesText) {
+    doc.addPage(); pdfBg(); pdfStars(155, 85);
+    pageHeader('STANDOUT ROLES', 'Who Plays Which Position', TEAL);
+    bodyText(content.standoutRolesText, 42, WHITE, 9);
+    pdfFooter(3, totalPages);
+    pageAfterOverview = 4;
+  }
+
   // ===== ONE PAGE PER PERSON =====
   profiles.forEach(function(p, idx) {
     doc.addPage(); pdfBg(); pdfStars(200 + idx * 17, 80);
     pageHeader(p.firstName.toUpperCase(), p.firstName, PURPLE);
     var y = bodyText(content.people[idx].text, 42, WHITE, 9.5);
-    pdfFooter(3 + idx, totalPages);
+    pdfFooter(pageAfterOverview + idx, totalPages);
   });
 
   // ===== STANDOUT PAIRINGS + BLESSING =====
@@ -3412,7 +3690,7 @@ function generateGroupPDF(profiles, content) {
   doc.setFont('times', 'italic'); doc.setFontSize(9); doc.setTextColor(GOLD[0], GOLD[1], GOLD[2]);
   var blessLines = doc.splitTextToSize(sanitizeForPdfText(content.blessing), W - 28);
   doc.text(blessLines, 14, yy);
-  pdfFooter(3 + profiles.length, totalPages);
+  pdfFooter(pageAfterOverview + profiles.length, totalPages);
 
   var filename = 'circles-squared-group-' + profiles.length + '-people.pdf';
   _openPDF(doc, filename);
@@ -9604,6 +9882,12 @@ function unlockFullGroupReading() {
     html += content.overviewText.split(/\n\n+/).filter(function(pp){ return pp.trim(); }).map(function(para) {
       return '<p style="margin-bottom:1.1rem;line-height:1.8;font-size:0.92rem;color:rgba(232,224,255,0.88);">' + para.trim() + '</p>';
     }).join('');
+    if (content.standoutRolesText) {
+      html += '<div style="font-family:Courier New,monospace;font-size:0.6rem;letter-spacing:0.3em;color:#50dcc8;margin:1.4rem 0 0.6rem;">✦ STANDOUT ROLES ✦</div>';
+      html += content.standoutRolesText.split(/\n\n+/).filter(function(pp){ return pp.trim(); }).map(function(para) {
+        return '<p style="margin-bottom:1.1rem;line-height:1.8;font-size:0.92rem;color:rgba(232,224,255,0.88);">' + para.trim() + '</p>';
+      }).join('');
+    }
     content.people.forEach(function(person) {
       html += '<div style="margin:1.8rem 0 1.2rem;padding-top:1.2rem;border-top:1px solid rgba(80,220,200,0.15);">'
         + '<div style="font-family:Courier New,monospace;font-size:0.62rem;letter-spacing:0.2em;color:#c9a84c;margin-bottom:0.5rem;">' + person.firstName.toUpperCase() + '</div>'
