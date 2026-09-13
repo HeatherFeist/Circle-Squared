@@ -1535,8 +1535,16 @@ function _kokoroChunkText(fullText) {
   var sentences = fullText.match(/[^.!?]+[.!?]+/g) || [fullText];
   var chunks = [];
   var current = '';
+  // The very first chunk is capped much shorter than the rest (150 chars vs
+  // 400): generate() is real, sequential CPU work, so whatever the first
+  // chunk's length is directly IS the silent pause before any sound plays
+  // at all. Every later chunk can afford to be the full 400 chars because
+  // kokoroSpeak() generates it ahead of time while the previous chunk is
+  // still playing (see kokoroSpeak()'s own comment) -- only the first chunk
+  // has no "previous chunk" to hide behind.
   for (var i = 0; i < sentences.length; i++) {
-    if ((current + sentences[i]).length > 400 && current.length > 0) {
+    var limit = chunks.length === 0 ? 150 : 400;
+    if ((current + sentences[i]).length > limit && current.length > 0) {
       chunks.push(current.trim());
       current = sentences[i];
     } else {
@@ -1552,7 +1560,12 @@ function _kokoroChunkText(fullText) {
 // this file -- so the rest of the app's mute/stop/progress wiring, which
 // only ever knows about `currentAudio` and `window.speechSynthesis`, keeps
 // working correctly no matter which voice tier is actually speaking.
-async function _kokoroSpeakChunk(text, voiceName, rate) {
+// Generates (but does not play) exactly one chunk of audio through Kokoro.
+// Split out from playback so kokoroSpeak() can pipeline: generate chunk N+1
+// while chunk N is still playing, instead of only starting chunk N+1's
+// generation after chunk N's audio finishes -- see kokoroSpeak()'s own
+// comment for why that pipelining exists.
+async function _kokoroGenerateChunk(text, voiceName, rate) {
   // Kokoro runs on WASM (CPU), not WebGPU (see loadKokoroVoice()'s own
   // comment on why) -- generate() is real, sustained CPU work, and on a
   // slower device or under memory pressure a single chunk can occasionally
@@ -1564,7 +1577,17 @@ async function _kokoroSpeakChunk(text, voiceName, rate) {
   var rawAudio = await _withTimeout(_kokoroTTS.generate(text, { voice: voiceName, speed: rate }), 20000, '[Kokoro] generate()');
   var blob = rawAudio.toBlob();
   var url = URL.createObjectURL(blob);
-  var audio = new Audio(url);
+  return { audio: new Audio(url), url: url };
+}
+
+// Plays audio already produced by _kokoroGenerateChunk(), resolving once
+// playback actually finishes (or rejecting on a play failure/timeout) --
+// uses the same currentAudio + <audio> contract used elsewhere in this file
+// so the rest of the app's mute/stop/progress wiring keeps working correctly
+// no matter which voice tier is actually speaking.
+async function _kokoroPlayGeneratedAudio(generated) {
+  var audio = generated.audio;
+  var url = generated.url;
   currentAudio = audio;
   try {
     await _withTimeout(audio.play(), 5000, '[Kokoro] audio.play()');
@@ -1576,6 +1599,40 @@ async function _kokoroSpeakChunk(text, voiceName, rate) {
     audio.addEventListener('ended', function() { URL.revokeObjectURL(url); resolve(); });
     audio.addEventListener('error', function(e) { URL.revokeObjectURL(url); reject(e); });
   });
+}
+
+// Convenience wrapper kept for the admin panel's single-shot "Test Voice"
+// button, which just needs one chunk generated then played, with no
+// pipelining involved (there is nothing to pipeline for a single chunk).
+async function _kokoroSpeakChunk(text, voiceName, rate) {
+  var generated = await _kokoroGenerateChunk(text, voiceName, rate);
+  return _kokoroPlayGeneratedAudio(generated);
+}
+
+// Generates one chunk with the same MAX_ATTEMPTS_PER_CHUNK/RETRY_DELAY_MS
+// retry discipline kokoroSpeak() has always used for transient WASM
+// hiccups -- extracted here so kokoroSpeak() can run this ahead of playback
+// for pipelining. Returns the generated {audio, url} on success, or null if
+// every attempt failed (the caller falls back to the native browser voice
+// for the remainder of the narration, exactly as before).
+async function _kokoroGenerateChunkWithRetry(text, voiceName, rate, chunkIndex, totalChunks) {
+  var MAX_ATTEMPTS_PER_CHUNK = 3;
+  var RETRY_DELAY_MS = 600;
+  var lastErr = null;
+  for (var attempt = 1; attempt <= MAX_ATTEMPTS_PER_CHUNK; attempt++) {
+    if (_speakCancelled || isMuted) return null;
+    try {
+      return await _kokoroGenerateChunk(text, voiceName, rate);
+    } catch (e) {
+      lastErr = e;
+      console.warn('[Kokoro] chunk ' + (chunkIndex + 1) + '/' + totalChunks + ' generation attempt ' + attempt + '/' + MAX_ATTEMPTS_PER_CHUNK + ' failed:', e);
+      if (attempt < MAX_ATTEMPTS_PER_CHUNK) {
+        await new Promise(function(res) { setTimeout(res, RETRY_DELAY_MS); });
+      }
+    }
+  }
+  console.error('[Kokoro] chunk ' + (chunkIndex + 1) + '/' + totalChunks + ' failed to generate after ' + MAX_ATTEMPTS_PER_CHUNK + ' attempts -- falling back to the default browser voice for the remainder of THIS narration only (Kokoro will be tried fresh again next time):', lastErr);
+  return null;
 }
 
 // The enhanced-voice narration path — only ever called from browserSpeak()
@@ -1603,6 +1660,18 @@ async function _kokoroSpeakChunk(text, voiceName, rate) {
 // and is deliberately NOT set here, so the very next reading (or the next
 // page's narration) gets a fresh, real chance at Kokoro again rather than
 // being stuck on the fallback voice for no reason a person can see.
+//
+// PIPELINED generation (fixes the reported "long pauses in between" chunks):
+// generate() is real, sequential CPU work on this device's own WASM
+// runtime -- it is not instant. The original version generated chunk N,
+// played it to completion, and ONLY THEN started generating chunk N+1,
+// so every single chunk boundary in a reading produced an audible silent
+// gap exactly as long as that next chunk's generation time. Chunk N+1's
+// generation is now kicked off as soon as chunk N's audio is ready (i.e.
+// while chunk N is still playing), so the CPU work overlaps with playback
+// instead of happening in a gap between chunks. Only the very first chunk
+// has no previous chunk to hide its generation time behind -- that's why
+// _kokoroChunkText() also caps the first chunk much shorter than the rest.
 async function kokoroSpeak(text, onEnd) {
   var voiceName = getKokoroVoiceName();
   // Kokoro's generate() takes a literal speed multiplier (1 = normal) --
@@ -1614,29 +1683,30 @@ async function kokoroSpeak(text, onEnd) {
   var finished = false;
   function finish() { if (finished) return; finished = true; if (onEnd) onEnd(); }
 
-  var MAX_ATTEMPTS_PER_CHUNK = 3;
-  var RETRY_DELAY_MS = 600;
+  if (chunks.length === 0) { finish(); return; }
+  if (_speakCancelled || isMuted) { finish(); return; }
+
+  var pendingNext = _kokoroGenerateChunkWithRetry(chunks[0], voiceName, rate, 0, chunks.length);
 
   for (var i = 0; i < chunks.length; i++) {
     if (_speakCancelled || isMuted) { finish(); return; }
-    var lastErr = null;
-    var succeeded = false;
-    for (var attempt = 1; attempt <= MAX_ATTEMPTS_PER_CHUNK; attempt++) {
-      if (_speakCancelled || isMuted) { finish(); return; }
-      try {
-        await _kokoroSpeakChunk(chunks[i], voiceName, rate);
-        succeeded = true;
-        break;
-      } catch (e) {
-        lastErr = e;
-        console.warn('[Kokoro] chunk ' + (i + 1) + '/' + chunks.length + ' attempt ' + attempt + '/' + MAX_ATTEMPTS_PER_CHUNK + ' failed:', e);
-        if (attempt < MAX_ATTEMPTS_PER_CHUNK) {
-          await new Promise(function(res) { setTimeout(res, RETRY_DELAY_MS); });
-        }
-      }
+    var generated = await pendingNext;
+    if (!generated) {
+      // _kokoroGenerateChunkWithRetry() already logged the real reason.
+      currentAudio = null;
+      _nativeBrowserSpeak(chunks.slice(i).join(' '), finish);
+      return;
     }
-    if (!succeeded) {
-      console.error('[Kokoro] chunk ' + (i + 1) + '/' + chunks.length + ' failed after ' + MAX_ATTEMPTS_PER_CHUNK + ' attempts -- falling back to the default browser voice for the remainder of THIS narration only (Kokoro will be tried fresh again next time):', lastErr);
+    // Kick off the NEXT chunk's generation now, before playing this one, so
+    // it runs concurrently with this chunk's playback instead of after it.
+    if (i + 1 < chunks.length) {
+      pendingNext = _kokoroGenerateChunkWithRetry(chunks[i + 1], voiceName, rate, i + 1, chunks.length);
+    }
+    if (_speakCancelled || isMuted) { finish(); return; }
+    try {
+      await _kokoroPlayGeneratedAudio(generated);
+    } catch (playErr) {
+      console.error('[Kokoro] chunk ' + (i + 1) + '/' + chunks.length + ' playback failed -- falling back to the default browser voice for the remainder of THIS narration only (Kokoro will be tried fresh again next time):', playErr);
       currentAudio = null;
       _nativeBrowserSpeak(chunks.slice(i).join(' '), finish);
       return;
