@@ -1574,10 +1574,27 @@ async function _kokoroGenerateChunk(text, voiceName, rate) {
   // as before) means a stuck generate() call surfaces as a real, catchable
   // error that the retry loop in kokoroSpeak() below can act on, rather
   // than silently freezing the reading with no sound at all.
+  //
+  // DIAGNOSTIC TIMING (Part XLIII): logs real generate() wall-clock time to
+  // the console, dev-only -- no visitor ever sees this. Added because
+  // pipelining chunk N+1's generation against chunk N's playback (Part
+  // XLII) only actually removes the audible gap between chunks IF
+  // generate() finishes faster than the previous chunk's own audio takes
+  // to play back. Whether that's true on a given real device was something
+  // this sandbox could not measure (no real browser/WASM runtime/audio
+  // device exists here) -- this makes it directly visible in DevTools on a
+  // real device instead of guessing.
+  var _genStart = (typeof performance !== 'undefined' ? performance.now() : Date.now());
   var rawAudio = await _withTimeout(_kokoroTTS.generate(text, { voice: voiceName, speed: rate }), 20000, '[Kokoro] generate()');
+  var _genMs = Math.round((typeof performance !== 'undefined' ? performance.now() : Date.now()) - _genStart);
   var blob = rawAudio.toBlob();
   var url = URL.createObjectURL(blob);
-  return { audio: new Audio(url), url: url };
+  var audio = new Audio(url);
+  audio.addEventListener('loadedmetadata', function() {
+    var durationMs = isFinite(audio.duration) ? Math.round(audio.duration * 1000) : null;
+    console.debug('[Kokoro][timing] generated ' + text.length + ' chars in ' + _genMs + 'ms; audio plays for ' + (durationMs === null ? '(unknown)' : durationMs + 'ms') + (durationMs !== null && _genMs > durationMs ? ' -- generate() was SLOWER than playback, this chunk WILL cause an audible gap regardless of pipelining' : durationMs !== null ? ' -- generate() was faster than playback, pipelining should hide this chunk entirely' : ''));
+  }, { once: true });
+  return { audio: audio, url: url };
 }
 
 // Plays audio already produced by _kokoroGenerateChunk(), resolving once
