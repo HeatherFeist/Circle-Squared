@@ -1236,6 +1236,13 @@ function preprocessForSpeech(text) {
     [/AIN SOPH/g, 'Ain Sof'],
     [/Chiron/g, 'KY-ron'],
     [/Lilith/g, 'LIL-ith'],
+    // "Libra" is real English text, but most TTS engines (Kokoro included,
+    // per a real reported mispronunciation) default to the "long I" reading
+    // ("LIE-bruh") since that matches more common English words' vowel
+    // pattern for this letter combination -- the correct astrological
+    // pronunciation is "LEE-bruh". Respelled phonetically here, audio-only
+    // (the visible reading text and PDF keep the real word "Libra").
+    [/\bLibra\b/g, 'LEE-bruh'],
     [/\b11\b/g, 'eleven'],
     [/\b22\b/g, 'twenty-two'],
     [/\b33\b/g, 'thirty-three'],
@@ -1602,7 +1609,14 @@ async function _kokoroGenerateChunk(text, voiceName, rate) {
 // uses the same currentAudio + <audio> contract used elsewhere in this file
 // so the rest of the app's mute/stop/progress wiring keeps working correctly
 // no matter which voice tier is actually speaking.
-async function _kokoroPlayGeneratedAudio(generated) {
+// `onStarted`, if given, fires the instant playback actually begins (right
+// after `audio.play()` resolves) -- this is the correct moment to kick off
+// any look-ahead generation for what comes NEXT (see _kokoroPrefetchForText
+// below): the audio hardware/media pipeline keeps this chunk's sound
+// playing on its own from here, independent of the JS main thread, so
+// starting the next chunk's CPU-bound generate() work right here overlaps
+// it with THIS chunk's playback instead of delaying this chunk's own start.
+async function _kokoroPlayGeneratedAudio(generated, onStarted) {
   var audio = generated.audio;
   var url = generated.url;
   currentAudio = audio;
@@ -1612,10 +1626,67 @@ async function _kokoroPlayGeneratedAudio(generated) {
     URL.revokeObjectURL(url);
     throw playErr;
   }
+  if (onStarted) onStarted();
   return new Promise(function(resolve, reject) {
     audio.addEventListener('ended', function() { URL.revokeObjectURL(url); resolve(); });
     audio.addEventListener('error', function(e) { URL.revokeObjectURL(url); reject(e); });
   });
+}
+
+// ===========================
+// SEGMENT-LEVEL LOOK-AHEAD PREFETCH (Part XLIV)
+// ===========================
+// The Part XLII pipelining fix overlaps generation ONLY *within* a single
+// kokoroSpeak() call's own chunks -- it does nothing across two SEPARATE
+// top-level narration calls. The free reveal screen (initRevealScreen()'s
+// playNext()) narrates in many short, independent segments -- each one its
+// own complete speakIntroText() call, invoked only once the PREVIOUS
+// segment's playback has fully finished (via its onFinish callback). Each
+// such segment is short enough to be exactly one Kokoro chunk, so within
+// that one segment there is nothing to pipeline -- and the very real
+// generate() latency for the NEXT segment was, before this Part, only ever
+// starting after the current segment's audio had already finished playing.
+// That produced exactly the reported symptom: audible speech in short
+// bursts ("just a few words"), each followed by a real silent gap before
+// the next burst -- a gap equal to that next segment's own generate() time,
+// with zero overlap, on every single segment boundary.
+//
+// This single-slot prefetch cache lets a caller that already KNOWS what
+// text comes next (like initRevealScreen()'s playNext(), which has the
+// whole segment script up front) hand that text forward so its generation
+// can be kicked off the moment the CURRENT segment's audio starts playing
+// (see the `onStarted` hook above) -- exactly the same "start the next
+// chunk's CPU work while a natively-playing audio element handles the
+// current chunk's sound" principle Part XLII already established, just
+// applied across the segment boundary this time instead of within one call.
+var _kokoroPrefetch = null; // { text, promise } | null
+
+// `lookaheadText` MUST already have gone through the exact same
+// preprocessForSpeech() the real next call will apply (see speakIntroText()
+// below) -- otherwise the string comparison in _kokoroGenerateChunkWithRetry()
+// below would never match and this would silently do nothing.
+function _kokoroPrefetchForText(lookaheadText) {
+  if (!lookaheadText || _speakCancelled || isMuted) return;
+  if (!isKokoroReady()) return; // only worth it if Kokoro is actually the voice in use
+  // Only the FIRST chunk of the next text is ever prefetched -- that's all
+  // the very next kokoroSpeak() call will ask _kokoroGenerateChunkWithRetry()
+  // for as its first generation, whether the next text turns out to be a
+  // single short segment (the common reveal-screen case) or, in principle,
+  // a longer text (whose own remaining chunks pipeline internally as usual
+  // once that call is under way).
+  var nextChunks = _kokoroChunkText(lookaheadText);
+  if (!nextChunks.length) return;
+  var firstChunk = nextChunks[0];
+  if (_kokoroPrefetch && _kokoroPrefetch.text === firstChunk) return; // already in flight/done
+  var voiceName = getKokoroVoiceName();
+  var rate = readBrowserVoiceRate();
+  _kokoroPrefetch = {
+    text: firstChunk,
+    promise: _kokoroGenerateChunk(firstChunk, voiceName, rate).catch(function(e) {
+      console.warn('[Kokoro] look-ahead prefetch for the next segment failed (it will simply be generated normally when actually needed):', e);
+      return null;
+    })
+  };
 }
 
 // Convenience wrapper kept for the admin panel's single-shot "Test Voice"
@@ -1633,6 +1704,22 @@ async function _kokoroSpeakChunk(text, voiceName, rate) {
 // every attempt failed (the caller falls back to the native browser voice
 // for the remainder of the narration, exactly as before).
 async function _kokoroGenerateChunkWithRetry(text, voiceName, rate, chunkIndex, totalChunks) {
+  // If a caller already kicked off a matching look-ahead prefetch for this
+  // exact chunk of text (see _kokoroPrefetchForText() above), reuse it
+  // instead of generating fresh -- this is the whole point of the
+  // segment-boundary prefetch: by the time this call actually happens, the
+  // audio may already be sitting ready, generated during the PREVIOUS
+  // segment's playback instead of only starting now.
+  if (_kokoroPrefetch && _kokoroPrefetch.text === text) {
+    var prefetchedPromise = _kokoroPrefetch.promise;
+    _kokoroPrefetch = null;
+    var prefetched = await prefetchedPromise;
+    if (prefetched) return prefetched;
+    // The prefetch itself failed -- fall through to a completely normal,
+    // fresh attempt below rather than treating this as this chunk's own
+    // failure (the retry loop below hasn't even tried yet).
+  }
+
   var MAX_ATTEMPTS_PER_CHUNK = 3;
   var RETRY_DELAY_MS = 600;
   var lastErr = null;
@@ -1689,7 +1776,13 @@ async function _kokoroGenerateChunkWithRetry(text, voiceName, rate, chunkIndex, 
 // instead of happening in a gap between chunks. Only the very first chunk
 // has no previous chunk to hide its generation time behind -- that's why
 // _kokoroChunkText() also caps the first chunk much shorter than the rest.
-async function kokoroSpeak(text, onEnd) {
+// `lookaheadText`, if given, is a caller-supplied preview of whatever text
+// will be spoken NEXT (via a separate, later call to this same function --
+// e.g. the reveal screen's next segment) -- see the "SEGMENT-LEVEL LOOK-
+// AHEAD PREFETCH" block comment above _kokoroPrefetch for why this exists.
+// It must already be preprocessed exactly like real narration text (the
+// caller is responsible for that -- see speakIntroText()).
+async function kokoroSpeak(text, onEnd, lookaheadText) {
   var voiceName = getKokoroVoiceName();
   // Kokoro's generate() takes a literal speed multiplier (1 = normal) --
   // see the block comment above confirming this is real, not assumed --
@@ -1720,8 +1813,16 @@ async function kokoroSpeak(text, onEnd) {
       pendingNext = _kokoroGenerateChunkWithRetry(chunks[i + 1], voiceName, rate, i + 1, chunks.length);
     }
     if (_speakCancelled || isMuted) { finish(); return; }
+    // Once THIS chunk is the last one in THIS text, there is no next chunk
+    // within this same call to pipeline against -- but there may be a
+    // caller-supplied next SEGMENT waiting. Kick its generation off the
+    // instant this chunk's playback actually starts (see
+    // _kokoroPlayGeneratedAudio()'s onStarted hook), so it overlaps with
+    // this chunk playing instead of only starting once this whole call's
+    // onEnd fires and the caller makes its own next call.
+    var isLastChunk = (i === chunks.length - 1);
     try {
-      await _kokoroPlayGeneratedAudio(generated);
+      await _kokoroPlayGeneratedAudio(generated, isLastChunk ? function() { _kokoroPrefetchForText(lookaheadText); } : undefined);
     } catch (playErr) {
       console.error('[Kokoro] chunk ' + (i + 1) + '/' + chunks.length + ' playback failed -- falling back to the default browser voice for the remainder of THIS narration only (Kokoro will be tried fresh again next time):', playErr);
       currentAudio = null;
@@ -1770,7 +1871,7 @@ async function kokoroSpeak(text, onEnd) {
 // 'false'), isKokoroEnabledPref() is false, no load is ever attempted, and
 // every visitor goes straight to the plain native browser voice below --
 // exactly the same silent, automatic fallback behavior either way.
-async function browserSpeak(text, onEnd) {
+async function browserSpeak(text, onEnd, lookaheadText) {
   if (isKokoroEnabledPref() && !_kokoroInitFailed && !_kokoroTTS) {
     try {
       await loadKokoroVoice();
@@ -1779,7 +1880,7 @@ async function browserSpeak(text, onEnd) {
       // nothing more to do here than fall through to the native voice below.
     }
   }
-  if (isKokoroReady()) { kokoroSpeak(text, onEnd); return; }
+  if (isKokoroReady()) { kokoroSpeak(text, onEnd, lookaheadText); return; }
   _nativeBrowserSpeak(text, onEnd);
 }
 
@@ -1867,24 +1968,33 @@ async function speakLongText(fullText, onFinish) {
 
 // Free-intro speak function — narrates the free reveal-screen text using
 // the same free-voice chain as speakLongText above.
-async function speakIntroText(fullText, onFinish) {
+//
+// `lookaheadRawText`, if given (initRevealScreen()'s playNext() passes the
+// NEXT segment's raw text, since it already has the whole script up front)
+// is preprocessed here with the exact same preprocessForSpeech() call the
+// text itself gets, then threaded down to kokoroSpeak() -- see the
+// "SEGMENT-LEVEL LOOK-AHEAD PREFETCH" comment above _kokoroPrefetch for why
+// that identical preprocessing matters (the prefetch is matched by an exact
+// string comparison against what the NEXT real call will actually ask for).
+async function speakIntroText(fullText, onFinish, lookaheadRawText) {
   fullText = preprocessForSpeech(fullText);
   if (isMuted) { if (onFinish) onFinish(); return; }
   stopSpeech();
   _speakCancelled = false;
 
-  await _fallbackSpeakLong(fullText, onFinish);
+  var lookaheadText = lookaheadRawText ? preprocessForSpeech(lookaheadRawText) : null;
+  await _fallbackSpeakLong(fullText, onFinish, lookaheadText);
 }
 
 // Default free-voice chain: Browser speechSynthesis (default, or the Kokoro
 // Enhanced Free Voice tier when enabled and ready — see browserSpeak) →
 // AppSDK.ai.speak (further fallback for environments without
 // speechSynthesis at all).
-async function _fallbackSpeakLong(fullText, onFinish) {
+async function _fallbackSpeakLong(fullText, onFinish, lookaheadText) {
   if (_speakCancelled || isMuted) { if (onFinish) onFinish(); return; }
 
   if (window.speechSynthesis) {
-    browserSpeak(fullText, onFinish);
+    browserSpeak(fullText, onFinish, lookaheadText);
     return;
   }
 
@@ -11074,13 +11184,20 @@ function initRevealScreen() {
   function playNext() {
     if (idx >= segments.length) { onRevealComplete(); return; }
     var seg = segments[idx];
+    var nextSeg = segments[idx + 1]; // may be undefined on the last segment
     idx++;
     if (seg.stage) sgRevealStage('reveal-sacred-geometry-svg', seg.stage);
 
     if (isMuted) {
       setTimeout(playNext, seg.mutedPauseMs || 3500);
     } else {
-      speakIntroText(seg.text, playNext);
+      // Pass the NEXT segment's raw text as a look-ahead hint (Part XLIV):
+      // this reveal script already narrates in many short, independent
+      // segments, each its own separate speakIntroText() call -- without
+      // this, the next segment's Kokoro generation only ever started once
+      // THIS segment's playback had already fully finished, producing a
+      // real silent gap at every single segment boundary.
+      speakIntroText(seg.text, playNext, nextSeg && nextSeg.text);
     }
   }
   playNext();
