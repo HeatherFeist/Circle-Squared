@@ -974,91 +974,25 @@ body {
     <div data-id="266" style="margin-top:2rem;border-top:1px solid rgba(176,138,255,0.15);padding-top:1.5rem;">
       <div data-id="267" style="font-family:'Courier New',monospace;font-size:0.62rem;letter-spacing:0.4em;color:#c9a84c;margin-bottom:0.3rem;">🎙️ VOICE SETTINGS</div>
       <div data-id="268" style="font:700 1.1rem Georgia,serif;color:#e8e0ff;margin-bottom:0.6rem;">Voice Settings</div>
-      <p data-id="269" style="font-size:0.8rem;color:#8a7aaa;line-height:1.6;margin-bottom:1rem;">By default the reading is narrated for free using the voice already built into your browser (preferring an "Aria" voice when one is available, or you can pick an exact voice yourself below). Stored only in your browser's local storage — never in any file or server.</p>
+      <p data-id="269" style="font-size:0.8rem;color:#8a7aaa;line-height:1.6;margin-bottom:1rem;">Heart (Kokoro-82M, an open-source neural voice) is the real narration voice every visitor now hears automatically — no admin action or visitor choice required. It downloads once per device (about 90MB, quantized) the first time a reading actually narrates on that device, then the browser caches it so every later reading is instant. This panel exists to monitor, toggle, and test that — not to configure a personal preference. The plain browser voice built into speechSynthesis (an automatic "Aria" search, if one exists) is kept only as an invisible safety-net fallback for the rare device that can't run Kokoro (no WebAssembly, a blocked download, etc.) — a visitor never sees or picks it directly.</p>
 
-      <!-- Free Browser Voice picker — lets someone choose exactly which
-           installed browser/OS voice narrates readings, instead of relying
-           on the automatic "Aria" name search (which can't be guaranteed to
-           find the right voice on every browser/OS combination). Populated
-           dynamically from speechSynthesis.getVoices() -- see
-           populateBrowserVoiceSelect(). -->
-      <div data-id="290" style="margin-bottom:1.4rem;padding-bottom:1.2rem;border-bottom:1px dashed rgba(176,138,255,0.15);">
-        <div data-id="291" style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#c9a84c;display:block;margin-bottom:0.4rem;">FREE BROWSER VOICE</div>
-        <p data-id="292" style="font-size:0.78rem;color:#8a7aaa;line-height:1.6;margin-bottom:0.6rem;">Choose exactly which voice already installed on this device/browser should narrate readings. This list comes straight from your browser, so pick whichever one actually sounds right when you test it. Leave unset to keep the automatic "Aria" search as the default.</p>
-        <select data-id="293" id="browser-voice-select" class="cosmic-select" style="width:100%;margin-bottom:0.6rem;">
-          <option value="">— Automatic (search for an "Aria" voice) —</option>
-        </select>
-        <div data-id="294" style="display:flex;gap:0.6rem;margin-bottom:0.6rem;flex-wrap:wrap;">
-          <button data-id="295" id="browser-voice-save-btn" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.55rem 1.2rem;background:linear-gradient(135deg,#c9a84c,#f0d070);color:#0a0015;font-weight:700;font-size:0.82rem;border:none;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;">💾 Save Voice</button>
-          <button data-id="296" id="browser-voice-test-btn" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.55rem 1.2rem;background:none;border:1px solid rgba(176,138,255,0.3);color:#b08aff;font-size:0.82rem;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;">🔊 Test Voice</button>
-        </div>
-        <div data-id="297" id="browser-voice-status" style="font-size:0.75rem;color:#5a4a7a;min-height:1.2em;margin-top:0.3rem;"></div>
-
-        <!-- Narration speed -- the fixed 0.95 rate felt too slow on some
-             machines/voices, so this exposes it as an adjustable slider
-             instead of a hardcoded constant. Saved to localStorage and
-             read by browserSpeak() -- see readBrowserVoiceRate(). -->
-        <div style="margin-top:1rem;padding-top:1rem;border-top:1px dashed rgba(176,138,255,0.15);">
-          <label style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#c9a84c;display:block;margin-bottom:0.4rem;">NARRATION SPEED <span id="browser-voice-rate-display" style="color:#e8e0ff;">1.0×</span></label>
-          <input id="browser-voice-rate-slider" type="range" min="0.6" max="1.3" step="0.05" value="0.95" style="width:100%;accent-color:#c9a84c;" />
-          <p style="font-size:0.72rem;color:#8a7aaa;margin-top:0.4rem;">Slower feels more meditative; faster gets through a long reading quicker. Adjust and hit Test Voice above to hear the difference immediately.</p>
-        </div>
-      </div>
-
-      <!-- Enhanced Free Voice (Beta) — Kokoro-82M, an open-source
-           (Apache-2.0) neural TTS model running entirely client-side via
-           WASM through the kokoro-js npm package (itself built on
-           Transformers.js/onnxruntime-web). Sits alongside the default free
-           browser voice above as a second, opt-in tier -- noticeably more
-           natural than the robotic default browser voice, still $0 and
-           still nothing sent to any server, at the cost of a one-time
-           ~90MB model download the first time it's enabled (cached by the
-           browser afterward). See
-           loadKokoroVoice()/kokoroSpeak()/isKokoroReady() and
-           docs/CODEX_LOGIC_V07.md Part XXXII. -->
+      <!-- Enhanced Voice (Heart) — Kokoro-82M, an open-source (Apache-2.0)
+           neural TTS model running entirely client-side via WASM through the
+           kokoro-js npm package (itself built on
+           Transformers.js/onnxruntime-web). THE default narration voice for
+           every visitor as of docs/CODEX_LOGIC_V07.md Part XLI -- not an
+           admin-only opt-in tier anymore (see that Part for the full
+           history: Part XXXIII introduced it as an opt-in beta gated behind
+           this very admin panel, which real customers never see or use).
+           This toggle exists only so the project owner can turn it off
+           (e.g. for debugging) and fall back to the plain browser voice for
+           everyone, and to preview it with Test Voice. See
+           loadKokoroVoice()/kokoroSpeak()/isKokoroReady()/isKokoroEnabledPref(). -->
       <div data-id="298" style="margin-bottom:1.4rem;padding-bottom:1.2rem;border-bottom:1px dashed rgba(176,138,255,0.15);">
-        <div data-id="299" style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#c9a84c;display:block;margin-bottom:0.4rem;">🧬 ENHANCED FREE VOICE (BETA) — OPEN-SOURCE NEURAL VOICE</div>
-        <p data-id="300" style="font-size:0.78rem;color:#8a7aaa;line-height:1.6;margin-bottom:0.6rem;">A free, open-source neural voice (Kokoro-82M, Apache-2.0 licensed) that sounds noticeably more natural than the default browser voice above. It still runs entirely in your browser — nothing is ever sent to a server — but the first time you enable it, it has to download a one-time set of model weights (about 90MB, quantized) before it can speak. After that first download your browser caches it and every later reading uses it instantly. This is a completely different, smaller technology than the browser voice above: Kokoro ships its own small set of named voices, picked below.</p>
-        <select data-id="301" id="kokoro-voice-select" class="cosmic-select" style="width:100%;margin-bottom:0.6rem;">
-          <optgroup label="— US ENGLISH: FEMALE —">
-            <option value="af_heart">Heart — American ✦ Recommended</option>
-            <option value="af_bella">Bella — American</option>
-            <option value="af_nicole">Nicole — American</option>
-            <option value="af_sarah">Sarah — American</option>
-            <option value="af_nova">Nova — American</option>
-            <option value="af_sky">Sky — American</option>
-            <option value="af_alloy">Alloy — American</option>
-            <option value="af_aoede">Aoede — American</option>
-            <option value="af_jessica">Jessica — American</option>
-            <option value="af_kore">Kore — American</option>
-            <option value="af_river">River — American</option>
-          </optgroup>
-          <optgroup label="— US ENGLISH: MALE —">
-            <option value="am_michael">Michael — American</option>
-            <option value="am_adam">Adam — American</option>
-            <option value="am_echo">Echo — American</option>
-            <option value="am_eric">Eric — American</option>
-            <option value="am_fenrir">Fenrir — American</option>
-            <option value="am_liam">Liam — American</option>
-            <option value="am_onyx">Onyx — American</option>
-            <option value="am_puck">Puck — American</option>
-            <option value="am_santa">Santa — American</option>
-          </optgroup>
-          <optgroup label="— BRITISH ENGLISH: FEMALE —">
-            <option value="bf_emma">Emma — British</option>
-            <option value="bf_isabella">Isabella — British</option>
-            <option value="bf_alice">Alice — British</option>
-            <option value="bf_lily">Lily — British</option>
-          </optgroup>
-          <optgroup label="— BRITISH ENGLISH: MALE —">
-            <option value="bm_george">George — British</option>
-            <option value="bm_fable">Fable — British</option>
-            <option value="bm_lewis">Lewis — British</option>
-            <option value="bm_daniel">Daniel — British</option>
-          </optgroup>
-        </select>
+        <div data-id="299" style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#c9a84c;display:block;margin-bottom:0.4rem;">🧬 ENHANCED VOICE — HEART (KOKORO), DEFAULT FOR EVERY VISITOR</div>
+        <p data-id="300" style="font-size:0.78rem;color:#8a7aaa;line-height:1.6;margin-bottom:0.6rem;">Heart is a free, open-source neural voice (Kokoro-82M, Apache-2.0 licensed) that sounds noticeably more natural than a plain browser voice. It runs entirely in the visitor's own browser — nothing is ever sent to a server — downloading its one-time model weights (about 90MB, quantized) automatically the moment a reading first narrates on a given device, then staying cached there for every reading after that. Disabling it below falls every visitor back to the plain default browser voice instead.</p>
         <div data-id="302" style="display:flex;gap:0.6rem;margin-bottom:0.6rem;flex-wrap:wrap;">
-          <button data-id="303" id="kokoro-enable-btn" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.55rem 1.2rem;background:linear-gradient(135deg,#c9a84c,#f0d070);color:#0a0015;font-weight:700;font-size:0.82rem;border:none;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;">⬇ Enable &amp; Download Voice</button>
+          <button data-id="303" id="kokoro-enable-btn" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.55rem 1.2rem;background:linear-gradient(135deg,#c9a84c,#f0d070);color:#0a0015;font-weight:700;font-size:0.82rem;border:none;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;">✅ Enabled for All Visitors — Click to Disable</button>
           <button data-id="304" id="kokoro-test-btn" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.55rem 1.2rem;background:none;border:1px solid rgba(176,138,255,0.3);color:#b08aff;font-size:0.82rem;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;">🔊 Test Voice</button>
         </div>
         <div data-id="305" id="kokoro-progress-wrap" style="display:none;margin-bottom:0.6rem;">
@@ -1066,7 +1000,18 @@ body {
             <div id="kokoro-progress-bar" style="background:linear-gradient(135deg,#c9a84c,#f0d070);height:100%;width:0%;transition:width 0.2s;"></div>
           </div>
         </div>
-        <div data-id="306" id="kokoro-voice-status" style="font-size:0.75rem;color:#5a4a7a;min-height:1.2em;margin-top:0.3rem;">This device/browser must support WebAssembly (nearly all modern browsers do). If the download or setup ever fails, readings simply keep narrating with the default free browser voice above — this tier never breaks narration.</div>
+        <div data-id="306" id="kokoro-voice-status" style="font-size:0.75rem;color:#5a4a7a;min-height:1.2em;margin-top:0.3rem;">This device/browser must support WebAssembly (nearly all modern browsers do). If the download or setup ever fails, readings simply narrate with the default free browser voice instead — this tier never breaks narration.</div>
+
+        <!-- Narration speed -- the fixed 0.95 rate felt too slow on some
+             machines/voices, so this exposes it as an adjustable slider
+             instead of a hardcoded constant. Saved to localStorage and read
+             by browserSpeak() -- see readBrowserVoiceRate(). Applies to
+             BOTH Heart and the plain browser-voice fallback. -->
+        <div style="margin-top:1rem;padding-top:1rem;border-top:1px dashed rgba(176,138,255,0.15);">
+          <label style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#c9a84c;display:block;margin-bottom:0.4rem;">NARRATION SPEED <span id="browser-voice-rate-display" style="color:#e8e0ff;">1.0×</span></label>
+          <input id="browser-voice-rate-slider" type="range" min="0.6" max="1.3" step="0.05" value="0.95" style="width:100%;accent-color:#c9a84c;" />
+          <p style="font-size:0.72rem;color:#8a7aaa;margin-top:0.4rem;">Slower feels more meditative; faster gets through a long reading quicker. Adjust and hit Test Voice above to hear the difference immediately.</p>
+        </div>
       </div>
     </div>
 
@@ -1408,24 +1353,6 @@ async function appSdkSpeak(text) {
 var _resolvedBrowserVoice = null;
 var _browserVoiceResolved = false;
 
-// Explicit picker override (admin panel "Free Browser Voice" setting) — if
-// the user has picked an exact voice, match it by name+lang (name alone
-// isn't unique across languages, e.g. multiple "Maria" voices in different
-// locales) against the CURRENT browser's voice list. Returns null (and logs
-// a warning) if the saved voice can't be found here, e.g. because the pick
-// was made in a different browser — callers fall back to the automatic
-// search in that case rather than erroring.
-function findExplicitBrowserVoice(voices) {
-  var name = localStorage.getItem('browser_voice_name');
-  if (!name) return null;
-  var lang = localStorage.getItem('browser_voice_lang') || '';
-  for (var i = 0; i < voices.length; i++) {
-    if (voices[i].name === name && (!lang || voices[i].lang === lang)) return voices[i];
-  }
-  console.warn('[Voice] Saved browser voice "' + name + '" (' + lang + ') was not found in this browser\'s voice list — falling back to automatic voice selection.');
-  return null;
-}
-
 // Prefer any voice with "Aria" as a standalone word in its name (word
 // boundary, case-insensitive) — this covers both the common US English
 // "Microsoft Aria Online (Natural)" neural voice and any Australian-flavored
@@ -1499,29 +1426,49 @@ function readBrowserVoiceRate() {
 //
 // Loaded lazily via a dynamic import() of the pinned CDN URL below — NOT a
 // <script> tag in <head> — specifically so nothing about this tier is
-// fetched, parsed, or downloaded until the admin panel's "Enable & Download
-// Voice" button is actually clicked. Normal page load, and every reading
-// for the ~99% of people who never open this setting, is completely
-// unaffected by this feature's mere existence in the codebase.
+// fetched, parsed, or downloaded on a bare page visit. As of Part XLI
+// (docs/CODEX_LOGIC_V07.md), it IS fetched automatically -- but only at the
+// real moment a reading actually starts narrating (see browserSpeak()
+// below), never on plain page load, and never for a visitor who has never
+// reached a reading at all.
 var KOKORO_CDN_URL = 'https://cdn.jsdelivr.net/npm/kokoro-js@1.2.1/dist/kokoro.web.js';
 var KOKORO_MODEL_ID = 'onnx-community/Kokoro-82M-v1.0-ONNX';
 
 var _kokoroTTS = null;          // the loaded KokoroTTS instance, for THIS page session only -- never persisted, never auto-restored on a fresh page load
-var _kokoroLoadPromise = null;  // in-flight load, so an overlapping Test-Voice click while Enable is still downloading shares the same download rather than starting a second one
-var _kokoroInitFailed = false;  // sticky per-session flag: set only when the model itself genuinely fails to LOAD (loadKokoroVoice()) -- a real, session-wide reason to stop. A single generate() call failing mid-reading does NOT set this (see kokoroSpeak()'s own retry-then-narration-scoped-fallback logic) -- that used to disable Kokoro for the whole rest of the session from one transient hiccup, which is exactly the "switches mid-read and never comes back" bug this comment used to describe as intentional.
+var _kokoroLoadPromise = null;  // in-flight load, so an overlapping Test-Voice click (or a second narration call) while a load is already in progress shares the same download rather than starting a second one
+var _kokoroInitFailed = false;  // sticky per-session flag: set only when the model itself genuinely fails to LOAD (loadKokoroVoice()) -- a real, session-wide reason to stop. A single generate() call failing mid-reading does NOT set this (see kokoroSpeak()'s own retry-then-narration-scoped-fallback logic) -- that used to disable Kokoro for the whole rest of the session from one transient hiccup, which is exactly the "switches mid-read and never comes back" bug this comment used to describe as intentional. Reset to false on every fresh page load (it is a plain JS var, never written to localStorage), so a failure in one browser session never carries over and permanently disables Kokoro for a later visit.
 
-// The gate every narration call site checks (via browserSpeak() below).
-// Deliberately requires BOTH the saved admin preference AND a successful
-// load THIS session -- a stale "enabled" flag left over from a previous
-// visit never silently re-triggers a ~90MB download in the middle of a
-// reading. After a page refresh, re-opening Voice Settings and clicking
-// "Enable & Download Voice" again is what actually starts using it again.
-function isKokoroReady() {
-  return !_kokoroInitFailed && localStorage.getItem('enhanced_voice_enabled') === 'true' && !!_kokoroTTS;
+// The admin's stored on/off preference for Heart, as distinct from whether
+// it has actually finished loading THIS session (see isKokoroReady() below).
+// Part XLI flips the default: Heart is now the universal default voice for
+// every visitor, so the ABSENCE of a stored preference (a brand new
+// visitor's browser, or the admin's own browser before ever touching this
+// toggle) must mean "on" -- only an explicit, saved 'false' (the admin
+// clicking the panel's disable toggle) means "off". This is why the check
+// below is `!== 'false'` and not `=== 'true'`: the latter would have made
+// "never set" evaluate to off, silently re-creating the exact opt-in-only
+// gating this Part exists to remove.
+function isKokoroEnabledPref() {
+  return localStorage.getItem('enhanced_voice_enabled') !== 'false';
 }
 
+// The gate every narration call site checks (via browserSpeak() below) to
+// decide whether Kokoro is ready to actually speak RIGHT NOW. Requires both
+// the admin preference above (default on) AND a successful load already
+// completed THIS page session (_kokoroTTS) -- a fresh page load always
+// starts with _kokoroTTS null, so it never assumes a previous session's
+// download is still resident; browserSpeak() is what actually (re)triggers
+// that load, automatically, the first time a reading in this session needs
+// to narrate.
+function isKokoroReady() {
+  return !_kokoroInitFailed && isKokoroEnabledPref() && !!_kokoroTTS;
+}
+
+// Part XLI removed the admin-only named-voice picker (per the project
+// owner's own "I am satisfied with just the one voice of Heart" direction)
+// -- Heart is simply THE voice now, with no dropdown or stored override.
 function getKokoroVoiceName() {
-  return localStorage.getItem('enhanced_voice_name') || 'af_heart';
+  return 'af_heart';
 }
 
 // Loads (lazily, once per session, de-duped) the kokoro-js library and the
@@ -1699,18 +1646,52 @@ async function kokoroSpeak(text, onEnd) {
   finish();
 }
 
-// Browser TTS — this is now the DEFAULT free voice path (per project owner
-// request: "just connect the free Microsoft voice that is in the browser...
-// keep the australian Aria or whatever voice my browser is using now").
-// AppSDK's own voice is kept only as a further fallback (see
-// _fallbackSpeakLong) for environments where speechSynthesis itself isn't
-// available at all.
+// browserSpeak() is the single integration point every narration call site
+// in this file already goes through (_fallbackSpeakLong, speakText, the
+// admin panel's own test buttons), and — as of Part XLI — the actual trigger
+// point for Kokoro's one-time ~90MB download for an ORDINARY VISITOR, not
+// just an admin who clicked a button.
 //
-// This is also the single integration point for the Enhanced Free Voice
-// (Beta) tier: when it's enabled AND has successfully loaded this session
-// (isKokoroReady()), Kokoro speaks instead -- otherwise every line below is
-// completely unchanged from before this feature existed.
-function browserSpeak(text, onEnd) {
+// Sequence on a brand-new visitor's very first narrated chunk of a session,
+// with zero localStorage state:
+//   1. isKokoroEnabledPref() reads 'enhanced_voice_enabled' from
+//      localStorage -- nothing has ever been set, so getItem() returns null,
+//      null !== 'false' is true, so the preference is ON by default. No
+//      admin action required.
+//   2. _kokoroInitFailed is false (fresh page load, never touched) and
+//      _kokoroTTS is null (nothing loaded yet this session) -- so this
+//      function awaits loadKokoroVoice(), the exact same lazy-load function
+//      the admin panel's "Enable & Download Voice" button used to trigger,
+//      now called automatically instead of from a click handler.
+//   3. loadKokoroVoice() dynamically imports kokoro-js and downloads the
+//      ~90MB q8 ONNX weights. This is a real, one-time pause before the
+//      very first sentence of audio in a session -- an accepted, honestly-
+//      documented tradeoff (see Part XLI) rather than something hidden.
+//   4. On success, _kokoroTTS is set, isKokoroReady() now returns true, and
+//      kokoroSpeak(text, onEnd) narrates with Heart. Every subsequent
+//      browserSpeak() call in the same page session skips straight past the
+//      awaited load (_kokoroTTS is already truthy) and speaks instantly.
+//   5. On failure (unsupported browser, no WebAssembly, network failure,
+//      etc.), loadKokoroVoice()'s own .catch() sets _kokoroInitFailed = true
+//      and rejects; the try/catch below swallows that rejection silently
+//      (already logged by loadKokoroVoice() itself) and falls through to
+//      _nativeBrowserSpeak() -- no error dialog, no broken narration, and
+//      every later browserSpeak() call this session short-circuits the
+//      awaited load immediately (_kokoroInitFailed is true) rather than
+//      retrying a download that already failed.
+// If the admin has explicitly disabled Heart ('enhanced_voice_enabled' ===
+// 'false'), isKokoroEnabledPref() is false, no load is ever attempted, and
+// every visitor goes straight to the plain native browser voice below --
+// exactly the same silent, automatic fallback behavior either way.
+async function browserSpeak(text, onEnd) {
+  if (isKokoroEnabledPref() && !_kokoroInitFailed && !_kokoroTTS) {
+    try {
+      await loadKokoroVoice();
+    } catch (e) {
+      // loadKokoroVoice() already logged this and set _kokoroInitFailed --
+      // nothing more to do here than fall through to the native voice below.
+    }
+  }
   if (isKokoroReady()) { kokoroSpeak(text, onEnd); return; }
   _nativeBrowserSpeak(text, onEnd);
 }
@@ -1733,11 +1714,13 @@ function _nativeBrowserSpeak(text, onEnd) {
 
   function speakWithVoices(voices) {
     if (!_browserVoiceResolved && voices && voices.length) {
-      // Explicit admin-panel pick wins; automatic Aria search is the
-      // fallback for anyone who hasn't chosen one. Resolved exactly once per
-      // page session and cached above so every later chunk/section of this
-      // (and any subsequent) reading reuses the identical voice object.
-      _resolvedBrowserVoice = findExplicitBrowserVoice(voices) || pickAriaVoice(voices);
+      // Automatic "Aria" name search -- this is a silent, automatic
+      // fallback for whenever Kokoro isn't speaking, not a visitor- or
+      // admin-facing picker (Part XLI removed the admin-only explicit
+      // override that used to sit on top of this). Resolved exactly once
+      // per page session and cached above so every later chunk/section of
+      // this (and any subsequent) reading reuses the identical voice object.
+      _resolvedBrowserVoice = pickAriaVoice(voices);
       _browserVoiceResolved = true;
     }
     // else: voices list is still empty -- leave _browserVoiceResolved false
@@ -4735,47 +4718,13 @@ function logPurchase(buyerName, buyerEmail, orderId, tier, priceOverride, isProm
 }
 
 // ===========================
-// FREE BROWSER VOICE ADMIN SETTINGS
+// NARRATION SPEED (admin-adjustable, applies to both Heart and the native
+// browser-voice fallback)
 // ===========================
-// Populates the "Free Browser Voice" <select> from speechSynthesis.getVoices()
-// -- handles the same async-population quirk as browserSpeak() above: some
-// browsers return an empty list on the very first call, only filling in
-// after 'voiceschanged' fires. Safe to call more than once (e.g. once
-// immediately and once again from voiceschanged) since it always rebuilds
-// the option list from scratch rather than appending, so voices are never
-// duplicated.
-function populateBrowserVoiceSelect() {
-  var select = document.getElementById('browser-voice-select');
-  if (!select || !window.speechSynthesis) return;
-  var voices = window.speechSynthesis.getVoices();
-  if (!voices || !voices.length) return;
-
-  var savedName = localStorage.getItem('browser_voice_name') || '';
-  var savedLang = localStorage.getItem('browser_voice_lang') || '';
-
-  select.innerHTML = '<option value="">— Automatic (search for an "Aria" voice) —</option>';
-  for (var i = 0; i < voices.length; i++) {
-    var v = voices[i];
-    var opt = document.createElement('option');
-    opt.value = v.name + '|' + v.lang;
-    opt.textContent = v.name + ' — ' + v.lang;
-    if (v.name === savedName && v.lang === savedLang) opt.selected = true;
-    select.appendChild(opt);
-  }
-}
-
-if (window.speechSynthesis) {
-  // Populate immediately (works when voices are already loaded) and again
-  // whenever the browser (re)announces its voice list.
-  populateBrowserVoiceSelect();
-  window.speechSynthesis.addEventListener('voiceschanged', populateBrowserVoiceSelect);
-}
-
-// Narration speed slider -- loads the saved rate (or the 0.95 default) into
-// the slider/display, and saves on every change so readBrowserVoiceRate()
-// picks it up on the very next narration/test, no separate "save" click
-// needed (unlike the voice picker, a slider mid-drag benefits from live
-// feedback rather than a deliberate save step).
+// Loads the saved rate (or the 0.95 default) into the slider/display, and
+// saves on every change so readBrowserVoiceRate() picks it up on the very
+// next narration/test, no separate "save" click needed (a slider mid-drag
+// benefits from live feedback rather than a deliberate save step).
 function loadBrowserVoiceRateSlider() {
   var slider = document.getElementById('browser-voice-rate-slider');
   var display = document.getElementById('browser-voice-rate-display');
@@ -4792,76 +4741,15 @@ document.getElementById('browser-voice-rate-slider').addEventListener('input', f
   try { localStorage.setItem('browser_voice_rate', String(rate)); } catch(e) {}
 });
 
-function loadBrowserVoiceSettings() {
-  populateBrowserVoiceSelect();
-  loadBrowserVoiceRateSlider();
-}
-
-document.getElementById('browser-voice-save-btn').addEventListener('click', function() {
-  var select = document.getElementById('browser-voice-select');
-  var status = document.getElementById('browser-voice-status');
-  var val = select.value;
-  if (!val) {
-    localStorage.removeItem('browser_voice_name');
-    localStorage.removeItem('browser_voice_lang');
-    status.textContent = '✅ Reset to automatic voice selection.';
-    status.style.color = '#c9a84c';
-    return;
-  }
-  var sep = val.indexOf('|');
-  var name = sep === -1 ? val : val.substring(0, sep);
-  var lang = sep === -1 ? '' : val.substring(sep + 1);
-  localStorage.setItem('browser_voice_name', name);
-  localStorage.setItem('browser_voice_lang', lang);
-  status.textContent = '✅ Voice saved! This exact voice will narrate readings on the free browser-voice path.';
-  status.style.color = '#c9a84c';
-});
-
-document.getElementById('browser-voice-test-btn').addEventListener('click', function() {
-  var select = document.getElementById('browser-voice-select');
-  var status = document.getElementById('browser-voice-status');
-  if (!window.speechSynthesis) {
-    status.textContent = '⚠️ This browser does not support speech synthesis.';
-    status.style.color = '#ff9ed2';
-    return;
-  }
-  var voices = window.speechSynthesis.getVoices();
-  var val = select.value;
-  var voice = null;
-  if (val) {
-    var sep = val.indexOf('|');
-    var name = sep === -1 ? val : val.substring(0, sep);
-    var lang = sep === -1 ? '' : val.substring(sep + 1);
-    for (var i = 0; i < voices.length; i++) {
-      if (voices[i].name === name && voices[i].lang === lang) { voice = voices[i]; break; }
-    }
-  } else {
-    voice = pickAriaVoice(voices);
-  }
-  status.textContent = '🎙️ Testing voice...';
-  status.style.color = '#b08aff';
-  window.speechSynthesis.cancel();
-  var utter = new SpeechSynthesisUtterance('The oracle is ready. Your blueprint awaits.');
-  utter.rate = readBrowserVoiceRate();
-  utter.pitch = 0.75;
-  utter.volume = 1.0;
-  if (voice) utter.voice = voice;
-  utter.onend = function() { status.textContent = '✅ Voice test finished.'; status.style.color = '#c9a84c'; };
-  utter.onerror = function() { status.textContent = '❌ Voice test failed to play.'; status.style.color = '#ff9ed2'; };
-  window.speechSynthesis.speak(utter);
-});
-
 // ===========================
-// ENHANCED FREE VOICE (BETA) ADMIN SETTINGS — Kokoro-82M
+// ENHANCED VOICE (HEART) ADMIN SETTINGS — Kokoro-82M
 // ===========================
-// Restores the saved voice pick and reflects current enabled/loaded state
-// into the button label + status text whenever the admin panel opens.
-// Never touches _kokoroTTS/isKokoroReady() itself — opening the panel must
-// never trigger a download on its own, only the Enable button does that.
+// Reflects the current enabled/loaded state into the toggle button + status
+// text whenever the admin panel opens. Never touches _kokoroTTS itself --
+// opening the panel must never by itself trigger a download; that only ever
+// happens from an actual narration request (browserSpeak(), automatically)
+// or this panel's own Test Voice button.
 function loadKokoroVoiceSettings() {
-  var select = document.getElementById('kokoro-voice-select');
-  var savedVoice = localStorage.getItem('enhanced_voice_name');
-  if (select && savedVoice) select.value = savedVoice;
   updateKokoroEnableButton();
 }
 
@@ -4869,79 +4757,49 @@ function updateKokoroEnableButton() {
   var btn = document.getElementById('kokoro-enable-btn');
   var status = document.getElementById('kokoro-voice-status');
   if (!btn) return;
-  var enabledFlag = localStorage.getItem('enhanced_voice_enabled') === 'true';
-  if (_kokoroTTS && enabledFlag) {
-    btn.textContent = '✅ Enabled — Click to Disable';
-    if (status) { status.textContent = '✅ Enhanced voice is loaded and active for narration this session.'; status.style.color = '#c9a84c'; }
-  } else if (enabledFlag && !_kokoroTTS) {
-    btn.textContent = '⬇ Enable & Download Voice';
-    if (status) { status.textContent = 'Enabled previously, but not loaded this session yet — click to download and activate it again (a page refresh clears the in-memory model, per the note above).'; status.style.color = '#8a7aaa'; }
+  if (isKokoroEnabledPref()) {
+    btn.textContent = '✅ Enabled for All Visitors — Click to Disable';
+    if (status) {
+      status.textContent = _kokoroTTS
+        ? '✅ Heart is loaded and actively narrating for this browser session.'
+        : '✅ Heart is enabled for every visitor. It downloads automatically (about 90MB, one time) the moment a reading actually narrates, then stays cached in this browser.';
+      status.style.color = '#c9a84c';
+    }
   } else {
-    btn.textContent = '⬇ Enable & Download Voice';
+    btn.textContent = '▶ Enable for All Visitors';
+    if (status) { status.textContent = 'Disabled — every visitor currently hears only the plain default browser voice. Click to re-enable Heart as the default for everyone.'; status.style.color = '#8a7aaa'; }
   }
 }
 
-document.getElementById('kokoro-voice-select').addEventListener('change', function() {
-  localStorage.setItem('enhanced_voice_name', this.value);
-});
-
 document.getElementById('kokoro-enable-btn').addEventListener('click', function() {
   var status = document.getElementById('kokoro-voice-status');
-  var progressWrap = document.getElementById('kokoro-progress-wrap');
-  var progressBar = document.getElementById('kokoro-progress-bar');
 
-  // Already enabled+loaded -- this click means "disable" (no unload of the
-  // in-memory model needed; isKokoroReady() simply stops returning true).
-  if (isKokoroReady()) {
+  if (isKokoroEnabledPref()) {
+    // Turning OFF -- every visitor (this browser/device) falls back to the
+    // plain default browser voice, and no Kokoro download is ever attempted
+    // until this is turned back on.
     localStorage.setItem('enhanced_voice_enabled', 'false');
     updateKokoroEnableButton();
-    status.textContent = 'Enhanced voice disabled. Readings will use the default free browser voice above again.';
+    status.textContent = 'Enhanced voice (Heart) disabled for all visitors. Every reading now narrates with the plain default browser voice instead.';
     status.style.color = '#8a7aaa';
     return;
   }
 
-  var select = document.getElementById('kokoro-voice-select');
-  localStorage.setItem('enhanced_voice_name', select.value);
-
-  if (typeof WebAssembly === 'undefined') {
-    status.textContent = '⚠️ This browser does not support WebAssembly, so the enhanced voice cannot run here. The default free browser voice above is completely unaffected.';
-    status.style.color = '#ff9ed2';
-    return;
-  }
-
-  _kokoroInitFailed = false; // an explicit click means "try again", even if a previous attempt this session failed
-  progressWrap.style.display = 'block';
-  progressBar.style.width = '0%';
-  status.textContent = '⬇️ Downloading enhanced voice model (about 90MB, one time only)…';
-  status.style.color = '#b08aff';
-
-  loadKokoroVoice(function(pct, label) {
-    if (typeof pct === 'number') progressBar.style.width = pct + '%';
-    status.textContent = '⬇️ ' + (typeof pct === 'number' ? pct + '% — ' : '') + (label || 'Downloading…');
-    status.style.color = '#b08aff';
-  }).then(function() {
-    localStorage.setItem('enhanced_voice_enabled', 'true');
-    progressBar.style.width = '100%';
-    status.textContent = '✅ Enhanced voice downloaded and ready! Readings will use it for the rest of this session.';
-    status.style.color = '#c9a84c';
-    updateKokoroEnableButton();
-  }).catch(function(err) {
-    console.error('[Kokoro] enable/download failed:', err);
-    localStorage.setItem('enhanced_voice_enabled', 'false');
-    progressWrap.style.display = 'none';
-    status.textContent = '❌ Could not load the enhanced voice (' + (err && err.message ? err.message : 'unknown error') + '). The default free browser voice above still works normally.';
-    status.style.color = '#ff9ed2';
-    updateKokoroEnableButton();
-  });
+  // Turning back ON -- clear any prior failure so the very next reading
+  // gets a fresh, real attempt rather than being stuck on last session's
+  // failure.
+  localStorage.setItem('enhanced_voice_enabled', 'true');
+  _kokoroInitFailed = false;
+  updateKokoroEnableButton();
+  status.textContent = '✅ Enhanced voice (Heart) re-enabled for all visitors. It downloads automatically (about 90MB, once per device) the next time a reading narrates.';
+  status.style.color = '#c9a84c';
 });
 
 document.getElementById('kokoro-test-btn').addEventListener('click', function() {
   var status = document.getElementById('kokoro-voice-status');
   var progressWrap = document.getElementById('kokoro-progress-wrap');
   var progressBar = document.getElementById('kokoro-progress-bar');
-  var select = document.getElementById('kokoro-voice-select');
-  var voiceName = select.value;
-  localStorage.setItem('enhanced_voice_name', voiceName);
+  var voiceName = getKokoroVoiceName();
 
   if (typeof WebAssembly === 'undefined') {
     status.textContent = '⚠️ This browser does not support WebAssembly, so the enhanced voice cannot run here.';
@@ -4966,6 +4824,7 @@ document.getElementById('kokoro-test-btn').addEventListener('click', function() 
   }).then(function() {
     status.textContent = '✅ Voice test finished.';
     status.style.color = '#c9a84c';
+    updateKokoroEnableButton();
   }).catch(function(err) {
     console.error('[Kokoro] test voice failed:', err);
     progressWrap.style.display = 'none';
@@ -5050,9 +4909,9 @@ function showAdminPanel() {
       }).join('');
     }
   }
-  // Load Free Browser Voice picker options/selection when admin panel opens
-  loadBrowserVoiceSettings();
-  // Load Enhanced Free Voice (Beta) picker/enabled-state when admin panel opens
+  // Load the Narration Speed slider when admin panel opens
+  loadBrowserVoiceRateSlider();
+  // Load Enhanced Voice (Heart) enabled/loaded state when admin panel opens
   loadKokoroVoiceSettings();
   // Load FreeAstroAPI (Ascendant) settings when admin panel opens
   loadAstroSettings();
