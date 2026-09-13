@@ -1508,7 +1508,7 @@ var KOKORO_MODEL_ID = 'onnx-community/Kokoro-82M-v1.0-ONNX';
 
 var _kokoroTTS = null;          // the loaded KokoroTTS instance, for THIS page session only -- never persisted, never auto-restored on a fresh page load
 var _kokoroLoadPromise = null;  // in-flight load, so an overlapping Test-Voice click while Enable is still downloading shares the same download rather than starting a second one
-var _kokoroInitFailed = false;  // sticky per-session flag: once a load OR a generate() call has failed, stop retrying Kokoro on our own for the rest of this session and just use the default browser voice
+var _kokoroInitFailed = false;  // sticky per-session flag: set only when the model itself genuinely fails to LOAD (loadKokoroVoice()) -- a real, session-wide reason to stop. A single generate() call failing mid-reading does NOT set this (see kokoroSpeak()'s own retry-then-narration-scoped-fallback logic) -- that used to disable Kokoro for the whole rest of the session from one transient hiccup, which is exactly the "switches mid-read and never comes back" bug this comment used to describe as intentional.
 
 // The gate every narration call site checks (via browserSpeak() below).
 // Deliberately requires BOTH the saved admin preference AND a successful
@@ -1606,7 +1606,15 @@ function _kokoroChunkText(fullText) {
 // only ever knows about `currentAudio` and `window.speechSynthesis`, keeps
 // working correctly no matter which voice tier is actually speaking.
 async function _kokoroSpeakChunk(text, voiceName, rate) {
-  var rawAudio = await _kokoroTTS.generate(text, { voice: voiceName, speed: rate });
+  // Kokoro runs on WASM (CPU), not WebGPU (see loadKokoroVoice()'s own
+  // comment on why) -- generate() is real, sustained CPU work, and on a
+  // slower device or under memory pressure a single chunk can occasionally
+  // hang or throw without that being a sign the whole engine is actually
+  // broken. Timing it out here (instead of only timing out audio.play(),
+  // as before) means a stuck generate() call surfaces as a real, catchable
+  // error that the retry loop in kokoroSpeak() below can act on, rather
+  // than silently freezing the reading with no sound at all.
+  var rawAudio = await _withTimeout(_kokoroTTS.generate(text, { voice: voiceName, speed: rate }), 20000, '[Kokoro] generate()');
   var blob = rawAudio.toBlob();
   var url = URL.createObjectURL(blob);
   var audio = new Audio(url);
@@ -1625,11 +1633,29 @@ async function _kokoroSpeakChunk(text, voiceName, rate) {
 
 // The enhanced-voice narration path — only ever called from browserSpeak()
 // below, and only when isKokoroReady() is true. Generates and plays
-// chunk-by-chunk (honoring stopSpeech()/mute between chunks), and on ANY
-// failure mid-reading falls back to the
-// untouched native browser-voice path (_nativeBrowserSpeak, below) for
-// whatever text hadn't played yet — so a Kokoro error never leaves a
-// reading silent, and never breaks the default tier for anyone else.
+// chunk-by-chunk (honoring stopSpeech()/mute between chunks).
+//
+// A single chunk failing mid-reading does not necessarily mean Kokoro
+// itself is broken -- WASM generation on a real device can hit a
+// transient hiccup (a momentary resource squeeze, a slow tick) on one
+// chunk of a long nine-page reading without that being a sign anything is
+// actually wrong. Previously, ANY single chunk error set the sticky
+// _kokoroInitFailed flag immediately, permanently switching the rest of
+// THAT SAME SESSION to the default browser voice -- including every later
+// page and every later reading -- from one transient blip. That produced
+// exactly the symptom reported: narration audibly switching mid-read with
+// no way back short of re-clicking "Enable" in the admin panel.
+//
+// Fixed behavior: retry the SAME failing chunk a couple of times first
+// (short pause between attempts, since a transient hiccup often clears on
+// its own within a second). Only if a chunk still fails after retrying
+// does this fall back to the native browser voice -- and only for the
+// REST OF THIS ONE narration call, not the whole session. _kokoroInitFailed
+// is reserved for loadKokoroVoice()'s own failure (the model genuinely
+// failed to load at all -- a real, session-wide reason not to keep trying)
+// and is deliberately NOT set here, so the very next reading (or the next
+// page's narration) gets a fresh, real chance at Kokoro again rather than
+// being stuck on the fallback voice for no reason a person can see.
 async function kokoroSpeak(text, onEnd) {
   var voiceName = getKokoroVoiceName();
   // Kokoro's generate() takes a literal speed multiplier (1 = normal) --
@@ -1641,13 +1667,29 @@ async function kokoroSpeak(text, onEnd) {
   var finished = false;
   function finish() { if (finished) return; finished = true; if (onEnd) onEnd(); }
 
+  var MAX_ATTEMPTS_PER_CHUNK = 3;
+  var RETRY_DELAY_MS = 600;
+
   for (var i = 0; i < chunks.length; i++) {
     if (_speakCancelled || isMuted) { finish(); return; }
-    try {
-      await _kokoroSpeakChunk(chunks[i], voiceName, rate);
-    } catch (e) {
-      console.error('[Kokoro] generation/playback error mid-reading -- falling back to the default browser voice for the remainder of this narration:', e);
-      _kokoroInitFailed = true;
+    var lastErr = null;
+    var succeeded = false;
+    for (var attempt = 1; attempt <= MAX_ATTEMPTS_PER_CHUNK; attempt++) {
+      if (_speakCancelled || isMuted) { finish(); return; }
+      try {
+        await _kokoroSpeakChunk(chunks[i], voiceName, rate);
+        succeeded = true;
+        break;
+      } catch (e) {
+        lastErr = e;
+        console.warn('[Kokoro] chunk ' + (i + 1) + '/' + chunks.length + ' attempt ' + attempt + '/' + MAX_ATTEMPTS_PER_CHUNK + ' failed:', e);
+        if (attempt < MAX_ATTEMPTS_PER_CHUNK) {
+          await new Promise(function(res) { setTimeout(res, RETRY_DELAY_MS); });
+        }
+      }
+    }
+    if (!succeeded) {
+      console.error('[Kokoro] chunk ' + (i + 1) + '/' + chunks.length + ' failed after ' + MAX_ATTEMPTS_PER_CHUNK + ' attempts -- falling back to the default browser voice for the remainder of THIS narration only (Kokoro will be tried fresh again next time):', lastErr);
       currentAudio = null;
       _nativeBrowserSpeak(chunks.slice(i).join(' '), finish);
       return;
