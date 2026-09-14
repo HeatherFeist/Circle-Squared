@@ -2088,6 +2088,45 @@ function stopSpeech() {
   if (window.speechSynthesis) window.speechSynthesis.cancel();
 }
 
+// Most mobile browsers (iOS Safari in particular, and many Android WebViews)
+// only allow an <audio> element's play() to succeed when it is closely tied
+// to a real, direct user gesture (a tap) -- a play() call happening deep
+// inside an async chain (load the ~90MB Kokoro model, THEN generate audio,
+// THEN finally call play()) can fall outside whatever grace period the
+// browser tracks and get silently blocked (a rejected/hanging play()
+// promise), especially for the very FIRST Kokoro chunk of a session, right
+// after that slow one-time download. window.speechSynthesis has an
+// analogous real quirk on some of the same browsers.
+//
+// This "unlocks" both for the rest of the page's lifetime by making a
+// trivial, silent call to each SYNCHRONOUSLY, inside the real tap's own
+// event-handler call stack -- before any of the async work (model
+// download, generation) that would otherwise separate the eventual real
+// play() call from the gesture that's supposed to authorize it. Call this
+// as the very first thing inside any click/tap handler that is the first
+// point a narration flow can begin (see hook-btn's click handler).
+//
+// Both calls are best-effort and intentionally silent about failure: on a
+// browser that doesn't need this at all (most desktop browsers), this is a
+// harmless no-op; on one that does need it, this is the fix; either way
+// nothing here should ever throw somewhere the caller doesn't expect it to.
+function _unlockMobileAudioForSession() {
+  try {
+    // Tiny (44-byte) silent WAV, inline as a data: URI -- no network
+    // request, so this never adds latency or depends on connectivity.
+    var silent = new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=');
+    var p = silent.play();
+    if (p && p.catch) p.catch(function() {}); // ignore -- this browser either didn't need it or still blocked it, no worse off either way
+  } catch (e) {}
+  try {
+    if (window.speechSynthesis) {
+      var emptyUtter = new SpeechSynthesisUtterance('');
+      window.speechSynthesis.speak(emptyUtter);
+      window.speechSynthesis.cancel();
+    }
+  } catch (e) {}
+}
+
 function toggleMute() {
   isMuted = !isMuted;
   var btn = document.getElementById('mute-btn');
@@ -8654,6 +8693,13 @@ document.getElementById('hook-btn').addEventListener('click', function(){
   // per reveal attempt.
   var hookBtn = document.getElementById('hook-btn');
   if (hookBtn.disabled) return;
+
+  // Mobile audio unlock (Part XLVIII) -- must happen synchronously, here,
+  // inside this real tap's own call stack, before any of the async work
+  // below (Kokoro's ~90MB download, generation) that would otherwise
+  // separate the eventual real play() call from the gesture authorizing
+  // it. See _unlockMobileAudioForSession()'s own comment for why.
+  _unlockMobileAudioForSession();
 
   var fullBirthName = document.getElementById('hook-fullname').value.trim().replace(/\s+/g,' ');
   var usedNameRaw = document.getElementById('hook-usedname').value.trim();
