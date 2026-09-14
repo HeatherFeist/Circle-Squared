@@ -7547,6 +7547,17 @@ var SIGN_TEASERS={
 // ===========================
 function showScreen(name){
   stopSpeech(); // Always stop speech when switching screens
+  // Re-enable the hook-screen submit button every time we land back on it,
+  // undoing the disable-on-click guard set in its own click handler (that
+  // guard exists purely to stop a double-click from starting two parallel
+  // initRevealScreen() narration chains at once -- see that handler's own
+  // comment). showScreen('hook') is the single choke point every "return
+  // to the hook screen" path in this file already goes through, so this is
+  // the one place that needs to know about the re-enable, not every caller.
+  if (name === 'hook') {
+    var hookBtn = document.getElementById('hook-btn');
+    if (hookBtn) hookBtn.disabled = false;
+  }
   document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');s.style.display='none';});
   var target=document.getElementById('screen-'+name);
   if(target){target.style.display='flex';void target.offsetWidth;target.classList.add('active');}
@@ -8605,6 +8616,19 @@ function drawSharedGeometryPDFPage(doc, p1, p2, W, H, C, pageNum, totalPages) {
 // HOOK SCREEN HANDLER (CHANGE 1 — now goes to edu screen)
 // ===========================
 document.getElementById('hook-btn').addEventListener('click', function(){
+  // Guards against a double-click/double-tap (or any other duplicate fire
+  // of this handler) starting TWO independent initRevealScreen() calls at
+  // once. Each keeps its own separate segment/playNext progression but
+  // they'd share the same global stopSpeech()/currentAudio state, each
+  // chain repeatedly interrupting and racing the other's narration --
+  // exactly the reported "both voices playing at the same time, the whole
+  // time" symptom. Re-enabled by showIntakeForm()/resetToStart() (wherever
+  // this screen can be returned to and a fresh reveal legitimately started
+  // again), never here -- this click handler only ever needs to fire once
+  // per reveal attempt.
+  var hookBtn = document.getElementById('hook-btn');
+  if (hookBtn.disabled) return;
+
   var fullBirthName = document.getElementById('hook-fullname').value.trim().replace(/\s+/g,' ');
   var usedNameRaw = document.getElementById('hook-usedname').value.trim();
   var month = document.getElementById('hook-month').value;
@@ -8615,6 +8639,8 @@ document.getElementById('hook-btn').addEventListener('click', function(){
 
   if (!fullBirthName) { valEl.textContent = 'Please enter your full birth name.'; return; }
   if (!month || !day || !year) { valEl.textContent = 'Please select your full date of birth.'; return; }
+
+  hookBtn.disabled = true;
 
   month = parseInt(month); day = parseInt(day); year = parseInt(year);
   var dob = year + '-' + String(month).padStart(2,'0') + '-' + String(day).padStart(2,'0');
