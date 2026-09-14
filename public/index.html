@@ -1216,6 +1216,21 @@ window._nodalChoiceAt = null;
 
 // ── SPEECH PREPROCESSING (CHANGE 4) ──────────────────────────
 function preprocessForSpeech(text) {
+  // FLAGGED, NOT YET FIXED: the "Libra" entry below was confirmed to have
+  // been garbled by Kokoro's real phonemizer (spelled out letter-by-letter)
+  // specifically because it used the ALL-CAPS+hyphen "stress syllable"
+  // convention every Sephiroth/Kether/Chokmah/Binah/Chesed/Geburah/Netzach/
+  // Yesod/Malkuth/Chiron/Lilith entry immediately below ALSO still uses.
+  // This file's own ALL-CAPS-spell-out-prevention regex (further down)
+  // correctly leaves all of these alone -- the suspect mechanism is
+  // downstream, inside Kokoro's own phonemizer, which this sandbox cannot
+  // actually run to test. It is realistic that some or all of these OTHER
+  // entries are ALSO being spelled out the same way, not just "Libra" --
+  // but none of them have been reported as mispronounced yet, so per this
+  // Codex's standing discipline (flag real cross-cutting suspicions rather
+  // than blind-fixing everything at once), they are left as-is until a
+  // real report confirms which ones actually need the same plain-word
+  // respelling "Libra" got.
   var replacements = [
     [/Kabbalistic/g, 'Kabbalistic'],
     [/Kabbalah/g, 'Kabbala'],
@@ -1236,13 +1251,24 @@ function preprocessForSpeech(text) {
     [/AIN SOPH/g, 'Ain Sof'],
     [/Chiron/g, 'KY-ron'],
     [/Lilith/g, 'LIL-ith'],
-    // "Libra" is real English text, but most TTS engines (Kokoro included,
-    // per a real reported mispronunciation) default to the "long I" reading
-    // ("LIE-bruh") since that matches more common English words' vowel
-    // pattern for this letter combination -- the correct astrological
-    // pronunciation is "LEE-bruh". Respelled phonetically here, audio-only
-    // (the visible reading text and PDF keep the real word "Libra").
-    [/\bLibra\b/g, 'LEE-bruh'],
+    // "Libra" is real English text, but most TTS engines default to the
+    // "long I" reading ("LIE-bruh") -- the correct astrological
+    // pronunciation is "LEE-bruh". The first attempt at this respelling,
+    // 'LEE-bruh' (the same ALL-CAPS+hyphen convention used for the
+    // Sephiroth/Kether/etc. entries below), made Kokoro's real phonemizer
+    // spell "LEE" out letter-by-letter instead of reading it as one
+    // syllable -- confirmed by re-running the actual ALL-CAPS-spell-out
+    // regex below against 'LEE-bruh' directly: it correctly leaves the
+    // hyphenated ALL-CAPS run untouched (this file's own code was never
+    // the bug), so the garbled pronunciation was happening downstream, in
+    // Kokoro's own grapheme-to-phoneme step, which apparently treats a
+    // short ALL-CAPS token as an acronym/initialism to spell out. A plain
+    // mixed-case single word with no hyphen sidesteps that entirely --
+    // ordinary English spelling rules already read a double "ee" as a
+    // long E (as in "see", "free", "agree"), so no phonetic hinting is
+    // even needed once it isn't ALL-CAPS. Audio-only either way -- the
+    // visible reading text and PDF keep the real word "Libra".
+    [/\bLibra\b/g, 'Leebruh'],
     [/\b11\b/g, 'eleven'],
     [/\b22\b/g, 'twenty-two'],
     [/\b33\b/g, 'thirty-three'],
