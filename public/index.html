@@ -974,7 +974,7 @@ body {
     <div data-id="266" style="margin-top:2rem;border-top:1px solid rgba(176,138,255,0.15);padding-top:1.5rem;">
       <div data-id="267" style="font-family:'Courier New',monospace;font-size:0.62rem;letter-spacing:0.4em;color:#c9a84c;margin-bottom:0.3rem;">🎙️ VOICE SETTINGS</div>
       <div data-id="268" style="font:700 1.1rem Georgia,serif;color:#e8e0ff;margin-bottom:0.6rem;">Voice Settings</div>
-      <p data-id="269" style="font-size:0.8rem;color:#8a7aaa;line-height:1.6;margin-bottom:1rem;">Heart (Kokoro-82M, an open-source neural voice) is the real narration voice every visitor now hears automatically — no admin action or visitor choice required. It downloads once per device (about 90MB, quantized) the first time a reading actually narrates on that device, then the browser caches it so every later reading is instant. This panel exists to monitor, toggle, and test that — not to configure a personal preference. The plain browser voice built into speechSynthesis (an automatic "Aria" search, if one exists) is kept only as an invisible safety-net fallback for the rare device that can't run Kokoro (no WebAssembly, a blocked download, etc.) — a visitor never sees or picks it directly.</p>
+      <p data-id="269" style="font-size:0.8rem;color:#8a7aaa;line-height:1.6;margin-bottom:1rem;">Heart (Kokoro-82M, an open-source neural voice) is the real narration voice every visitor now hears automatically — no admin action or visitor choice required. It downloads once per device (about 90MB on most devices, or a larger download automatically on a browser that supports WebGPU acceleration — real, meaningfully faster generation in exchange for the bigger one-time download) the first time a reading actually narrates on that device, then the browser caches it so every later reading is instant. This panel exists to monitor, toggle, and test that — not to configure a personal preference. The plain browser voice built into speechSynthesis (an automatic "Aria" search, if one exists) is kept only as an invisible safety-net fallback for the rare device that can't run Kokoro (no WebAssembly, a blocked download, etc.) — a visitor never sees or picks it directly.</p>
 
       <!-- Enhanced Voice (Heart) — Kokoro-82M, an open-source (Apache-2.0)
            neural TTS model running entirely client-side via WASM through the
@@ -990,7 +990,7 @@ body {
            loadKokoroVoice()/kokoroSpeak()/isKokoroReady()/isKokoroEnabledPref(). -->
       <div data-id="298" style="margin-bottom:1.4rem;padding-bottom:1.2rem;border-bottom:1px dashed rgba(176,138,255,0.15);">
         <div data-id="299" style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#c9a84c;display:block;margin-bottom:0.4rem;">🧬 ENHANCED VOICE — HEART (KOKORO), DEFAULT FOR EVERY VISITOR</div>
-        <p data-id="300" style="font-size:0.78rem;color:#8a7aaa;line-height:1.6;margin-bottom:0.6rem;">Heart is a free, open-source neural voice (Kokoro-82M, Apache-2.0 licensed) that sounds noticeably more natural than a plain browser voice. It runs entirely in the visitor's own browser — nothing is ever sent to a server — downloading its one-time model weights (about 90MB, quantized) automatically the moment a reading first narrates on a given device, then staying cached there for every reading after that. Disabling it below falls every visitor back to the plain default browser voice instead.</p>
+        <p data-id="300" style="font-size:0.78rem;color:#8a7aaa;line-height:1.6;margin-bottom:0.6rem;">Heart is a free, open-source neural voice (Kokoro-82M, Apache-2.0 licensed) that sounds noticeably more natural than a plain browser voice. It runs entirely in the visitor's own browser — nothing is ever sent to a server — downloading its one-time model weights automatically the moment a reading first narrates on a given device (about 90MB on most devices; a larger, GPU-accelerated download on a browser that supports WebGPU, for meaningfully faster generation — falls back automatically to the standard download if that fails), then staying cached there for every reading after that. Disabling it below falls every visitor back to the plain default browser voice instead.</p>
         <div data-id="302" style="display:flex;gap:0.6rem;margin-bottom:0.6rem;flex-wrap:wrap;">
           <button data-id="303" id="kokoro-enable-btn" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.55rem 1.2rem;background:linear-gradient(135deg,#c9a84c,#f0d070);color:#0a0015;font-weight:700;font-size:0.82rem;border:none;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;">✅ Enabled for All Visitors — Click to Disable</button>
           <button data-id="304" id="kokoro-test-btn" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.55rem 1.2rem;background:none;border:1px solid rgba(176,138,255,0.3);color:#b08aff;font-size:0.82rem;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;">🔊 Test Voice</button>
@@ -1435,10 +1435,31 @@ function readBrowserVoiceRate() {
 //   - Model: "onnx-community/Kokoro-82M-v1.0-ONNX" on Hugging Face — the
 //     exact model id kokoro-js's own README example uses. The ONNX export
 //     comes in several quantizations; "q8" (8-bit quantized) is roughly
-//     90MB, vs. ~326MB for the unquantized fp32 export. "q8" + device
-//     "wasm" is deliberately used below (not WebGPU/fp32) to keep the
-//     one-time download in a range that's reasonable to ask a free-tier
-//     visitor to opt into.
+//     90MB, vs. ~326MB for the unquantized fp32 export (this 326MB figure
+//     was checked against the npm registry/GitHub repo when this comment
+//     was first written -- it was NOT possible to re-confirm it again this
+//     session, since this sandbox's network egress proxy blocks direct
+//     access to huggingface.co; treat it as a documented estimate, not a
+//     freshly-verified number). "q8" + device "wasm" is the DEFAULT tier
+//     below to keep the one-time download small for every visitor.
+//   - WebGPU acceleration (Part XLIX): when the browser exposes
+//     `navigator.gpu`, loadKokoroVoice() now ATTEMPTS a GPU-accelerated
+//     "fp32" + device "webgpu" load first, before falling back to the
+//     default "q8"/"wasm" path on any failure. Real, independently-sourced
+//     benchmarks (not this project's own measurement, which this sandbox
+//     cannot produce) report a genuine 2-10x generate() speedup from
+//     WebGPU over WASM/CPU for models this size -- a real lever against
+//     the reported mobile-device lag, where WASM-only generate() can
+//     genuinely take longer than a chunk's own playback duration no matter
+//     how the surrounding code schedules things (see Part XLII/XLIV's own
+//     honest notes on that ceiling). The cost is the larger ~326MB
+//     download instead of ~90MB, ONLY for visitors whose browser actually
+//     supports WebGPU (per Part XLIX's own verification, broadly available
+//     on 2026 mobile browsers: iOS 26+ Safari, Android 12+ Chrome on
+//     Qualcomm/ARM GPUs) -- everyone else, and anyone for whom the WebGPU
+//     attempt itself fails (unsupported GPU, out of memory, a driver
+//     issue), transparently gets the original small q8/wasm download
+//     instead, with no broken narration either way.
 //   - Kokoro ships a small FIXED set of 28 named English voices (11 US
 //     female, 9 US male, 4 British female, 4 British male) — no custom
 //     voice cloning, no arbitrary named voices. The full, real list (from
@@ -1511,6 +1532,31 @@ function getKokoroVoiceName() {
 // for) before byte counts are known. Resolves with the ready KokoroTTS
 // instance; rejects (never hangs, never silently swallows) on any failure
 // so callers can show a real error and fall back to the default voice.
+var _kokoroUsedWebGPU = false; // set once loadKokoroVoice() actually succeeds -- diagnostics/admin-panel status text only, never gates any behavior
+
+// Builds the progress_callback passed to KokoroTTS.from_pretrained() --
+// factored out since loadKokoroVoice() now potentially calls
+// from_pretrained() twice (a WebGPU attempt, then a wasm fallback if that
+// attempt fails) and both need identical progress reporting.
+function _buildKokoroProgressCallback(onProgress) {
+  return function(info) {
+    if (!onProgress || !info) return;
+    // Transformers.js progress events vary by `status` -- only 'progress'
+    // reliably carries loaded/total byte counts to compute a real
+    // percentage from. Other statuses just update the label so the person
+    // sees *something* moving before byte counts exist yet.
+    if (info.status === 'progress' && typeof info.loaded === 'number' && typeof info.total === 'number' && info.total > 0) {
+      onProgress(Math.round((info.loaded / info.total) * 100), info.file || 'model weights');
+    } else if (info.status === 'initiate') {
+      onProgress(null, 'Starting download: ' + (info.file || 'model files') + '…');
+    } else if (info.status === 'done') {
+      onProgress(null, 'Finished: ' + (info.file || 'a file') + '.');
+    } else if (info.status === 'ready') {
+      onProgress(100, 'Ready.');
+    }
+  };
+}
+
 function loadKokoroVoice(onProgress) {
   if (_kokoroTTS) return Promise.resolve(_kokoroTTS);
   if (_kokoroLoadPromise) return _kokoroLoadPromise;
@@ -1523,27 +1569,42 @@ function loadKokoroVoice(onProgress) {
     var mod = await import(KOKORO_CDN_URL);
     var KokoroTTS = mod.KokoroTTS;
     if (!KokoroTTS) throw new Error('kokoro-js loaded but did not export KokoroTTS as expected.');
-    var tts = await KokoroTTS.from_pretrained(KOKORO_MODEL_ID, {
-      dtype: 'q8',    // ~90MB quantized weights -- see the size note in the block comment above
-      device: 'wasm', // works in every modern browser; WebGPU is not attempted automatically (see note above on why)
-      progress_callback: function(info) {
-        if (!onProgress || !info) return;
-        // Transformers.js progress events vary by `status` -- only
-        // 'progress' reliably carries loaded/total byte counts to compute
-        // a real percentage from. Other statuses just update the label so
-        // the person sees *something* moving before byte counts exist yet.
-        if (info.status === 'progress' && typeof info.loaded === 'number' && typeof info.total === 'number' && info.total > 0) {
-          onProgress(Math.round((info.loaded / info.total) * 100), info.file || 'model weights');
-        } else if (info.status === 'initiate') {
-          onProgress(null, 'Starting download: ' + (info.file || 'model files') + '…');
-        } else if (info.status === 'done') {
-          onProgress(null, 'Finished: ' + (info.file || 'a file') + '.');
-        } else if (info.status === 'ready') {
-          onProgress(100, 'Ready.');
-        }
+
+    var progressCallback = _buildKokoroProgressCallback(onProgress);
+
+    // WebGPU acceleration attempt (Part XLIX) -- see the block comment
+    // above confirming why this is real, not assumed, and why it's a
+    // larger download only for browsers that actually support it. Any
+    // failure here (unsupported GPU, out of memory, a driver issue, the
+    // browser lying about navigator.gpu, etc.) falls straight through to
+    // the standard q8/wasm path below -- never a broken narration
+    // experience, exactly like every other fallback in this file.
+    var tts = null;
+    var usedWebGPU = false;
+    if (typeof navigator !== 'undefined' && !!navigator.gpu) {
+      try {
+        tts = await KokoroTTS.from_pretrained(KOKORO_MODEL_ID, {
+          dtype: 'fp32',
+          device: 'webgpu',
+          progress_callback: progressCallback
+        });
+        usedWebGPU = true;
+      } catch (webgpuErr) {
+        console.warn('[Kokoro] WebGPU acceleration failed to initialize -- falling back to the standard WASM (CPU) path:', webgpuErr);
+        tts = null;
       }
-    });
+    }
+
+    if (!tts) {
+      tts = await KokoroTTS.from_pretrained(KOKORO_MODEL_ID, {
+        dtype: 'q8',    // ~90MB quantized weights -- see the size note in the block comment above
+        device: 'wasm', // works in every modern browser
+        progress_callback: progressCallback
+      });
+    }
+
     _kokoroTTS = tts;
+    _kokoroUsedWebGPU = usedWebGPU;
     return tts;
   })();
 
@@ -5023,8 +5084,8 @@ function updateKokoroEnableButton() {
     btn.textContent = '✅ Enabled for All Visitors — Click to Disable';
     if (status) {
       status.textContent = _kokoroTTS
-        ? '✅ Heart is loaded and actively narrating for this browser session.'
-        : '✅ Heart is enabled for every visitor. It downloads automatically (about 90MB, one time) the moment a reading actually narrates, then stays cached in this browser.';
+        ? ('✅ Heart is loaded and actively narrating for this browser session' + (_kokoroUsedWebGPU ? ' (GPU-accelerated via WebGPU, for faster generation on this device).' : ' (standard WASM/CPU path).'))
+        : '✅ Heart is enabled for every visitor. It downloads automatically the moment a reading actually narrates, then stays cached in this browser — about 90MB on most devices, or a larger download on a browser that supports WebGPU acceleration (faster generation in exchange for the bigger one-time download; falls back automatically if that fails).';
       status.style.color = '#c9a84c';
     }
   } else {
@@ -5069,7 +5130,7 @@ document.getElementById('kokoro-test-btn').addEventListener('click', function() 
     return;
   }
 
-  status.textContent = _kokoroTTS ? '🎙️ Testing voice...' : '⬇️ Downloading enhanced voice model (about 90MB, one time only)…';
+  status.textContent = _kokoroTTS ? '🎙️ Testing voice...' : '⬇️ Downloading enhanced voice model (about 90MB, or larger with WebGPU acceleration — one time only)…';
   status.style.color = '#b08aff';
   if (!_kokoroTTS) progressWrap.style.display = 'block';
 
