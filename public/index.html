@@ -974,7 +974,7 @@ body {
     <div data-id="266" style="margin-top:2rem;border-top:1px solid rgba(176,138,255,0.15);padding-top:1.5rem;">
       <div data-id="267" style="font-family:'Courier New',monospace;font-size:0.62rem;letter-spacing:0.4em;color:#c9a84c;margin-bottom:0.3rem;">🎙️ VOICE SETTINGS</div>
       <div data-id="268" style="font:700 1.1rem Georgia,serif;color:#e8e0ff;margin-bottom:0.6rem;">Voice Settings</div>
-      <p data-id="269" style="font-size:0.8rem;color:#8a7aaa;line-height:1.6;margin-bottom:1rem;">Heart (Kokoro-82M, an open-source neural voice) is the real narration voice every visitor now hears automatically — no admin action or visitor choice required. It downloads once per device (about 90MB on most devices, or a larger download automatically on a browser that supports WebGPU acceleration — real, meaningfully faster generation in exchange for the bigger one-time download) the first time a reading actually narrates on that device, then the browser caches it so every later reading is instant. This panel exists to monitor, toggle, and test that — not to configure a personal preference. The plain browser voice built into speechSynthesis (an automatic "Aria" search, if one exists) is kept only as an invisible safety-net fallback for the rare device that can't run Kokoro (no WebAssembly, a blocked download, etc.) — a visitor never sees or picks it directly.</p>
+      <p data-id="269" style="font-size:0.8rem;color:#8a7aaa;line-height:1.6;margin-bottom:1rem;">Every visitor's default narration voice is the plain, free, instant browser voice (preferring "Natasha" when the visitor's device has her — a Windows-only voice — else an automatic "Aria" search) — no download, no lag, no compute cost. Heart (Kokoro-82M, an open-source neural voice) sounds more natural but is real, live AI computation on the visitor's own device every time it speaks, which real-device testing showed can mean genuine lag and, on some mobile devices, an audible overlap with the native voice — as of Part L this is an admin-only option again, OFF by default for every visitor, exactly like it was before Part XLI. Turn it on below only to test it or to make it live for everyone; it downloads automatically (about 90MB on most devices, or a larger download on a browser that supports WebGPU acceleration) the first time a reading narrates after being enabled.</p>
 
       <!-- Enhanced Voice (Heart) — Kokoro-82M, an open-source (Apache-2.0)
            neural TTS model running entirely client-side via WASM through the
@@ -989,10 +989,10 @@ body {
            everyone, and to preview it with Test Voice. See
            loadKokoroVoice()/kokoroSpeak()/isKokoroReady()/isKokoroEnabledPref(). -->
       <div data-id="298" style="margin-bottom:1.4rem;padding-bottom:1.2rem;border-bottom:1px dashed rgba(176,138,255,0.15);">
-        <div data-id="299" style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#c9a84c;display:block;margin-bottom:0.4rem;">🧬 ENHANCED VOICE — HEART (KOKORO), DEFAULT FOR EVERY VISITOR</div>
-        <p data-id="300" style="font-size:0.78rem;color:#8a7aaa;line-height:1.6;margin-bottom:0.6rem;">Heart is a free, open-source neural voice (Kokoro-82M, Apache-2.0 licensed) that sounds noticeably more natural than a plain browser voice. It runs entirely in the visitor's own browser — nothing is ever sent to a server — downloading its one-time model weights automatically the moment a reading first narrates on a given device (about 90MB on most devices; a larger, GPU-accelerated download on a browser that supports WebGPU, for meaningfully faster generation — falls back automatically to the standard download if that fails), then staying cached there for every reading after that. Disabling it below falls every visitor back to the plain default browser voice instead.</p>
+        <div data-id="299" style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#c9a84c;display:block;margin-bottom:0.4rem;">🧬 ENHANCED VOICE — HEART (KOKORO), ADMIN-ONLY OPTION (OFF BY DEFAULT)</div>
+        <p data-id="300" style="font-size:0.78rem;color:#8a7aaa;line-height:1.6;margin-bottom:0.6rem;">Heart is a free, open-source neural voice (Kokoro-82M, Apache-2.0 licensed) that sounds noticeably more natural than a plain browser voice. It runs entirely in the visitor's own browser — nothing is ever sent to a server — downloading its one-time model weights automatically the moment a reading first narrates on a given device (about 90MB on most devices; a larger, GPU-accelerated download on a browser that supports WebGPU, for meaningfully faster generation — falls back automatically to the standard download if that fails), then staying cached there for every reading after that. Real-device testing showed genuine lag on some devices, so this is OFF for every visitor unless you turn it on below — everyone hears the plain native voice (Natasha, where available) by default instead.</p>
         <div data-id="302" style="display:flex;gap:0.6rem;margin-bottom:0.6rem;flex-wrap:wrap;">
-          <button data-id="303" id="kokoro-enable-btn" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.55rem 1.2rem;background:linear-gradient(135deg,#c9a84c,#f0d070);color:#0a0015;font-weight:700;font-size:0.82rem;border:none;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;">✅ Enabled for All Visitors — Click to Disable</button>
+          <button data-id="303" id="kokoro-enable-btn" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.55rem 1.2rem;background:linear-gradient(135deg,#c9a84c,#f0d070);color:#0a0015;font-weight:700;font-size:0.82rem;border:none;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;">▶ Enable for All Visitors</button>
           <button data-id="304" id="kokoro-test-btn" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.55rem 1.2rem;background:none;border:1px solid rgba(176,138,255,0.3);color:#b08aff;font-size:0.82rem;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;">🔊 Test Voice</button>
         </div>
         <div data-id="305" id="kokoro-progress-wrap" style="display:none;margin-bottom:0.6rem;">
@@ -1404,6 +1404,23 @@ function pickAriaVoice(voices) {
   return null;
 }
 
+// "Natasha" (Part L) -- a Microsoft/Windows-built-in voice. Only ever
+// present in the browser's own voice list on a Windows device (part of
+// Windows' bundled speech voices) -- macOS, iOS, and Android each ship
+// their own separate voice sets and never include a Microsoft voice named
+// Natasha. Tried FIRST (see speakWithVoices() below); when it isn't
+// present (any non-Windows device, or a Windows browser without her
+// specifically installed), this simply returns null and the existing
+// pickAriaVoice() search is used instead -- never a hang or an error,
+// exactly the same graceful-fallback posture every voice-tier decision in
+// this file already has.
+function pickNatashaVoice(voices) {
+  for (var i = 0; i < voices.length; i++) {
+    if (voices[i].name && /\bnatasha\b/i.test(voices[i].name)) return voices[i];
+  }
+  return null;
+}
+
 // Narration speed for the free browser voice path -- admin-adjustable via
 // the "Narration Speed" slider (Voice Settings) rather than a hardcoded
 // constant, since the fixed 0.95 rate felt too slow on some machines/voices.
@@ -1494,16 +1511,29 @@ var _kokoroInitFailed = false;  // sticky per-session flag: set only when the mo
 
 // The admin's stored on/off preference for Heart, as distinct from whether
 // it has actually finished loading THIS session (see isKokoroReady() below).
-// Part XLI flips the default: Heart is now the universal default voice for
-// every visitor, so the ABSENCE of a stored preference (a brand new
-// visitor's browser, or the admin's own browser before ever touching this
-// toggle) must mean "on" -- only an explicit, saved 'false' (the admin
-// clicking the panel's disable toggle) means "off". This is why the check
-// below is `!== 'false'` and not `=== 'true'`: the latter would have made
-// "never set" evaluate to off, silently re-creating the exact opt-in-only
-// gating this Part exists to remove.
+//
+// Part XLI (2026-09-13) flipped this to default ON for every visitor.
+// Part L (2026-09-17) flips it back to default OFF, admin-only again --
+// after real-device testing surfaced persistent narration lag and an
+// audible native-voice/Kokoro overlap on mobile that repeated mitigation
+// attempts (Parts XLII-XLIX: chunk pipelining, segment-level look-ahead
+// prefetch, a duplicate-invocation guard, a mobile audio-unlock, WebGPU
+// acceleration) reduced but never fully resolved, plus the project owner's
+// explicit, deliberate decision to prioritize a free, always-fast,
+// always-available voice over a slower natural-sounding one for now. The
+// default free narration voice is once again the plain native
+// speechSynthesis voice (preferring "Natasha" where available -- see
+// pickNatashaVoice() -- else the existing "Aria" search). Kokoro/Heart
+// itself was NOT removed: every function and admin-panel control from
+// Parts XXXIII-XLIX still exists byte-for-byte, so the project owner can
+// switch it back on for every visitor from the admin panel at any time,
+// with zero rebuilding, should the underlying technology (or a device's
+// real-world performance) improve. The check below is `=== 'true'`, not
+// `!== 'false'` (the inverse of Part XLI's own change) -- "never set" now
+// correctly evaluates to OFF again, matching the original Part XXXIII
+// opt-in design this reverts to.
 function isKokoroEnabledPref() {
-  return localStorage.getItem('enhanced_voice_enabled') !== 'false';
+  return localStorage.getItem('enhanced_voice_enabled') === 'true';
 }
 
 // The gate every narration call site checks (via browserSpeak() below) to
@@ -1989,13 +2019,19 @@ function _nativeBrowserSpeak(text, onEnd) {
 
   function speakWithVoices(voices) {
     if (!_browserVoiceResolved && voices && voices.length) {
-      // Automatic "Aria" name search -- this is a silent, automatic
-      // fallback for whenever Kokoro isn't speaking, not a visitor- or
-      // admin-facing picker (Part XLI removed the admin-only explicit
-      // override that used to sit on top of this). Resolved exactly once
-      // per page session and cached above so every later chunk/section of
-      // this (and any subsequent) reading reuses the identical voice object.
-      _resolvedBrowserVoice = pickAriaVoice(voices);
+      // Automatic name search -- this is the DEFAULT narration voice as of
+      // Part L (Kokoro reverted to admin-only, off by default -- see
+      // isKokoroEnabledPref()'s own comment), not a visitor- or admin-
+      // facing picker. Tries "Natasha" first (a real person's stated
+      // preference), which only ever exists on a Windows device's own
+      // voice list -- pickNatashaVoice() returns null everywhere else
+      // (macOS, iOS, Android, or a Windows browser without her installed),
+      // so this falls through to the pre-existing "Aria" search
+      // automatically, never a hang or a missing-voice error. Resolved
+      // exactly once per page session and cached above so every later
+      // chunk/section of this (and any subsequent) reading reuses the
+      // identical voice object.
+      _resolvedBrowserVoice = pickNatashaVoice(voices) || pickAriaVoice(voices);
       _browserVoiceResolved = true;
     }
     // else: voices list is still empty -- leave _browserVoiceResolved false
