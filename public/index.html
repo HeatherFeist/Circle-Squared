@@ -1421,6 +1421,28 @@ function pickNatashaVoice(voices) {
   return null;
 }
 
+// "Google" voices (Part LI) -- Android's own free, built-in text-to-speech
+// engine ("Speech Services by Google"), the Android equivalent of Natasha
+// on Windows. Checked directly (not assumed): Chrome on Android's
+// getVoices() list is real but notably messier than Windows/iOS -- it
+// doesn't reliably expose clean, human-readable names like desktop Chrome
+// does. This search is a defensive best-effort layer for the browser/OS
+// combinations that DO expose a named "Google ..." voice; on the (likely
+// common) Android combinations that don't, this simply returns null like
+// every other miss here, and the voice stays unset -- which itself already
+// falls through to the device's own current default voice, and on the
+// overwhelming majority of real Android phones THAT default already is
+// this same free Google voice, since it ships as the OS's default TTS
+// engine. So Android is very likely already covered even without this
+// function ever matching anything; this exists only to catch it by name
+// on the browser/OS combinations where that's actually possible.
+function pickGoogleVoice(voices) {
+  for (var i = 0; i < voices.length; i++) {
+    if (voices[i].name && /\bgoogle\b/i.test(voices[i].name)) return voices[i];
+  }
+  return null;
+}
+
 // Narration speed for the free browser voice path -- admin-adjustable via
 // the "Narration Speed" slider (Voice Settings) rather than a hardcoded
 // constant, since the fixed 0.95 rate felt too slow on some machines/voices.
@@ -2022,16 +2044,18 @@ function _nativeBrowserSpeak(text, onEnd) {
       // Automatic name search -- this is the DEFAULT narration voice as of
       // Part L (Kokoro reverted to admin-only, off by default -- see
       // isKokoroEnabledPref()'s own comment), not a visitor- or admin-
-      // facing picker. Tries "Natasha" first (a real person's stated
-      // preference), which only ever exists on a Windows device's own
-      // voice list -- pickNatashaVoice() returns null everywhere else
-      // (macOS, iOS, Android, or a Windows browser without her installed),
-      // so this falls through to the pre-existing "Aria" search
-      // automatically, never a hang or a missing-voice error. Resolved
-      // exactly once per page session and cached above so every later
-      // chunk/section of this (and any subsequent) reading reuses the
-      // identical voice object.
-      _resolvedBrowserVoice = pickNatashaVoice(voices) || pickAriaVoice(voices);
+      // facing picker. Tries three real, named preferences in order, each
+      // one only ever matching on the platform it's actually native to,
+      // falling through harmlessly (never a hang or a missing-voice error)
+      // on every other platform: "Natasha" (Windows), then "Google"
+      // (Android's own built-in TTS voice, when the browser/OS combination
+      // happens to expose it by name -- see pickGoogleVoice()'s own
+      // comment on why Android is very likely already covered even without
+      // this matching anything), then the pre-existing "Aria" search.
+      // Resolved exactly once per page session and cached above so every
+      // later chunk/section of this (and any subsequent) reading reuses
+      // the identical voice object.
+      _resolvedBrowserVoice = pickNatashaVoice(voices) || pickGoogleVoice(voices) || pickAriaVoice(voices);
       _browserVoiceResolved = true;
     }
     // else: voices list is still empty -- leave _browserVoiceResolved false
