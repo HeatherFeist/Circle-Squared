@@ -820,7 +820,8 @@ body {
       <div id="sub-status-active" style="display:none;">
         <div style="text-align:center;font-size:0.82rem;color:#88dd99;margin-bottom:1rem;">✦ Subscription active</div>
         <button id="sub-today-reading-btn" class="cta-btn w-full" style="font-size:0.92rem;padding:0.75rem 1.5rem;background:linear-gradient(135deg,#c9a84c,#8a6d1f);margin-bottom:0.7rem;">Today's Reading →</button>
-        <button id="sub-lookback-btn" class="cta-btn w-full" style="font-size:0.92rem;padding:0.75rem 1.5rem;background:linear-gradient(135deg,#b08aff,#7c3aed);">Your Lookback →</button>
+        <button id="sub-lookback-btn" class="cta-btn w-full" style="font-size:0.92rem;padding:0.75rem 1.5rem;background:linear-gradient(135deg,#b08aff,#7c3aed);margin-bottom:0.7rem;">Your Lookback →</button>
+        <button id="sub-contacts-btn" class="cta-btn w-full" style="font-size:0.92rem;padding:0.75rem 1.5rem;background:linear-gradient(135deg,#4fce8a,#2f9e5c);">👪 Family Contacts →</button>
       </div>
     </div>
 
@@ -860,6 +861,68 @@ body {
     <div id="lookback-status" style="font-size:0.8rem;color:#f0d070;text-align:center;margin-bottom:1rem;min-height:1.2em;"></div>
     <div id="lookback-summary" style="font-size:0.85rem;color:rgba(232,224,255,0.9);line-height:1.7;white-space:pre-wrap;"></div>
     <button id="lookback-back-btn" type="button" style="width:100%;margin-top:1rem;padding:0.5rem;background:none;border:none;color:#6a5a9a;cursor:pointer;font-size:0.78rem;">← Back</button>
+  </div>
+</div>
+
+<!-- ===== SCREEN FAMILY CONTACTS (subscribers only) =====
+     Save a family member or friend's birth info once (e.g. the moment a
+     new baby is born) and reuse it later for a Group or Partnership
+     Reading instead of re-typing it. See
+     supabase/saved_contacts_schema.sql and docs/CODEX_LOGIC_V07.md for
+     the honest-labeling writeup. All writes go through
+     upsert_saved_contact()/delete_saved_contact() -- this screen never
+     writes to the saved_contacts table directly. -->
+<div id="screen-my-contacts" class="screen">
+  <div class="cosmic-card" style="max-width:680px;width:100%;margin:2rem auto;padding:1.6rem 1.4rem;max-height:90vh;overflow-y:auto;">
+    <div style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.35em;color:#4fce8a;margin-bottom:0.4rem;text-align:center;">✦ FAMILY CONTACTS ✦</div>
+    <h2 style="font:700 1.3rem Georgia,serif;color:#e8e0ff;text-align:center;margin:0 0 0.4rem;">Save birth info now, use it later</h2>
+    <p style="font-size:0.78rem;color:#8a7aaa;text-align:center;line-height:1.5;margin:0 0 1.2rem;">Save a family member or friend's exact birth date and time the moment you have it, so it's never lost — then pull it up later for a Group or Partnership Reading. Only you can see your saved contacts.</p>
+
+    <div id="contacts-list-wrap">
+      <div id="contacts-status" style="font-size:0.78rem;color:#f0d070;text-align:center;min-height:1.2em;margin-bottom:0.6rem;"></div>
+      <div id="contacts-list" style="display:flex;flex-direction:column;gap:0.6rem;margin-bottom:1.2rem;"></div>
+      <div id="contacts-empty-state" style="text-align:center;padding:1.5rem;color:#3a2a5a;font-style:italic;display:none;">No saved contacts yet — add your first one below.</div>
+      <button id="contact-add-new-btn" class="cta-btn w-full" style="font-size:0.9rem;padding:0.7rem 1.4rem;background:linear-gradient(135deg,#4fce8a,#2f9e5c);">+ Add a Contact</button>
+    </div>
+
+    <div id="contact-form-wrap" style="display:none;margin-top:1.2rem;padding-top:1.2rem;border-top:1px solid rgba(176,138,255,0.15);">
+      <h3 id="contact-form-title" style="font:700 1rem Georgia,serif;color:#e8e0ff;margin:0 0 0.8rem;">Add a Contact</h3>
+      <input type="hidden" id="contact-form-id" value="" />
+
+      <label class="label-mono block mb-2">LABEL <span style="opacity:0.6;text-transform:none;letter-spacing:0;">(private note to yourself, e.g. "Nephew's son")</span></label>
+      <input id="contact-label" type="text" class="cosmic-input mb-3" placeholder="e.g. Nephew's son" autocomplete="off" />
+
+      <label class="label-mono block mb-2">FULL NAME</label>
+      <input id="contact-full-name" type="text" class="cosmic-input mb-3" placeholder="Full birth name" autocomplete="off" />
+
+      <label class="label-mono block mb-2">USED NAME <span style="opacity:0.6;text-transform:none;letter-spacing:0;">(optional nickname)</span></label>
+      <input id="contact-used-name" type="text" class="cosmic-input mb-3" placeholder="Leave blank to use the full name" autocomplete="off" />
+
+      <label class="label-mono block mb-2">BIRTH DATE</label>
+      <input id="contact-birth-date" type="date" class="cosmic-input mb-3" />
+
+      <label class="label-mono block mb-2">BIRTH TIME <span style="opacity:0.6;text-transform:none;letter-spacing:0;">(optional — powers the Ascendant)</span></label>
+      <input id="contact-birth-time" type="time" class="cosmic-input mb-1" />
+      <label style="display:flex;align-items:center;gap:0.5rem;margin:0.5rem 0 0.8rem;cursor:pointer;">
+        <input type="checkbox" id="contact-time-unknown" style="width:16px;height:16px;accent-color:#4fce8a;" />
+        <span style="font-size:0.78rem;color:#8a7aaa;">Exact time isn't known</span>
+      </label>
+
+      <label class="label-mono block mb-2">BIRTH PLACE <span style="opacity:0.6;text-transform:none;letter-spacing:0;">(optional)</span></label>
+      <input id="contact-birth-place" type="text" class="cosmic-input mb-3" placeholder="City, State/Country" autocomplete="off" />
+
+      <label class="label-mono block mb-2">NOTES <span style="opacity:0.6;text-transform:none;letter-spacing:0;">(optional, private to you)</span></label>
+      <textarea id="contact-notes" class="cosmic-input mb-3" rows="2" placeholder="Anything you want to remember"></textarea>
+
+      <div id="contact-form-status" style="font-size:0.78rem;color:#ff9ed2;min-height:1.2em;margin-bottom:0.6rem;text-align:center;"></div>
+
+      <div style="display:flex;gap:0.6rem;">
+        <button id="contact-save-btn" class="cta-btn" style="flex:1;font-size:0.9rem;padding:0.7rem 1.4rem;background:linear-gradient(135deg,#4fce8a,#2f9e5c);">Save Contact</button>
+        <button id="contact-cancel-btn" type="button" style="padding:0.7rem 1.2rem;background:none;border:1px solid rgba(176,138,255,0.3);border-radius:8px;color:#8a7aaa;cursor:pointer;">Cancel</button>
+      </div>
+    </div>
+
+    <button id="contacts-back-btn" type="button" style="width:100%;margin-top:1.2rem;padding:0.5rem;background:none;border:none;color:#6a5a9a;cursor:pointer;font-size:0.78rem;">← Back</button>
   </div>
 </div>
 
@@ -12462,6 +12525,80 @@ async function subFetchDailyReadsRange(startDate, endDate) {
 }
 
 // -----------------------------------------------------------
+// saved_contacts (Family Contacts): persist + fetch + delete. See
+// supabase/saved_contacts_schema.sql for the full design. Reads use a
+// plain RLS-scoped SELECT (a signed-in subscriber can only ever see their
+// own rows); writes and deletes both go through SECURITY DEFINER RPCs
+// that ALSO re-check active-subscriber status server-side -- this file
+// never writes to the saved_contacts table directly, same discipline
+// subUpsertDailyRead() already uses.
+// -----------------------------------------------------------
+async function subFetchSavedContacts() {
+  var session = subGetSession();
+  if (!session || !session.access_token) throw new Error('Please sign in first.');
+  var url = SUPABASE_URL + '/rest/v1/saved_contacts'
+    + '?select=id,label,full_name,used_name,birth_date,birth_time,birth_time_unknown,birth_place,notes'
+    + '&order=created_at.desc';
+  var res = await fetch(url, {
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + session.access_token }
+  });
+  if (!res.ok) throw new Error('Could not load your saved contacts (status ' + res.status + ').');
+  return res.json();
+}
+
+// `payload` matches upsert_saved_contact()'s own parameter names exactly
+// (p_contact_id, p_label, p_full_name, p_used_name, p_birth_date,
+// p_birth_time, p_birth_time_unknown, p_birth_place, p_notes) -- pass
+// p_contact_id: null to insert a new contact, or an existing contact's id
+// to update it (the RPC itself refuses to touch a contact that isn't the
+// caller's own, regardless of what id is passed).
+async function subUpsertSavedContact(payload) {
+  var session = subGetSession();
+  if (!session || !session.access_token) throw new Error('Please sign in first.');
+  var res = await fetch(SUPABASE_URL + '/rest/v1/rpc/upsert_saved_contact', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + session.access_token
+    },
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) throw new Error('Could not save this contact (status ' + res.status + ').');
+  var result = await res.json();
+  if (!result || !result.ok) {
+    var reason = result && result.reason;
+    var messages = {
+      not_authenticated: 'Please sign in first.',
+      not_an_active_subscriber: 'Family Contacts is available to active $20/month subscribers.',
+      missing_full_name: 'Please enter a full name.',
+      missing_birth_date: 'Please enter a birth date.',
+      not_found: 'That contact could not be found.'
+    };
+    throw new Error(messages[reason] || 'Could not save this contact.');
+  }
+  return result;
+}
+
+async function subDeleteSavedContact(contactId) {
+  var session = subGetSession();
+  if (!session || !session.access_token) throw new Error('Please sign in first.');
+  var res = await fetch(SUPABASE_URL + '/rest/v1/rpc/delete_saved_contact', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + session.access_token
+    },
+    body: JSON.stringify({ p_contact_id: contactId })
+  });
+  if (!res.ok) throw new Error('Could not delete this contact (status ' + res.status + ').');
+  var result = await res.json();
+  if (!result || !result.ok) throw new Error('Could not delete this contact.');
+  return result;
+}
+
+// -----------------------------------------------------------
 // Today's Reading (subscribers only) -- calls doReading()/
 // getFallbackReading() exactly as the one-time flow does, no duplicated
 // pipeline, then persists the result via subUpsertDailyRead() above.
@@ -12789,6 +12926,154 @@ document.getElementById('sub-lookback-btn').addEventListener('click', function()
 document.getElementById('lookback-quarter-btn').addEventListener('click', function() { renderLookback('quarter'); });
 document.getElementById('lookback-year-btn').addEventListener('click', function() { renderLookback('year'); });
 document.getElementById('lookback-back-btn').addEventListener('click', function() { showScreen('subscribe'); });
+
+// -----------------------------------------------------------
+// Family Contacts UI -- list/add/edit/delete. All data plumbing above
+// (subFetchSavedContacts/subUpsertSavedContact/subDeleteSavedContact)
+// already enforces sign-in + active-subscriber status server-side; this
+// UI layer just calls those and shows a clear message on any refusal.
+// -----------------------------------------------------------
+function escapeHtmlForContacts(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+// Formats a saved contact's birth date/time for display -- reuses the
+// browser's own locale-aware date formatting rather than hand-rolling one,
+// and reads plainly whether or not a time was given.
+function formatContactBirthInfo(contact) {
+  var d = new Date(contact.birth_date + 'T00:00:00');
+  var dateStr = isNaN(d.getTime()) ? contact.birth_date : d.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+  if (contact.birth_time_unknown || !contact.birth_time) return dateStr + ' · exact time not known';
+  var timeParts = String(contact.birth_time).split(':');
+  var t = new Date(1970, 0, 1, parseInt(timeParts[0], 10), parseInt(timeParts[1], 10));
+  var timeStr = t.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+  return dateStr + ' · ' + timeStr;
+}
+
+function loadContactsList() {
+  var statusEl = document.getElementById('contacts-status');
+  var listEl = document.getElementById('contacts-list');
+  var emptyEl = document.getElementById('contacts-empty-state');
+  statusEl.textContent = 'Loading your saved contacts…';
+  listEl.innerHTML = '';
+  emptyEl.style.display = 'none';
+
+  subFetchSavedContacts().then(function(contacts) {
+    statusEl.textContent = '';
+    if (!contacts || !contacts.length) {
+      emptyEl.style.display = 'block';
+      return;
+    }
+    listEl.innerHTML = contacts.map(function(c) {
+      var labelLine = c.label ? '<div style="font-family:\'Courier New\',monospace;font-size:0.62rem;letter-spacing:0.1em;color:#4fce8a;margin-bottom:0.2rem;">' + escapeHtmlForContacts(c.label) + '</div>' : '';
+      return '<div class="cosmic-card" style="padding:0.9rem 1rem;text-align:left;" data-contact-id="' + c.id + '">'
+        + labelLine
+        + '<div style="font-weight:700;color:#e8e0ff;font-size:0.95rem;">' + escapeHtmlForContacts(c.full_name) + '</div>'
+        + '<div style="font-size:0.78rem;color:#8a7aaa;margin-top:0.2rem;">' + escapeHtmlForContacts(formatContactBirthInfo(c)) + (c.birth_place ? ' · ' + escapeHtmlForContacts(c.birth_place) : '') + '</div>'
+        + '<div style="display:flex;gap:0.5rem;margin-top:0.6rem;">'
+        + '<button type="button" class="contact-edit-btn" data-contact-id="' + c.id + '" style="font-size:0.75rem;padding:0.35rem 0.8rem;background:none;border:1px solid rgba(176,138,255,0.3);border-radius:50px;color:#b08aff;cursor:pointer;">Edit</button>'
+        + '<button type="button" class="contact-delete-btn" data-contact-id="' + c.id + '" style="font-size:0.75rem;padding:0.35rem 0.8rem;background:none;border:1px solid rgba(255,100,100,0.3);border-radius:50px;color:#ff6b6b;cursor:pointer;">Delete</button>'
+        + '</div></div>';
+    }).join('');
+    // Stash the raw contacts for the Edit button to look up without a
+    // second round-trip -- cleared/refreshed every time this list reloads.
+    window._savedContactsCache = contacts;
+  }).catch(function(err) {
+    statusEl.textContent = (err && err.message) || 'Could not load your saved contacts.';
+  });
+}
+
+function showContactForm(existingContact) {
+  document.getElementById('contacts-list-wrap').style.display = 'none';
+  document.getElementById('contact-form-wrap').style.display = 'block';
+  document.getElementById('contact-form-status').textContent = '';
+  document.getElementById('contact-form-title').textContent = existingContact ? 'Edit Contact' : 'Add a Contact';
+  document.getElementById('contact-form-id').value = existingContact ? existingContact.id : '';
+  document.getElementById('contact-label').value = (existingContact && existingContact.label) || '';
+  document.getElementById('contact-full-name').value = (existingContact && existingContact.full_name) || '';
+  document.getElementById('contact-used-name').value = (existingContact && existingContact.used_name) || '';
+  document.getElementById('contact-birth-date').value = (existingContact && existingContact.birth_date) || '';
+  document.getElementById('contact-birth-time').value = (existingContact && existingContact.birth_time) ? String(existingContact.birth_time).slice(0, 5) : '';
+  document.getElementById('contact-time-unknown').checked = !!(existingContact && existingContact.birth_time_unknown);
+  document.getElementById('contact-birth-place').value = (existingContact && existingContact.birth_place) || '';
+  document.getElementById('contact-notes').value = (existingContact && existingContact.notes) || '';
+}
+
+function hideContactForm() {
+  document.getElementById('contacts-list-wrap').style.display = 'block';
+  document.getElementById('contact-form-wrap').style.display = 'none';
+}
+
+document.getElementById('sub-contacts-btn').addEventListener('click', function() {
+  showScreen('my-contacts');
+  hideContactForm();
+  loadContactsList();
+});
+
+document.getElementById('contacts-back-btn').addEventListener('click', function() { showScreen('subscribe'); });
+
+document.getElementById('contact-add-new-btn').addEventListener('click', function() { showContactForm(null); });
+document.getElementById('contact-cancel-btn').addEventListener('click', function() { hideContactForm(); });
+
+document.getElementById('contacts-list').addEventListener('click', function(e) {
+  var editBtn = e.target.closest('.contact-edit-btn');
+  var deleteBtn = e.target.closest('.contact-delete-btn');
+  if (editBtn) {
+    var id = editBtn.getAttribute('data-contact-id');
+    var contact = (window._savedContactsCache || []).filter(function(c) { return c.id === id; })[0];
+    if (contact) showContactForm(contact);
+    return;
+  }
+  if (deleteBtn) {
+    var delId = deleteBtn.getAttribute('data-contact-id');
+    if (!confirm('Delete this saved contact? This cannot be undone.')) return;
+    deleteBtn.disabled = true;
+    subDeleteSavedContact(delId).then(function() {
+      loadContactsList();
+    }).catch(function(err) {
+      alert((err && err.message) || 'Could not delete this contact.');
+      deleteBtn.disabled = false;
+    });
+  }
+});
+
+document.getElementById('contact-save-btn').addEventListener('click', function() {
+  var statusEl = document.getElementById('contact-form-status');
+  var fullName = document.getElementById('contact-full-name').value.trim();
+  var birthDate = document.getElementById('contact-birth-date').value;
+  if (!fullName) { statusEl.textContent = 'Please enter a full name.'; return; }
+  if (!birthDate) { statusEl.textContent = 'Please enter a birth date.'; return; }
+
+  var timeUnknown = document.getElementById('contact-time-unknown').checked;
+  var birthTimeRaw = document.getElementById('contact-birth-time').value; // 'HH:MM' or ''
+  var saveBtn = document.getElementById('contact-save-btn');
+  saveBtn.disabled = true;
+  statusEl.textContent = 'Saving…';
+  statusEl.style.color = '#f0d070';
+
+  var idVal = document.getElementById('contact-form-id').value;
+  subUpsertSavedContact({
+    p_contact_id: idVal || null,
+    p_label: document.getElementById('contact-label').value.trim() || null,
+    p_full_name: fullName,
+    p_used_name: document.getElementById('contact-used-name').value.trim() || null,
+    p_birth_date: birthDate,
+    p_birth_time: (!timeUnknown && birthTimeRaw) ? (birthTimeRaw + ':00') : null,
+    p_birth_time_unknown: timeUnknown,
+    p_birth_place: document.getElementById('contact-birth-place').value.trim() || null,
+    p_notes: document.getElementById('contact-notes').value.trim() || null
+  }).then(function() {
+    hideContactForm();
+    loadContactsList();
+  }).catch(function(err) {
+    statusEl.textContent = (err && err.message) || 'Could not save this contact.';
+    statusEl.style.color = '#ff9ed2';
+  }).finally(function() {
+    saveBtn.disabled = false;
+  });
+});
 
 // ===========================
 // INIT
