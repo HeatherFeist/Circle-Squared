@@ -841,6 +841,21 @@ body {
     <h2 id="sub-reading-name" style="font:700 1.3rem Georgia,serif;color:#e8e0ff;text-align:center;margin:0 0 0.8rem;"></h2>
     <div id="sub-reading-status" style="font-size:0.8rem;color:#f0d070;text-align:center;margin-bottom:1rem;min-height:1.2em;"></div>
     <div id="sub-nodal-choice-mount"></div>
+
+    <!-- ===== DAILY MINOR ARCANA CARD PULL + TIP (Part LIII, subscribers
+         only) ===== One specific card, drawn from the person's own real
+         numerology (today's Personal Day digit = the card's rank,
+         Ace-Nine) and their own real Elemental Suit -- grounded in the
+         real, standard Ace-through-Ten numerological correspondence
+         already cross-verified in Codex Logic V07 Part LIII, not a random
+         draw. See getDailyMinorCardPull()/DAILY_MINOR_TIPS below. -->
+    <div id="sub-daily-card-wrap" class="cosmic-card" style="margin:1rem 0;padding:1.1rem 1.2rem;background:rgba(176,138,255,0.06);">
+      <div style="font-family:'Courier New',monospace;font-size:0.58rem;letter-spacing:0.3em;color:#b08aff;margin-bottom:0.4rem;">✦ TODAY'S CARD ✦</div>
+      <div id="sub-daily-card-name" style="font:700 1.1rem Georgia,serif;color:#e8e0ff;margin-bottom:0.2rem;"></div>
+      <div id="sub-daily-card-title" style="font-size:0.72rem;color:#8a7aaa;font-style:italic;margin-bottom:0.6rem;"></div>
+      <div id="sub-daily-card-tip" style="font-size:0.85rem;color:rgba(232,224,255,0.9);line-height:1.6;"></div>
+    </div>
+
     <div id="sub-reading-text" style="white-space:pre-wrap;font-size:0.85rem;color:rgba(232,224,255,0.9);line-height:1.7;margin-top:1rem;"></div>
     <div id="sub-save-status" style="font-size:0.78rem;color:#88dd99;text-align:center;margin-top:1rem;min-height:1.2em;"></div>
     <button id="sub-reading-back-btn" type="button" style="width:100%;margin-top:1rem;padding:0.5rem;background:none;border:none;color:#6a5a9a;cursor:pointer;font-size:0.78rem;">← Back</button>
@@ -7378,6 +7393,108 @@ function formatPersonalDayWildcard(pdw) {
 }
 
 // ===========================
+// W3BB CODEX V07 PART LIII -- DAILY MINOR ARCANA CARD PULL (Daily
+// Readings subscribers only)
+// ===========================
+// A real daily subscriber request: a specific card pull each day, not
+// just the Personal Day Wildcard's invitational pool above. Deliberately
+// a DIFFERENT, complementary mechanic, not a replacement -- the Wildcard
+// pool above stays hedged/possibility-framed on purpose (Part XXV); this
+// is a single, definite card for the day, in the classic "card of the
+// day" spirit, grounded in two REAL, cross-verified facts rather than
+// invented:
+//   1. Rank (Ace-Nine) = today's Personal Day digit directly. The
+//      Ace-through-Ten numerological correspondence (each pip rank
+//      carrying the same core meaning as the identically-numbered Major
+//      Arcana) is a real, standard, widely-documented Tarot tradition --
+//      verified via WebSearch against Labyrinthos Academy, Tarot
+//      Elements, and Numerologist.com, not asserted from memory. Personal
+//      Day in this codebase is already always reduced to a single digit
+//      1-9 (see PERSONAL_DAY_MAJOR_POOL above, which only ever has keys
+//      1-9) -- no master-number/10 edge case exists for this field.
+//   2. Suit = the person's own real Elemental Suit (ELEMENT_TO_SOLID,
+//      already computed for every profile since Part XXXV/XXXIX) --
+//      personalized per subscriber, not the same card for everyone on a
+//      given day. Confirmed directly with the project owner as the
+//      intended design before writing the 36 tips below.
+// Card name and its real Golden Dawn decanic title reuse pipCardName()/
+// pipKeyword() and MINOR_KEYWORDS verbatim -- the exact same real,
+// already-established data the Personal Day Wildcard pool above uses,
+// not a second hand-typed card-name table that could drift out of sync.
+//
+// DAILY_MINOR_TIPS below is genuinely new content (36 entries: ranks 1-9
+// x 4 suits): practical, second-person, everyday-language guidance for
+// each card, grounded in (a) that card's real Golden Dawn title, (b) the
+// real numerological meaning of its rank (see the WebSearch sources
+// above), and (c) its suit's real elemental domain (Wands=Fire,
+// Cups=Water, Swords=Air, Pentacles=Earth -- already established
+// throughout this Codex) -- per the project's standing "explain before
+// applying" discipline (Part XXXVI), not generic card-meaning copy.
+var DAILY_MINOR_TIPS = {
+  Wands: [
+    "A real spark is available today — not a finished plan, just the raw want to begin something. Don't wait for the whole path to be clear before taking one honest first step; Fire moves by starting, not by planning perfectly.",
+    "A choice about direction is genuinely in front of you. Before committing, take a real beat to weigh your options rather than charging at the first one — a decision made too fast today may need retracing tomorrow.",
+    "Something you started is ready to grow past its first stage. Let your view widen: look further down the road than you have been, and trust that the groundwork already laid can support more.",
+    "A real point of arrival is here — something is stable enough to pause and actually acknowledge, not just rush past toward the next goal. Let yourself notice what's already working before adding more to it.",
+    "Expect some real friction today — competing wants, a disagreement, more than one voice pulling in different directions. This isn't a sign something is broken; it's the normal cost of several real energies sharing one space.",
+    "Recognition or a win that's been building is likely to land today. Let it actually register instead of immediately moving the goalposts — a real moment of “this worked” is worth pausing in.",
+    "You may need to hold your ground today, not necessarily against a person, but against pressure to compromise on something that actually matters to you. Standing firm here is reasonable, not stubborn.",
+    "Things are likely to move fast today — plans accelerating, news arriving quickly, little time to overthink. Stay responsive rather than rigid; this is a day that rewards quick, clear action over a long windup.",
+    "You're closer to finishing something than it may feel. A wary, guarded energy is normal this near the end of a real effort — it doesn't mean the thing is going wrong, just that you're protecting something you've already built.",
+  ],
+  Cups: [
+    "An emotional opening is available today — a new connection, a soft feeling worth naming, or simply more openness than usual. Let yourself feel it before deciding what it means; Water doesn't need to be analyzed to be trusted.",
+    "A real exchange — of feeling, of attention, of care — is possible today, and it likely needs two sides actually showing up, not one person doing all the reaching. Notice where mutual effort is (or isn't) happening.",
+    "Shared joy is the theme today — time with others, a real reason to celebrate something, connection that doesn't need to be explained or justified. Let today be about togetherness rather than a solo task.",
+    "You may be comfortable today in a way that's starting to tip into complacency. Nothing is wrong, exactly — but check honestly whether you're staying somewhere out of real contentment, or just because moving feels like effort.",
+    "Some real disappointment or loss may be present today — don't rush past it. At the same time, it's worth genuinely looking at what's still standing rather than only what's spilled; both are true at once.",
+    "A pull toward nostalgia or an old, simple pleasure is likely today — reconnecting with someone, a memory, something that used to make you happy. There's real value in this, not just sentimentality.",
+    "Today may bring more options, daydreams, or tempting possibilities than usual — and the real risk is picking none of them because imagining is easier than choosing. One honest look at what's actually real (versus just appealing) helps.",
+    "You may feel the pull to walk away from something that's stopped fulfilling you, even if it still looks fine from the outside. That instinct is worth taking seriously — Water doesn't stay where it's gone stagnant.",
+    "A real sense of satisfaction is available today — something you wanted has actually come together, or is close to it. Let yourself enjoy it plainly, without immediately qualifying or minimizing it.",
+  ],
+  Swords: [
+    "A genuinely clear idea or realization may arrive today — sharp, sudden, cutting through confusion that's been sitting around for a while. Trust the clarity itself, even if it's inconvenient or means changing course.",
+    "You may be avoiding an honest decision today, caught between two real options and staying still rather than choosing either. The tension of an unmade choice is often more draining than just making the call, even imperfectly.",
+    "Some real, honest pain or a hard truth may surface today. This isn't a sign to shut down — Air moves by naming things clearly, even painful ones, rather than smoothing them over.",
+    "Today may call for genuine rest, specifically mental rest — stepping back from a conflict or a heavy thought pattern rather than pushing through it. A pause here isn't giving up, it's recovery.",
+    "Conflict today may leave everyone a little worse off, even the side that “wins.” Before pushing for victory in a disagreement, ask honestly whether this is a fight actually worth having right now.",
+    "A real shift toward calmer conditions is underway today, even if the move itself feels effortful or awkward in the moment. Trust that the direction is the right one, even if the transition isn't graceful.",
+    "Watch today for the temptation to take a shortcut, or to avoid a direct conversation by going around it instead. Honesty with yourself about what you're actually doing (and why) matters more than usual right now.",
+    "You may feel more boxed in today than you actually are — a sense of restriction that's partly real and partly a story you're telling yourself about your options. Worth checking which parts are genuinely fixed.",
+    "Anxious, looping thoughts are more likely than usual today, especially late in the day or at night. The real gap between what you're afraid of and what's actually happening is usually larger than it feels in the moment.",
+  ],
+  Pentacles: [
+    "A real, tangible opportunity may show up today — not abstract, something concrete: an offer, a resource, a practical opening. Earth moves slowly but solidly; this is worth taking seriously even if it isn't flashy.",
+    "You may be juggling more than one real priority today — work and rest, one commitment against another. The goal isn't to drop either one, but to find an honest, sustainable rhythm between them today specifically.",
+    "Today favors real collaboration and skill-building — work that's better done with others, or a chance to actually get better at something through practice rather than talent alone. Let today be about the craft, not the shortcut.",
+    "You may be holding onto something — a resource, a role, a routine — more tightly than it actually needs. Worth asking honestly today whether you're protecting real security, or just resisting change out of habit.",
+    "Real worry about resources, money, or stability may be present today. This is worth taking seriously, not dismissing — and also worth remembering that asking for real help is a legitimate option, not a failure.",
+    "A real exchange of generosity is available today — giving or receiving something tangible, help, support, or resources. Notice whether that exchange currently feels balanced, or lopsided in either direction.",
+    "You may be in a genuine waiting period today — effort already put in, results not fully visible yet. This is a real, normal stage, not a sign the effort isn't working; patience here is earned, not wasted.",
+    "Today rewards real, unglamorous diligence — steady practice, refining a skill, doing the next small right thing rather than looking for a big leap. Earth builds through repetition, not through drama.",
+    "A real sense of self-sufficiency is available today — enjoying something you built or earned through your own actual effort. Let yourself register that this is genuinely yours, not luck.",
+  ]
+};
+
+// Rank = today's Personal Day digit directly (always 1-9 in this
+// codebase -- see the comment above). Suit = the person's own real
+// Elemental Suit. Returns null (never a broken/blank card) only if
+// elementSuit is somehow missing from the profile, which should not
+// happen for a completed profile -- defensive, not expected in practice.
+function getDailyMinorCardPull(personalDayDigit, elementSuit) {
+  if (!elementSuit || !MINOR_KEYWORDS[elementSuit]) return null;
+  var rank = Math.max(1, Math.min(9, personalDayDigit || 1));
+  return {
+    rank: rank,
+    suit: elementSuit,
+    card: pipCardName(rank, elementSuit),
+    goldenDawnTitle: pipKeyword(rank, elementSuit),
+    tip: (DAILY_MINOR_TIPS[elementSuit] || [])[rank - 1] || ''
+  };
+}
+
+// ===========================
 // W3BB CODEX V07 PART XXX -- NODAL CHOICE INTERFACE (solo reading only)
 // ===========================
 // The North/South Node Decan Cards themselves (getNodeDecanCards(), Part
@@ -12603,6 +12720,22 @@ async function subDeleteSavedContact(contactId) {
 // getFallbackReading() exactly as the one-time flow does, no duplicated
 // pipeline, then persists the result via subUpsertDailyRead() above.
 // -----------------------------------------------------------
+// Renders Part LIII's daily Minor Arcana card pull into sub-daily-card-*
+// -- a pure render function over an already-computed pull object so it
+// can't itself fail the rest of generateTodaysSubscriberReading() if
+// something about the profile is unexpectedly incomplete (see the null
+// check inside, same defensive posture getDailyMinorCardPull() itself has).
+function renderDailyMinorCardPull(p) {
+  var wrap = document.getElementById('sub-daily-card-wrap');
+  if (!wrap) return;
+  var pull = getDailyMinorCardPull(p.personalDay, p.elementSuit);
+  if (!pull) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+  document.getElementById('sub-daily-card-name').textContent = pull.card;
+  document.getElementById('sub-daily-card-title').textContent = pull.goldenDawnTitle ? ('Golden Dawn title: ' + pull.goldenDawnTitle) : '';
+  document.getElementById('sub-daily-card-tip').textContent = pull.tip;
+}
+
 async function generateTodaysSubscriberReading() {
   var p = window._readingProfile;
   if (!p || !p.firstName) return;
@@ -12611,6 +12744,7 @@ async function generateTodaysSubscriberReading() {
   var saveEl = document.getElementById('sub-save-status');
   if (statusEl) statusEl.textContent = 'Generating today’s reading…';
   if (saveEl) saveEl.textContent = '';
+  renderDailyMinorCardPull(p);
   try {
     await doReading(); // the exact same solo reading pipeline the one-time flow uses
     if (textEl) textEl.textContent = window._readingText || getFallbackReading();
