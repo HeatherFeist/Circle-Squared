@@ -1110,6 +1110,29 @@ body {
       <div id="astro-status" style="font-size:0.75rem;color:#5a4a7a;min-height:1.2em;margin-top:0.3rem;"></div>
     </div>
 
+    <!-- ===== ELEVENLABS VOICE SETTINGS (paid readings only) =====
+         The API key itself is NEVER entered here or stored client-side --
+         it lives only as an environment variable in the Cloudflare Pages
+         project (functions/api/elevenlabs-tts.js reads it server-side).
+         Only the Voice ID is set here, same localStorage pattern as the
+         FreeAstroAPI key above, since a Voice ID is not a billable secret
+         -- just which of ElevenLabs' voices to use. -->
+    <div style="margin-top:2rem;border-top:1px solid rgba(176,138,255,0.15);padding-top:1.5rem;">
+      <div style="font-family:'Courier New',monospace;font-size:0.62rem;letter-spacing:0.4em;color:#c9a84c;margin-bottom:0.3rem;">🎙️ ENHANCED VOICE (ELEVENLABS)</div>
+      <div style="font:700 1.1rem Georgia,serif;color:#e8e0ff;margin-bottom:0.6rem;">Enhanced Voice — Paid Readings Only</div>
+      <p style="font-size:0.8rem;color:#8a7aaa;line-height:1.6;margin-bottom:1rem;">Narrates an already-unlocked reading (the "Listen to Your Blueprint"/Partnership playback) through ElevenLabs instead of the free browser voice — real, billed cost per use, so it is deliberately never used on the free pre-purchase reveal. The API key itself lives only as a Cloudflare environment variable (never entered here, never stored in the browser) — paste just the Voice ID of whichever voice you picked from ElevenLabs' own Voice Library. Leave this blank to keep every reading on the free native voice, exactly as before.</p>
+
+      <div style="margin-bottom:0.8rem;">
+        <label style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.25em;color:#c9a84c;display:block;margin-bottom:0.4rem;">ELEVENLABS VOICE ID</label>
+        <input type="text" id="elevenlabs-voice-id-input" class="cosmic-input" placeholder="e.g. 21m00Tcm4TlvDq8ikWAM" style="font-family:'Courier New',monospace;font-size:0.88rem;" />
+      </div>
+
+      <div style="display:flex;gap:0.6rem;margin-bottom:0.6rem;flex-wrap:wrap;">
+        <button id="elevenlabs-save-btn" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.55rem 1.2rem;background:linear-gradient(135deg,#c9a84c,#f0d070);color:#0a0015;font-weight:700;font-size:0.82rem;border:none;border-radius:50px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:0.05em;">💾 Save Voice ID</button>
+      </div>
+      <div id="elevenlabs-status" style="font-size:0.75rem;color:#5a4a7a;min-height:1.2em;margin-top:0.3rem;"></div>
+    </div>
+
     <!-- ===== CUSTOMER PDF GENERATOR ===== -->
     <div style="margin-top:2rem;border-top:1px solid rgba(176,138,255,0.15);padding-top:1.5rem;">
       <div style="font-family:'Courier New',monospace;font-size:0.62rem;letter-spacing:0.4em;color:#c9a84c;margin-bottom:0.3rem;">📄 CUSTOMER PDF GENERATOR</div>
@@ -2179,14 +2202,87 @@ function _nativeBrowserSpeak(text, onEnd) {
   }
 }
 
+// ===========================
+// ENHANCED VOICE (ELEVENLABS) -- paid readings only
+// ===========================
+// Deliberately separate from the free Kokoro/native chain above: this
+// calls OUR OWN backend (functions/api/elevenlabs-tts.js), which holds
+// the real ElevenLabs API key server-side and is the only thing that
+// ever talks to ElevenLabs directly -- see that file's own header
+// comment for the full reasoning. Returns '' (not null/undefined) when
+// unset so callers can use it directly in a boolean check.
+function getElevenLabsVoiceId() {
+  return localStorage.getItem('elevenlabs_voice_id') || '';
+}
+
+// Generates and plays one chunk of ElevenLabs audio through our own
+// backend proxy, using the same currentAudio + <audio> +
+// URL.createObjectURL contract every other voice tier in this file
+// already uses, so mute/stop keep working no matter which tier is
+// actually speaking. Resolves normally on success; REJECTS (does not
+// itself fall back) on any failure, by design -- the caller
+// (speakLongText() below) decides what "enhanced voice failed" should
+// fall back to, exactly like kokoroSpeak()'s own failure contract.
+async function elevenLabsSpeak(text, voiceId) {
+  var res = await _withTimeout(fetch('/api/elevenlabs-tts', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text: text, voiceId: voiceId })
+  }), 20000, '[ElevenLabs] fetch');
+
+  if (!res.ok) {
+    var errBody = {};
+    try { errBody = await res.json(); } catch (e) {}
+    throw new Error((errBody && errBody.error) || ('ElevenLabs narration failed (status ' + res.status + ').'));
+  }
+
+  var blob = await res.blob();
+  var url = URL.createObjectURL(blob);
+  var audio = new Audio(url);
+  currentAudio = audio;
+  try {
+    await _withTimeout(audio.play(), 5000, '[ElevenLabs] audio.play()');
+  } catch (playErr) {
+    URL.revokeObjectURL(url);
+    throw playErr;
+  }
+  return new Promise(function(resolve, reject) {
+    audio.addEventListener('ended', function() { URL.revokeObjectURL(url); resolve(); });
+    audio.addEventListener('error', function(e) { URL.revokeObjectURL(url); reject(e); });
+  });
+}
+
 // Main speak function — narrates via the free-voice chain (Kokoro
 // Enhanced Free Voice if enabled and ready, else the native browser voice,
 // with AppSDK as a last-resort fallback — see _fallbackSpeakLong).
-async function speakLongText(fullText, onFinish) {
+//
+// `useElevenLabs`, when true (passed ONLY by paid-reading narration call
+// sites -- narrateBlueprintReading()/narratePartnershipReading(), never
+// the free reveal/teaser), attempts the ElevenLabs enhanced voice FIRST,
+// falling through to the exact same free-voice chain on any failure
+// (not configured, network error, playback error) -- never a broken or
+// silently-skipped narration either way.
+async function speakLongText(fullText, onFinish, useElevenLabs) {
   fullText = preprocessForSpeech(fullText);
   if (isMuted) { if (onFinish) onFinish(); return; }
   stopSpeech();
   _speakCancelled = false;
+
+  if (useElevenLabs) {
+    var voiceId = getElevenLabsVoiceId();
+    if (voiceId) {
+      try {
+        await elevenLabsSpeak(fullText, voiceId);
+        if (onFinish) onFinish();
+        return;
+      } catch (e) {
+        console.warn('[ElevenLabs] narration failed, falling back to the free native voice for this chunk:', e);
+        // Falls through to the free-voice chain below -- never a broken
+        // or silently-missing narration just because the paid tier
+        // failed once.
+      }
+    }
+  }
 
   await _fallbackSpeakLong(fullText, onFinish);
 }
@@ -5317,6 +5413,37 @@ document.getElementById('astro-save-btn').addEventListener('click', function() {
 });
 
 // ===========================
+// ELEVENLABS ADMIN SETTINGS (Enhanced Voice, paid readings only)
+// ===========================
+// Only the Voice ID is ever stored here -- the real, billable API key
+// lives solely as a Cloudflare Pages environment variable, read
+// server-side by functions/api/elevenlabs-tts.js, never entered into or
+// stored by this page. See getElevenLabsVoiceId()/elevenLabsSpeak() for
+// how this value is actually used.
+function loadElevenLabsSettings() {
+  var savedVoiceId = localStorage.getItem('elevenlabs_voice_id');
+  var voiceInput = document.getElementById('elevenlabs-voice-id-input');
+  if (voiceInput && savedVoiceId) voiceInput.value = savedVoiceId;
+}
+
+document.getElementById('elevenlabs-save-btn').addEventListener('click', function() {
+  var voiceId = document.getElementById('elevenlabs-voice-id-input').value.trim();
+  var status = document.getElementById('elevenlabs-status');
+  if (!voiceId) {
+    // Deliberately allowed: an empty Voice ID is how enhanced voice gets
+    // turned back off -- getElevenLabsVoiceId() returning '' is exactly
+    // what makes speakLongText() fall through to the free native voice.
+    localStorage.removeItem('elevenlabs_voice_id');
+    status.textContent = 'Enhanced voice disabled — paid readings will narrate with the free native voice.';
+    status.style.color = '#8a7aaa';
+    return;
+  }
+  localStorage.setItem('elevenlabs_voice_id', voiceId);
+  status.textContent = '✅ Voice ID saved! Paid readings will use this ElevenLabs voice on their next narration (requires ELEVENLABS_API_KEY to also be set in the Cloudflare Pages project’s environment variables).';
+  status.style.color = '#c9a84c';
+});
+
+// ===========================
 // ADMIN PANEL
 // ===========================
 var _adminTaps = 0, _adminTapTimer = null;
@@ -5376,6 +5503,7 @@ function showAdminPanel() {
   loadKokoroVoiceSettings();
   // Load FreeAstroAPI (Ascendant) settings when admin panel opens
   loadAstroSettings();
+  loadElevenLabsSettings();
   panel.style.display = 'block';
 }
 function exportPurchaseCSV() {
@@ -10221,7 +10349,7 @@ async function narrateBlueprintReading() {
     var highlight = paras.slice(0, 2).join(' ').replace(/\n/g, ' ').trim();
     if (!highlight) continue;
     var spoken = 'Section ' + (i+1) + '. ' + meta.title + '. ' + highlight;
-    await new Promise(function(resolve) { speakLongText(preprocessForSpeech(spoken), resolve); });
+    await new Promise(function(resolve) { speakLongText(preprocessForSpeech(spoken), resolve, true); });
     await new Promise(function(resolve) { setTimeout(resolve, 900); });
   }
   statusEl.innerHTML = '<span style="font-family:Courier New,monospace;font-size:0.58rem;letter-spacing:0.3em;color:#c9a84c;">READING COMPLETE</span><br><span style="color:#88dd99;font-size:0.82rem;">Your full blueprint is ready to download.</span>';
@@ -10266,7 +10394,7 @@ async function narratePartnershipReading() {
   progressEl.style.display = 'block';
   if (waveEl) waveEl.classList.remove('paused');
   var opener = p1name && p2name ? (p1name + ' and ' + p2name + '. ') : '';
-  await new Promise(function(resolve) { speakLongText(preprocessForSpeech(opener + 'Here is what the field between you reveals.'), resolve); });
+  await new Promise(function(resolve) { speakLongText(preprocessForSpeech(opener + 'Here is what the field between you reveals.'), resolve, true); });
   await new Promise(function(resolve) { setTimeout(resolve, 600); });
   for (var i = 0; i < Math.min(pages.length, 7); i++) {
     var pageContent = pages[i];
@@ -10277,7 +10405,7 @@ async function narratePartnershipReading() {
     var highlight = paras.slice(0, 2).join(' ').replace(/\n/g, ' ').trim();
     if (!highlight) continue;
     var spoken = title + '. ' + highlight;
-    await new Promise(function(resolve) { speakLongText(preprocessForSpeech(spoken), resolve); });
+    await new Promise(function(resolve) { speakLongText(preprocessForSpeech(spoken), resolve, true); });
     await new Promise(function(resolve) { setTimeout(resolve, 900); });
   }
   statusEl.innerHTML = '<span style="font-family:Courier New,monospace;font-size:0.55rem;letter-spacing:0.3em;color:#c9a84c;">READING COMPLETE</span><br><span style="color:#88dd99;font-size:0.78rem;">Download your Partnership PDF above.</span>';
