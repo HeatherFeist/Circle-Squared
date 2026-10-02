@@ -769,6 +769,23 @@ body {
     <h2 style="font:700 1.3rem Georgia,serif;color:#e8e0ff;text-align:center;margin:0 0 0.4rem;">Add Your Group (3–25 People)</h2>
     <p style="font-size:0.78rem;color:#8a7aaa;text-align:center;line-height:1.5;margin:0 0 1.2rem;">For family, friends, and group activities — everyone gets their own page, plus the real patterns across the whole group. Birth time and place are optional for each person.</p>
 
+    <!-- Shown only to a signed-in, active $20/mo subscriber (see
+         checkGroupContactsAvailability()) -- lets them fill person rows
+         from their saved Family Contacts instead of retyping birth data
+         by hand. Hidden by default; everyone else never sees it, and
+         manual entry below works exactly as before either way. -->
+    <button id="group-pick-contacts-btn" type="button" style="display:none;width:100%;margin-bottom:0.6rem;padding:0.55rem;background:rgba(79,206,138,0.12);border:1px solid rgba(79,206,138,0.35);color:#4fce8a;border-radius:10px;cursor:pointer;font-family:'Courier New',monospace;font-size:0.75rem;letter-spacing:0.05em;">👪 Choose from Family Contacts</button>
+
+    <div id="group-contacts-picker" style="display:none;margin-bottom:0.8rem;padding:0.9rem;border-radius:10px;background:rgba(79,206,138,0.06);border:1px solid rgba(79,206,138,0.25);">
+      <div style="font-family:'Courier New',monospace;font-size:0.6rem;letter-spacing:0.2em;color:#4fce8a;margin-bottom:0.6rem;">PICK PEOPLE TO ADD</div>
+      <div id="group-contacts-picker-status" style="font-size:0.78rem;color:#8a7aaa;margin-bottom:0.4rem;"></div>
+      <div id="group-contacts-picker-list"></div>
+      <div style="display:flex;gap:0.5rem;margin-top:0.6rem;">
+        <button id="group-contacts-add-selected-btn" type="button" style="flex:1;padding:0.5rem;background:linear-gradient(135deg,#4fce8a,#2f9e5c);border:none;color:#0a0a14;border-radius:50px;cursor:pointer;font-size:0.78rem;font-weight:700;">Add Selected</button>
+        <button id="group-contacts-picker-cancel-btn" type="button" style="padding:0.5rem 1rem;background:none;border:1px solid rgba(138,122,170,0.35);color:#8a7aaa;border-radius:50px;cursor:pointer;font-size:0.78rem;">Cancel</button>
+      </div>
+    </div>
+
     <div id="group-people-list"></div>
 
     <button id="group-add-person-btn" type="button" style="width:100%;margin:0.6rem 0 1rem;padding:0.55rem;background:rgba(80,220,200,0.12);border:1px solid rgba(80,220,200,0.35);color:#50dcc8;border-radius:10px;cursor:pointer;font-family:'Courier New',monospace;font-size:0.75rem;letter-spacing:0.05em;">+ Add Another Person</button>
@@ -4335,7 +4352,7 @@ function groupPersonRowHtml(idx) {
     + '<div style="display:flex;gap:0.4rem;">'
     + '<input class="cosmic-input group-person-month" type="number" min="1" max="12" placeholder="M" style="padding:0.5rem;text-align:center;flex:1;" />'
     + '<input class="cosmic-input group-person-day" type="number" min="1" max="31" placeholder="D" style="padding:0.5rem;text-align:center;flex:1;" />'
-    + '<input class="cosmic-input group-person-year" type="number" min="1900" max="2020" placeholder="YYYY" style="padding:0.5rem;text-align:center;flex:1.5;" />'
+    + '<input class="cosmic-input group-person-year" type="number" min="1900" max="2035" placeholder="YYYY" style="padding:0.5rem;text-align:center;flex:1.5;" />'
     + '</div>'
     + '</div>';
 }
@@ -4380,6 +4397,8 @@ function initGroupIntakeScreen() {
 
 document.getElementById('open-group-intake-btn').addEventListener('click', function() {
   initGroupIntakeScreen();
+  closeGroupContactsPicker();
+  checkGroupContactsAvailability();
   showScreen('group');
 });
 
@@ -4436,6 +4455,138 @@ document.getElementById('group-continue-btn').addEventListener('click', function
   window._groupPeople = people;
   window._groupContactEmail = email;
   openPaymentModal(tier.slug);
+});
+
+// -----------------------------------------------------------
+// Pick From Family Contacts (Group Reading intake). Lets a signed-in,
+// active $20/mo subscriber fill group person rows from their saved
+// Family Contacts (subFetchSavedContacts(), Part LII) instead of
+// retyping each person's name and birth date by hand -- this is exactly
+// the "pick people from my contacts" flow the project owner asked for
+// after the newborn-birth-info report that originally motivated Family
+// Contacts. Reuses subFetchSavedContacts() read-only; never writes to
+// saved_contacts from this screen. Everyone else (signed out, or signed
+// in but not an active subscriber) never sees the button at all --
+// manual entry below works exactly as it always has either way.
+//
+// Only birth DATE (month/day/year) carries over, matching the fields
+// the group-person-row itself already collects -- Group Reading has
+// never asked for birth time or place for any person (solo/Partnership
+// readings are the only flows that use those), so a contact's saved
+// birth_time/birth_place are simply not applicable here and are left
+// alone, not lost (they still live on the saved contact itself).
+// -----------------------------------------------------------
+function findEmptyGroupRow() {
+  var rows = document.querySelectorAll('#group-people-list .group-person-row');
+  for (var i = 0; i < rows.length; i++) {
+    var r = rows[i];
+    var name = r.querySelector('.group-person-name').value.trim();
+    var m = r.querySelector('.group-person-month').value;
+    var d = r.querySelector('.group-person-day').value;
+    var y = r.querySelector('.group-person-year').value;
+    if (!name && !m && !d && !y) return r;
+  }
+  return null;
+}
+
+function fillGroupRowFromContact(row, contact) {
+  var name = (contact.used_name || contact.full_name || '').trim();
+  row.querySelector('.group-person-name').value = name;
+  var parts = String(contact.birth_date || '').split('-'); // YYYY-MM-DD
+  if (parts.length === 3) {
+    row.querySelector('.group-person-year').value = parseInt(parts[0], 10);
+    row.querySelector('.group-person-month').value = parseInt(parts[1], 10);
+    row.querySelector('.group-person-day').value = parseInt(parts[2], 10);
+  }
+}
+
+// Fills existing empty rows first (so the form's default 3 blank rows
+// get used before any new ones are created), then appends new rows via
+// the existing addGroupPersonRow() for anything beyond that -- which
+// already refuses past MAX_GROUP_SIZE on its own.
+function addGroupContactsToForm(contacts) {
+  var list = document.getElementById('group-people-list');
+  var added = 0, skippedMax = false;
+  contacts.forEach(function(contact) {
+    var row = findEmptyGroupRow();
+    if (!row) {
+      var countNow = list.querySelectorAll('.group-person-row').length;
+      if (countNow >= MAX_GROUP_SIZE) { skippedMax = true; return; }
+      addGroupPersonRow();
+      var rows = list.querySelectorAll('.group-person-row');
+      row = rows[rows.length - 1];
+    }
+    fillGroupRowFromContact(row, contact);
+    added++;
+  });
+  renderGroupPriceDisplay();
+  return { added: added, skippedMax: skippedMax };
+}
+
+async function checkGroupContactsAvailability() {
+  var btn = document.getElementById('group-pick-contacts-btn');
+  if (!btn) return;
+  btn.style.display = 'none';
+  var session = subGetSession();
+  if (!session || !session.access_token) return;
+  var sub = null;
+  try { sub = await subFetchSubscriberStatus(); } catch (e) {}
+  if (sub && sub.status === 'active') btn.style.display = '';
+}
+
+function openGroupContactsPicker() {
+  var picker = document.getElementById('group-contacts-picker');
+  var listEl = document.getElementById('group-contacts-picker-list');
+  var statusEl = document.getElementById('group-contacts-picker-status');
+  picker.style.display = 'block';
+  listEl.innerHTML = '';
+  statusEl.textContent = 'Loading your saved contacts…';
+  subFetchSavedContacts().then(function(contacts) {
+    if (!contacts || !contacts.length) {
+      statusEl.textContent = 'You don’t have any saved Family Contacts yet. Add some from the Daily Readings screen first.';
+      return;
+    }
+    statusEl.textContent = '';
+    window._groupContactsPickerCache = contacts;
+    listEl.innerHTML = contacts.map(function(c) {
+      return '<label style="display:flex;align-items:center;gap:0.5rem;padding:0.4rem 0;cursor:pointer;">'
+        + '<input type="checkbox" class="group-contact-pick-checkbox" value="' + c.id + '" />'
+        + '<span style="font-size:0.85rem;color:#e8e0ff;">' + escapeHtmlForContacts(c.used_name || c.full_name) + '</span>'
+        + '<span style="font-size:0.72rem;color:#8a7aaa;">' + escapeHtmlForContacts(formatContactBirthInfo(c)) + '</span>'
+        + '</label>';
+    }).join('');
+  }).catch(function(err) {
+    statusEl.textContent = (err && err.message) || 'Could not load your saved contacts.';
+  });
+}
+
+function closeGroupContactsPicker() {
+  document.getElementById('group-contacts-picker').style.display = 'none';
+}
+
+document.getElementById('group-pick-contacts-btn').addEventListener('click', function() {
+  openGroupContactsPicker();
+});
+
+document.getElementById('group-contacts-picker-cancel-btn').addEventListener('click', function() {
+  closeGroupContactsPicker();
+});
+
+document.getElementById('group-contacts-add-selected-btn').addEventListener('click', function() {
+  var checked = document.querySelectorAll('.group-contact-pick-checkbox:checked');
+  var statusEl = document.getElementById('group-contacts-picker-status');
+  if (!checked.length) { statusEl.textContent = 'Select at least one person first.'; return; }
+  var ids = Array.prototype.map.call(checked, function(cb) { return cb.value; });
+  var cache = window._groupContactsPickerCache || [];
+  var selected = cache.filter(function(c) { return ids.indexOf(String(c.id)) !== -1; });
+  var result = addGroupContactsToForm(selected);
+  closeGroupContactsPicker();
+  var groupStatusEl = document.getElementById('group-status');
+  if (groupStatusEl) {
+    groupStatusEl.textContent = result.skippedMax
+      ? 'Added ' + result.added + ' — the rest were skipped (a Group Reading tops out at ' + MAX_GROUP_SIZE + ' people).'
+      : '';
+  }
 });
 
 // Path numbers 11-32, each connecting two Sephiroth (by SEPHIROTH id 1-10),
