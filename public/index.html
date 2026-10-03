@@ -782,6 +782,7 @@ body {
       <div id="group-contacts-picker-list"></div>
       <div style="display:flex;gap:0.5rem;margin-top:0.6rem;">
         <button id="group-contacts-add-selected-btn" type="button" style="flex:1;padding:0.5rem;background:linear-gradient(135deg,#4fce8a,#2f9e5c);border:none;color:#0a0a14;border-radius:50px;cursor:pointer;font-size:0.78rem;font-weight:700;">Add Selected</button>
+        <button id="group-contacts-add-all-btn" type="button" style="flex:1;padding:0.5rem;background:none;border:1px solid rgba(79,206,138,0.45);color:#4fce8a;border-radius:50px;cursor:pointer;font-size:0.78rem;font-weight:700;">Add All</button>
         <button id="group-contacts-picker-cancel-btn" type="button" style="padding:0.5rem 1rem;background:none;border:1px solid rgba(138,122,170,0.35);color:#8a7aaa;border-radius:50px;cursor:pointer;font-size:0.78rem;">Cancel</button>
       </div>
     </div>
@@ -4572,14 +4573,11 @@ document.getElementById('group-contacts-picker-cancel-btn').addEventListener('cl
   closeGroupContactsPicker();
 });
 
-document.getElementById('group-contacts-add-selected-btn').addEventListener('click', function() {
-  var checked = document.querySelectorAll('.group-contact-pick-checkbox:checked');
-  var statusEl = document.getElementById('group-contacts-picker-status');
-  if (!checked.length) { statusEl.textContent = 'Select at least one person first.'; return; }
-  var ids = Array.prototype.map.call(checked, function(cb) { return cb.value; });
-  var cache = window._groupContactsPickerCache || [];
-  var selected = cache.filter(function(c) { return ids.indexOf(String(c.id)) !== -1; });
-  var result = addGroupContactsToForm(selected);
+// Shared by both "Add Selected" and "Add All" below -- fills the group
+// form from a given list of contacts, closes the picker, and reports any
+// MAX_GROUP_SIZE overflow the same way either path.
+function finishAddingContactsToGroup(contacts) {
+  var result = addGroupContactsToForm(contacts);
   closeGroupContactsPicker();
   var groupStatusEl = document.getElementById('group-status');
   if (groupStatusEl) {
@@ -4587,6 +4585,26 @@ document.getElementById('group-contacts-add-selected-btn').addEventListener('cli
       ? 'Added ' + result.added + ' — the rest were skipped (a Group Reading tops out at ' + MAX_GROUP_SIZE + ' people).'
       : '';
   }
+}
+
+document.getElementById('group-contacts-add-selected-btn').addEventListener('click', function() {
+  var checked = document.querySelectorAll('.group-contact-pick-checkbox:checked');
+  var statusEl = document.getElementById('group-contacts-picker-status');
+  if (!checked.length) { statusEl.textContent = 'Select at least one person first.'; return; }
+  var ids = Array.prototype.map.call(checked, function(cb) { return cb.value; });
+  var cache = window._groupContactsPickerCache || [];
+  var selected = cache.filter(function(c) { return ids.indexOf(String(c.id)) !== -1; });
+  finishAddingContactsToGroup(selected);
+});
+
+// "Add All" -- every saved contact, regardless of which checkboxes (if
+// any) happen to be checked, skipping the one-by-one selection step
+// entirely. Same MAX_GROUP_SIZE-respecting path as "Add Selected".
+document.getElementById('group-contacts-add-all-btn').addEventListener('click', function() {
+  var statusEl = document.getElementById('group-contacts-picker-status');
+  var cache = window._groupContactsPickerCache || [];
+  if (!cache.length) { statusEl.textContent = 'You don’t have any saved Family Contacts yet.'; return; }
+  finishAddingContactsToGroup(cache);
 });
 
 // Path numbers 11-32, each connecting two Sephiroth (by SEPHIROTH id 1-10),
